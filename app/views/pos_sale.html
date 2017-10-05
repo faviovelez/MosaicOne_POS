@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title> POS Sistema DC </title>
+  <link rel="stylesheet" href="../vendor/assets/css/bootstrap.css">
+  <link rel="stylesheet" href="../vendor/assets/css/font-awesome.css">
+  <link rel="stylesheet" href="../assets/css/pos.css">
+  <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
+  <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
+  <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+  <script src="../assets/js/pos.js" charset="utf-8"></script>
+</head>
+<body>
+
+ <!-- Inicia Navbar -->
+ <nav class="navbar navbar-default">
+ <div class="container-fluid">
+   <!-- Brand and toggle get grouped for better mobile display -->
+   <div class="navbar-header">
+     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+       <span class="sr-only">Toggle navigation</span>
+       <span class="icon-bar"></span>
+       <span class="icon-bar"></span>
+       <span class="icon-bar"></span>
+     </button>
+     <div class="corner-logo">
+       <a href="#">
+         <img src="../assets/img/sistema-dc-1.png" alt="Logo Sistema DC" class="logo img-responsive">
+       </a>
+     </div>
+   </div>
+   <!-- Collect the nav links, forms, and other content for toggling -->
+   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+     <ul class="nav navbar-nav navbar-right">
+       <li>
+         <a href="#" id="username">
+           <i class="fa fa-user-circle-o bigger-icon" aria-hidden="true"></i>
+           Bienvenido, Favio Velez
+         </a>
+       </li>
+       <li>
+         <a href="#">Cerrar sesión</a>
+       </li>
+     </ul>
+   </div><!-- /.navbar-collapse -->
+ </div><!-- /.container-fluid -->
+</nav>
+ <!-- Termina Navbar -->
+ <ul class="nav nav-tabs fixed z-index">
+   <li role="presentation" class="active" id="pos"><a href="#">Punto de Venta</a></li>
+   <li role="presentation"><a href="#" id="savedTickets">Tickets guardados</a></li>
+   <li role="presentation"><a href="#" id="config">Configuración</a></li>
+ </ul>
+
+  <div class="page-container">
+
+    <div class="left-container">
+
+      <div class="search-container">
+        <div class="input-group">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="basic-addon1" data-toggle="modal" data-target="#productos">
+              <i class="fa fa-archive " aria-hidden="true"></i>
+            </button>
+          </span>
+          <input type="text" class="form-control" placeholder="Buscar productos o servicios"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+        </div>
+      </div>
+
+      <table class="items-sales">
+        <thead>
+          <tr>
+            <th> </th>
+            <th> Producto o Servicio </th>
+            <th> Color/Diseño </th>
+            <th> Precio </th>
+            <th> Cantidad </th>
+            <th> Descuento </th>
+            <th> Total </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="close-icon">
+                <button type="button" class="close center-close" aria-label="Close">
+                  <span aria-hidden="true" class="white-light">&times;</span>
+                </button>
+              </div>
+            </td>
+            <td class="left"> Bolsa para botella Kraft Satinada Navideña </td>
+            <td> Kraft </td>
+            <td> $ 26.50 </td>
+            <td> <a href="#"> 40 </a> </td>
+            <td> <a href="#"> 5% </a> </td>
+            <td class="right"> $ 1,007.00 </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="close-icon">
+                <button type="button" class="close center-close" aria-label="Close">
+                  <span aria-hidden="true" class="white-light">&times;</span>
+                </button>
+              </div>
+            </td>
+            <td class="left"> Cilindro de acetato botella decorado Nav </td>
+            <td> Transparente </td>
+            <td> $ 37.50 </td>
+            <td> <a href="#"> 10 </a>  </td>
+            <td> <a href="#"> 0% </a> </td>
+            <td class="right"> $ 375.00 </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="close-icon">
+                <button type="button" class="close center-close" aria-label="Close">
+                  <span aria-hidden="true" class="white-light">&times;</span>
+                </button>
+              </div>
+            </td>
+            <td class="left"> Servicio de mensajería UPS (Nacional) </td>
+            <td> N/A </td>
+            <td> <a href="#"> $ 37.50 </a> </td>
+            <td> <a href="# "> 1 </a> </td>
+            <td> <a href="#"> 0% </a> </td>
+            <td class="right"> $ 375.00 </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div><!-- Termina left-container  -->
+
+    <div class="right-container">
+
+      <div class="save-ticket-container">
+      </div>
+
+      <div class="input-group">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button" id="basic-addon2" data-toggle="modal" data-target="#clientes">
+            <i class="fa fa-user-plus " aria-hidden="true"></i>
+          </button>
+        </span>
+        <input type="text" class="form-control" placeholder="Agregar cliente"><!-- Agregar aquí el select2 de clientes (prospects)-->
+      </div>
+
+      <div class="discounts-container">
+        <h4>Descuento:</h4>
+        <div class="payment-form-wrapper">
+          <button type="button" class="btn btn-default custom-button" id="manual">
+            <i class="fa fa-hand-pointer-o " aria-hidden="true"></i>
+            Manual
+          </button>
+          <button type="button" class="btn btn-default custom-button" id="automatic">
+            <i class="fa fa-repeat " aria-hidden="true"></i>
+            Automático
+          </button>
+          <button type="button" class="btn btn-default custom-button selected" id="none">
+            <i class="fa fa-book " aria-hidden="true"></i>
+            Ninguno
+          </button>
+        </div>
+
+        <table class="discounts-table hidden" id="automatic-discount">
+          <thead>
+            <tr>
+              <th colspan="2"> Descuentos automáticos: </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td> Descuento productos línea Hogar </td>
+              <td class="right"> <a href="#">Detalles</a> </td>
+            </tr>
+            <tr>
+              <td> 15.0% de descuento </td>
+              <td class="right">
+                <select name="discount_rule_options" class="myfield" id="discount_rule_options">
+                  <option value="1">Ignorar</option>
+                  <option value="2">Aplicar</option>
+                </select>
+               </td>
+            </tr>
+            <tr>
+              <td> Total descuento </td>
+              <td class="right"> $ 53.00 </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="discounts-table hidden" id="manual-discount">
+          <thead>
+            <tr>
+              <th colspan="2"> Descuentos Manuales: </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td> Descuento total ticket $ </td>
+              <td class="right"> <a href="#">Anotar descuento</a> </td>
+            </tr>
+            <tr>
+              <td> Descuento total ticket % </td>
+              <td class="right"> <a href="#">Anotar descuento</a> </td>
+            </tr>
+            <tr>
+              <td> Total descuento </td>
+              <td class="right"> $ 53.00 </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="subtotal">
+          <tbody>
+            <tr>
+              <td> Subtotal: </td>
+              <td class="right"> $ 1,500.00 </td>
+            </tr>
+            <tr>
+              <td> IVA: </td>
+              <td class="right"> $160.00 </td>
+            </tr>
+            <tr>
+              <td class="bigger"> <strong> Total: </strong> </td>
+              <td class="right bigger"> <strong> $ 1,060.00 </strong> </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="pay-forms-table">
+          <thead>
+            <tr>
+              <th colspan="2"> Formas de pago: </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="flex">
+                <div class="close-icon">
+                  <button type="button" class="close center-close" aria-label="Close">
+                    <span aria-hidden="true" class="white-light">&times;</span>
+                  </button>
+                </div>
+                Tarjeta de Crédito
+              </td>
+              <td class="right"> $ 800.00 </a> </td>
+            </tr>
+            <tr>
+              <td class="flex">
+                <div class="close-icon">
+                  <button type="button" class="close center-close" aria-label="Close">
+                    <span aria-hidden="true" class="white-light">&times;</span>
+                  </button>
+                </div>
+                Efectivo
+              </td>
+              <td class="right"> $ 60.00 </td>
+            </tr>
+            <tr>
+              <td class="bigger"> <strong> Por pagar: </strong> </td>
+              <td class="right bigger"> <strong> $200.00 </strong> </td>
+            </tr>
+            <tr>
+              <td class="bigger"> <strong> Cambio: </strong> </td>
+              <td class="right bigger"> <strong> $0.00 </strong> </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="payment-form-wrapper">
+        <button type="button" class="btn btn-default custom-button" id="cash">
+          <i class="fa fa-money " aria-hidden="true"></i>
+          Efectivo
+        </button>
+        <button type="button" class="btn btn-default custom-button" id="debit">
+          <i class="fa fa-credit-card " aria-hidden="true"></i>
+          Débito
+        </button>
+        <button type="button" class="btn btn-default custom-button" id="credit">
+          <i class="fa fa-credit-card-alt " aria-hidden="true"></i>
+          Crédito
+        </button>
+        <button type="button" class="btn btn-default custom-button" id="check">
+          <i class="fa fa-pencil-square-o " aria-hidden="true"></i>
+          Cheque
+        </button>
+        <button type="button" class="btn btn-default custom-button" id="transfer">
+          <i class="fa fa-copy " aria-hidden="true"></i>
+          Transferencia
+        </button>
+        <button type="button" class="btn btn-default custom-button" id="other">
+          <i class="fa fa-question-circle-o " aria-hidden="true"></i>
+          Otra
+        </button>
+      </div>
+
+      <div class="row">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Ingrese monto de pago">
+          <span class="input-group-btn">
+            <button class="btn btn-default color-button hidden" type="button" id="completeSale">Completar venta</button>
+            <button class="btn btn-default color-button" type="button" id="addPayment">Agregar pago</button>
+          </span>
+        </div><!-- /input-group -->
+      </div><!-- /.row -->
+      <input type="text" class="form-control" placeholder="Comentarios">
+
+
+    </div> <!-- Termina right-container  -->
+  </div><!-- Termina page-container  -->
+
+ <!-- Inicia Modal Clientes -->
+  <div class="modal fade" id="clientes" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Alta de clientes</h4>
+        </div>
+        <div class="modal-body">
+          <p>One fine body&hellip;</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+<!-- Termina Modal Clientes -->
+
+<!-- Inicia Modal Agregar productos o servicios -->
+ <div class="modal fade" id="productos" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title">Alta de productos o servicios</h4>
+       </div>
+       <div class="modal-body">
+         <p>One fine body&hellip;</p>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+         <button type="button" class="btn btn-primary">Save changes</button>
+       </div>
+     </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+ </div><!-- /.modal -->
+<!-- Termina Modal Agregar productos o servicios -->
+
+
+<!-- Temporalmente deshabilitada la Bottom Nav
+  <div class="bottom-nav">
+    <a href="#">
+      <i class="fa fa-print bigger-icon " aria-hidden="true"></i>
+      Reimprimir
+    </a>
+  </div>
+-->
+
+</body>
+</html>
