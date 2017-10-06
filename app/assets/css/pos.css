@@ -1,116 +1,3 @@
-html{
- height:100vh;
- min-height:100vh;
- }
-
-body {
-  overflow-x:hidden;
-  min-height:100vh;
-}
-
-nav {
-  font-family: 'Open Sans', sans-serif;
-}
-
-body {
-  overflow-x:hidden;
-}
-
-.fixed {
-  position: fixed;
-  background-color: #fff;
-}
-
-.z-index {
-  z-index: 10;
-}
-
-.navbar-default .navbar-nav > .open > a,
-.navbar-default .navbar-nav > .open > a:hover,
-.navbar-default .navbar-nav > .open > a:focus {
-  color: #fff;
-  background-color: #36c6d3;
-}
-
-a.drop-text-link:hover {
-}
-
-#right-logo {
-  font-size: 2.5rem;
-}
-
-.navbar.navbar-default {
-  height: 8vh;
-  margin: 0 !important;
-  background-color: #232c37;
-  width: 100vw;
-  border: 0 !important;
-  padding: 0 !important;
-  border-radius: 0%;
-  position: fixed;
-  right: 0;
-  left: 0;
-  top: 0;
-  z-index: 100;
-}
-
-.navbar-default .navbar-nav > li > a, .username {
-  color: #d5dce4;
-}
-
-.icon-user {
-  color: #d5dce4;
-}
-
-.navbar-default .navbar-nav > li > a:hover, a:visited {
-  background-color: #36c6d3;
-  text-decoration: none;
-}
-
-.username {
-  padding: 1.5rem 0rem;
-  border-bottom: 1px solid #3d4957;
-}
-
-a.text-link {
-  padding-left: 3px;
-  color: #b4bcc8;
-  vertical-align: middle;
-}
-
-a.text-link:hover {
-  color: #36c6d3  ;
-}
-
-a.text-link:hover, a.text-link:active, a.text-link:visited, a.text-link:focus {
-  text-decoration: none;
-}
-
-.nav-list {
-  list-style-type: none;
-  list-style-position:inside;
-  margin:0;
-  padding:0;
-  font-size: 1.6rem;
-}
-
-.corner-logo {
-  navth: 20vw;
-  background-color: #232c37;
-  height: 8vh;
-  display: block;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-}
-
-/*Esto es solo para que el logo se haga pequeño */
-.logo {
-  height: 50px;
-  margin: 0.5rem 0.3rem;
-}
-/*Esto es solo para que el logo se haga pequeño */
-
 .row {
   margin: 0 auto;
 }
@@ -183,6 +70,10 @@ a.text-link:hover, a.text-link:active, a.text-link:visited, a.text-link:focus {
   text-align: left !important;
 }
 
+.items-sales {
+  margin-top: 2rem;
+}
+
 .items-sales > thead > tr > th,
 .items-sales > tbody > tr > td,
 .total-table > thead > tr > th,
@@ -217,16 +108,15 @@ p {
   width: 100%;
 }
 
-#basic-addon1,
-#basic-addon2 {
+.pos-main-btn {
   background-color: #009CB7;
   color: #fff;
   border: none;
   border: 1px solid #009CB7;
 }
 
-#basic-addon1:hover,
-#basic-addon2:hover {
+.pos-main-btn:hover,
+.pos-main-btn:hover {
   background-color: #232c37;
   color: #fff;
   border: 1px solid #232c37;
@@ -267,13 +157,13 @@ p {
   flex-wrap: nowrap;
 }
 
-.color-button {
+.pos-secondary-btn {
   background-color: #232c37;
   color: #fff;
   border: 1px solid #232c37;
 }
 
-.color-button:hover {
+.pos-secondary-btn:hover {
   background-color: #009CB7;
   color: #fff;
   border: 1px solid #009CB7;
@@ -297,10 +187,6 @@ p {
   font-size: 1.6rem;
 }
 
-.hidden {
-  display: none;
-}
-
 button:focus,
 button:active {
   background-color: #009CB7 !important;
@@ -320,23 +206,18 @@ button:active {
   border: none;
   }
 
-#completeSale {
+.pos-main-btn {
   background-color: #009CB7;
   color: #fff;
   border: 1px solid #009CB7;
 }
 
-#completeSale:hover,
-#completeSale:active,
-#completeSale:focus {
+.pos-main-btn:hover,
+.pos-main-btn:active,
+.pos-main-btn:focus {
   background-color: #232c37;
   color: #fff;
   border: 1px solid #232c37;
-}
-
-.nav-tabs {
-  margin-top: 5%;
-  margin-bottom: 0%
 }
 
 #username:hover {
@@ -344,29 +225,8 @@ button:active {
   color: #fff;
 }
 
-.bottom-nav {
-  position: fixed;
-  height: 7vh;
-  width: 60vw;
-  border-radius: 5px;
-  background-color: #232c37;
-  border: 1px solid #232c37;
-  color: #fff;
-  margin-left: 3%;
-  padding: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.bottom-nav > a {
-  color: #fff;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-li[role="presentation"] > a:hover {
+.dropdown-menu > li > a:hover {
   background-color: #009CB7;
   color: #fff;
+  border: 1px solid #009CB7;
 }

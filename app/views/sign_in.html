@@ -7,41 +7,88 @@
   <title> POS Sistema DC </title>
   <link rel="stylesheet" href="../vendor/assets/css/bootstrap.css">
   <link rel="stylesheet" href="../vendor/assets/css/font-awesome.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="../assets/css/sign_in.css">
   <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
   <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
   <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
 </head>
-<body>
+<body class="background-img">
 
   <!-- Inicia Navbar -->
   <nav class="navbar navbar-default">
-  <div class="container-fluid">
+    <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <div class="corner-logo">
-        <a href="#">
-          <img src="../assets/img/sistema-dc-1.png" alt="Logo Sistema DC" class="logo img-responsive">
-        </a>
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <div class="corner-logo">
+          <a href="#">
+            <img src="../assets/img/sistema-dc-3.png" alt="Logo Sistema DC" class="logo img-responsive">
+          </a>
+        </div>
       </div>
-    </div>
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav navbar-right">
-        <li>
-          <a href="#">Ingresa</a>
-        </li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
- </nav>
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="#">Ingresa</a>
+          </li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
   <!-- Termina Navbar -->
+
+  <div class="alert">
+    Tienes que iniciar sesión o registrarte para poder continuar.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  </div>
+
+  <div class="centered-without-margin">
+
+    <img alt="Logo Diseños de Cartón" class="second-logo" src="../assets/img/logo-disenos-decarton.png" />
+    <div class="container-log-in">
+
+      <div class="sign-in-tittle-div">
+        <h2 class="reg-title">Punto de Venta Sistema DC</h2>
+      </div>
+
+      <form class="new_user" id="new_user" action="/users/sign_in" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+        <div class="field sign-in">
+          <label for="user_email">Correo electrónico</label><br />
+          <input placeholder="ejemplo@ejemplo.com" class="long-sign-in" type="email" value="" name="user[email]" id="user_email" />
+        </div>
+
+        <div class="field sign-in">
+          <label for="user_password">Contraseña</label><br />
+          <input placeholder="Ingresa tu contraseña" autocomplete="off" class="long-sign-in" type="password" name="user[password]" id="user_password" />
+        </div>
+
+        <div class="actions">
+          <div class="field">
+            <input name="user[remember_me]" type="hidden" value="0" /><input type="checkbox" value="1" name="user[remember_me]" id="user_remember_me" />
+            <label for="user_remember_me">Recordarme</label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <input type="submit" name="commit" value="Ingresar" class="main-button" />
+        </div>
+      </form>
+
+
+      <div class="actions">
+        <a class="link" href="/users/sign_up">Regístrate</a>
+        <a class="link" href="/users/password/new">¿Olvidaste tu contraseña?</a>
+      </div>
+
+    </div>
+  </div>
 
 </body>
 </html>

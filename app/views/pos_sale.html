@@ -7,7 +7,10 @@
   <title> POS Sistema DC </title>
   <link rel="stylesheet" href="../vendor/assets/css/bootstrap.css">
   <link rel="stylesheet" href="../vendor/assets/css/font-awesome.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/pills.css">
   <link rel="stylesheet" href="../assets/css/pos.css">
+  <link rel="stylesheet" href="../assets/css/bottom-nav.css">
   <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
   <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
   <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
@@ -28,7 +31,7 @@
      </button>
      <div class="corner-logo">
        <a href="#">
-         <img src="../assets/img/sistema-dc-1.png" alt="Logo Sistema DC" class="logo img-responsive">
+         <img src="../assets/img/sistema-dc-3.png" alt="Logo Sistema DC" class="logo img-responsive">
        </a>
      </div>
    </div>
@@ -50,6 +53,7 @@
 </nav>
  <!-- Termina Navbar -->
  <ul class="nav nav-tabs fixed z-index">
+   <li role="presentation" id="cashRegister"><a href="#">Apertura / cierre de caja</a></li>
    <li role="presentation" class="active" id="pos"><a href="#">Punto de Venta</a></li>
    <li role="presentation"><a href="#" id="savedTickets">Tickets guardados</a></li>
    <li role="presentation"><a href="#" id="config">Configuración</a></li>
@@ -62,11 +66,57 @@
       <div class="search-container">
         <div class="input-group">
           <span class="input-group-btn">
-            <button class="btn btn-default" type="button" id="basic-addon1" data-toggle="modal" data-target="#productos">
+            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#productos" id="basic-addon1">
               <i class="fa fa-archive " aria-hidden="true"></i>
             </button>
           </span>
           <input type="text" class="form-control" placeholder="Buscar productos o servicios"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <span class="input-group-btn">
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle pos-secondary-btn active-sale-option" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="sale">
+                <i class="fa fa-cart-plus " aria-hidden="true"></i>
+                Venta
+              </button>
+              <button type="button" class="btn btn-default dropdown-toggle pos-secondary-btn hidden" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="return">
+                <i class="fa fa-hand-paper-o" aria-hidden="true"></i>
+                Devolución
+              </button>
+              <button type="button" class="btn btn-default dropdown-toggle pos-secondary-btn hidden" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="change">
+                <i class="fa fa-handshake-o " aria-hidden="true"></i>
+                Cambio
+              </button>
+              <button type="button" class="btn btn-default dropdown-toggle pos-secondary-btn hidden" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="advance">
+                <i class="fa fa-money " aria-hidden="true"></i>
+                Anticipo
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="#" id="sale-option" class="hidden">
+                    <i class="fa fa-cart-plus " aria-hidden="true"></i>
+                    Venta
+                  </a>
+                </li>
+                <li>
+                  <a href="#" id="return-option">
+                    <i class="fa fa-hand-paper-o" aria-hidden="true"></i>
+                    Devolución
+                  </a>
+                </li>
+                <li>
+                  <a href="#" id="change-option">
+                    <i class="fa fa-handshake-o " aria-hidden="true"></i>
+                    Cambio
+                  </a>
+                </li>
+                <li>
+                  <a href="#" id="advance-option">
+                    <i class="fa fa-money " aria-hidden="true"></i>
+                    Anticipo
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </span>
         </div>
       </div>
 
@@ -121,7 +171,11 @@
                 </button>
               </div>
             </td>
-            <td class="left"> Servicio de mensajería UPS (Nacional) </td>
+            <td class="left">
+              <a href="#">
+                Servicio de mensajería UPS (Nacional)
+              </a>
+            </td>
             <td> N/A </td>
             <td> <a href="#"> $ 37.50 </a> </td>
             <td> <a href="# "> 1 </a> </td>
@@ -140,7 +194,7 @@
 
       <div class="input-group">
         <span class="input-group-btn">
-          <button class="btn btn-default" type="button" id="basic-addon2" data-toggle="modal" data-target="#clientes">
+          <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#clientes" id="basic-addon2">
             <i class="fa fa-user-plus " aria-hidden="true"></i>
           </button>
         </span>
@@ -303,8 +357,8 @@
         <div class="input-group">
           <input type="text" class="form-control" placeholder="Ingrese monto de pago">
           <span class="input-group-btn">
-            <button class="btn btn-default color-button hidden" type="button" id="completeSale">Completar venta</button>
-            <button class="btn btn-default color-button" type="button" id="addPayment">Agregar pago</button>
+            <button class="btn btn-default color-button pos-main-btn hidden" type="button" id="completeSale">Completar venta</button>
+            <button class="btn btn-default color-button pos-secondary-btn" type="button" id="addPayment">Agregar pago</button>
           </span>
         </div><!-- /input-group -->
       </div><!-- /.row -->

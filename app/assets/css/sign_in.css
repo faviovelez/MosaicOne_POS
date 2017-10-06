@@ -1,0 +1,167 @@
+.background-img {
+  background-image: url('../img/conceptos-innovadores.jpg');
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-color: #232c37;
+}
+
+.row {
+  margin: 0 auto;
+}
+
+.container-log-in {
+  margin-top: 10vh;
+  background-color: #EAEFEE;
+  opacity: .65;
+  width: 40vw;
+  margin-left: 55vw;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  padding-bottom: 1rem;
+  border-radius: 1.5%;
+  z-index: 3;
+  position: absolute;
+}
+
+.container-home {
+  margin-top: 15vh;
+  width: 58vw;
+  margin-left: 10vw;
+}
+
+.big-logo-home {
+  width: 60vw;
+  z-index: 100;
+  padding-bottom: 1rem;
+}
+
+.home-welcome {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 3rem;
+  color: #0288D1;
+}
+
+.sign-in-title {
+  margin-top: 8rem;
+}
+
+.medium-logo {
+  height: 8vh;
+  margin: 0;
+  padding: 0 18rem;
+  display: inline-flex;
+}
+
+.medium-small-logo {
+  height: 7.5vh;
+  margin: 0;
+  padding-right: 18rem;
+  padding-left: 18rem;
+  display: inline-flex;
+}
+
+.logos {
+  display: flex;
+  width: 45vw;
+  justify-content: center;
+  margin-left: 8vw;
+  height: 20vh;
+}
+
+.form-inside-style {
+  text-align: left;
+  margin-left: 5rem;
+}
+
+.form-inside {
+  margin-top: 1rem;
+  height: 6vh;
+  min-height: 40px;
+  margin-bottom: 1rem;
+  box-shadow: none;
+  border-bottom: 3px;
+  background-color: #F5F2F7;
+  border: none;
+  border-bottom: 3px;
+  text-align: left;
+  border-radius: 10px;
+}
+
+.long-sign-in {
+  width: 30vw;
+  min-height: 40px;
+  height: 8vh;
+  margin-bottom: 2rem;
+  box-shadow: none;
+  border-bottom: 3px;
+  background-color: #fff;
+  opacity: .95;
+  border: none;
+}
+
+.sign-in {
+  text-align: center;
+}
+
+::-webkit-input-placeholder, input.long-sign-in {
+   text-align: center;
+   font-size: 1.8rem;
+   font-family: 'Open Sans', sans-serif;
+   font-weight: 300;
+   color: #009CB7;
+}
+
+:-moz-placeholder, input.long-sign-in  { /* Firefox 18- */
+   text-align: center;
+   font-size: 1.8rem;
+   font-family: 'Open Sans', sans-serif;
+   font-weight: 300;
+   color: #009CB7;
+}
+
+::-moz-placeholder, input.long-sign-in  {  /* Firefox 19+ */
+   text-align: center;
+   font-size: 1.8rem;
+   font-family: 'Open Sans', sans-serif;
+   font-weight: 300;
+   color: #009CB7;
+}
+
+:-ms-input-placeholder, input.long-sign-in {
+   text-align: center;
+   font-size: 1.8rem;
+   font-family: 'Open Sans', sans-serif;
+   font-weight: 300;
+   color: #009CB7;
+}
+
+.welcome-img {
+  height: 100vh;
+  z-index: 0;
+  margin: 0;
+  position: absolute;
+}
+
+.second-logo {
+  position: absolute;
+  z-index: 1;
+  width: 20vw;
+  bottom: 5vh;
+  left: 5vw;
+}
+
+.container-log-in {
+  width: 45vw;
+  margin-left: 48vw;
+}
+
+h2.reg-title {
+  font-size: 2.5rem;
+  vertical-align: middle;
+  padding-top: 2rem;
+  margin-bottom: 3rem;
+  padding: 0 auto;
+  display: block;
+  text-align: center;
+}

@@ -91,4 +91,50 @@ $(document).ready(function() {
     $('#completeSale').removeClass('hidden');
   });
 
+  /* Métodos para cambiar botón de tipo de ventas*/
+  $("#return-option").click(function () {
+    $('#return').removeClass('hidden');
+    $('#sale').addClass('hidden');
+    $('#change').addClass('hidden');
+    $('#advance').addClass('hidden');
+    $("#return-option").addClass('hidden');
+    $("#sale-option").removeClass('hidden');
+    $("#change-option").removeClass('hidden');
+    $("#advance-option").removeClass('hidden');
+
+  });
+
+  $("#sale-option").click(function () {
+    $('#sale').removeClass('hidden');
+    $('#return').addClass('hidden');
+    $('#change').addClass('hidden');
+    $('#advance').addClass('hidden');
+    $("#sale-option").addClass('hidden');
+    $("#return-option").removeClass('hidden');
+    $("#change-option").removeClass('hidden');
+    $("#advance-option").removeClass('hidden');
+  });
+
+  $("#change-option").click(function () {
+    $('#change').removeClass('hidden');
+    $('#sale').addClass('hidden');
+    $('#return').addClass('hidden');
+    $('#advance').addClass('hidden');
+    $("#change-option").addClass('hidden');
+    $("#sale-option").removeClass('hidden');
+    $("#return-option").removeClass('hidden');
+    $("#advance-option").removeClass('hidden');
+  });
+
+  $("#advance-option").click(function () {
+    $('#advance').removeClass('hidden');
+    $('#change').addClass('hidden');
+    $('#sale').addClass('hidden');
+    $('#return').addClass('hidden');
+    $("#advance-option").addClass('hidden');
+    $("#change-option").removeClass('hidden');
+    $("#sale-option").removeClass('hidden');
+    $("#return-option").removeClass('hidden');
+  });
+
 });
