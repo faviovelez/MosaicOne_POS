@@ -4,6 +4,8 @@ html {
 }
 
 body {
+  margin: 0 auto;
+  padding: 0 auto;
   overflow-x:hidden;
   height:100vh;
 }
@@ -120,6 +122,15 @@ html {
   z-index: 100;
 }
 
+.left {
+  text-align: left !important;
+}
+
+.right {
+  text-align: right !important;
+}
+
+
 .navbar-default .navbar-nav > li > a, .username {
   color: #d5dce4;
 }
@@ -166,3 +177,64 @@ a.text-link:hover, a.text-link:active, a.text-link:visited, a.text-link:focus {
   margin: 0.5rem 0.3rem;
 }
 /*Esto es solo para que el logo se haga pequeño */
+
+#username:hover,
+#store:hover {
+  background-color: #232c37;
+  color: #fff;
+}
+
+.modal-form-input {
+  color: #009CB7;
+  text-align: center;
+  font-size: 1.8rem;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  border-radius: 5px;
+}
+
+::-webkit-input-placeholder, input.long-sign-in {
+   text-align: center;
+   font-size: 1.6rem;
+   font-family: 'Open Sans', sans-serif;
+   font-weight: 300;
+   color: #009CB7;
+}
+
+:-moz-placeholder, input.long-sign-in  { /* Firefox 18- */
+   text-align: center;
+   font-size: 1.6rem;
+   font-family: 'Open Sans', sans-serif;
+   font-weight: 300;
+   color: #009CB7;
+}
+
+::-moz-placeholder, input.long-sign-in  {  /* Firefox 19+ */
+   text-align: center;
+   font-size: 1.6rem;
+   font-family: 'Open Sans', sans-serif;
+   font-weight: 300;
+   color: #009CB7;
+}
+
+:-ms-input-placeholder, input.long-sign-in {
+   text-align: center;
+   font-size: 1.6rem;
+   font-family: 'Open Sans', sans-serif;
+   font-weight: 300;
+   color: #009CB7;
+ }
+
+ .form-inside {
+   margin-top: 1rem;
+   height: 6vh;
+   min-height: 40px;
+   margin-bottom: 1rem;
+   box-shadow: none;
+   border-bottom: 3px;
+   background-color: #F5F2F7;
+   border: none;
+   border-bottom: 3px;
+   text-align: center;
+   border-radius: 10px;
+ }

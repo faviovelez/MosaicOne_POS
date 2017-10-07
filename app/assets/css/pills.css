@@ -1,13 +1,24 @@
-.nav-tabs {
-  margin-top: 5%;
-  margin-bottom: 0%
+.pills-row {
+  margin-top: 5% !important;
+  margin-bottom: 0 !important;
 }
 
 li[role="presentation"] > a:hover {
-  background-color: #009CB7;
+  background-color: #5BC0DE;
   color: #fff;
 }
 
 .active {
   font-weight: bold;
+}
+
+.cash-ticket-info {
+  position:absolute;
+  margin-left: 128.5%;
+  margin-top: -7%;
+  padding: 1.2rem;
+  font-size: 1.5rem;
+}
+.row.pills-row.fixed.z-index {
+  border-radius: 10px;
 }

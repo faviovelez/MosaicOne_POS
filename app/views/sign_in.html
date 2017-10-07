@@ -36,7 +36,7 @@
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
           <li>
-            <a href="#">Ingresa</a>
+            <a href="sign_in.html">Ingresa</a>
           </li>
         </ul>
       </div><!-- /.navbar-collapse -->
@@ -58,7 +58,9 @@
         <h2 class="reg-title">Punto de Venta Sistema DC</h2>
       </div>
 
-      <form class="new_user" id="new_user" action="/users/sign_in" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+      <form class="new_user" id="new_user" action="open_register.html" accept-charset="UTF-8" method="post">
+        <input name="utf8" type="hidden" value="&#x2713;" />
+        <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
         <div class="field sign-in">
           <label for="user_email">Correo electrónico</label><br />
           <input placeholder="ejemplo@ejemplo.com" class="long-sign-in" type="email" value="" name="user[email]" id="user_email" />
@@ -83,8 +85,8 @@
 
 
       <div class="actions">
-        <a class="link" href="/users/sign_up">Regístrate</a>
-        <a class="link" href="/users/password/new">¿Olvidaste tu contraseña?</a>
+        <a class="link" href="#">Regístrate</a>
+        <a class="link" href="#">¿Olvidaste tu contraseña?</a>
       </div>
 
     </div>

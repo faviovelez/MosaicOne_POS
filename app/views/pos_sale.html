@@ -45,19 +45,36 @@
          </a>
        </li>
        <li>
-         <a href="#">Cerrar sesión</a>
+         <a href="#" id="store">
+            Franquicia - Aguascalientes
+         </a>
+       </li>
+       <li>
+         <a href="sign_in.html">Cerrar sesión</a>
        </li>
      </ul>
    </div><!-- /.navbar-collapse -->
  </div><!-- /.container-fluid -->
 </nav>
  <!-- Termina Navbar -->
- <ul class="nav nav-tabs fixed z-index">
-   <li role="presentation" id="cashRegister"><a href="#">Apertura / cierre de caja</a></li>
-   <li role="presentation" class="active" id="pos"><a href="#">Punto de Venta</a></li>
-   <li role="presentation"><a href="#" id="savedTickets">Tickets guardados</a></li>
-   <li role="presentation"><a href="#" id="config">Configuración</a></li>
- </ul>
+
+ <!-- Inician Pills-->
+  <div class="row pills-row fixed z-index">
+     <ul class="nav nav-tabs">
+       <li role="presentation" id="cashRegisterClose"><a href="close_register.html">Cierre de caja</a></li>
+       <li role="presentation" class="hidden" id="cashRegisterOpen"><a href="open_register.html">Apertura de caja</a></li>
+       <li role="presentation" class="active" id="pos"><a href="pos_sale.html">Punto de Venta</a></li>
+       <li role="presentation"><a href="saved_tickets.html" id="savedTickets">Tickets guardados</a></li>
+       <li role="presentation"><a href="configuration.html" id="config">Configuración</a></li>
+     </ul>
+     <span class="label label-danger cash-ticket-info">
+       Caja
+       <span id="cashRegisterNum"> 1 </span>
+       /
+       Ticket <span id="ticketNum"> 1 </span>
+     </span>
+  </div>
+ <!-- Terminan Pills -->
 
   <div class="page-container">
 
@@ -87,7 +104,7 @@
               </button>
               <button type="button" class="btn btn-default dropdown-toggle pos-secondary-btn hidden" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="advance">
                 <i class="fa fa-money " aria-hidden="true"></i>
-                Anticipo
+                Pago
               </button>
               <ul class="dropdown-menu">
                 <li>
@@ -111,7 +128,7 @@
                 <li>
                   <a href="#" id="advance-option">
                     <i class="fa fa-money " aria-hidden="true"></i>
-                    Anticipo
+                    Pago
                   </a>
                 </li>
               </ul>
@@ -144,8 +161,10 @@
             <td class="left"> Bolsa para botella Kraft Satinada Navideña </td>
             <td> Kraft </td>
             <td> $ 26.50 </td>
-            <td> <a href="#"> 40 </a> </td>
-            <td> <a href="#"> 5% </a> </td>
+            <td>
+              <input type="text" class="form-control smaller-form" placeholder="1">
+            </td>
+            <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_1"> 5% </a> </td>
             <td class="right"> $ 1,007.00 </td>
           </tr>
           <tr>
@@ -159,8 +178,10 @@
             <td class="left"> Cilindro de acetato botella decorado Nav </td>
             <td> Transparente </td>
             <td> $ 37.50 </td>
-            <td> <a href="#"> 10 </a>  </td>
-            <td> <a href="#"> 0% </a> </td>
+            <td>
+              <input type="text" class="form-control smaller-form" placeholder="1">
+            </td>
+            <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_2"> 0% </a> </td>
             <td class="right"> $ 375.00 </td>
           </tr>
           <tr>
@@ -177,10 +198,14 @@
               </a>
             </td>
             <td> N/A </td>
-            <td> <a href="#"> $ 37.50 </a> </td>
-            <td> <a href="# "> 1 </a> </td>
-            <td> <a href="#"> 0% </a> </td>
-            <td class="right"> $ 375.00 </td>
+            <td>
+              <input type="text" class="form-control smaller-form" placeholder="$ 100.00">
+            </td>
+            <td>
+              <input type="text" class="form-control smaller-form" placeholder="1">
+            </td>
+            <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_3"> 0% </a> </td>
+            <td class="right"> $ 100.00 </td>
           </tr>
 
         </tbody>
@@ -202,7 +227,7 @@
       </div>
 
       <div class="discounts-container">
-        <h4>Descuento:</h4>
+        <h4> Tipo de descuento</h4>
         <div class="payment-form-wrapper">
           <button type="button" class="btn btn-default custom-button" id="manual">
             <i class="fa fa-hand-pointer-o " aria-hidden="true"></i>
@@ -248,14 +273,10 @@
         <table class="discounts-table hidden" id="manual-discount">
           <thead>
             <tr>
-              <th colspan="2"> Descuentos Manuales: </th>
+              <th colspan="2"> Descuento manual: </th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td> Descuento total ticket $ </td>
-              <td class="right"> <a href="#">Anotar descuento</a> </td>
-            </tr>
             <tr>
               <td> Descuento total ticket % </td>
               <td class="right"> <a href="#">Anotar descuento</a> </td>
@@ -347,6 +368,10 @@
           <i class="fa fa-copy " aria-hidden="true"></i>
           Transferencia
         </button>
+        <button type="button" class="btn btn-default custom-button" id="creditSale">
+          <i class="fa fa-address-book-o " aria-hidden="true"></i>
+          Venta a Crédito
+        </button>
         <button type="button" class="btn btn-default custom-button" id="other">
           <i class="fa fa-question-circle-o " aria-hidden="true"></i>
           Otra
@@ -362,7 +387,7 @@
           </span>
         </div><!-- /input-group -->
       </div><!-- /.row -->
-      <input type="text" class="form-control" placeholder="Comentarios">
+      <input type="text" class="form-control higher-form" placeholder="Comentarios">
 
 
     </div> <!-- Termina right-container  -->
@@ -408,6 +433,31 @@
  </div><!-- /.modal -->
 <!-- Termina Modal Agregar productos o servicios -->
 
+<!-- Inicia mini Modal para cambiar descuento  -->
+ <div class="modal fade" id="discountChange" tabindex="-1" role="dialog">
+   <div class="modal-dialog discount-change-modal" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title">Cambiar descuento</h4>
+       </div>
+       <div class="modal-body">
+         <div class="input-group">
+           <input type="text" class="form-control smaller-form round-form" placeholder="1">
+           <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
+         </div><!-- /input-group -->
+       </div>
+       <div class="modal-footer">
+         <button class="btn btn-default pos-main-btn" type="button">
+           Confirmar
+           <i class="fa fa-check " aria-hidden="true"></i>
+         </button>
+       </div>
+
+     </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+ </div><!-- /.modal -->
+<!-- Termina mini Modal para cambiar precio -->
 
 <!-- Temporalmente deshabilitada la Bottom Nav
   <div class="bottom-nav">

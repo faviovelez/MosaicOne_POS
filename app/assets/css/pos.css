@@ -66,9 +66,6 @@
   color: #fff;
 }
 
-.left {
-  text-align: left !important;
-}
 
 .items-sales {
   margin-top: 2rem;
@@ -80,7 +77,7 @@
 .total-table > tbody > tr > td {
   text-align: center;
   padding: 0.5rem 0.5rem;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
 }
 
 .discounts-table > tbody > tr > td,
@@ -97,10 +94,6 @@ p {
   font-size: 1.6rem;
 }
 
-.right {
-  text-align: right !important;
-}
-
 .discounts-table,
 .subtotal,
 .total-table,
@@ -109,10 +102,10 @@ p {
 }
 
 .pos-main-btn {
-  background-color: #009CB7;
+  background-color: #5BC0DE;
   color: #fff;
   border: none;
-  border: 1px solid #009CB7;
+  border: 1px solid #5BC0DE;
 }
 
 .pos-main-btn:hover,
@@ -147,9 +140,9 @@ p {
 .custom-button:active,
 .custom-button:visited,
 .custom-button:hover {
-  background-color: #009CB7;
+  background-color: #5BC0DE;
   color: #fff;
-  border: 1px solid #009CB7;
+  border: 1px solid #5BC0DE;
 }
 
 .single-line {
@@ -164,9 +157,9 @@ p {
 }
 
 .pos-secondary-btn:hover {
-  background-color: #009CB7;
+  background-color: #5BC0DE;
   color: #fff;
-  border: 1px solid #009CB7;
+  border: 1px solid #5BC0DE;
 }
 
 .bigger > strong {
@@ -178,9 +171,9 @@ p {
 }
 
 .selected {
-  background-color: #009CB7;
+  background-color: #5BC0DE;
   color: #fff;
-  border: 1px solid #009CB7;
+  border: 1px solid #5BC0DE;
 }
 
 .special-title {
@@ -189,14 +182,14 @@ p {
 
 button:focus,
 button:active {
-  background-color: #009CB7 !important;
+  background-color: #5BC0DE !important;
   color: #fff !important;
-  border: 1px solid #009CB7 !important;
+  border: 1px solid #5BC0DE !important;
 }
 
 .myfield {
   background-color: #F5F2F7;
-  color: #009CB7;
+  color: #5BC0DE;
   border-radius: 8px;
   box-shadow: none;
   padding-top: 0.5rem;
@@ -207,9 +200,9 @@ button:active {
   }
 
 .pos-main-btn {
-  background-color: #009CB7;
+  background-color: #5BC0DE;
   color: #fff;
-  border: 1px solid #009CB7;
+  border: 1px solid #5BC0DE;
 }
 
 .pos-main-btn:hover,
@@ -220,13 +213,31 @@ button:active {
   border: 1px solid #232c37;
 }
 
-#username:hover {
-  background-color: #232c37;
+.dropdown-menu > li > a:hover {
+  background-color: #5BC0DE;
   color: #fff;
+  border: 1px solid #5BC0DE;
 }
 
-.dropdown-menu > li > a:hover {
-  background-color: #009CB7;
-  color: #fff;
-  border: 1px solid #009CB7;
+.price-change-modal,
+.discount-change-modal {
+  width: 330px;
+  height: 20px;
+}
+
+.smaller-form {
+  width: 80px;
+  text-align: center;
+}
+
+.higher-form {
+  margin-top: 10px;
+  height: 70px;
+}
+
+.round-form {
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+  border-bottom-left-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
 }

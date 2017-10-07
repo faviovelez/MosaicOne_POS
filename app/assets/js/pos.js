@@ -27,7 +27,6 @@ $(document).ready(function() {
     $('#none').removeClass('selected');
   });
 
-
 /* Métodos para tipo de forma de pago*/
 
   $("#cash").click(function () {
@@ -37,6 +36,7 @@ $(document).ready(function() {
     $('#check').removeClass('selected');
     $('#transfer').removeClass('selected');
     $('#other').removeClass('selected');
+    $('#creditSale').removeClass('selected');
   });
 
   $("#debit").click(function () {
@@ -46,6 +46,7 @@ $(document).ready(function() {
     $('#check').removeClass('selected');
     $('#transfer').removeClass('selected');
     $('#other').removeClass('selected');
+    $('#creditSale').removeClass('selected');
   });
 
   $("#credit").click(function () {
@@ -55,6 +56,7 @@ $(document).ready(function() {
     $('#check').removeClass('selected');
     $('#transfer').removeClass('selected');
     $('#other').removeClass('selected');
+    $('#creditSale').removeClass('selected');
   });
 
   $("#check").click(function () {
@@ -64,6 +66,7 @@ $(document).ready(function() {
     $('#cash').removeClass('selected');
     $('#transfer').removeClass('selected');
     $('#other').removeClass('selected');
+    $('#creditSale').removeClass('selected');
   });
 
   $("#transfer").click(function () {
@@ -73,6 +76,7 @@ $(document).ready(function() {
     $('#check').removeClass('selected');
     $('#cash').removeClass('selected');
     $('#other').removeClass('selected');
+    $('#creditSale').removeClass('selected');
   });
 
   $("#other").click(function () {
@@ -82,6 +86,17 @@ $(document).ready(function() {
     $('#check').removeClass('selected');
     $('#transfer').removeClass('selected');
     $('#cash').removeClass('selected');
+    $('#creditSale').removeClass('selected');
+  });
+
+  $("#creditSale").click(function () {
+    $(this).addClass('selected');
+    $('#debit').removeClass('selected');
+    $('#credit').removeClass('selected');
+    $('#check').removeClass('selected');
+    $('#transfer').removeClass('selected');
+    $('#cash').removeClass('selected');
+    $('#other').removeClass('selected');
   });
 
 /* Métodos para cambiar botón de pagos*/
@@ -101,7 +116,6 @@ $(document).ready(function() {
     $("#sale-option").removeClass('hidden');
     $("#change-option").removeClass('hidden');
     $("#advance-option").removeClass('hidden');
-
   });
 
   $("#sale-option").click(function () {
