@@ -1,6 +1,128 @@
 
 $(document).ready(function() {
 
+/* Métodos para cambiar botón de tipo de ventas*/
+  $("#change-option").click(function () {
+    $('.items-sales').addClass('hidden');
+    $('.ticket-results').addClass('hidden');
+    $('.ticket-selected').addClass('hidden');
+    $('.items-returns').addClass('hidden');
+    $('.items-changes').addClass('hidden');
+    $('#change').addClass('active-sale-option');
+    $('#return').removeClass('active-sale-option');
+    $('#sale').removeClass('active-sale-option');
+    $('#advance').removeClass('active-sale-option');
+    $('.extra-search').removeClass('hidden');
+    $('.main-search').addClass('hidden');
+    $('.items-sales').addClass('hidden');
+    $('#change').removeClass('hidden');
+    $('#sale').addClass('hidden');
+    $('#return').addClass('hidden');
+    $('#advance').addClass('hidden');
+    $("#change-option").addClass('hidden');
+    $("#sale-option").removeClass('hidden');
+    $("#return-option").removeClass('hidden');
+    $("#advance-option").removeClass('hidden');
+  });
+
+  $("#return-option").click(function () {
+    $('.items-sales').addClass('hidden');
+    $('.ticket-results').addClass('hidden');
+    $('.ticket-selected').addClass('hidden');
+    $('.items-returns').addClass('hidden');
+    $('.items-changes').addClass('hidden');
+    $('#return').addClass('active-sale-option');
+    $('#sale').removeClass('active-sale-option');
+    $('#advance').removeClass('active-sale-option');
+    $('#change').removeClass('active-sale-option');
+    $('.extra-search').removeClass('hidden');
+    $('.main-search').addClass('hidden');
+    $('.items-sales').addClass('hidden');
+    $('#return').removeClass('hidden');
+    $('#sale').addClass('hidden');
+    $('#change').addClass('hidden');
+    $('#advance').addClass('hidden');
+    $("#return-option").addClass('hidden');
+    $("#sale-option").removeClass('hidden');
+    $("#change-option").removeClass('hidden');
+    $("#advance-option").removeClass('hidden');
+  });
+
+  $("#sale-option").click(function () {
+    $('#sale').addClass('active-sale-option');
+    $('#advance').removeClass('active-sale-option');
+    $('#change').removeClass('active-sale-option');
+    $('#return').removeClass('active-sale-option');
+    $('.extra-search').addClass('hidden');
+    $('.main-search').removeClass('hidden');
+    $('.items-sales').removeClass('hidden');
+    $('.ticket-selected').addClass('hidden');
+    $('.items-changes').addClass('hidden');
+    $('.items-returns').addClass('hidden');
+    $('#sale').removeClass('hidden');
+    $('#return').addClass('hidden');
+    $('#change').addClass('hidden');
+    $('#advance').addClass('hidden');
+    $("#sale-option").addClass('hidden');
+    $("#return-option").removeClass('hidden');
+    $("#change-option").removeClass('hidden');
+    $("#advance-option").removeClass('hidden');
+  });
+
+  $("#advance-option").click(function () {
+    $('.items-sales').addClass('hidden');
+    $('.ticket-results').addClass('hidden');
+    $('.ticket-selected').addClass('hidden');
+    $('.items-returns').addClass('hidden');
+    $('.items-changes').addClass('hidden');
+    $('#advance').addClass('active-sale-option');
+    $('#sale').removeClass('active-sale-option');
+    $('#change').removeClass('active-sale-option');
+    $('#return').removeClass('active-sale-option');
+    $('.extra-search').removeClass('hidden');
+    $('.main-search').addClass('hidden');
+    $('.items-sales').addClass('hidden');
+    $('#advance').removeClass('hidden');
+    $('#change').addClass('hidden');
+    $('#sale').addClass('hidden');
+    $('#return').addClass('hidden');
+    $("#advance-option").addClass('hidden');
+    $("#change-option").removeClass('hidden');
+    $("#sale-option").removeClass('hidden');
+    $("#return-option").removeClass('hidden');
+  });
+
+/* Métodos para los buscadores de productos / tickets / clientes (mostrar tabla de resultados) */
+$("#searchProducts").click(function () {
+  $('.ticket-results').removeClass('hidden');
+});
+
+$("#searchProspects").click(function () {
+  $('.ticket-results').removeClass('hidden');
+});
+
+$("#searchTickets").click(function () {
+  $('.ticket-results').removeClass('hidden');
+});
+
+/* Método para ocultar tabla de resultados ymostrar tablas y buscadores pagos / cambios / devoluciones */
+$(".hide-results").click(function () {
+  $('.ticket-results').addClass('hidden');
+  $('.ticket-selected').removeClass('hidden');
+
+    if ($("#return").hasClass('active-sale-option')) {
+      $('.items-returns').removeClass('hidden');
+
+    } else if ($("#change").hasClass('active-sale-option')) {
+      $('.items-changes').removeClass('hidden');
+
+    } else if ($("#advance").hasClass('active-sale-option')) {
+
+    };
+});
+
+
+
 /* Métodos para descuentos*/
 
   $("#manual").click(function () {
@@ -104,51 +226,6 @@ $(document).ready(function() {
   $("#addPayment").click(function () {
     $(this).addClass('hidden');
     $('#completeSale').removeClass('hidden');
-  });
-
-  /* Métodos para cambiar botón de tipo de ventas*/
-  $("#return-option").click(function () {
-    $('#return').removeClass('hidden');
-    $('#sale').addClass('hidden');
-    $('#change').addClass('hidden');
-    $('#advance').addClass('hidden');
-    $("#return-option").addClass('hidden');
-    $("#sale-option").removeClass('hidden');
-    $("#change-option").removeClass('hidden');
-    $("#advance-option").removeClass('hidden');
-  });
-
-  $("#sale-option").click(function () {
-    $('#sale').removeClass('hidden');
-    $('#return').addClass('hidden');
-    $('#change').addClass('hidden');
-    $('#advance').addClass('hidden');
-    $("#sale-option").addClass('hidden');
-    $("#return-option").removeClass('hidden');
-    $("#change-option").removeClass('hidden');
-    $("#advance-option").removeClass('hidden');
-  });
-
-  $("#change-option").click(function () {
-    $('#change').removeClass('hidden');
-    $('#sale').addClass('hidden');
-    $('#return').addClass('hidden');
-    $('#advance').addClass('hidden');
-    $("#change-option").addClass('hidden');
-    $("#sale-option").removeClass('hidden');
-    $("#return-option").removeClass('hidden');
-    $("#advance-option").removeClass('hidden');
-  });
-
-  $("#advance-option").click(function () {
-    $('#advance').removeClass('hidden');
-    $('#change').addClass('hidden');
-    $('#sale').addClass('hidden');
-    $('#return').addClass('hidden');
-    $("#advance-option").addClass('hidden');
-    $("#change-option").removeClass('hidden');
-    $("#sale-option").removeClass('hidden');
-    $("#return-option").removeClass('hidden');
   });
 
 });
