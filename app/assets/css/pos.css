@@ -64,11 +64,14 @@
   margin-left: 4px;
 }
 
+.space-left {
+  margin-left: 8px;
+}
+
 .gray-btn:hover {
   background-color: #00B3D3 !important;
   border: 1px solid #00B3D3 !important;
 }
-
 
 .flex {
   display: flex;
@@ -77,6 +80,49 @@
 .close-icon:hover,
 .close-icon:focus {
   background-color: #D72638;
+}
+
+.blue {
+  background-color: #00B3D3;
+}
+
+.blue:hover,
+.blue:active {
+  background-color: #0087C1;
+}
+
+.left-edge {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.right-edge {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.orange-btn {
+  background-color: #F9C422 !important;
+  border: 1px solid #F9C422 !important;
+}
+
+.orange-btn:hover,
+.orange-btn:active,
+.orange-btn:focus {
+  background-color: #F99A00 !important;
+  border: 1px solid #F99A00 !important;
+}
+
+.red-btn {
+  background-color: #E84356 !important;
+  border: 1px solid #E84356 !important;
+}
+
+.red-btn:hover,
+.red-btn:active,
+.red-btn:focus {
+  background-color: #E71D36 !important;
+  border: 1px solid #E71D36 !important;
 }
 
 .center-close {
@@ -116,6 +162,12 @@
   font-size: 1.5rem;
 }
 
+.saved-tickets > thead > tr > th,
+.saved-tickets > tbody > tr > td {
+  text-align: center;
+  padding: 0.5rem 1.4rem;
+  font-size: 1.5rem;
+}
 
 .items-sales > thead > tr > th,
 .items-sales > tbody > tr > td,
@@ -287,9 +339,26 @@ button:active {
   height: 70px;
 }
 
+.green-btn {
+  background-color: #8EFF56 !important;
+  border: 1px solid #8EFF56 !important;
+}
+
+.green-btn:hover,
+.green-btn:active,
+.green-btn:focus {
+  background-color: #60E51D !important;
+  border: 1px solid #60E51D !important;
+}
+
 .round-form {
   border-top-left-radius: 8px !important;
   border-top-right-radius: 8px !important;
   border-bottom-left-radius: 8px !important;
   border-bottom-right-radius: 8px !important;
+}
+
+.saved-tickets {
+  margin-top: 12%;
+  margin-left: 4%;
 }

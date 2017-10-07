@@ -3,6 +3,8 @@ $(document).ready(function() {
 
 /* Métodos para cambiar botón de tipo de ventas*/
   $("#change-option").click(function () {
+    $('#creditSale').removeClass('hidden');
+    $('#returnCash').removeClass('hidden');
     $('.items-sales').addClass('hidden');
     $('.ticket-results').addClass('hidden');
     $('.ticket-selected').addClass('hidden');
@@ -26,6 +28,8 @@ $(document).ready(function() {
   });
 
   $("#return-option").click(function () {
+    $('#creditSale').addClass('hidden');
+    $('#returnCash').removeClass('hidden');
     $('.items-sales').addClass('hidden');
     $('.ticket-results').addClass('hidden');
     $('.ticket-selected').addClass('hidden');
@@ -49,6 +53,8 @@ $(document).ready(function() {
   });
 
   $("#sale-option").click(function () {
+    $('#creditSale').removeClass('hidden');
+    $('#returnCash').addClass('hidden');
     $('#sale').addClass('active-sale-option');
     $('#advance').removeClass('active-sale-option');
     $('#change').removeClass('active-sale-option');
@@ -70,6 +76,8 @@ $(document).ready(function() {
   });
 
   $("#advance-option").click(function () {
+    $('#creditSale').addClass('hidden');
+    $('#returnCash').addClass('hidden');
     $('.items-sales').addClass('hidden');
     $('.ticket-results').addClass('hidden');
     $('.ticket-selected').addClass('hidden');
@@ -121,10 +129,7 @@ $(".hide-results").click(function () {
     };
 });
 
-
-
 /* Métodos para descuentos*/
-
   $("#manual").click(function () {
     $(this).addClass('selected');
     $('#automatic-discount').addClass('hidden');
@@ -150,7 +155,6 @@ $(".hide-results").click(function () {
   });
 
 /* Métodos para tipo de forma de pago*/
-
   $("#cash").click(function () {
     $(this).addClass('selected');
     $('#debit').removeClass('selected');
@@ -159,6 +163,7 @@ $(".hide-results").click(function () {
     $('#transfer').removeClass('selected');
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
+    $('#returnCash').removeClass('selected');
   });
 
   $("#debit").click(function () {
@@ -169,6 +174,7 @@ $(".hide-results").click(function () {
     $('#transfer').removeClass('selected');
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
+    $('#returnCash').removeClass('selected');
   });
 
   $("#credit").click(function () {
@@ -179,6 +185,7 @@ $(".hide-results").click(function () {
     $('#transfer').removeClass('selected');
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
+    $('#returnCash').removeClass('selected');
   });
 
   $("#check").click(function () {
@@ -189,6 +196,7 @@ $(".hide-results").click(function () {
     $('#transfer').removeClass('selected');
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
+    $('#returnCash').removeClass('selected');
   });
 
   $("#transfer").click(function () {
@@ -199,6 +207,7 @@ $(".hide-results").click(function () {
     $('#cash').removeClass('selected');
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
+    $('#returnCash').removeClass('selected');
   });
 
   $("#other").click(function () {
@@ -209,6 +218,7 @@ $(".hide-results").click(function () {
     $('#transfer').removeClass('selected');
     $('#cash').removeClass('selected');
     $('#creditSale').removeClass('selected');
+    $('#returnCash').removeClass('selected');
   });
 
   $("#creditSale").click(function () {
@@ -219,6 +229,18 @@ $(".hide-results").click(function () {
     $('#transfer').removeClass('selected');
     $('#cash').removeClass('selected');
     $('#other').removeClass('selected');
+    $('#returnCash').removeClass('selected');
+  });
+
+  $("#returnCash").click(function () {
+    $(this).addClass('selected');
+    $('#debit').removeClass('selected');
+    $('#credit').removeClass('selected');
+    $('#check').removeClass('selected');
+    $('#transfer').removeClass('selected');
+    $('#cash').removeClass('selected');
+    $('#other').removeClass('selected');
+    $('#creditSale').removeClass('selected');
   });
 
 /* Métodos para cambiar botón de pagos*/

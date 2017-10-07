@@ -80,6 +80,7 @@
 
     <div class="left-container">
 
+      <!-- Inicia Barra de búsqueda multi ticket -->
       <div class="search-container">
         <div class="input-group">
           <span class="input-group-btn main-search">
@@ -110,6 +111,7 @@
           </span>
           <input type="text" class="form-control extra-search hidden" placeholder="Número de ticket" id="ticketSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
 
+          <!-- Inician botones de la barra de búsqueda (cambian de acuerdo a la selección de opciones) -->
           <span class="input-group-btn">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle pos-secondary-btn active-sale-option" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="sale">
@@ -128,6 +130,8 @@
                 <i class="fa fa-money" aria-hidden="true"></i>
                 Pago
               </button>
+
+              <!-- Inician las opciones de la selección de multi-ticket -->
               <ul class="dropdown-menu">
                 <li>
                   <a href="#" id="sale-option" class="hidden">
@@ -159,6 +163,7 @@
         </div>
       </div>
 
+      <!-- Inicia la tabla de ventas (agrega conforme a la barra de búsqueda, se elimina con el botón rojo)-->
       <table class="items-sales">
         <thead>
           <tr>
@@ -229,10 +234,11 @@
             <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_3"> 0% </a> </td>
             <td class="right"> $ 100.00 </td>
           </tr>
-
         </tbody>
       </table>
+      <!-- Termina la tabla de ventas -->
 
+      <!-- Inicia la tabla de resultados de tickets -->
       <table class="ticket-results hidden">
         <thead>
           <tr>
@@ -279,7 +285,9 @@
           </tr>
         </tbody>
       </table>
+      <!-- Termina la tabla de resultados de tickets -->
 
+      <!-- Inicia la tabla del ticket seleccionado en la búsqueda-->
       <table class="ticket-selected hidden">
         <thead>
           <tr>
@@ -367,7 +375,9 @@
           </tr>
         </tbody>
       </table>
+      <!-- Termina la tabla del ticket seleccionado en la búsqueda-->
 
+      <!-- Inicia la tabla del tickets para cambiar artículos (devolver y comprar otro)-->
       <table class="items-changes hidden">
         <thead>
           <th colspan="7" class="head-black">
@@ -439,10 +449,28 @@
             <td> 0% </td>
             <td class="right"> $ 100.00 </td>
           </tr>
-
+          <tr>
+            <td>
+              <div class="close-icon blue">
+                <button type="button" class="close center-close" aria-label="Close">
+                  <span aria-hidden="true" class="white-light">&times;</span>
+                </button>
+              </div>
+            </td>
+            <td class="left"> Dulcera especial esferas y reno </td>
+            <td> Kraft </td>
+            <td> $ 16.20 </td>
+            <td>
+              <input type="text" class="form-control smaller-form" placeholder="1">
+            </td>
+            <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_2"> 0% </a> </td>
+            <td class="right"> $ 16.20 </td>
+          </tr>
         </tbody>
       </table>
+      <!-- Termina la tabla del tickets para cambiar artículos (devolver y comprar otro)-->
 
+      <!-- Inicia la tabla del tickets para devolver artículos (sin comprar otro)-->
       <table class="items-returns hidden">
         <thead>
           <th colspan="7" class="head-black">
@@ -517,6 +545,7 @@
 
         </tbody>
       </table>
+      <!-- Termina la tabla del tickets para devolver artículos (sin comprar otro)-->
 
     </div><!-- Termina left-container  -->
 
@@ -528,29 +557,40 @@
       <div class="input-group">
         <span class="input-group-btn">
           <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#clientes" id="basic-addon2">
-            <i class="fa fa-user-plus " aria-hidden="true"></i>
+            <i class="fa fa-user-plus" aria-hidden="true"></i>
           </button>
         </span>
         <input type="text" class="form-control" placeholder="Agregar cliente"><!-- Agregar aquí el select2 de clientes (prospects)-->
+        <span class="input-group-btn">
+          <button class="btn btn-default space-left pos-main-btn right-edge orange-btn" type="button" data-toggle="modal" data-placement="left" title="Guardar ticket" data-target="#saveTicket">
+            <i class="fa fa-pause" aria-hidden="true"></i>
+          </button>
+        </span>
+        <span class="input-group-btn">
+          <button class="btn btn-default pos-main-btn left-edge red-btn" type="button" data-toggle="modal" data-placement="left" title="Cancelar ticket" data-target="#cancelTicket">
+            <i class="fa fa-stop" aria-hidden="true"></i>
+          </button>
+        </span>
       </div>
 
       <div class="discounts-container">
         <h4> Tipo de descuento</h4>
         <div class="payment-form-wrapper">
           <button type="button" class="btn btn-default custom-button" id="manual">
-            <i class="fa fa-hand-pointer-o " aria-hidden="true"></i>
+            <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
             Manual
           </button>
           <button type="button" class="btn btn-default custom-button" id="automatic">
-            <i class="fa fa-repeat " aria-hidden="true"></i>
+            <i class="fa fa-repeat" aria-hidden="true"></i>
             Automático
           </button>
           <button type="button" class="btn btn-default custom-button selected" id="none">
-            <i class="fa fa-book " aria-hidden="true"></i>
+            <i class="fa fa-book" aria-hidden="true"></i>
             Ninguno
           </button>
         </div>
 
+        <!-- Tabla descuentos automáticos (regla de descuentos) -->
         <table class="discounts-table hidden" id="automatic-discount">
           <thead>
             <tr>
@@ -578,6 +618,7 @@
           </tbody>
         </table>
 
+        <!-- Tabla descuentos manuales -->
         <table class="discounts-table hidden" id="manual-discount">
           <thead>
             <tr>
@@ -596,6 +637,7 @@
           </tbody>
         </table>
 
+        <!-- Tabla Subtotal e IVA -->
         <table class="subtotal">
           <tbody>
             <tr>
@@ -613,6 +655,7 @@
           </tbody>
         </table>
 
+        <!-- Inicia la tabla donde se arreglan renglones por cada de pago -->
         <table class="pay-forms-table">
           <thead>
             <tr>
@@ -652,9 +695,11 @@
             </tr>
           </tbody>
         </table>
+        <!-- Termina la tabla donde se arreglan renglones por cada de pago -->
 
-      </div>
+      </div>  <!-- Termina el discounts-container -->
 
+      <!-- Inicia la sección de formas de pago -->
       <div class="payment-form-wrapper">
         <button type="button" class="btn btn-default custom-button" id="cash">
           <i class="fa fa-money " aria-hidden="true"></i>
@@ -680,7 +725,7 @@
           <i class="fa fa-address-book-o " aria-hidden="true"></i>
           Venta a Crédito
         </button>
-        <button type="button" class="btn btn-default custom-button" id="creditSale">
+        <button type="button" class="btn btn-default custom-button hidden" id="returnCash">
           <i class="fa fa-exchange " aria-hidden="true"></i>
           Devolución
         </button>
@@ -689,7 +734,9 @@
           Otra
         </button>
       </div>
+      <!-- Termina la sección de formas de pago -->
 
+      <!-- Sección para agregar formas de pago o concluir la venta -->
       <div class="row">
         <div class="input-group">
           <input type="text" class="form-control" placeholder="Ingrese monto de pago">
@@ -770,6 +817,53 @@
    </div><!-- /.modal-dialog -->
  </div><!-- /.modal -->
 <!-- Termina mini Modal para cambiar precio -->
+
+<!-- Inicia mini Modal para confirmar si desea guardar el ticket -->
+ <div class="modal fade" id="saveTicket" tabindex="-1" role="dialog">
+   <div class="modal-dialog discount-change-modal" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title">Guardar ticket</h4>
+       </div>
+       <div class="modal-body">
+         ¿Desea guardar este ticket para después?
+       </div>
+       <div class="modal-footer">
+         <button class="btn btn-default pos-main-btn" type="button">
+           Confirmar
+           <i class="fa fa-check " aria-hidden="true"></i>
+         </button>
+       </div>
+
+     </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+ </div><!-- /.modal -->
+ <!-- Termina mini Modal para confirmar si desea guardar el ticket -->
+
+ <!-- Inicia mini Modal para confirmar si desea cancelar el ticket -->
+  <div class="modal fade" id="cancelTicket" tabindex="-1" role="dialog">
+    <div class="modal-dialog discount-change-modal" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Cancelar ticket</h4>
+        </div>
+        <div class="modal-body">
+          ¿Desea cancelar este ticket? Si lo hace, no podrá recuperarlo.
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-default pos-main-btn" type="button">
+            Confirmar
+            <i class="fa fa-check " aria-hidden="true"></i>
+          </button>
+        </div>
+
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <!-- Termina mini Modal para confirmar si desea cancelar el ticket -->
+
 
 <!-- Temporalmente deshabilitada la Bottom Nav
   <div class="bottom-nav">
