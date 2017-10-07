@@ -39,6 +39,37 @@
   z-index: 0;
 }
 
+.quantity-width {
+  width: 90px;
+}
+
+.head-blue {
+  background-color: #00B3D3;
+  color: #fff;
+  border-radius: 5px;
+  opacity: .7;
+}
+
+.head-black {
+  background-color: #232c37;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.gray-btn {
+  background-color: lightgray !important;
+  border: 1px solid lightgray !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  margin-left: 4px;
+}
+
+.gray-btn:hover {
+  background-color: #00B3D3 !important;
+  border: 1px solid #00B3D3 !important;
+}
+
+
 .flex {
   display: flex;
 }
@@ -67,12 +98,33 @@
 }
 
 
-.items-sales {
+.items-sales,
+.items-returns,
+.items-changes,
+.ticket-selected {
   margin-top: 2rem;
 }
 
+.ticket-results {
+  margin-top: 2rem;
+}
+
+.ticket-results > thead > tr > th,
+.ticket-results > tbody > tr > td {
+  text-align: center;
+  padding: 0.5rem 2.9rem;
+  font-size: 1.5rem;
+}
+
+
 .items-sales > thead > tr > th,
 .items-sales > tbody > tr > td,
+.ticket-selected > thead > tr > th,
+.ticket-selected > tbody > tr > td,
+.items-returns > thead > tr > th,
+.items-returns > tbody > tr > td,
+.items-changes > thead > tr > th,
+.items-changes > tbody > tr > td,
 .total-table > thead > tr > th,
 .total-table > tbody > tr > td {
   text-align: center;
