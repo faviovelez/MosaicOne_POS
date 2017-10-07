@@ -53,7 +53,24 @@ label {
   text-align: center;
 }
 
+.open-register-title {
+  width: 100%;
+  display: block;
+}
+
+.cash-register-container-open {
+  margin-top: 18vh;
+  margin-left: 55vw;
+  height: 75vh;
+  width: 38vw;
+  background-color: #232c37;
+  color: #fff;
+  border-radius: 20px;
+  z-index: 10;
+  opacity: .8;
+}
+
 option {
   background-color: #161C23;
-  opacity: .5; 
+  opacity: .5;
 }

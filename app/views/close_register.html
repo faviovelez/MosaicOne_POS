@@ -72,159 +72,256 @@
   </div>
  <!-- Terminan Pills -->
 
+   <h3 class="title-close-register title-blue">
+     Cerrar caja
+     <span> 1 </span>
+   </h3>
+
   <div class="page-container">
 
-    <div class="cash-register-container">
-      <h3>
-        Cerrar caja
-        <span> 1 </span>
-      </h3>
-      <form class="new_register_close" id="new_register_close" action="pos_sale.html" accept-charset="UTF-8" method="post">
-        <input name="utf8" type="hidden" value="&#x2713;" />
-        <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
-        <div class="actions">
-          <input type="submit" name="commit" value="Cerrar caja" class="third-button" />
-        </div>
-      </form>
-    </div>
+    <div class="closure-tables-container">
 
-    <table class="closure-sales-table">
-      <tbody>
-        <tr>
-          <td class="top-of-table">
-            Ventas:
-          </td>
-          <td class="top-of-table right">
-              $ 2,950.00
-              <a href="#">
-                <i class="fa fa-chevron-up hidden" aria-hidden="true" id="sales-hide"></i>
-                <i class="fa fa-chevron-down" aria-hidden="true" id="sales-show"></i>
-              </a>
-          </td>
-        </tr>
-        <tr>
-          <td class="sales-hide hidden"> Efectivo </td>
-          <td class="right sales-hide hidden"> $ 1,535.50 </td>
-        </tr>
-        <tr>
-          <td class="sales-hide hidden"> Tarjeta de débito </td>
-          <td class="right sales-hide hidden"> $ 2,621.00 </td>
-        </tr>
-        <tr>
-          <td class="sales-hide hidden"> Tarjeta de crédito </td>
-          <td class="right sales-hide hidden"> $ 894.00 </td>
-        </tr>
-        <tr>
-          <td class="sales-hide hidden"> Cheque </td>
-          <td class="right sales-hide hidden"> $ 400.00 </td>
-        </tr>
-        <tr>
-          <td class="sales-hide hidden"> Transferencias </td>
-          <td class="right sales-hide hidden"> $ 5,000.00 </td>
-        </tr>
-        <tr>
-          <td class="sales-hide hidden"> Ventas a crédito </td>
-          <td class="right sales-hide hidden"> $ 2,000.00 </td>
-        </tr>
-        <tr>
-          <td class="sales-hide hidden"> Otras formas de pago </td>
-          <td class="right sales-hide hidden"> $ 100.00 </td>
-        </tr>
-        <tr>
-          <td>
-            <strong>
-              Efectivo en caja (ventas):
-            </strong>
-          </td>
-          <td class="right">
-            <strong>
-              $ 1,535.50
-            </strong>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <br />
-          </td>
-        </tr>
-        <tr>
-          <td class="top-of-table">
-            Pagos:
-          </td>
-          <td class="top-of-table right">
-              $ 1,450.00
-              <a href="#">
-                <i class="fa fa-chevron-up hidden" aria-hidden="true" id="payment-hide"></i>
-                <i class="fa fa-chevron-down" aria-hidden="true" id="payment-show"></i>
-              </a>
-           </td>
-        </tr>
-        <tr>
-          <td class="payment-hide hidden"> Efectivo </td>
-          <td class="right payment-hide hidden"> $ 539.50 </td>
-        </tr>
-        <tr>
-          <td class="payment-hide hidden"> Tarjeta de débito </td>
-          <td class="right payment-hide hidden"> $ 624.00 </td>
-        </tr>
-        <tr>
-          <td class="payment-hide hidden"> Tarjeta de crédito </td>
-          <td class="right payment-hide hidden"> $ 1,995.00 </td>
-        </tr>
-        <tr>
-          <td class="payment-hide hidden"> Cheque </td>
-          <td class="right payment-hide hidden"> $ 4,000.00 </td>
-        </tr>
-        <tr>
-          <td class="payment-hide hidden"> Transferencias </td>
-          <td class="right payment-hide hidden"> $ 1,000.00 </td>
-        </tr>
-        <tr>
-          <td class="payment-hide hidden"> Otras formas de pago </td>
-          <td class="right payment-hide hidden"> $ 250.00 </td>
-        </tr>
-        <tr>
-          <td>
-            <strong>
-              Efectivo en caja (anticipos):
-            </strong>
-          </td>
-          <td class="right">
-            <strong>
-              $ 539.50
-            </strong>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <br /><br />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    
+      <div class="returns-changes-container">
+
+        <table class="closure-returns-table">
+          <tbody>
+            <tr>
+              <td class="top-of-table">
+                Devoluciones:
+              </td>
+              <td class="top-of-table">
+                4
+              </td>
+              <td class="top-of-table right">
+                - $ 328.50
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>
+                  Efectivo en caja (solo devoluciones):
+                </strong>
+              </td>
+              <td></td>
+              <td class="right">
+                <strong>
+                  - $ 328.50
+                </strong>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <br /><br />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="closure-changes-table">
+          <tbody>
+            <tr>
+              <td class="top-of-table">
+                Cambios:
+              </td>
+              <td class="top-of-table">
+                2
+              </td>
+              <td class="top-of-table right">
+                $ 324.20
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Salidas de efectivo por cambios
+              </td>
+              <td></td>
+              <td class="right">
+                - $ 100.00
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Entradas de efectivo por cambios:
+              </td>
+              <td></td>
+              <td class="right">
+                $ 424.20
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>
+                  Efectivo en caja (solo cambios):
+                </strong>
+              </td>
+              <td></td>
+              <td class="right">
+                <strong>
+                  $ 324.20
+                </strong>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <br />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>  <!-- Terminan returns-changes-container -->
+
+      <div class="sales-payments-container">
+
+        <table class="closure-sales-table">
+          <tbody>
+            <tr>
+              <td class="top-of-table">
+                Ventas:
+              </td>
+              <td class="top-of-table right">
+                  $ 2,950.00
+                  <a href="#">
+                    <i class="fa fa-chevron-up hidden" aria-hidden="true" id="sales-hide"></i>
+                    <i class="fa fa-chevron-down" aria-hidden="true" id="sales-show"></i>
+                  </a>
+              </td>
+            </tr>
+            <tr>
+              <td class="sales-hide hidden"> Efectivo </td>
+              <td class="right sales-hide hidden"> $ 1,535.50 </td>
+            </tr>
+            <tr>
+              <td class="sales-hide hidden"> Tarjeta de débito </td>
+              <td class="right sales-hide hidden"> $ 2,621.00 </td>
+            </tr>
+            <tr>
+              <td class="sales-hide hidden"> Tarjeta de crédito </td>
+              <td class="right sales-hide hidden"> $ 894.00 </td>
+            </tr>
+            <tr>
+              <td class="sales-hide hidden"> Cheque </td>
+              <td class="right sales-hide hidden"> $ 400.00 </td>
+            </tr>
+            <tr>
+              <td class="sales-hide hidden"> Transferencias </td>
+              <td class="right sales-hide hidden"> $ 5,000.00 </td>
+            </tr>
+            <tr>
+              <td class="sales-hide hidden"> Ventas a crédito </td>
+              <td class="right sales-hide hidden"> $ 2,000.00 </td>
+            </tr>
+            <tr>
+              <td class="sales-hide hidden"> Otras formas de pago </td>
+              <td class="right sales-hide hidden"> $ 100.00 </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>
+                  Efectivo en caja (ventas):
+                </strong>
+              </td>
+              <td class="right">
+                <strong>
+                  $ 1,535.50
+                </strong>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <br />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="closure-payments-table">
+          <tbody>
+            <tr>
+              <td class="top-of-table">
+                Pagos:
+              </td>
+              <td class="top-of-table right">
+                  $ 1,450.00
+                  <a href="#">
+                    <i class="fa fa-chevron-up hidden" aria-hidden="true" id="payment-hide"></i>
+                    <i class="fa fa-chevron-down" aria-hidden="true" id="payment-show"></i>
+                  </a>
+               </td>
+            </tr>
+            <tr>
+              <td class="payment-hide hidden"> Efectivo </td>
+              <td class="right payment-hide hidden"> $ 539.50 </td>
+            </tr>
+            <tr>
+              <td class="payment-hide hidden"> Tarjeta de débito </td>
+              <td class="right payment-hide hidden"> $ 624.00 </td>
+            </tr>
+            <tr>
+              <td class="payment-hide hidden"> Tarjeta de crédito </td>
+              <td class="right payment-hide hidden"> $ 1,995.00 </td>
+            </tr>
+            <tr>
+              <td class="payment-hide hidden"> Cheque </td>
+              <td class="right payment-hide hidden"> $ 4,000.00 </td>
+            </tr>
+            <tr>
+              <td class="payment-hide hidden"> Transferencias </td>
+              <td class="right payment-hide hidden"> $ 1,000.00 </td>
+            </tr>
+            <tr>
+              <td class="payment-hide hidden"> Otras formas de pago </td>
+              <td class="right payment-hide hidden"> $ 250.00 </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>
+                  Efectivo en caja (pagos):
+                </strong>
+              </td>
+              <td class="right">
+                <strong>
+                  $ 539.50
+                </strong>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <br />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div> <!-- Terminan sales-payments-container -->
+
+      <div class="total-cash-container">
+        <table class="total-cash-table">
+          <tbody>
+            <tr>
+              <td class="top-of-table-black"> Efectivo total en caja </td>
+              <td class="right top-of-table-black"> $ 2,070.70 </td>
+            </tr>
+            <tr>
+              <td> <br /><br /><br /> </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cash-register-container">
+        <form class="new_register_close" id="new_register_close" action="open_register.html" accept-charset="UTF-8" method="post">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+          <div class="actions">
+            <input type="submit" name="commit" value="Cerrar caja" class="third-button" />
+          </div>
+        </form>
+      </div>
+
+    </div><!-- Termina closure-tables-container  -->
 
   </div><!-- Termina page-container  -->
-
- <!-- Inicia Modal -->
-  <div class="modal fade" id="clientes" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Alta de clientes</h4>
-        </div>
-        <div class="modal-body">
-          <p>One fine body&hellip;</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
-<!-- Termina Modal -->
 
 <!-- Temporalmente deshabilitada la Bottom Nav
   <div class="bottom-nav">

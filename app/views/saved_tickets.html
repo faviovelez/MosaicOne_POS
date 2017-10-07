@@ -71,7 +71,103 @@
  <!-- Terminan Pills -->
 
   <div class="page-container">
-
+    <!-- Inicia la tabla de resultados de tickets -->
+    <table class="saved-tickets">
+      <thead>
+        <tr>
+          <th colspan="10" class="head-blue">
+            Tickets guardados
+          </th>
+        </tr>
+        <tr>
+          <th> No. ticket </th>
+          <th> Fecha </th>
+          <th> Hora </th>
+          <th> Productos </th>
+          <th class="quantity-width"> Piezas </th>
+          <th> Cliente </th>
+          <th> Total </th>
+          <th> Atendió </th>
+          <th> Comentarios </th>
+          <th> Acciones </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td> 147 </td>
+          <td> 01/10/2017 </td>
+          <td> 04:20 pm </td>
+          <td> 4 </td>
+          <td> 8 </td>
+          <td> María Antonieta </td>
+          <td class="right"> $ 1,007.00 </td>
+          <td> Favio Velez </td>
+          <td> Facturar cuando llegue pedido 456 </td>
+          <td>
+            <span class="input-group-btn">
+              <button class="btn btn-default space-left pos-main-btn right-edge green-btn" type="button" data-toggle="modal" data-placement="left" title="Reactivar ticket" data-target="#activateTicket">
+                <i class="fa fa-play" aria-hidden="true"></i>
+              </button>
+            </span>
+            <span class="input-group-btn">
+              <button class="btn btn-default pos-main-btn left-edge red-btn" type="button" data-toggle="modal" data-placement="left" title="Cancelar ticket" data-target="#cancelTicket">
+                <i class="fa fa-stop" aria-hidden="true"></i>
+              </button>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td> 148 </td>
+          <td> 05/10/2017 </td>
+          <td> 10:15 am </td>
+          <td> 3 </td>
+          <td> 24 </td>
+          <td> - </td>
+          <td class="right"> $ 967.50 </td>
+          <td> Favio Velez </td>
+          <td> - </td>
+          <td>
+            <span class="input-group-btn">
+              <button class="btn btn-default space-left pos-main-btn right-edge green-btn" type="button" data-toggle="modal" data-placement="left" title="Reactivar ticket" data-target="#activateTicket">
+                <i class="fa fa-play" aria-hidden="true"></i>
+              </button>
+            </span>
+            <span class="input-group-btn">
+              <button class="btn btn-default pos-main-btn left-edge red-btn" type="button" data-toggle="modal" data-placement="left" title="Cancelar ticket" data-target="#cancelTicket">
+                <i class="fa fa-stop" aria-hidden="true"></i>
+              </button>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td> 149 </td>
+          <td> 06/10/2017 </td>
+          <td> 11:17 am </td>
+          <td> 1 </td>
+          <td> 20 </td>
+          <td> Jorge Hernandez </td>
+          <td class="right"> $ 423.50 </td>
+          <td> Juan Perez </td>
+          <td> Cliente regresa por la tarde </td>
+          <td>
+            <span class="input-group-btn">
+              <button class="btn btn-default space-left pos-main-btn right-edge green-btn" type="button" data-toggle="modal" data-placement="left" title="Reactivar ticket" data-target="#activateTicket">
+                <i class="fa fa-play" aria-hidden="true"></i>
+              </button>
+            </span>
+            <span class="input-group-btn">
+              <button class="btn btn-default pos-main-btn left-edge red-btn" type="button" data-toggle="modal" data-placement="left" title="Cancelar ticket" data-target="#cancelTicket">
+                <i class="fa fa-stop" aria-hidden="true"></i>
+              </button>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td> <br /> </td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- Termina la tabla de resultados de tickets -->
   </div><!-- Termina page-container  -->
 
  <!-- Inicia Modal -->
@@ -93,6 +189,52 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 <!-- Termina Modal -->
+
+<!-- Inicia mini Modal para confirmar si desea guardar el ticket -->
+ <div class="modal fade" id="activateTicket" tabindex="-1" role="dialog">
+   <div class="modal-dialog discount-change-modal" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title">Reactivar ticket</h4>
+       </div>
+       <div class="modal-body">
+         ¿Desea reactivar este ticket?
+       </div>
+       <div class="modal-footer">
+         <button class="btn btn-default pos-main-btn" type="button">
+           Confirmar
+           <i class="fa fa-check " aria-hidden="true"></i>
+         </button>
+       </div>
+
+     </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+ </div><!-- /.modal -->
+ <!-- Termina mini Modal para confirmar si desea guardar el ticket -->
+
+ <!-- Inicia mini Modal para confirmar si desea cancelar el ticket -->
+  <div class="modal fade" id="cancelTicket" tabindex="-1" role="dialog">
+    <div class="modal-dialog discount-change-modal" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Cancelar ticket</h4>
+        </div>
+        <div class="modal-body">
+          ¿Desea cancelar este ticket? Si lo hace, no podrá recuperarlo.
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-default pos-main-btn" type="button">
+            Confirmar
+            <i class="fa fa-check " aria-hidden="true"></i>
+          </button>
+        </div>
+
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <!-- Termina mini Modal para confirmar si desea cancelar el ticket -->
 
 <!-- Temporalmente deshabilitada la Bottom Nav
   <div class="bottom-nav">
