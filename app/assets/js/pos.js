@@ -123,6 +123,7 @@ $(".hide-results").click(function () {
 
     } else if ($("#change").hasClass('active-sale-option')) {
       $('.items-changes').removeClass('hidden');
+      $('.second-search').removeClass('hidden');
 
     } else if ($("#advance").hasClass('active-sale-option')) {
 
