@@ -362,3 +362,7 @@ button:active {
   margin-top: 12%;
   margin-left: 4%;
 }
+
+.minor-width {
+  width: 93.5%;
+}

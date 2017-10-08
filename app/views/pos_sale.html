@@ -84,7 +84,7 @@
       <div class="search-container">
         <div class="input-group">
           <span class="input-group-btn main-search">
-            <button class="btn btn-default pos-main-btn " type="button" data-toggle="modal" data-target="#productos" id="basic-addon1">
+            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#productos" id="basic-addon1">
               <i class="fa fa-archive " aria-hidden="true"></i>
             </button>
           </span>
@@ -280,9 +280,6 @@
             <td class="right"> $ 423.50 </td>
             <td> Juan Perez </td>
           </tr>
-          <tr>
-            <td> <br /> </td>
-          </tr>
         </tbody>
       </table>
       <!-- Termina la tabla de resultados de tickets -->
@@ -378,13 +375,14 @@
       <!-- Termina la tabla del ticket seleccionado en la búsqueda-->
 
       <!-- Segundo search (para cambios)-->
-      <div class="input-group second-search">
+      <div class="input-group second-search minor-width hidden">
         <span class="input-group-btn">
-          <button class="btn btn-default pos-main-btn " type="button" data-toggle="modal" data-target="#productos">
+          <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#productos">
             <i class="fa fa-archive " aria-hidden="true"></i>
           </button>
         </span>
-        <input type="text" class="form-control main-search" placeholder="Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+        <input type="text" class="form-control" placeholder="Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+      </div>
 
       <!-- Inicia la tabla del tickets para cambiar artículos (devolver y comprar otro)-->
       <table class="items-changes hidden">
