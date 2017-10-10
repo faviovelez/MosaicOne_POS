@@ -6,11 +6,16 @@ const BrowserWindow = electron.BrowserWindow;
 let mainWindow = null;
 
 app.on('window-all-closed',() => {
-   if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('ready', () => {
-   mainWindow = new BrowserWindow({icon:'app/assets/img/business.png'});
-   mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_in.html`);
-   mainWindow.on('closed', () => { mainWindow = null; });
+  mainWindow = new BrowserWindow();
+  mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_in.html`);
+
+  setTimeout(function(){
+    mainWindow.loadURL(`file://${app.getAppPath()}/app/views/configuration.html`);
+  }, 5000);
+
+  mainWindow.on('closed', () => { mainWindow = null; });
 });
