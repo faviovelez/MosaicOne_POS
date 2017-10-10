@@ -14,7 +14,7 @@
   <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
   <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
   <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
-  <script src="../assets/js/pos.js" charset="utf-8"></script>
+  <script src="../assets/js/options.js" charset="utf-8"></script>
 </head>
 <body>
 
@@ -65,14 +65,208 @@
        <li role="presentation" class="hidden" id="cashRegisterOpen"><a href="open_register.html">Apertura de caja</a></li>
        <li role="presentation" id="pos"><a href="pos_sale.html">Punto de Venta</a></li>
        <li role="presentation"><a href="saved_tickets.html" id="savedTickets">Tickets guardados</a></li>
-       <li role="presentation" class="active"><a href="configuration.html" id="config">Configuración</a></li>
+       <li role="presentation" class="active"><a href="configuration.html" id="config">Opciones adicionales</a></li>
+       <li role="presentation" class="hidden"><a href="product_prices.html" id="config">Lista de precios</a></li>
      </ul>
   </div>
  <!-- Terminan Pills -->
 
   <div class="page-container">
 
-  </div><!-- Termina page-container  -->
+    <ul class="action-list">
+      <li>
+        <a href="#" id="cashAlert">
+          Crear / Modificar alerta de efectivo
+        </a>
+      </li>
+      <li>
+        <a href="#" id="registerDeposit">
+          Registrar un depósito
+        </a>
+      </li>
+      <li>
+        <a href="#" id="registerWithdrawal">
+          Registrar un retiro
+        </a>
+      </li>
+      <li>
+        <a href="#" id="createRegister">
+          Crear nueva caja
+        </a>
+      </li>
+      <li>
+        <a href="#" id="deleteRegister">
+          Eliminar caja
+        </a>
+      </li>
+      <li>
+        <a href="product_prices.html">
+          Ir a lista de precios
+        </a>
+      </li>
+    </ul>
+
+    <div class="options-container">
+      <div class="cash-alert hidden">
+
+        <h3 class="title-blue open-register-title space-bottom"> Alertar cuando el efectivo llegue a: </h3>
+        <p> Esta acción aplicará para todas las cajas de esta tienda de manera individual. </p>
+        <form class="new_register_open" id="new_register_open" action="configuration.html" accept-charset="UTF-8" method="post">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+          <div class="field ">
+            <label for="register_open_initial_cash">Monto mínimo para alerta</label><br>
+            <input placeholder="Ejemplo: $1,000.00" class="form-control round-form transparent-field" type="text" value="" name="register_open[initial_cash]" id="register_open_initial_cash" />
+          </div>
+
+          <br /><br />
+          <div class="actions">
+            <input type="submit" name="commit" value="Crear alerta" class="main-button" />
+          </div>
+        </form>
+      </div>
+
+      <div class="register-withdrawal hidden">
+
+        <h3 class="title-blue open-register-title space-bottom"> Registrar retiro </h3>
+        <p> Esta acción afectará el saldo registrado en la caja seleccionada. </p>
+        <br />
+        <form class="new_register_open" id="new_register_open" action="configuration.html" accept-charset="UTF-8" method="post">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+          <table class="cash-withdrawal-table">
+            <tbody>
+              <tr>
+                <td>
+                  <select name="discount_rule_options" class="myfield" id="discount_rule_options">
+                    <option value="1">Caja 1</option>
+                    <option value="2">Caja 2</option>
+                  </select>
+                </td>
+                <td>
+                  <strong>
+                  Efectivo:
+                </strong>
+                    $ 200.00
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <br />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="new_cash_withdrawal">Descripción del retiro</label><br>
+                  <input placeholder="Depósito banco" class="form-control round-form transparent-field" type="text" value="" name="new_cash_withdrawal[description]" id="new_cash_withdrawal_description" />
+                 </td>
+                 <td>
+                   <label for="new_cash_withdrawal">Monto del retiro</label><br>
+                   <input placeholder="Ejemplo: $1,000.00" class="form-control round-form transparent-field" type="text" value="" name="new_cash_withdrawal[amount]" id="new_cash_withdrawal_amount" />
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="actions">
+            <input type="submit" name="commit" value="Registrar retiro" class="main-button" />
+          </div>
+        </form>
+
+      </div>
+
+      <div class="register-deposit hidden">
+
+        <h3 class="title-blue open-register-title space-bottom"> Registrar depósito </h3>
+        <p> Por favor seleccione la caja a la cuál hará el depósito.</p>
+        <br />
+        <form class="new_register_open" id="new_register_open" action="configuration.html" accept-charset="UTF-8" method="post">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+          <table class="cash-deposit-table">
+            <tbody>
+              <tr>
+                <td>
+                  <select name="discount_rule_options" class="myfield" id="discount_rule_options">
+                    <option value="1">Caja 1</option>
+                    <option value="2">Caja 2</option>
+                  </select>
+                </td>
+                <td>
+                  <strong>
+                  Efectivo:
+                </strong>
+                    $ 200.00
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <br />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="new_cash_deposit">Descripción del depósito</label><br>
+                  <input placeholder="Apertura de caja" class="form-control round-form transparent-field" type="text" value="" name="new_cash_deposit[description]" id="new_cash_deposit_description" />
+                 </td>
+                 <td>
+                   <label for="new_cash_deposit">Monto del depósito</label><br>
+                   <input placeholder="Ejemplo: $1,000.00" class="form-control round-form transparent-field" type="text" value="" name="new_cash_deposit[amount]" id="new_cash_deposit_amount" />
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="actions">
+            <input type="submit" name="commit" value="Registrar depósito" class="main-button" />
+          </div>
+        </form>
+
+      </div>
+
+      <div class="delete-cash-register hidden">
+
+        <h3 class="title-blue open-register-title space-bottom"> Eliminar caja </h3>
+        <p> Por favor seleccione la caja que desea eliminar.</p>
+        <br />
+        <form class="new_register_open" id="new_register_open" action="configuration.html" accept-charset="UTF-8" method="post">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+          <div class="actions">
+            <select name="discount_rule_options" class="myfield" id="discount_rule_options">
+              <option value="1">Caja 1</option>
+              <option value="2">Caja 2</option>
+            </select>
+          </div>
+          <br />
+
+          <div class="actions">
+            <input type="submit" name="commit" value="Eliminar caja" class="third-button" />
+          </div>
+        </form>
+
+      </div>
+
+      <div class="create-cash-register hidden">
+
+        <h3 class="title-blue open-register-title space-bottom"> Crear caja </h3>
+        <p> ¿Desea crear una nueva caja?</p>
+        <br />
+        <form class="new_register_open" id="new_register_open" action="configuration.html" accept-charset="UTF-8" method="post">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+          <br />
+          <div class="actions">
+            <input type="submit" name="commit" value="Crear caja" class="main-button" />
+          </div>
+        </form>
+
+      </div>
+
+  </div><!-- Termina options-container  -->
 
  <!-- Inicia Modal -->
   <div class="modal fade" id="clientes" tabindex="-1" role="dialog">

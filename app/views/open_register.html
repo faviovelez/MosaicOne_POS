@@ -67,12 +67,14 @@
        <li role="presentation" class="active" id="cashRegisterOpen"><a href="open_register.html">Apertura de caja</a></li>
        <li role="presentation" id="pos"><a href="pos_sale.html">Punto de Venta</a></li>
        <li role="presentation"><a href="saved_tickets.html" id="savedTickets">Tickets guardados</a></li>
-       <li role="presentation"><a href="configuration.html" id="config">Configuración</a></li>
+       <li role="presentation"><a href="configuration.html" id="config">Opciones adicionales</a></li>
+       <li role="presentation" class="hidden"><a href="product_prices.html" id="config">Lista de precios</a></li>
      </ul>
   </div>
  <!-- Terminan Pills -->
 
   <div class="page-container">
+
     <div class="cash-register-container-open">
       <h2 class="title-blue open-register-title"> Abrir caja </h2>
       <form class="new_register_open" id="new_register_open" action="pos_sale.html" accept-charset="UTF-8" method="post">
@@ -80,7 +82,14 @@
         <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
         <div class="field ">
           <label for="register_open_initial_cash">Efectivo inicial</label><br>
-          <input placeholder="Ejemplo: $1,000.00" class="form-control round-form transparent-field" type="text" value="" name="register_open[initial_cash]" id="register_open_initial_cash" />
+          <input placeholder="Ejemplo: $1,000.00" class="form-control round-form transparent-field" type="text" value="$ 3,542.50" name="register_open[initial_cash]" id="register_open_initial_cash" />
+        </div>
+
+        <div class="field"> </br>
+          <p>
+            <input type="checkbox" name="vehicle" value="auto" class="margin-right" checked>
+            Abrir con efectivo del cierre anterior
+          </p>
         </div>
 
         <div class="field">
@@ -95,8 +104,8 @@
           <input type="submit" name="commit" value="Abrir caja" class="main-button" />
         </div>
       </form>
-
     </div>
+
     <div class="side-img-container">
       <img src="../assets/img/box-key.jpg" alt="Caja con llave" class="side-img">
     </div>

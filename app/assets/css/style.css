@@ -17,6 +17,10 @@ nav {
 html {
 }
 
+.justify {
+  text-align: justify;
+}
+
 .fixed {
   position: fixed;
   background-color: #fff;
@@ -134,7 +138,6 @@ html {
   text-align: right !important;
 }
 
-
 .navbar-default .navbar-nav > li > a, .username {
   color: #d5dce4;
 }
@@ -241,4 +244,12 @@ a.text-link:hover, a.text-link:active, a.text-link:visited, a.text-link:focus {
    border-bottom: 3px;
    text-align: center;
    border-radius: 10px;
+ }
+
+ .third-button:hover {
+   color: #364150;
+ }
+
+ .main-button:hover {
+   color: #fff;
  }

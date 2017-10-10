@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title> POS Sistema DC </title>
+  <link rel="stylesheet" href="../vendor/assets/css/bootstrap.css">
+  <link rel="stylesheet" href="../vendor/assets/css/font-awesome.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/pills.css">
+  <link rel="stylesheet" href="../assets/css/pos.css">
+  <link rel="stylesheet" href="../assets/css/bottom-nav.css">
+  <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
+  <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
+  <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+  <script src="../assets/js/pos.js" charset="utf-8"></script>
+</head>
+<body>
+
+  <!-- Inicia Navbar -->
+  <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <div class="corner-logo">
+        <a href="#">
+          <img src="../assets/img/sistema-dc-3.png" alt="Logo Sistema DC" class="logo img-responsive">
+        </a>
+      </div>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="#" id="username">
+            <i class="fa fa-user-circle-o bigger-icon" aria-hidden="true"></i>
+            Bienvenido, Favio Velez
+          </a>
+        </li>
+        <li>
+          <a href="#" id="store">
+             Franquicia - Aguascalientes
+          </a>
+        </li>
+        <li>
+          <a href="sign_in.html">Cerrar sesión</a>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+ </nav>
+  <!-- Termina Navbar -->
+
+ <!-- Inician Pills-->
+  <div class="row pills-row fixed z-index">
+     <ul class="nav nav-tabs">
+       <li role="presentation" id="cashRegisterClose"><a href="close_register.html">Cierre de caja</a></li>
+       <li role="presentation" class="hidden" id="cashRegisterOpen"><a href="open_register.html">Apertura de caja</a></li>
+       <li role="presentation" id="pos"><a href="pos_sale.html">Punto de Venta</a></li>
+       <li role="presentation"><a href="saved_tickets.html" id="savedTickets">Tickets guardados</a></li>
+       <li role="presentation"><a href="configuration.html" id="config">Opciones adicionales</a></li>
+       <li role="presentation" class="active"><a href="product_prices.html" id="config">Lista de precios</a></li>
+     </ul>
+
+       <table class="list-status-table">
+         <tbody>
+           <tr>
+             <td class="left">
+               Estatus:
+             </td>
+             <td>
+               <span class="label label-danger list-status-info">
+                 <a href="#" data-toggle="modal" data-target="#changePriceList">
+                   Sin actualizar
+                 </a>
+               </span>
+               <span class="label label-success list-status-info hidden">
+                 Actualizada
+               </span>
+             </td>
+           </tr>
+           <tr>
+             <td class="left">
+               Sobreprecio
+             </td>
+             <td>
+               10%
+             </td>
+           </tr>
+           <tr>
+             <td class="left">
+               Cambios en productos:
+             </td>
+             <td>
+               <a href="#">
+                 Consultar
+               </a>
+             </td>
+           </tr>
+           <tr>
+             <td class="left">
+               Cambios en precios:
+             </td>
+             <td>
+               <a href="#">
+                 Consultar
+               </a>
+             </td>
+           </tr>
+         </tbody>
+       </table>
+    </div>
+ <!-- Terminan Pills -->
+
+  <div class="page-container">
+
+
+    <table class="price-list-table">
+      <thead>
+        <tr class="head-black">
+          <th class="rounded-edges-left"> Código</th>
+          <th> Descripción </th>
+          <th> Color </th>
+          <th> Medidas </th>
+          <th> Material </th>
+          <th> Resistencia </th>
+          <th> Línea </th>
+          <th class="rounded-edges-right"> Precio de venta </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 1234 </td>
+          <td> Un producto muy especial </td>
+          <td> Kraft </td>
+          <td> 10.0 x 20.50 x 30.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 26 ECT </td>
+          <td> Empaque y embalaje </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 12.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 4567 </td>
+          <td> Caja Regular CR </td>
+          <td> Kraft </td>
+          <td> 30.0 x 40.50 x 50.40 </td>
+          <td> Corrugado </td>
+          <td> 16kg - 26 ECT </td>
+          <td> Hogar </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 32.50
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> 3471 </td>
+          <td> Arhigaveta </td>
+          <td> Kraft </td>
+          <td> 20.0 x 37.20 x 21.40 </td>
+          <td> Corrugado </td>
+          <td> 12kg - 24 ECT </td>
+          <td> Oficina </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#changeSinglePrice">
+              $ 22.50
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div><!-- Termina page-container  -->
+
+ <!-- Inicia mini Modal para cambiar precios individuales -->
+  <div class="modal fade" id="changeSinglePrice" tabindex="-1" role="dialog">
+    <div class="modal-dialog price-change-modal" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Cambiar precio</h4>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <input type="text" class="form-control smaller-form" placeholder="$ 1.00">
+            <span class="input-group-btn main-search">
+              <button class="btn btn-default pos-main-btn" type="submit" value="submit">
+                <i class="fa fa-check " aria-hidden="true"></i>
+              </button>
+            </span>
+          </div><!-- /input-group -->
+          <br />
+          <input type="checkbox" name="vehicle" value="auto" class="margin-right">Actualizar manualmente<br>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+<!-- Termina mini Modal para cambiar precios individuales -->
+
+<!-- Inicia mini Modal para actualizar toda la lista de precios -->
+ <div class="modal fade" id="changePriceList" tabindex="-1" role="dialog">
+   <div class="modal-dialog price-change-modal" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title"> Actualizar precios </h4>
+       </div>
+       <div class="modal-body">
+        <p class="justify">
+          Esta acción modificará toda la lista de precios con la información más reciente.<br><br>
+          Los productos que estén marcados con actualización manual, permanecerán con el mismo precio. <br /><br />
+        </p>
+         <input type="checkbox" name="vehicle" value="auto" checked class="margin-right">Actualizar con sobreprecio<br /><br />
+         <div class="input-group">
+           <input type="text" class="form-control smaller-form" placeholder="Ejemplo: 10%">
+           <span class="input-group-btn main-search">
+             <button class="btn btn-default pos-main-btn" type="submit" value="submit">
+               <i class="fa fa-check " aria-hidden="true"></i>
+             </button>
+           </span>
+         </div><!-- /input-group -->
+         <br />
+       </div>
+     </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+ </div><!-- /.modal -->
+<!-- Termina mini Modal para cambiar precios individuales -->
+
+
+<!-- Temporalmente deshabilitada la Bottom Nav
+  <div class="bottom-nav">
+    <a href="#">
+      <i class="fa fa-print bigger-icon " aria-hidden="true"></i>
+      Reimprimir
+    </a>
+  </div>
+-->
+
+</body>
+</html>
