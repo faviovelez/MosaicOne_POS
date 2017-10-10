@@ -374,4 +374,16 @@ $(".hide-results").click(function () {
     $('#returnCash').removeClass('selected');
   });
 
+  $(".show-payments").click(function () {
+    $('.payments-received-on-ticket-two').removeClass('hidden');
+    $(".show-payments").addClass('hidden');
+    $(".hide-payments").removeClass('hidden');
+  });
+
+  $(".hide-payments").click(function () {
+    $('.payments-received-on-ticket-two').addClass('hidden');
+    $(".hide-payments").addClass('hidden');
+    $(".show-payments").removeClass('hidden');
+  });
+
 });

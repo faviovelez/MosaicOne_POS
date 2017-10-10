@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title> POS Sistema DC </title>
+  <link rel="stylesheet" href="../vendor/assets/css/bootstrap.css">
+  <link rel="stylesheet" href="../vendor/assets/css/font-awesome.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/pills.css">
+  <link rel="stylesheet" href="../assets/css/pos.css">
+  <link rel="stylesheet" href="../assets/css/cash_register.css">
+  <link rel="stylesheet" href="../assets/css/bottom-nav.css">
+  <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
+  <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
+  <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+  <script src="../assets/js/pos.js" charset="utf-8"></script>
+  <script src="../assets/js/close_register.js" charset="utf-8"></script>
+</head>
+<body>
+
+  <!-- Inicia Navbar -->
+  <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <div class="corner-logo">
+        <a href="#">
+          <img src="../assets/img/sistema-dc-3.png" alt="Logo Sistema DC" class="logo img-responsive">
+        </a>
+      </div>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="#" id="username">
+            <i class="fa fa-user-circle-o bigger-icon" aria-hidden="true"></i>
+            Bienvenido, Favio Velez
+          </a>
+        </li>
+        <li>
+          <a href="#" id="store">
+             Franquicia - Aguascalientes
+          </a>
+        </li>
+        <li>
+          <a href="sign_in.html">Cerrar sesión</a>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+ </nav>
+  <!-- Termina Navbar -->
+
+ <!-- Inician Pills-->
+  <div class="row pills-row fixed z-index">
+     <ul class="nav nav-tabs">
+       <li role="presentation" class="hidden" id="cashRegisterClose"><a href="close_register.html">Cierre de caja</a></li>
+       <li role="presentation" class="active" id="cashRegisterClose"><a href="close_register.html">Detalle de pagos</a></li>
+       <li role="presentation" class="hidden" id="cashRegisterOpen"><a href="open_register.html">Apertura de caja</a></li>
+       <li role="presentation" id="pos"><a href="pos_sale.html">Punto de Venta</a></li>
+       <li role="presentation"><a href="saved_tickets.html" id="savedTickets">Tickets guardados</a></li>
+       <li role="presentation"><a href="configuration.html" id="config">Opciones adicionales</a></li>
+       <li role="presentation" class="hidden"><a href="product_prices.html" id="config">Lista de precios</a></li>
+     </ul>
+  </div>
+ <!-- Terminan Pills -->
+
+   <h3 class="title-close-register title-blue">
+     Tickets de pagos caja
+     <span> 1 </span>
+   </h3>
+
+  <div class="page-container">
+
+    <div class="ticket-details-change">
+
+    <table class="payments-received-on-ticket-two">
+      <thead>
+        <tr>
+          <th colspan="5" class="head-black center">
+            Pagos a ticket:
+            <span id="ticket-id">
+              185
+            </span>
+             -
+            <span id="ticket-date">
+              17/10/2017
+            </span>
+            -
+            <span id="ticket-user">
+              Usuario: Favio Velez
+            </span>
+            -
+            <span id="ticket-prospect">
+              Cliente: Juan Perez
+            </span>
+          </th>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <th>
+            Operación
+          </th>
+          <th>
+            Forma de pago
+          </th>
+          <th>
+            Fecha
+          </th>
+          <th>
+            Atendió
+          </th>
+          <th class="right">
+            Monto
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td> Pago </td>
+          <td> Efectivo </td>
+          <td> 18/09/2017 </td>
+          <td> Favio Velez </td>
+          <td class="right"> $1,000.00 </td>
+        </tr>
+        <tr>
+          <td colspan="3"> </td>
+          <td class="top-border">
+            <strong>
+              Total (neto):
+            </strong>
+           </td>
+           <td class="top-border right">
+             <strong>
+               $200.00
+             </strong>
+           </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  </div><!-- Termina page-container  -->
+
+  <div class="actions">
+    <a href="close_register.html">
+      <p>
+        Resumen de cierre
+      </p>
+    </a>
+    <a href="register_sales_details.html">
+      <p>
+        Detalles de ventas
+      </p>
+    </a>
+    <a href="register_returns_details.html">
+      <p>
+        Detalle de devoluciones
+      </p>
+    </a>
+    <a href="register_changes_details.html">
+      <p>
+        Detalle de cambios
+      </p>
+    </a>
+    <a href="register_payments_details.html">
+      <p>
+        Detalle de pagos
+      </p>
+    </a>
+    <a href="#">
+      <p>
+        Imprimir
+      </p>
+    </a>
+
+  </div>
+
+<!-- Temporalmente deshabilitada la Bottom Nav
+  <div class="bottom-nav">
+    <a href="#">
+      <i class="fa fa-print bigger-icon " aria-hidden="true"></i>
+      Reimprimir
+    </a>
+  </div>
+-->
+
+</body>
+</html>

@@ -253,3 +253,23 @@ a.text-link:hover, a.text-link:active, a.text-link:visited, a.text-link:focus {
  .main-button:hover {
    color: #fff;
  }
+
+.red-modal-button {
+  background-color: #D72638 !important;
+  border: 1px solid #D72638 !important;
+}
+
+.green-modal-button {
+  background-color: #BAFF29 !important;
+  border: 1px solid #BAFF29 !important;
+  color: #364150;
+}
+
+.green-modal-button:hover,
+.green-modal-button:focus,
+.red-modal-button:hover,
+.red-modal-button:focus {
+  background-color: #232c37 !important;
+  border: 1px solid #232c37 !important;
+  color: #fff !important;
+}

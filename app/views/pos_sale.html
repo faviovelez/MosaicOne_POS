@@ -85,7 +85,7 @@
       <div class="search-container">
         <div class="input-group">
           <span class="input-group-btn main-search">
-            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#productos" data-placement="left" title="Alta de productos" id="basic-addon1">
+            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#warehouseEntry" data-placement="left" title="Entrada de mercancía" id="basic-addon1">
               <i class="fa fa-archive " aria-hidden="true"></i>
             </button>
           </span>
@@ -175,7 +175,7 @@
       </div>
 
       <!-- Inicia la tabla de ventas (agrega conforme a la barra de búsqueda, se elimina con el botón rojo)-->
-      <table class="items-sales extra-margin">
+      <table class="items-sales">
         <thead>
           <tr>
             <th> </th>
@@ -677,6 +677,7 @@
         </span>
       </div>
       <div class="prospect-tag-container">
+
         <table class="prospect-table">
           <tbody>
             <tr>
@@ -688,15 +689,23 @@
                 </div>
               </td>
               <td class="prospect_name">
-                Juan Pérez
+                Pedro Martínez
               </td>
-              <td> <a href="#">
-                Detalles
-              </a>
-            </td>
+              <td>
+                <select name="bill_tag" class="myfield" id="prospect_bill_tag">
+                  <option value="1">Sin factura</option>
+                  <option value="2">Facturar</option>
+                </select>
+              </td>
+              <td>
+                <a href="#" data-toggle="modal" data-target="#billCfdiUse">
+                  Detalles
+                </a>
+              </td>
             </tr>
           </tbody>
         </table>
+
       </div>
 
       <div class="discounts-container">
@@ -879,7 +888,7 @@
           </span>
         </div><!-- /input-group -->
       </div><!-- /.row -->
-      <input type="text" class="form-control higher-form process-sale" placeholder="Comentarios">
+      <input type="text" class="form-control higher-form process-sale" placeholder="Comentarios"><br /><br />
 
     </div> <!-- Termina right-container  -->
   </div><!-- Termina page-container  -->
@@ -1059,6 +1068,65 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
   <!-- Termina mini Modal para confirmar si desea cancelar el ticket -->
+
+  <!-- Inicia mini Modal para llenar datos de uso de la factura -->
+   <div class="modal fade" id="billCfdiUse" tabindex="-1" role="dialog">
+     <div class="modal-dialog" role="document">
+       <div class="modal-content">
+         <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+           <h4 class="modal-title">Datos de factura y uso del CFDI</h4>
+         </div>
+         <div class="modal-body">
+           <table class="cfdi-use-table">
+             <tbody>
+               <tr>
+                 <td class="center">
+                   <strong>
+                     Nombre o razón social:
+                   </strong>
+                 </td>
+                 <td class="center">
+                   <strong>
+                     RFC:
+                   </strong>
+                 </td>
+                 <td class="center">
+                   <strong>
+                     Uso de CFDI:
+                   </strong>
+                 </td>
+               </tr>
+               <tr>
+                 <td class="prospect_name center">
+                   Pedro Martínez
+                 </td>
+                 <td class="center">
+                   MAPE811023JR8
+                 </td>
+                 <td colspan="2">
+                   <select class="prospect_business_type" name="business_type" id="prospect_business_type">
+                     <option value="persona física">Gastos en general</option>
+                     <option value="persona moral">Adquisición de mercancías</option>
+                   </select>
+                 </td>
+               </tr>
+             </tbody>
+           </table>
+         </div>
+         <div class="modal-footer">
+           <button class="btn btn-default pos-main-btn red-modal-button" type="button" data-toggle="modal" data-target="#newProspect">
+             Editar cliente
+           </button>
+
+           <button class="btn btn-default pos-main-btn" type="button">
+             Confirmar
+           </button>
+         </div>
+       </div><!-- /.modal-content -->
+     </div><!-- /.modal-dialog -->
+   </div><!-- /.modal -->
+   <!-- Termina mini Modal para confirmar si desea cancelar el ticket -->
 
   <!-- Inicia Modal para registrar datos de envío -->
    <div class="modal fade" id="deliveryService" tabindex="-1" role="dialog">
@@ -1455,6 +1523,70 @@
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
     <!-- Termina Modal para registrar clientes -->
+
+    <!-- Inicia Modal para alta de productos -->
+     <div class="modal fade" id="warehouseEntry" tabindex="-1" role="dialog">
+       <div class="modal-dialog" role="document">
+         <div class="modal-content">
+           <div class="modal-header">
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+             <h4 class="modal-title">Alta de mercancías</h4>
+           </div>
+           <div class="modal-body">
+
+             <table class="items-sales center-table">
+               <thead>
+                 <tr>
+                   <th colspan="4">
+                     <input type="text" class="form-control main-search" placeholder="Buscar Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+                   </th>
+                 </tr>
+                 <tr>
+                     <th> <br /></th>
+                 </tr>
+                 <tr class="head-blue">
+                   <th class="rounded-edges-left"> </th>
+                   <th> Producto o Servicio </th>
+                   <th> Color/Diseño </th>
+                   <th class="rounded-edges-right"> Cantidad </th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr>
+                   <td>
+                     <div class="close-icon">
+                       <button type="button" class="close center-close" aria-label="Close">
+                         <span aria-hidden="true" class="white-light">&times;</span>
+                       </button>
+                     </div>
+                    </td>
+                   <td class="left">
+                     Bolsa para botella Kraft Satinada Navideña
+                   </td>
+                   <td> Kraft </td>
+                   <td>
+                     <input type="text" class="form-control smaller-form" placeholder="1">
+                   </td>
+                 </tr>
+               </tbody>
+             </table>
+
+             <div class="actions">
+               <input type="submit" name="commit" value="Confirmar alta" class="main-button" />
+             </div>
+           </div>
+
+           <div class="modal-footer">
+           </div>
+
+         </div><!-- /.modal-content -->
+       </div><!-- /.modal-dialog -->
+     </div><!-- /.modal -->
+   <!-- Termina Modal para alta de produtos-->
+
+
+
+
 
 <!-- Temporalmente deshabilitada la Bottom Nav
   <div class="bottom-nav">

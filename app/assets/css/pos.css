@@ -164,6 +164,10 @@
   color: #fff;
 }
 
+.center {
+  text-align: center;
+}
+
 .white-light {
   color: #fff;
   font-weight: normal;
@@ -193,7 +197,7 @@
 
 .prospect-table > tbody > tr > td {
   text-align: center;
-  padding: 0.5rem 2rem;
+  padding: 0.5rem 1rem;
 }
 
 .icon-close-td {
@@ -399,8 +403,6 @@ button:active {
   height: 20px;
 }
 
-
-
 .smaller-form {
   width: 80px;
   text-align: center;
@@ -470,7 +472,8 @@ th > label {
 }
 
 select#prospect_business_type,
-select#discount_rule_options {
+select#discount_rule_options,
+.myfield {
   background-color: #fff;
   border-radius: 8px;
   padding: 0.7rem 2rem;
@@ -522,7 +525,6 @@ select#discount_rule_options {
   border-radius: 10px;
 }
 
-
 .space-bottom {
   margin-bottom: 30px;
 }
@@ -552,4 +554,56 @@ select#discount_rule_options {
 .active-list:hover,
 .active-list:focus {
   text-decoration: none;
+}
+
+.cfdi-use-table > tbody > tr > td {
+  padding: 0 1rem;
+}
+
+.center-table {
+  margin: 0 auto;
+}
+
+.ticket-details {
+  margin-left: 0 auto;
+  width: 76%;
+  margin-left: 12%;
+  margin-top: 16%;
+}
+
+.ticket-details-change {
+  margin-left: 0 auto;
+  width: 82%;
+  margin-left: 9%;
+  margin-top: 16%;
+}
+
+.gray > td {
+  color: gray;
+}
+
+.payments-received-on-ticket-two {
+  width: 95%;
+}
+
+.payments-received-on-ticket-two > thead > tr > th,
+.payments-received-on-ticket-two > tbody > tr > td,
+.sales-of-the-day > thead > tr > th,
+.sales-of-the-day > tbody > tr > td  {
+  text-align: center;
+}
+
+.top-border {
+  border-top: 1px solid black;
+}
+
+i.fa.fa-chevron-down.show-payments,
+i.fa.fa-chevron-up.hide-payments {
+  color: #fff;
+}
+
+
+i.fa.fa-chevron-down.show-payments:hover,
+i.fa.fa-chevron-up.hide-payments:hover {
+  color: #009CB7;
 }
