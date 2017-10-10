@@ -10,7 +10,7 @@ app.on('window-all-closed',() => {
 });
 
 app.on('ready', () => {
-   mainWindow = new BrowserWindow();
+   mainWindow = new BrowserWindow({icon:'app/assets/img/business.png'});
    mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_in.html`);
    mainWindow.on('closed', () => { mainWindow = null; });
 });

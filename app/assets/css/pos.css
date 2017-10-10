@@ -10,12 +10,33 @@
   width: 94%
 }
 
+.margin-right {
+  margin-right: 2rem !important;
+}
+
 .right-container {
   margin-top: 5%;
   margin-right: 2.5%;
   width: 32%;
   margin-left: 0;
   padding-left: 0;
+}
+
+.list-status-table {
+  position: absolute;
+  top: 10%;
+  margin-left: 122%;
+  width: 300px;
+}
+
+.list-status-table > tbody > tr > td > .label > a {
+  color: #fff;
+  padding: 0.5rem 1rem;
+}
+
+.list-status-table > tbody > tr > td {
+  padding: 0.2rem 0.5rem;
+  text-align: center;
 }
 
 .left-container {
@@ -54,6 +75,16 @@
   background-color: #232c37;
   color: #fff;
   border-radius: 5px;
+}
+
+.rounded-edges-right {
+  border-top-right-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+.rounded-edges-left {
+  border-top-left-radius: 10px !important;
+  border-bottom-left-radius: 10px !important;
 }
 
 .gray-btn {
@@ -143,6 +174,31 @@
   color: #fff;
 }
 
+.padding-right {
+  padding-right: 30px;
+}
+
+.margin-bottom {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.prospect-table {
+  margin: 0 auto;
+}
+
+.prospect-tag-container {
+  margin-top: 10px;
+}
+
+.prospect-table > tbody > tr > td {
+  text-align: center;
+  padding: 0.5rem 2rem;
+}
+
+.icon-close-td {
+  padding: 0.5rem 0 !important;
+}
 
 .items-sales,
 .items-returns,
@@ -156,7 +212,9 @@
 }
 
 .ticket-results > thead > tr > th,
-.ticket-results > tbody > tr > td {
+.ticket-results > tbody > tr > td,
+.payments-received-on-ticket > thead > tr > th,
+.payments-received-on-ticket > tbody > tr > td {
   text-align: center;
   padding: 0.5rem 2.9rem;
   font-size: 1.5rem;
@@ -181,6 +239,18 @@
 .total-table > tbody > tr > td {
   text-align: center;
   padding: 0.5rem 0.5rem;
+  font-size: 1.5rem;
+}
+
+.price-list-table {
+  margin-top: 14%;
+  margin-left: 8%;
+}
+
+.price-list-table > tbody > tr > td,
+.price-list-table > thead > tr > th {
+  text-align: center;
+  padding: 0.5rem 1.5rem;
   font-size: 1.5rem;
 }
 
@@ -229,7 +299,8 @@ p {
   padding: 0 1rem;
 }
 
-.payment-form-wrapper {
+.payment-form-wrapper,
+.discounts-form-wrapper {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -293,7 +364,6 @@ button:active {
 
 .myfield {
   background-color: #F5F2F7;
-  color: #5BC0DE;
   border-radius: 8px;
   box-shadow: none;
   padding-top: 0.5rem;
@@ -328,6 +398,8 @@ button:active {
   width: 330px;
   height: 20px;
 }
+
+
 
 .smaller-form {
   width: 80px;
@@ -365,4 +437,119 @@ button:active {
 
 .minor-width {
   width: 93.5%;
+}
+
+.title-margin-modal,
+.table-margin-modal {
+  margin-top: 4%;
+}
+
+th > label {
+  color: gray;
+  text-align: center;
+}
+
+.delivery-services-table tbody tr td,
+.prospect-details-table tbody tr td {
+  padding-right: 2px;
+  padding-left: 2px;
+}
+
+.edge-right {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.edge-left {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.payments-received-on-ticket {
+  margin-left: 7%;
+}
+
+select#prospect_business_type,
+select#discount_rule_options {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 0.7rem 2rem;
+  border: 1px solid lightgray;
+}
+
+.action-list {
+  margin-top: 20%;
+  margin-left: 5%;
+}
+
+.action-list > li > a {
+  font-size: 1.8rem;
+}
+
+.action-list > li {
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  list-style-type: none;
+}
+
+.options-container {
+  margin-top: 13%;
+  margin-left: 10%;
+}
+
+.cash-alert {
+  width: 80%;
+  border: 1px solid lightgray;
+  padding: 5rem;
+  border-radius: 10px;
+}
+
+.delete-cash-register {
+  margin-top: 15%;
+}
+
+.create-cash-register {
+  margin-top: 25%;
+}
+
+.register-deposit,
+.register-withdrawal,
+.delete-cash-register,
+.create-cash-register {
+  width: 100%;
+  border: 1px solid lightgray;
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+
+.space-bottom {
+  margin-bottom: 30px;
+}
+
+.cash-withdrawal-table,
+.cash-deposit-table {
+  width: 100%
+}
+
+.cash-withdrawal-table > tbody > tr > td,
+.cash-deposit-table > tbody > tr > td {
+  padding: 0.5rem 1rem;
+}
+
+.active-list {
+  background-color: #00B3D3;
+  color: #fff !important;
+  text-decoration: none;
+  vertical-align: middle;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 0.5rem;
+  padding-right: 3rem;
+  text-align: left;
+}
+
+.active-list:hover,
+.active-list:focus {
+  text-decoration: none;
 }

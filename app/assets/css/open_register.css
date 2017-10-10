@@ -74,3 +74,11 @@ option {
   background-color: #161C23;
   opacity: .5;
 }
+
+.actions > input {
+  margin: 0 1rem;
+}
+
+.field > p {
+  margin-left: 20%;
+}

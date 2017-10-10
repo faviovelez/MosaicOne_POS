@@ -65,7 +65,8 @@
        <li role="presentation" class="hidden" id="cashRegisterOpen"><a href="open_register.html">Apertura de caja</a></li>
        <li role="presentation" class="active" id="pos"><a href="pos_sale.html">Punto de Venta</a></li>
        <li role="presentation"><a href="saved_tickets.html" id="savedTickets">Tickets guardados</a></li>
-       <li role="presentation"><a href="configuration.html" id="config">Configuración</a></li>
+       <li role="presentation"><a href="configuration.html" id="config">Opciones adicionales</a></li>
+       <li role="presentation" class="hidden"><a href="product_prices.html" id="config">Lista de precios</a></li>
      </ul>
      <span class="label label-danger cash-ticket-info">
        Caja
@@ -84,7 +85,7 @@
       <div class="search-container">
         <div class="input-group">
           <span class="input-group-btn main-search">
-            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#productos" id="basic-addon1">
+            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#productos" data-placement="left" title="Alta de productos" id="basic-addon1">
               <i class="fa fa-archive " aria-hidden="true"></i>
             </button>
           </span>
@@ -130,6 +131,10 @@
                 <i class="fa fa-money" aria-hidden="true"></i>
                 Pago
               </button>
+              <button type="button" class="btn btn-default dropdown-toggle pos-secondary-btn hidden" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="estimate">
+                <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                Cotización
+              </button>
 
               <!-- Inician las opciones de la selección de multi-ticket -->
               <ul class="dropdown-menu">
@@ -147,14 +152,20 @@
                 </li>
                 <li>
                   <a href="#" id="change-option">
-                    <i class="fa fa-handshake-o " aria-hidden="true"></i>
+                    <i class="fa fa-handshake-o" aria-hidden="true"></i>
                     Cambio
                   </a>
                 </li>
                 <li>
                   <a href="#" id="advance-option">
-                    <i class="fa fa-money " aria-hidden="true"></i>
+                    <i class="fa fa-money" aria-hidden="true"></i>
                     Pago
+                  </a>
+                </li>
+                <li>
+                  <a href="#" id="estimate-option">
+                    <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                    Cotización
                   </a>
                 </li>
               </ul>
@@ -164,7 +175,7 @@
       </div>
 
       <!-- Inicia la tabla de ventas (agrega conforme a la barra de búsqueda, se elimina con el botón rojo)-->
-      <table class="items-sales">
+      <table class="items-sales extra-margin">
         <thead>
           <tr>
             <th> </th>
@@ -185,13 +196,17 @@
                 </button>
               </div>
             </td>
-            <td class="left"> Bolsa para botella Kraft Satinada Navideña </td>
+            <td class="left">
+              <a href="#" data-toggle="modal" data-target="#productShow">
+                Bolsa para botella Kraft Satinada Navideña
+              </a>
+            </td>
             <td> Kraft </td>
             <td> $ 26.50 </td>
             <td>
               <input type="text" class="form-control smaller-form" placeholder="1">
             </td>
-            <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_1"> 5% </a> </td>
+            <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_1"> 0% </a> </td>
             <td class="right"> $ 1,007.00 </td>
           </tr>
           <tr>
@@ -202,7 +217,11 @@
                 </button>
               </div>
             </td>
-            <td class="left"> Cilindro de acetato botella decorado Nav </td>
+            <td class="left">
+              <a href="#" data-toggle="modal" data-target="#productShow">
+                Cilindro de acetato botella decorado Nav
+              </a>
+             </td>
             <td> Transparente </td>
             <td> $ 37.50 </td>
             <td>
@@ -220,16 +239,18 @@
               </div>
             </td>
             <td class="left">
-              <a href="#">
-                Servicio de mensajería UPS (Nacional)
-              </a>
+              Servicio de mensajería UPS (Nacional)
             </td>
-            <td> N/A </td>
+            <td>
+              <a href="#" data-toggle="modal" data-target="#deliveryService" id="service_1">
+                <i class="fa fa-truck" aria-hidden="true"></i>
+              </a>
+             </td>
             <td>
               <input type="text" class="form-control smaller-form" placeholder="$ 100.00">
             </td>
             <td>
-              <input type="text" class="form-control smaller-form" placeholder="1">
+              1
             </td>
             <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_3"> 0% </a> </td>
             <td class="right"> $ 100.00 </td>
@@ -288,7 +309,7 @@
       <table class="ticket-selected hidden">
         <thead>
           <tr>
-            <th colspan="7" class="head-blue">
+            <th colspan="6" class="head-blue edge-right">
               Ticket de venta:
               <span id="ticket-id">
                 147
@@ -305,6 +326,9 @@
               <span id="ticket-prospect">
                 Cliente: Juan Perez
               </span>
+            </th>
+            <th class="head-blue edge-left">
+              <span class="label label-danger">Pendiente</span>
             </th>
           </tr>
           <tr>
@@ -326,7 +350,11 @@
                 </button>
               </div>
             </td>
-            <td class="left"> Bolsa para botella Kraft Satinada Navideña </td>
+            <td class="left">
+              <a href="#" data-toggle="modal" data-target="#productShow">
+                Bolsa para botella Kraft Satinada Navideña
+              </a>
+            </td>
             <td> Kraft </td>
             <td> $ 26.50 </td>
             <td> 1 </td>
@@ -341,7 +369,11 @@
                 </button>
               </div>
             </td>
-            <td class="left"> Cilindro de acetato botella decorado Nav </td>
+            <td class="left">
+              <a href="#" data-toggle="modal" data-target="#productShow">
+                Cilindro de acetato botella decorado Nav
+              </a>
+            </td>
             <td> Transparente </td>
             <td> $ 37.50 </td>
             <td>
@@ -373,6 +405,59 @@
         </tbody>
       </table>
       <!-- Termina la tabla del ticket seleccionado en la búsqueda-->
+
+      <table class="payments-received-on-ticket hidden">
+        <thead>
+          <tr>
+            <th colspan="5" class="head-black">
+              Pagos recibidos Ticket:
+              <span class="ticket-number">
+                147
+              </span>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              Ticket
+            </th>
+            <th>
+              Forma de pago
+            </th>
+            <th>
+              Monto
+            </th>
+            <th>
+              Fecha
+            </th>
+            <th>
+              Recibió
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td> 147 </td>
+            <td> Efectivo </td>
+            <td> $800.00 </td>
+            <td> 10/09/2017 </td>
+            <td> Favio Velez </td>
+          </tr>
+          <tr>
+            <td> 155 </td>
+            <td> Efectivo </td>
+            <td> $1,000.00 </td>
+            <td> 18/09/2017 </td>
+            <td> Favio Velez </td>
+          </tr>
+          <tr>
+            <td> 194 </td>
+            <td> Transferencia </td>
+            <td> $2,000.00 </td>
+            <td> 10/09/2017 </td>
+            <td> Favio Velez </td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Segundo search (para cambios)-->
       <div class="input-group second-search minor-width hidden">
@@ -409,7 +494,11 @@
                 </button>
               </div>
             </td>
-            <td class="left"> Bolsa para botella Kraft Satinada Navideña </td>
+            <td class="left">
+              <a href="#" data-toggle="modal" data-target="#productShow">
+                Bolsa para botella Kraft Satinada Navideña
+              </a>
+            </td>
             <td> Kraft </td>
             <td> $ 26.50 </td>
             <td>
@@ -426,7 +515,10 @@
                 </button>
               </div>
             </td>
-            <td class="left"> Cilindro de acetato botella decorado Nav </td>
+            <td class="left">
+              <a href="#" data-toggle="modal" data-target="#productShow">
+                Cilindro de acetato botella decorado Nav </td>
+              </a>
             <td> Transparente </td>
             <td> $ 37.50 </td>
             <td>
@@ -502,7 +594,11 @@
                 </button>
               </div>
             </td>
-            <td class="left"> Bolsa para botella Kraft Satinada Navideña </td>
+            <td class="left">
+              <a href="#" data-toggle="modal" data-target="#productShow">
+                Bolsa para botella Kraft Satinada Navideña
+              </a>
+            </td>
             <td> Kraft </td>
             <td> $ 26.50 </td>
             <td>
@@ -519,7 +615,11 @@
                 </button>
               </div>
             </td>
-            <td class="left"> Cilindro de acetato botella decorado Nav </td>
+            <td class="left">
+              <a href="#" data-toggle="modal" data-target="#productShow">
+                Cilindro de acetato botella decorado Nav
+              </a>
+            </td>
             <td> Transparente </td>
             <td> $ 37.50 </td>
             <td>
@@ -558,31 +658,50 @@
 
     <div class="right-container">
 
-      <div class="save-ticket-container">
-      </div>
-
       <div class="input-group">
         <span class="input-group-btn">
-          <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#clientes" id="basic-addon2">
+          <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#newProspect" id="basic-addon2" data-placement="left" title="Registrar cliente">
             <i class="fa fa-user-plus" aria-hidden="true"></i>
           </button>
         </span>
         <input type="text" class="form-control" placeholder="Agregar cliente"><!-- Agregar aquí el select2 de clientes (prospects)-->
-        <span class="input-group-btn">
+        <span class="input-group-btn pause-stop">
           <button class="btn btn-default space-left pos-main-btn right-edge orange-btn" type="button" data-toggle="modal" data-placement="left" title="Guardar ticket" data-target="#saveTicket">
             <i class="fa fa-pause" aria-hidden="true"></i>
           </button>
         </span>
-        <span class="input-group-btn">
+        <span class="input-group-btn pause-stop">
           <button class="btn btn-default pos-main-btn left-edge red-btn" type="button" data-toggle="modal" data-placement="left" title="Cancelar ticket" data-target="#cancelTicket">
             <i class="fa fa-stop" aria-hidden="true"></i>
           </button>
         </span>
       </div>
+      <div class="prospect-tag-container">
+        <table class="prospect-table">
+          <tbody>
+            <tr>
+              <td class="icon-close-td">
+                <div class="close-icon" id="prospectCloseIcon">
+                  <button type="button" class="close center-close" aria-label="Close">
+                    <span aria-hidden="true" class="white-light">&times;</span>
+                  </button>
+                </div>
+              </td>
+              <td class="prospect_name">
+                Juan Pérez
+              </td>
+              <td> <a href="#">
+                Detalles
+              </a>
+            </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="discounts-container">
         <h4> Tipo de descuento</h4>
-        <div class="payment-form-wrapper">
+        <div class="discounts-form-wrapper">
           <button type="button" class="btn btn-default custom-button" id="manual">
             <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
             Manual
@@ -635,7 +754,7 @@
           <tbody>
             <tr>
               <td> Descuento total ticket % </td>
-              <td class="right"> <a href="#">Anotar descuento</a> </td>
+              <td class="right"> <a href="#" data-toggle="modal" data-target="#ticketDiscountChange" id="discount_ticket">Aplicar descuento</a> </td>
             </tr>
             <tr>
               <td> Total descuento </td>
@@ -662,7 +781,7 @@
           </tbody>
         </table>
 
-        <!-- Inicia la tabla donde se arreglan renglones por cada de pago -->
+        <!-- Inicia la tabla donde se agregan renglones por cada de pago -->
         <table class="pay-forms-table">
           <thead>
             <tr>
@@ -743,8 +862,15 @@
       </div>
       <!-- Termina la sección de formas de pago -->
 
+      <div class="input-group margin-bottom credit-days-container hidden">
+        <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)">
+        <span class="input-group-btn">
+          <button class="btn btn-default color-button pos-main-btn" type="button" id="creditDays">Días de crédito</button>
+        </span>
+      </div><!-- /input-group -->
+
       <!-- Sección para agregar formas de pago o concluir la venta -->
-      <div class="row">
+      <div class="row process-sale">
         <div class="input-group">
           <input type="text" class="form-control" placeholder="Ingrese monto de pago">
           <span class="input-group-btn">
@@ -753,77 +879,144 @@
           </span>
         </div><!-- /input-group -->
       </div><!-- /.row -->
-      <input type="text" class="form-control higher-form" placeholder="Comentarios">
-
+      <input type="text" class="form-control higher-form process-sale" placeholder="Comentarios">
 
     </div> <!-- Termina right-container  -->
   </div><!-- Termina page-container  -->
 
- <!-- Inicia Modal Clientes -->
-  <div class="modal fade" id="clientes" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Alta de clientes</h4>
-        </div>
-        <div class="modal-body">
-          <p>One fine body&hellip;</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
-<!-- Termina Modal Clientes -->
-
-<!-- Inicia Modal Agregar productos o servicios -->
- <div class="modal fade" id="productos" tabindex="-1" role="dialog">
-   <div class="modal-dialog" role="document">
-     <div class="modal-content">
-       <div class="modal-header">
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-         <h4 class="modal-title">Alta de productos o servicios</h4>
-       </div>
-       <div class="modal-body">
-         <p>One fine body&hellip;</p>
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-         <button type="button" class="btn btn-primary">Save changes</button>
-       </div>
-     </div><!-- /.modal-content -->
-   </div><!-- /.modal-dialog -->
- </div><!-- /.modal -->
-<!-- Termina Modal Agregar productos o servicios -->
-
-<!-- Inicia mini Modal para cambiar descuento  -->
+<!-- Inicia mini Modal para cambiar descuento individual -->
  <div class="modal fade" id="discountChange" tabindex="-1" role="dialog">
    <div class="modal-dialog discount-change-modal" role="document">
      <div class="modal-content">
        <div class="modal-header">
          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-         <h4 class="modal-title">Cambiar descuento</h4>
+         <h4 class="modal-title">Descuento individual</h4>
        </div>
        <div class="modal-body">
          <div class="input-group">
-           <input type="text" class="form-control smaller-form round-form" placeholder="1">
+           <input type="text" class="form-control smaller-form round-form" placeholder="5%">
            <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
          </div><!-- /input-group -->
        </div>
        <div class="modal-footer">
          <button class="btn btn-default pos-main-btn" type="button">
            Confirmar
-           <i class="fa fa-check " aria-hidden="true"></i>
          </button>
        </div>
-
      </div><!-- /.modal-content -->
    </div><!-- /.modal-dialog -->
  </div><!-- /.modal -->
 <!-- Termina mini Modal para cambiar precio -->
+
+<!-- Inicia Modal para mostrar detalles del producto -->
+ <div class="modal fade" id="productShow" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title">Detalles del producto</h4>
+       </div>
+       <div class="modal-body">
+         <table>
+           <tbody>
+             <tr>
+               <td colspan="2">
+                 <p>
+                   <strong class="product_description">
+                     Bolsa para botella Kraft Satinada Navideña
+                   </strong>
+                 </p>
+               </td>
+             </tr>
+             <tr>
+               <td class="padding-right">
+                 <img src="../assets/img/product_small.png" alt="Imagen no disponible">
+               </td>
+               <td>
+                 <p>
+                  <strong>
+                    Código:
+                  </strong>
+                  <span class="product_unique_code">
+                    3456
+                  </span>
+                 </p>
+                 <p>
+                   <strong>
+                     Medidas:
+                   </strong>
+                   <span class="product_measures">
+                     34.0 x 24.5 x 17.4 cm
+                   </span>
+                 </p>
+                 <p>
+                   <strong>
+                     Material:
+                   </strong>
+                   <span class="product_main_material">
+                    Corrugado
+                   </span>
+                 </p>
+                 <p>
+                   <strong>
+                     Resistencia:
+                   </strong>
+                   <span class="product_resistance_main_material">
+                    12kg - 20 ECT
+                   </span>
+                 </p>
+                 <p>
+                  <strong>
+                    Inventario:
+                  </strong>
+                  <span class="stores_inventory_quantity">
+                    245
+                  </span>
+                  <span class="product_unit">
+                    piezas
+                  </span>
+                 </p>
+               </td>
+             </tr>
+           </tbody>
+         </table>
+       </div>
+       <div class="modal-footer">
+         <button class="btn btn-default pos-main-btn" type="button">
+           Confirmar
+         </button>
+       </div>
+     </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+ </div><!-- /.modal -->
+<!-- Termina Modal para mostrar detalles del producto -->
+
+<!-- Inicia mini Modal para cambiar descuento individual -->
+ <div class="modal fade" id="ticketDiscountChange" tabindex="-1" role="dialog">
+   <div class="modal-dialog discount-change-modal" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title">Descuento total ticket</h4>
+       </div>
+       <div class="modal-body">
+           <p>
+             Aplicar descuento a todo el ticket.
+           </p>
+         <div class="input-group">
+           <input type="text" class="form-control smaller-form round-form" placeholder="5%">
+           <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
+         </div><!-- /input-group -->
+       </div>
+       <div class="modal-footer">
+         <button class="btn btn-default pos-main-btn" type="button">
+           Confirmar
+         </button>
+       </div>
+     </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+ </div><!-- /.modal -->
+<!-- Termina mini Modal para cambiar descuento individual -->
 
 <!-- Inicia mini Modal para confirmar si desea guardar el ticket -->
  <div class="modal fade" id="saveTicket" tabindex="-1" role="dialog">
@@ -839,10 +1032,8 @@
        <div class="modal-footer">
          <button class="btn btn-default pos-main-btn" type="button">
            Confirmar
-           <i class="fa fa-check " aria-hidden="true"></i>
          </button>
        </div>
-
      </div><!-- /.modal-content -->
    </div><!-- /.modal-dialog -->
  </div><!-- /.modal -->
@@ -862,15 +1053,408 @@
         <div class="modal-footer">
           <button class="btn btn-default pos-main-btn" type="button">
             Confirmar
-            <i class="fa fa-check " aria-hidden="true"></i>
           </button>
         </div>
-
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
   <!-- Termina mini Modal para confirmar si desea cancelar el ticket -->
 
+  <!-- Inicia Modal para registrar datos de envío -->
+   <div class="modal fade" id="deliveryService" tabindex="-1" role="dialog">
+     <div class="modal-dialog" role="document">
+       <div class="modal-content">
+         <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+           <h4 class="modal-title">Datos de envío</h4>
+         </div>
+         <div class="modal-body">
+
+           <form class="new_delivery_service" id="new_delivery_service" action="#" accept-charset="UTF-8" method="post">
+             <input name="utf8" type="hidden" value="&#x2713;" />
+             <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+             <h4> Datos de guía y remitente </h4>
+             <table class="delivery-services-table">
+               <thead>
+                 <tr>
+                   <th>
+                     <label for="delivery_service_country">Número de guía</label><br>
+                   </th>
+                   <th>
+                     <label for="delivery_service_sender_name">Nombre del remitente</label><br>
+                   </th>
+                   <th>
+                     <label for="delivery_service_sender_zipcode">Código postal</label><br>
+                   </th>
+                 </tr>
+             </thead>
+               <tbody>
+                 <tr>
+                   <td>
+                     <input placeholder="Número de guía" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[tracking_number]" id="delivery_service_tracking_number" />
+                   </td>
+                   <td>
+                     <input placeholder="Nombre compelto" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[sender_name]" id="delivery_service_sender_name" />
+                   </td>
+                   <td>
+                     <input placeholder="Código postal" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[sender_zipcode]" id="delivery_service_sender_zipcode" />
+                   </td>
+                 </tr>
+               </tbody>
+             </table>
+
+              <h4 class="title-margin-modal"> Destinatario </h4>
+
+              <table class="delivery-services-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <label for="delivery_service_receivers_name">Nombre o razón social</label><br>
+                    </th>
+                    <th>
+                      <label for="delivery_service_contact_name">Nombre del contacto</label><br>
+                    </th>
+                    <th>
+                      <label for="delivery_service_receivers_zipcode">Código postal</label><br>
+                    </th>
+                  </tr>
+              </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input placeholder="Nombre o razón social" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[receivers_name]" id="delivery_service_receivers_name" />
+                    </td>
+                    <td>
+                      <input placeholder="Nombre completo" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[contact_name]" id="delivery_service_contact_name" />
+                    </td>
+                    <td>
+                      <input placeholder="Código postal" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[receivers_zipcode]" id="delivery_service_receivers_zipcode" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table class="table-margin-modal delivery-services-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <label for="delivery_service_street">Calle</label><br>
+                    </th>
+                    <th>
+                      <label for="delivery_service_exterior_number">Número exterior</label><br>
+                    </th>
+                    <th>
+                      <label for="delivery_service_interior_number">Número interior</label><br>
+                    </th>
+                    <th>
+                      <label for="delivery_service_neighborhood">Colonia</label><br>
+                    </th>
+                  </tr>
+              </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input placeholder="Calle" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[street]" id="delivery_service_street" />
+                    </td>
+                    <td>
+                      <input placeholder="Número exterior" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[exterior_number]" id="delivery_service_exterior_number" />
+                    </td>
+                    <td>
+                      <input placeholder="Número interior" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[interior_number]" id="delivery_service_interior_number" />
+                    </td>
+                    <td>
+                      <input placeholder="Colonia" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[neighborhood]" id="delivery_service_neighborhood" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table class="table-margin-modal delivery-services-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <label for="delivery_service_city">Ciudad</label><br>
+                    </th>
+                    <th>
+                      <label for="delivery_service_state">Estado</label><br>
+                    </th>
+                    <th>
+                      <label for="delivery_service_country">País</label><br>
+                    </th>
+                  </tr>
+              </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input placeholder="Ciudad" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[city]" id="delivery_service_city" />
+                    </td>
+                    <td>
+                      <input placeholder="Estado" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[state]" id="delivery_service_state" />
+                    </td>
+                    <td>
+                      <input placeholder="País" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[country]" id="delivery_service_country" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+             <h4 class="title-margin-modal"> Contacto </h4>
+
+               <table class="delivery-services-table">
+                 <thead>
+                   <tr>
+                     <th>
+                       <label for="delivery_service_email">Email</label><br>
+                     </th>
+                     <th>
+                       <label for="delivery_service_cellphone">Celular</label><br>
+                     </th>
+                     <th>
+                       <label for="delivery_service_phone">Teléfono</label><br>
+                     </th>
+                   </tr>
+               </thead>
+                 <tbody>
+                   <tr>
+                     <td>
+                       <input placeholder="Correo electrónico" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[email]" id="delivery_service_email" />
+                     </td>
+                     <td>
+                       <input placeholder="Celular" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[cellphone]" id="delivery_service_cellphone" />
+                     </td>
+                     <td>
+                       <input placeholder="Teléfono fijo" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[phone]" id="delivery_service_phone" />
+                     </td>
+                   </tr>
+                 </tbody>
+               </table>
+
+             <div class="actions">
+               <input type="submit" name="commit" value="Guardar datos" class="main-button" />
+             </div>
+           </form>
+         </div>
+
+       </div><!-- /.modal-content -->
+     </div><!-- /.modal-dialog -->
+   </div><!-- /.modal -->
+   <!-- Termina Modal para registrar datos de envío -->
+
+   <!-- Inicia Modal para registrar clientes -->
+    <div class="modal fade" id="newProspect" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Alta de cliente</h4>
+          </div>
+          <div class="modal-body">
+
+            <form class="new_prospect" id="new_prospect" action="#" accept-charset="UTF-8" method="post">
+              <input name="utf8" type="hidden" value="&#x2713;" />
+              <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+              <h4> Datos generales </h4>
+
+              <table class="prospect-details-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <label for="prospect_name">Nombre</label><br>
+                    </th>
+                    <th>
+                      <label for="prospect_sender_name">Giro</label><br>
+                    </th>
+                    <th>
+                      <label for="prospect_sender_zipcode">Tipo de persona</label><br>
+                    </th>
+                  </tr>
+              </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input placeholder="Nombre o Razón social" class="form-control round-form transparent-field" type="text" value="" name="prospect[legal_or_business_name]" id="prospect_legal_or_business_name" />
+                    </td>
+                    <td>
+                      <input placeholder="Giro comercial" class="form-control round-form transparent-field" type="text" value="" name="prospect[prospect_type]" id="prospect_prospect_type" />
+                    </td>
+                    <td>
+                      <select class="prospect_business_type" name="business_type" id="prospect_business_type">
+                        <option value="persona física">Persona física</option>
+                        <option value="persona moral">Persona moral</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+               <h4 class="title-margin-modal"> Datos de contacto </h4>
+
+               <table class="prospect-details-table">
+                 <thead>
+                   <tr>
+                     <th>
+                       <label for="prospect_contact_first_name"> Primer nombre </label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_contact_middle_name"> Segundo nombre </label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_contact_last_name">Apellido paterno</label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_second_last_name">Apellido materno</label><br>
+                     </th>
+                   </tr>
+               </thead>
+                 <tbody>
+                   <tr>
+                     <td>
+                       <input placeholder="Nombre" class="form-control round-form transparent-field" type="text" value="" name="prospect[contact_first_name]" id="prospect_contact_first_name" />
+                     </td>
+                     <td>
+                       <input placeholder="Segundo nombre" class="form-control round-form transparent-field" type="text" value="" name="prospect[contact_middle_name]" id="prospect_contact_middle_name" />
+                     </td>
+                     <td>
+                       <input placeholder="Apellido paterno" class="form-control round-form transparent-field" type="text" value="" name="prospect[contact_last_name]" id="prospect_contact_last_name" />
+                     </td>
+                     <td>
+                       <input placeholder="Apellido materno" class="form-control round-form transparent-field" type="text" value="" name="prospect[second_last_name]" id="prospect_second_last_name" />
+                     </td>
+                   </tr>
+                 </tbody>
+               </table>
+
+               <table class="table-margin-modal prospect-details-table">
+                 <thead>
+                   <tr>
+                     <th>
+                       <label for="prospect_contact_position">Puesto</label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_email">Email</label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_direct_phone">Teléfono fijo</label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_direct_phone">Ext.</label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_cell_phone">Celular</label><br>
+                     </th>
+                   </tr>
+               </thead>
+                 <tbody>
+                   <tr>
+                     <td>
+                       <input placeholder="Puesto" class="form-control round-form transparent-field" type="text" value="" name="prospect[contact_position]" id="prospect_contact_position" />
+                     </td>
+                     <td>
+                       <input placeholder="ejemplo@ejemplo.com" class="form-control round-form transparent-field" type="text" value="" name="prospect[email]" id="prospect_email" />
+                     </td>
+                     <td>
+                       <input placeholder="Teléfono fijo" class="form-control round-form transparent-field" type="text" value="" name="prospect[direct_phone]" id="prospect_direct_phone" />
+                     </td>
+                     <td>
+                       <input placeholder="Ext." class="form-control round-form transparent-field" type="text" value="" name="prospect[extension]" id="prospect_extension" />
+                     </td>
+                     <td>
+                       <input placeholder="Celular" class="form-control round-form transparent-field" type="text" value="" name="prospect[cell_phone]" id="prospect_cell_phone" />
+                     </td>
+                   </tr>
+                 </tbody>
+               </table>
+
+               <h4 class="title-margin-modal"> Datos de facturación </h4>
+
+               <table class="table-margin-modal prospect-details-table">
+                 <thead>
+                   <tr>
+                     <th>
+                       <label for="prospect_billing_address_rfc">RFC</label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_billing_address_street">Calle</label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_billing_address_exterior_number">No. Exterior</label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_billing_address_interior_number">No. Interior</label><br>
+                     </th>
+                     <th>
+                       <label for="prospect_billing_address_zipcode">Código Postal</label><br>
+                     </th>
+                   </tr>
+               </thead>
+                 <tbody>
+                   <tr>
+                     <td>
+                       <input placeholder="RFC" class="form-control round-form transparent-field" type="text" value="" name="prospect[billing_address_rfc]" id="prospect_billing_address_rfc" />
+                     </td>
+                     <td>
+                       <input placeholder="Calle" class="form-control round-form transparent-field" type="text" value="" name="prospect[billing_address_street]" id="prospect_billing_address_street" />
+                     </td>
+                     <td>
+                       <input placeholder="No. Ext." class="form-control round-form transparent-field" type="text" value="" name="prospect[billing_address_exterior_number]" id="prospect_billing_address_exterior_number" />
+                     </td>
+                     <td>
+                       <input placeholder="No. Int." class="form-control round-form transparent-field" type="text" value="" name="prospect[billing_address_interior_number]" id="prospect_billing_address_interior_number" />
+                     </td>
+                     <td>
+                       <input placeholder="Código postal." class="form-control round-form transparent-field" type="text" value="" name="prospect[billing_address_zipcode]" id="prospect_billing_address_zipcode" />
+                     </td>
+                   </tr>
+                 </tbody>
+               </table>
+
+                <table class="prospect-details-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        <label for="prospect_billing_address_neighborhood">Colonia</label><br>
+                      </th>
+                      <th>
+                        <label for="prospect_billing_address_city">Ciudad</label><br>
+                      </th>
+                      <th>
+                        <label for="prospect_billing_address_state">Estado</label><br>
+                      </th>
+                      <th>
+                        <label for="prospect_billing_address_country">País</label><br>
+                      </th>
+                    </tr>
+                </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <input placeholder="Colonia" class="form-control round-form transparent-field" type="text" value="" name="prospect[billing_address_neighborhood]" id="prospect_billing_address_neighborhood" />
+                      </td>
+                      <td>
+                        <input placeholder="Ciudad" class="form-control round-form transparent-field" type="text" value="" name="prospect[billing_address_city]" id="prospect_billing_address_city" />
+                      </td>
+                      <td>
+                        <input placeholder="Estado" class="form-control round-form transparent-field" type="text" value="" name="prospect[billing_address_state]" id="prospect_billing_address_state" />
+                      </td>
+                      <td>
+                        <input placeholder="País" class="form-control round-form transparent-field" type="text" value="" name="prospect[billing_address_country]" id="prospect_billing_address_country" />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+              <div class="actions">
+                <input type="submit" name="commit" value="Guardar datos" class="main-button" />
+              </div>
+            </form>
+          </div>
+
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- Termina Modal para registrar clientes -->
 
 <!-- Temporalmente deshabilitada la Bottom Nav
   <div class="bottom-nav">
