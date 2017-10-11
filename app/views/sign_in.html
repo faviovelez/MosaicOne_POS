@@ -23,6 +23,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
+        <a href='#' id='close-btn' >Cerrar apppp</a>
         <div class="corner-logo">
           <a href="#">
             <img src="../assets/img/sistema-dc-3.png" alt="Logo Sistema DC" class="logo img-responsive">
@@ -97,6 +98,14 @@
     <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+    <script>
+      const remote = require('electron').remote;
+
+      document.getElementById("close-btn").addEventListener("click", function (e) {
+        var window = remote.getCurrentWindow();
+        window.close();
+      }); 
+    </script>
 
   <script>if (window.module) module = window.module;</script>
 
