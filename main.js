@@ -1,9 +1,17 @@
-const electron = require('electron');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
-const remote = require('electron').remote;
+const electron = require('electron'),
+  app = electron.app,
+  BrowserWindow = electron.BrowserWindow;
 
 let mainWindow = null;
+
+async function hasUser(){
+  try {
+    const { rows } = await query('SELECT * FROM users')
+    return rows.length > 0;
+  } catch (err) {
+    return false;
+  }
+}
 
 app.on('window-all-closed',() => {
   if (process.platform !== 'darwin') app.quit();
@@ -17,7 +25,13 @@ app.on('ready', () => {
     width: 1024
   });
 
-  mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_in.html`);
+  hasUser().then(res => {
+    if (res) {
+      mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_in.html`);
+    } else {
+      mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_up.html`);
+    }
+  });
 
   mainWindow.on('closed', () => { mainWindow = null; });
 });

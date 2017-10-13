@@ -1,11 +1,11 @@
-const { Pool, Client } = require('pg');
+const {Pool} = require('pg');
 
 const localPool = new Pool({
-  user: 'dbuser',
-  host: 'database.server.com',
-  database: 'mydb',
-  password: 'secretpassword',
-  port: 3211,
+  user: 'oscar',
+  host: 'localhost',
+  database: 'local_db',
+  password: '12345678',
+  port: 5432,
 });
 
 const remotePool = new Pool({
@@ -16,9 +16,30 @@ const remotePool = new Pool({
   port: 5432,
 });
 
-function findUser(email, password){
-  remotePool.query('SELECT NOW()', (err, res) => {
-    console.log(err, res.rows[0].now)
-  });
-  return false;
+
+async function query (q) {
+  const client = await localPool.connect()
+  let res
+  try {
+    await client.query('BEGIN')
+    try {
+      res = await client.query(q)
+      await client.query('COMMIT')
+    } catch (err) {
+      await client.query('ROLLBACK')
+      throw err
+    }
+  } finally {
+    client.release()
+  }
+  return res
+}
+
+async function hasUser(){
+  try {
+    const { rows } = await query('SELECT * FROM users')
+    return rows.length > 0;
+  } catch (err) {
+    return false;
+  }
 }
