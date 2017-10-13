@@ -481,7 +481,7 @@ select#discount_rule_options,
 }
 
 .action-list {
-  margin-top: 20%;
+  margin-top: 15%;
   margin-left: 5%;
 }
 
@@ -529,6 +529,13 @@ select#discount_rule_options,
   width: 70%;
   border: 1px solid lightgray;
   padding: 2rem;
+  border-radius: 10px;
+}
+
+.change-password {
+  width: 150%;
+  border: 1px solid lightgray;
+  padding: 6rem;
   border-radius: 10px;
 }
 

@@ -82,6 +82,11 @@
         </a>
       </li>
       <li>
+        <a href="#" id="changePassword">
+          Cambiar contraseña
+        </a>
+      </li>
+      <li>
         <a href="#" id="registerDeposit">
           Registrar un depósito
         </a>
@@ -295,7 +300,38 @@
           <input placeholder="Ejemplo: 3.6%" class="form-control round-form transparent-field" type="text" value="" name="terminal_number" id="new_terminal_number" />
 
           <div class="actions">
-            <input type="submit" name="commit" value="Crear caja" class="main-button" />
+            <input type="submit" name="commit" value="Agregar terminal" class="main-button" />
+          </div>
+
+        </form>
+
+      </div>
+
+      <div class="change-password hidden">
+        <h3 class="title-blue open-register-title space-bottom"> Cambiar contraseña </h3>
+
+        <form class="change_password" id="change_password" action="configuration.html" accept-charset="UTF-8" method="post">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+          <select name="user_options" class="myfield" id="bank_select">
+            <option value="1">Juan Perez</option>
+            <option value="2">Maria Antonieta</option>
+          </select>
+          <br /><br />
+
+          <label for="new_cash_deposit">Nueva conrtaseña</label><br>
+          <input placeholder="Contraseña" class="form-control round-form transparent-field" type="password" value="" name="password" id="password" />
+
+          <br />
+
+          <label for="new_cash_deposit">Confirmrar conrtaseña</label><br>
+          <input placeholder="Contraseña" class="form-control round-form transparent-field" type="password" value="" name="password_confirmation" id="password_confirmation" />
+
+          <br />
+
+          <div class="actions">
+            <input type="submit" name="commit" value="Cambiar contraseña" class="main-button" />
           </div>
 
         </form>

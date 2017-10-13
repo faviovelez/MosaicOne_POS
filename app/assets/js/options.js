@@ -6,6 +6,7 @@ $(document).ready(function() {
     $('#addTerminal').removeClass('active-list');
     $('#registerDeposit').removeClass('active-list');
     $('#registerWithdrawal').removeClass('active-list');
+    $('#changePassword').removeClass('active-list');
     $('#createRegister').removeClass('active-list');
     $('#deleteRegister').removeClass('active-list');
     $('.cash-alert').removeClass('hidden');
@@ -13,6 +14,8 @@ $(document).ready(function() {
     $('.add-terminal').addClass('hidden');
     $('.register-withdrawal').addClass('hidden');
     $('.register-deposit').addClass('hidden');
+    $('.change-password').addClass('hidden');
+    $('.register-colaborator').addClass('hidden');
     $('.delete-cash-register').addClass('hidden');
     $('.create-cash-register').addClass('hidden');
   });
@@ -23,6 +26,7 @@ $(document).ready(function() {
     $('#addTerminal').removeClass('active-list');
     $('#cashAlert').removeClass('active-list');
     $('#registerWithdrawal').removeClass('active-list');
+    $('#changePassword').removeClass('active-list');
     $('#createRegister').removeClass('active-list');
     $('#deleteRegister').removeClass('active-list');
     $('.register-deposit').removeClass('hidden');
@@ -30,7 +34,9 @@ $(document).ready(function() {
     $('.add-terminal').addClass('hidden');
     $('.cash-alert').addClass('hidden');
     $('.register-withdrawal').addClass('hidden');
+    $('.change-password').addClass('hidden');
     $('.delete-cash-register').addClass('hidden');
+    $('.register-colaborator').addClass('hidden');
     $('.create-cash-register').addClass('hidden');
   });
 
@@ -39,6 +45,7 @@ $(document).ready(function() {
     $('#registerColaborator').removeClass('active-list');
     $('#addTerminal').removeClass('active-list');
     $('#cashAlert').removeClass('active-list');
+    $('#changePassword').removeClass('active-list');
     $('#registerDeposit').removeClass('active-list');
     $('#createRegister').removeClass('active-list');
     $('#deleteRegister').removeClass('active-list');
@@ -46,7 +53,9 @@ $(document).ready(function() {
     $('.register-sign-margin').addClass('hidden');
     $('.add-terminal').addClass('hidden');
     $('.cash-alert').addClass('hidden');
+    $('.change-password').addClass('hidden');
     $('.register-deposit').addClass('hidden');
+    $('.register-colaborator').addClass('hidden');
     $('.delete-cash-register').addClass('hidden');
     $('.create-cash-register').addClass('hidden');
   });
@@ -55,6 +64,7 @@ $(document).ready(function() {
     $(this).addClass('active-list');
     $('#registerColaborator').removeClass('active-list');
     $('#addTerminal').removeClass('active-list');
+    $('#changePassword').removeClass('active-list');
     $('#cashAlert').removeClass('active-list');
     $('#registerDeposit').removeClass('active-list');
     $('#registerWithdrawal').removeClass('active-list');
@@ -63,14 +73,17 @@ $(document).ready(function() {
     $('.register-sign-margin').addClass('hidden');
     $('.add-terminal').addClass('hidden');
     $('.cash-alert').addClass('hidden');
+    $('.change-password').addClass('hidden');
     $('.register-withdrawal').addClass('hidden');
     $('.register-deposit').addClass('hidden');
+    $('.register-colaborator').addClass('hidden');
     $('.delete-cash-register').addClass('hidden');
   });
 
   $("#deleteRegister").click(function () {
     $(this).addClass('active-list');
     $('#registerColaborator').removeClass('active-list');
+    $('#changePassword').removeClass('active-list');
     $('#cashAlert').removeClass('active-list');
     $('#addTerminal').removeClass('active-list');
     $('#registerDeposit').removeClass('active-list');
@@ -80,7 +93,9 @@ $(document).ready(function() {
     $('.register-sign-margin').addClass('hidden');
     $('.add-terminal').addClass('hidden');
     $('.create-cash-register').addClass('hidden');
+    $('.change-password').addClass('hidden');
     $('.cash-alert').addClass('hidden');
+    $('.register-colaborator').addClass('hidden');
     $('.register-withdrawal').addClass('hidden');
     $('.register-deposit').addClass('hidden');
   });
@@ -90,15 +105,18 @@ $(document).ready(function() {
     $('#registerColaborator').removeClass('active-list');
     $('#cashAlert').removeClass('active-list');
     $('#registerDeposit').removeClass('active-list');
+    $('#changePassword').removeClass('active-list');
     $('#deleteRegister').removeClass('active-list');
     $('#registerWithdrawal').removeClass('active-list');
     $('#createRegister').removeClass('active-list');
     $('.add-terminal').removeClass('hidden');
     $('.register-sign-margin').addClass('hidden');
+    $('.change-password').addClass('hidden');
     $('.delete-cash-register').addClass('hidden');
     $('.create-cash-register').addClass('hidden');
     $('.cash-alert').addClass('hidden');
     $('.register-withdrawal').addClass('hidden');
+    $('.register-colaborator').addClass('hidden');
     $('.register-deposit').addClass('hidden');
   });
 
@@ -107,10 +125,12 @@ $(document).ready(function() {
     $('#cashAlert').removeClass('active-list');
     $('#addTerminal').removeClass('active-list');
     $('#registerDeposit').removeClass('active-list');
+    $('#changePassword').removeClass('active-list');
     $('#deleteRegister').removeClass('active-list');
     $('#registerWithdrawal').removeClass('active-list');
     $('#createRegister').removeClass('active-list');
     $('.register-sign-margin').removeClass('hidden');
+    $('.change-password').addClass('hidden');
     $('.add-terminal').addClass('hidden');
     $('.delete-cash-register').addClass('hidden');
     $('.create-cash-register').addClass('hidden');
@@ -119,6 +139,25 @@ $(document).ready(function() {
     $('.register-deposit').addClass('hidden');
   });
 
-register-sign-margin
+  $('#changePassword').removeClass('active-list');
+    $("#changePassword").click(function () {
+      $(this).addClass('active-list');
+      $('#cashAlert').removeClass('active-list');
+      $('#addTerminal').removeClass('active-list');
+      $('#registerDeposit').removeClass('active-list');
+      $('#deleteRegister').removeClass('active-list');
+      $('#registerColaborator').removeClass('active-list');
+      $('#registerWithdrawal').removeClass('active-list');
+      $('#createRegister').removeClass('active-list');
+      $('.change-password').removeClass('hidden');
+      $('.register-sign-margin').addClass('hidden');
+      $('.add-terminal').addClass('hidden');
+      $('.delete-cash-register').addClass('hidden');
+      $('.create-cash-register').addClass('hidden');
+      $('.cash-alert').addClass('hidden');
+      $('.register-withdrawal').addClass('hidden');
+      $('.register-colaborator').addClass('hidden');
+      $('.register-deposit').addClass('hidden');
+    });
 
 });
