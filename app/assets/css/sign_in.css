@@ -12,7 +12,7 @@
 }
 
 .container-log-in {
-  margin-top: 10vh;
+  margin-top: 20vh;
   background-color: #EAEFEE;
   opacity: .65;
   width: 40vw;
@@ -25,7 +25,7 @@
 }
 
 .container-sign-up {
-  margin-top: 10vh;
+  margin-top: 20vh;
   background-color: #232c37;
   opacity: .65;
   width: 50vw;

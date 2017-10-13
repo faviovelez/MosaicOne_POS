@@ -17,6 +17,26 @@ nav {
 html {
 }
 
+.alerts-container {
+  position: absolute;
+  top: 9%;
+  left: 84%;
+  z-index: 100;
+}
+
+.alert {
+  width: 200px;
+  background-color: #00B3D3 !important;
+  border: 1px solid #00B3D3 !important;
+  color: #fff !important;
+}
+
+.alert > button {
+  margin-left: 0.8rem;
+  margin-top: -8px;
+  margin-right: -3px;
+}
+
 .justify {
   text-align: justify;
 }
