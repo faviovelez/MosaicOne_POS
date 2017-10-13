@@ -1,5 +1,8 @@
 {
   "name": "lorikeet",
   "version": "1.0.0",
-  "main": "main.js"
+  "main": "main.js",
+  "dependencies": {
+    "pg": "^7.3.0"
+  }
 }
