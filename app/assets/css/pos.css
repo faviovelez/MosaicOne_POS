@@ -525,6 +525,13 @@ select#discount_rule_options,
   border-radius: 10px;
 }
 
+.add-terminal {
+  width: 70%;
+  border: 1px solid lightgray;
+  padding: 2rem;
+  border-radius: 10px;
+}
+
 .space-bottom {
   margin-bottom: 30px;
 }

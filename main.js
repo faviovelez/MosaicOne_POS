@@ -13,9 +13,5 @@ app.on('ready', () => {
   mainWindow = new BrowserWindow({icon:'app/assets/img/business.png'});
   mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_in.html`);
 
-  setTimeout(function(){
-    mainWindow.loadURL(`file://${app.getAppPath()}/app/views/configuration.html`);
-  }, 5000);
-
   mainWindow.on('closed', () => { mainWindow = null; });
 });

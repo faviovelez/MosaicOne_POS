@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title> POS Sistema DC </title>
+  <link rel="stylesheet" href="../vendor/assets/css/bootstrap.css">
+  <link rel="stylesheet" href="../vendor/assets/css/font-awesome.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/sign_in.css">
+  <link rel="stylesheet" href="../assets/css/pills.css">
+  <link rel="stylesheet" href="../assets/css/bottom-nav.css">
+</head>
+<body>
+
+  <!-- Inicia Navbar -->
+  <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <div class="corner-logo">
+        <a href="#">
+          <img src="../assets/img/sistema-dc-3.png" alt="Logo Sistema DC" class="logo img-responsive">
+        </a>
+      </div>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="#" id="username">
+            <i class="fa fa-user-circle-o bigger-icon" aria-hidden="true"></i>
+            Bienvenido, Favio Velez
+          </a>
+        </li>
+        <li>
+          <a href="#" id="store">
+             Franquicia - Aguascalientes
+          </a>
+        </li>
+        <li>
+          <a href="sign_in.html">Cerrar sesión</a>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+ </nav>
+  <!-- Termina Navbar -->
+
+  <!-- Inician Pills-->
+   <div class="row pills-row fixed z-index">
+      <ul class="nav nav-tabs">
+        <li role="presentation" id="cashRegisterClose"><a href="close_register.html">Cierre de caja</a></li>
+        <li role="presentation" class="hidden" id="cashRegisterOpen"><a href="open_register.html">Apertura de caja</a></li>
+        <li role="presentation" id="pos"><a href="pos_sale.html">Punto de Venta</a></li>
+        <li role="presentation"><a href="saved_tickets.html" id="savedTickets">Tickets guardados</a></li>
+        <li role="presentation" class="active"><a href="configuration.html" id="config">Opciones adicionales</a></li>
+        <li role="presentation" class="hidden"><a href="product_prices.html" id="config">Lista de precios</a></li>
+      </ul>
+   </div>
+  <!-- Terminan Pills -->
+
+  <div class="centered-without-margin">
+
+    <div class="container-sign-up register-sign-margin">
+
+      <div class="sign-in-tittle-div">
+        <h2 class="reg-title white">Regístrar Colaborador</h2>
+      </div>
+
+      <form class="new_user" id="new_user" action="open_register.html" accept-charset="UTF-8" method="post">
+        <input name="utf8" type="hidden" value="&#x2713;" />
+        <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+        <div class="actions">
+          <div class="field sign-in">
+            <label for="user_email" class="white">Primer nombre</label><br />
+            <input placeholder="Primer nombre" class="middle-sign-in" type="text" value="" name="user[first_name]" id="user_first_name" />
+          </div>
+
+          <div class="field sign-in">
+            <label for="user_email" class="white">Segundo nombre</label><br />
+            <input placeholder="Segundo nombre" class="middle-sign-in" type="text" value="" name="user[second_name]" id="user_middle_name" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="field sign-in">
+            <label for="user_email" class="white">Apellidos</label><br />
+            <input placeholder="Apellidos" class="middle-sign-in" type="text" value="" name="user[last_name]" id="user_last_name" />
+          </div>
+
+          <div class="field sign-in">
+            <label for="user_email" class="white">Correo electrónico</label><br />
+            <input placeholder="ejemplo@ejemplo.com" class="middle-sign-in" type="email" value="" name="user[email]" id="user_email" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="field sign-in">
+            <label for="user_password" class="white">Contraseña</label><br />
+            <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password" />
+          </div>
+
+          <div class="field sign-in">
+            <label for="user_password" class="white">Confirmar Contraseña</label><br />
+            <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <input type="submit" name="commit" value="Registrar" class="main-button" />
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+    <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
+    <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
+    <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+
+  <script>if (window.module) module = window.module;</script>
+
+</body>
+</html>

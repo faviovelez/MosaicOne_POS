@@ -33,7 +33,7 @@
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
           <li>
-            <a href="sign_in.html">Bienvenido</a>
+            <a href="sign_in.html">Registro</a>
           </li>
         </ul>
       </div><!-- /.navbar-collapse -->
@@ -49,30 +49,49 @@
   <div class="centered-without-margin">
 
     <img alt="Logo Diseños de Cartón" class="second-logo" src="../assets/img/logo-disenos-decarton.png" />
-    <div class="container-log-in">
+    <div class="container-sign-up">
 
       <div class="sign-in-tittle-div">
-        <h2 class="reg-title">Punto de Venta Sistema DC</h2>
+        <h2 class="reg-title white">Regístrate</h2>
       </div>
 
       <form class="new_user" id="new_user" action="open_register.html" accept-charset="UTF-8" method="post">
         <input name="utf8" type="hidden" value="&#x2713;" />
         <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
 
-        <div class="field sign-in">
-          <label for="user_email">Correo electrónico</label><br />
-          <input placeholder="ejemplo@ejemplo.com" class="long-sign-in" type="email" value="" name="user[email]" id="user_email" />
-        </div>
+        <div class="actions">
+          <div class="field sign-in">
+            <label for="user_email" class="white">Primer nombre</label><br />
+            <input placeholder="Primer nombre" class="middle-sign-in" type="text" value="" name="user[first_name]" id="user_first_name" />
+          </div>
 
-        <div class="field sign-in">
-          <label for="user_password">Contraseña</label><br />
-          <input placeholder="Ingresa tu contraseña" autocomplete="off" class="long-sign-in" type="password" name="user[password]" id="user_password" />
+          <div class="field sign-in">
+            <label for="user_email" class="white">Segundo nombre</label><br />
+            <input placeholder="Segundo nombre" class="middle-sign-in" type="text" value="" name="user[second_name]" id="user_middle_name" />
+          </div>
         </div>
 
         <div class="actions">
-          <div class="field">
-            <input name="user[remember_me]" type="hidden" value="0" /><input type="checkbox" value="1" name="user[remember_me]" id="user_remember_me" />
-            <label for="user_remember_me">Recordarme</label>
+          <div class="field sign-in">
+            <label for="user_email" class="white">Apellidos</label><br />
+            <input placeholder="Apellidos" class="middle-sign-in" type="text" value="" name="user[last_name]" id="user_last_name" />
+          </div>
+
+          <div class="field sign-in">
+            <label for="user_email" class="white">Correo electrónico</label><br />
+            <input placeholder="ejemplo@ejemplo.com" class="middle-sign-in" type="email" value="" name="user[email]" id="user_email" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="field sign-in">
+            <label for="user_password" class="white">Contraseña</label><br />
+            <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password" />
+          </div>
+
+          <div class="field sign-in">
+            <label for="user_password" class="white">Confirmar Contraseña</label><br />
+            <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password" />
           </div>
         </div>
 
@@ -81,10 +100,8 @@
         </div>
       </form>
 
-
       <div class="actions">
-        <a class="link" href="sign_up.html">Regístrate</a>
-        <a class="link" href="#">¿Olvidaste tu contraseña?</a>
+        <a class="link white" href="#">¿Olvidaste tu contraseña?</a>
       </div>
 
     </div>

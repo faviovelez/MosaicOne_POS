@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../vendor/assets/css/bootstrap.css">
   <link rel="stylesheet" href="../vendor/assets/css/font-awesome.css">
   <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/sign_in.css">
   <link rel="stylesheet" href="../assets/css/pills.css">
   <link rel="stylesheet" href="../assets/css/pos.css">
   <link rel="stylesheet" href="../assets/css/bottom-nav.css">
@@ -76,6 +77,11 @@
         </a>
       </li>
       <li>
+        <a href="#" id="registerColaborator">
+          Registrar colaborador
+        </a>
+      </li>
+      <li>
         <a href="#" id="registerDeposit">
           Registrar un depósito
         </a>
@@ -93,6 +99,11 @@
       <li>
         <a href="#" id="deleteRegister">
           Eliminar caja
+        </a>
+      </li>
+      <li>
+        <a href="#" id="addTerminal">
+          Agregar terminar
         </a>
       </li>
       <li>
@@ -232,7 +243,7 @@
           <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
 
           <div class="actions">
-            <select name="discount_rule_options" class="myfield" id="discount_rule_options">
+            <select name="cash_register_options" class="myfield" id="cash_register_select">
               <option value="1">Caja 1</option>
               <option value="2">Caja 2</option>
             </select>
@@ -261,6 +272,89 @@
         </form>
 
       </div>
+
+      <div class="add-terminal hidden">
+        <h3 class="title-blue open-register-title space-bottom"> Agregar terminal </h3>
+        <p>
+          Al agregar una terminal, todas las operaciones de Tarjeta de crédito y débito se registrarán con la comisión que haya seleccionado.
+        </p>
+        <form class="new_register_open" id="new_register_open" action="configuration.html" accept-charset="UTF-8" method="post">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+          <select name="bank_options" class="myfield" id="bank_select">
+            <option value="1">Banamex</option>
+            <option value="2">Santander</option>
+          </select>
+          <br /><br />
+
+          <label for="new_cash_deposit">Número de afiliación</label><br>
+          <input placeholder="Ejemplo: 79864516" class="form-control round-form transparent-field" type="text" value="" name="terminal_number" id="new_terminal_number" />
+
+          <label for="new_cash_deposit">Comisión</label><br>
+          <input placeholder="Ejemplo: 3.6%" class="form-control round-form transparent-field" type="text" value="" name="terminal_number" id="new_terminal_number" />
+
+          <div class="actions">
+            <input type="submit" name="commit" value="Crear caja" class="main-button" />
+          </div>
+
+        </form>
+
+      </div>
+
+      <div class="container-sign-up register-sign-margin hidden">
+
+        <div class="sign-in-tittle-div">
+          <h2 class="reg-title white">Regístrar Colaborador</h2>
+        </div>
+
+        <form class="new_user" id="new_user" action="open_register.html" accept-charset="UTF-8" method="post">
+          <input name="utf8" type="hidden" value="&#x2713;" />
+          <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+          <div class="actions">
+            <div class="field sign-in">
+              <label for="user_email" class="white">Primer nombre</label><br />
+              <input placeholder="Primer nombre" class="middle-sign-in" type="text" value="" name="user[first_name]" id="user_first_name" />
+            </div>
+
+            <div class="field sign-in">
+              <label for="user_email" class="white">Segundo nombre</label><br />
+              <input placeholder="Segundo nombre" class="middle-sign-in" type="text" value="" name="user[second_name]" id="user_middle_name" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <div class="field sign-in">
+              <label for="user_email" class="white">Apellidos</label><br />
+              <input placeholder="Apellidos" class="middle-sign-in" type="text" value="" name="user[last_name]" id="user_last_name" />
+            </div>
+
+            <div class="field sign-in">
+              <label for="user_email" class="white">Correo electrónico</label><br />
+              <input placeholder="ejemplo@ejemplo.com" class="middle-sign-in" type="email" value="" name="user[email]" id="user_email" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <div class="field sign-in">
+              <label for="user_password" class="white">Contraseña</label><br />
+              <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password" />
+            </div>
+
+            <div class="field sign-in">
+              <label for="user_password" class="white">Confirmar Contraseña</label><br />
+              <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <input type="submit" name="commit" value="Registrar" class="main-button" />
+          </div>
+        </form>
+
+      </div>
+
 
   </div><!-- Termina options-container  -->
 

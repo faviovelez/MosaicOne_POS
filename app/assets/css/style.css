@@ -178,12 +178,10 @@ a.text-link:hover, a.text-link:active, a.text-link:visited, a.text-link:focus {
   font-size: 1.6rem;
 }
 
-/*Esto es solo para que el logo se haga pequeño */
 .logo {
   height: 50px;
   margin: 0.5rem 0.3rem;
 }
-/*Esto es solo para que el logo se haga pequeño */
 
 #username:hover,
 #store:hover {
@@ -272,4 +270,9 @@ a.text-link:hover, a.text-link:active, a.text-link:visited, a.text-link:focus {
   background-color: #232c37 !important;
   border: 1px solid #232c37 !important;
   color: #fff !important;
+}
+
+.container-sign-up.register-sign-margin {
+    margin-top: 0%;
+    margin-left: 0%;
 }
