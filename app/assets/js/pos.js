@@ -272,6 +272,7 @@ $(".hide-results").click(function () {
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
     $('.credit-days-container').addClass('hidden');
+    $('.operation-number-container').addClass('hidden');
   });
 
   $("#debit").click(function () {
@@ -284,6 +285,7 @@ $(".hide-results").click(function () {
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
     $('.credit-days-container').addClass('hidden');
+    $('.operation-number-container').addClass('hidden');
   });
 
   $("#credit").click(function () {
@@ -296,6 +298,7 @@ $(".hide-results").click(function () {
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
     $('.credit-days-container').addClass('hidden');
+    $('.operation-number-container').addClass('hidden');
   });
 
   $("#check").click(function () {
@@ -308,6 +311,7 @@ $(".hide-results").click(function () {
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
     $('.credit-days-container').addClass('hidden');
+    $('.operation-number-container').removeClass('hidden');
   });
 
   $("#transfer").click(function () {
@@ -320,6 +324,7 @@ $(".hide-results").click(function () {
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
     $('.credit-days-container').addClass('hidden');
+    $('.operation-number-container').removeClass('hidden');
   });
 
   $("#other").click(function () {
@@ -332,6 +337,7 @@ $(".hide-results").click(function () {
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
     $('.credit-days-container').addClass('hidden');
+    $('.operation-number-container').addClass('hidden');
   });
 
   $("#creditSale").click(function () {
@@ -344,6 +350,8 @@ $(".hide-results").click(function () {
     $('#cash').removeClass('selected');
     $('#other').removeClass('selected');
     $('#returnCash').removeClass('selected');
+    $('.credit-days-container').removeClass('hidden');
+    $('.operation-number-container').addClass('hidden');
   });
 
   $("#returnCash").click(function () {
@@ -356,6 +364,7 @@ $(".hide-results").click(function () {
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
     $('.credit-days-container').addClass('hidden');
+    $('.operation-number-container').addClass('hidden');
   });
 
 /* Métodos para cambiar botón de pagos*/
