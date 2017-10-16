@@ -35,7 +35,6 @@ async function hasUser(){
     const { rows } = await query('SELECT * FROM users');
     return rows.length > 0;
   } catch (err) {
-    console.log(err);
     return false;
   }
 }
