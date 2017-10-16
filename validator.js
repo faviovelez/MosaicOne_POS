@@ -32,7 +32,7 @@ function notNull(val, name){
   return evalue(
     val !== '',
     {
-      true:  'El valor si contiene informacion',
+      true:  `El ${name} si contiene informacion`,
       false: `El ${name} debe contener informacion minima`
     }
   );
