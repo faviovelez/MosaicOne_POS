@@ -48,7 +48,6 @@ $(function(){
 
     let params = {
       first_name   : $('#user_first_name').val(),
-      middle_name  : $('#user_middle_name').val(),
       last_name    : $('#user_last_name').val(),
       email        : $('#user_email').val(),
       password     : $('#user_password').val(),
@@ -58,6 +57,8 @@ $(function(){
     checkFillAll(params).then(error => {
 
       if (!error) {
+
+        params.middle_name = $('#user_middle_name').val();
 
         addUser(params).then(result => {
           showAlert('Success', 'Usuario creado correctamente', cloneAlert());
