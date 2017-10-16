@@ -1,4 +1,19 @@
 $(function(){
+  function cloneAlert(){
+    $('.container-sign-up').prepend(
+      '<div class="alert" hidden>' +
+      `${$('.alert').html()} </div>`
+    );
+  }
+
+  function showAlert(type, message){
+    $('.alert span.title').html(`${type}: ${message}`);
+    $('.alert:last')
+      .show()
+      .addClass('alert-danger')
+      .removeClass('hidden');
+  }
+
   $('#registerAction').click(function(){
 
     let params = {
@@ -10,16 +25,12 @@ $(function(){
       pass_confirm : $('#user_password_confirm').val()
     };
 
+    cloneAlert();
 
     addUser(params).then(result => {
-      debugger
-      if (result) {
-      } else {
-        $('.alert span.title').html('Error type');
-        $('.alert')
-          .addClass('alert-danger')
-          .removeClass('hidden');
-      }
+      showAlert('Success', 'Usuario creado correctamente');
+    }, err => {
+      showAlert('Error', err.detail);
     });
 
     return false;

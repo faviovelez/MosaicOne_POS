@@ -44,5 +44,5 @@ async function insert (columns, data, table){
   data.forEach(data => {
     localQuery += `, '${data}'`;
   });
-  return await query(`${localQuery})`).length > 0;
+  return await query(`${localQuery})`);
 }

@@ -18,8 +18,10 @@ async function addUser(params){
 async function hasUser(){
   try {
     const { rows } = await query('SELECT * FROM users');
+    console.log('asfdasdf');
     return rows.length > 0;
   } catch (err) {
+    console.log('aqu');
     return false;
   }
 }
