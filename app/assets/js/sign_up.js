@@ -1,7 +1,7 @@
 $(function(){
   function cloneAlert(){
     let alerts = $('.alert').length + 1;
-    $('.container-sign-up').prepend(
+    $('.alerts-container').prepend(
       `<div class="alert" id="alertNo_${alerts}" hidden>` +
       `${$('.alert').html()} </div>`
     );

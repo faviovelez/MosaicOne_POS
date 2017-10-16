@@ -1,18 +1,18 @@
 const {Pool} = require('pg');
 
 const localPool = new Pool({
-  user: 'oscar',
+  user: 'faviovelez',
   host: 'localhost',
-  database: 'local_db',
-  password: '12345678',
+  database: 'mosaicOnePOS_000',
+  password: 'bafio44741',
   port: 5432,
 });
 
 const remotePool = new Pool({
-  user: 'oscar',
+  user: 'faviovelez',
   host: 'localhost',
   database: 'mosaicone007_development',
-  password: '12345678',
+  password: 'bafio44741',
   port: 5432,
 });
 

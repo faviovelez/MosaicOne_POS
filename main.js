@@ -2,10 +2,10 @@ const electron = require('electron'),
   app = electron.app,
   {Pool} = require('pg'),
   localPool = new Pool({
-    user: 'oscar',
+    user: 'faviovelez',
     host: 'localhost',
-    database: 'local_db',
-    password: '12345678',
+    database: 'mosaicOnePOS_000',
+    password: 'bafio44741',
     port: 5432,
   }),
   BrowserWindow = electron.BrowserWindow;
@@ -62,4 +62,3 @@ app.on('ready', () => {
 
   mainWindow.on('closed', () => { mainWindow = null; });
 });
-
