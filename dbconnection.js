@@ -16,30 +16,33 @@ const remotePool = new Pool({
   port: 5432,
 });
 
-
 async function query (q) {
-  const client = await localPool.connect()
-  let res
+  const client = await localPool.connect();
+  let res;
   try {
-    await client.query('BEGIN')
+    await client.query('BEGIN');
     try {
-      res = await client.query(q)
-      await client.query('COMMIT')
+      res = await client.query(q);
+      await client.query('COMMIT');
     } catch (err) {
-      await client.query('ROLLBACK')
-      throw err
+      await client.query('ROLLBACK');
+      throw err;
     }
   } finally {
-    client.release()
+    client.release();
   }
-  return res
+  return res;
 }
 
-async function hasUser(){
-  try {
-    const { rows } = await query('SELECT * FROM users')
-    return rows.length > 0;
-  } catch (err) {
-    return false;
-  }
+async function insert (columns, data, table){
+  let localQuery = `INSERT INTO public.${table}(`;
+  localQuery += columns.shift();
+  columns.forEach(fieldName => {
+    localQuery += `, ${fieldName}`;
+  });
+  localQuery += `) VALUES ( '${data.shift()}'`;
+  data.forEach(data => {
+    localQuery += `, '${data}'`;
+  });
+  return await query(`${localQuery})`).length > 0;
 }

@@ -6,7 +6,7 @@ let mainWindow = null;
 
 async function hasUser(){
   try {
-    const { rows } = await query('SELECT * FROM users')
+    const { rows } = await query('SELECT * FROM users');
     return rows.length > 0;
   } catch (err) {
     return false;
