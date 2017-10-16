@@ -1,0 +1,50 @@
+function createJson(result, message){
+  return {
+    result: result,
+    message: message,
+    type:    result ? 'Éxito' : 'Error'
+  };
+}
+
+function evalue(result, messages){
+  return createJson(
+    result, messages[result]
+  );
+}
+
+function processVal(val, show){
+  return show ? val : '*****';
+}
+
+function equals(val1, val2, show = true) {
+  return evalue(
+    val1 === val2,
+    {
+      true:  'Valores iguales',
+      false: 'Error de comparación ' +
+              `${processVal(val1, show)} ` +
+              `no es igual a ${processVal(val2)}`
+    }
+  );
+}
+
+function notNull(val, name){
+  name = i18nEsMx()[name];
+  return evalue(
+    val !== '',
+    {
+      true:  `El campo ${name} sí contiene información`,
+      false: `El campo ${name} debe contener información mínima`
+    }
+  );
+}
+
+function size(size, min) {
+  return evalue(
+    size > min,
+    {
+      true:  'Sí tiene el mínimo requerido',
+      false: `La longuitud de la cadena no es la mínima ${min} requerida`
+    }
+  );
+}

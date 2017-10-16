@@ -40,11 +40,10 @@
     </div><!-- /.container-fluid -->
   </nav>
   <!-- Termina Navbar -->
-
   <div class="alerts-container">
-    <div class="alert alert-info hidden" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <div class="alert hidden">
       <span class='title'>Tienes que iniciar sesión o registrarte para poder continuar.</span>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     </div>
   </div>
 
@@ -57,7 +56,7 @@
         <h2 class="reg-title white">Regístrate</h2>
       </div>
 
-      <form class="new_user" id="new_user" action="open_register.html" accept-charset="UTF-8" method="post">
+      <form class="new_user" id="new_user" action="#" accept-charset="UTF-8" method="post">
         <input name="utf8" type="hidden" value="&#x2713;" />
         <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
 
@@ -93,12 +92,12 @@
 
           <div class="field sign-in">
             <label for="user_password" class="white">Confirmar Contraseña</label><br />
-            <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password" />
+            <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password_confirm" />
           </div>
         </div>
 
         <div class="actions">
-          <input type="submit" name="commit" value="Ingresar" class="main-button" />
+          <input type="submit" id="registerAction" name="commit" value="Ingresar" class="main-button" />
         </div>
       </form>
 
@@ -114,6 +113,11 @@
     <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+    <script src="../assets/js/sign_up.js" charset="utf-8"></script>
+    <script src="../../users_gestor.js" charset="utf-8"></script>
+    <script src="../../dbconnection.js" charset="utf-8"></script>
+    <script src="../../validator.js" charset="utf-8"></script>
+    <script src="../../esMx.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
 
