@@ -53,7 +53,6 @@ app.on('ready', () => {
   });
 
   hasUser().then(res => {
-    console.log(res);
     if (res) {
       mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_in.html`);
     } else {
