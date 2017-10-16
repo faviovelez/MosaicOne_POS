@@ -61,7 +61,7 @@ $(function(){
         params.middle_name = $('#user_middle_name').val();
 
         addUser(params).then(result => {
-          showAlert('Success', 'Usuario creado correctamente', cloneAlert());
+          showAlert('Éxito', 'Usuario creado correctamente', cloneAlert());
         }, err => {
           showAlert('Error', err.detail, cloneAlert());
         });

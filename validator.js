@@ -2,7 +2,7 @@ function createJson(result, message){
   return {
     result: result,
     message: message,
-    type:    result ? 'Success' : 'Error'
+    type:    result ? 'Éxito' : 'Error'
   };
 }
 
@@ -21,7 +21,7 @@ function equals(val1, val2, show = true) {
     val1 === val2,
     {
       true:  'Valores iguales',
-      false: 'Error de comparacion ' +
+      false: 'Error de comparación ' +
               `${processVal(val1, show)} ` +
               `no es igual a ${processVal(val2)}`
     }
@@ -33,8 +33,8 @@ function notNull(val, name){
   return evalue(
     val !== '',
     {
-      true:  `El ${name} si contiene informacion`,
-      false: `El ${name} debe contener informacion minima`
+      true:  `El campo ${name} sí contiene información`,
+      false: `El campo ${name} debe contener información mínima`
     }
   );
 }
@@ -43,8 +43,8 @@ function size(size, min) {
   return evalue(
     size > min,
     {
-      true:  'Si tiene el minimo requerido',
-      false: `La longuitud de la cadena no es la minima ${min} requerida`
+      true:  'Sí tiene el mínimo requerido',
+      false: `La longuitud de la cadena no es la mínima ${min} requerida`
     }
   );
 }

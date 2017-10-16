@@ -2,9 +2,9 @@ function i18nEsMx(){
   return {
     first_name   : 'Primer Nombre',
     middle_name  : 'Segundo Nombre',
-    last_name    : 'Apellido',
+    last_name    : 'Apellidos',
     email        : 'Correo',
-    password     : 'Contrasena',
-    pass_confirm : 'Confirmacion de contrasena'
+    password     : 'Contraseña',
+    pass_confirm : 'Confirmación de contraseña'
   }
 }
