@@ -29,6 +29,7 @@ function equals(val1, val2, show = true) {
 }
 
 function notNull(val, name){
+  name = i18nEsMx()[name];
   return evalue(
     val !== '',
     {
