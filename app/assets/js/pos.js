@@ -47,6 +47,8 @@ $(document).ready(function() {
     $("#advance-option").removeClass('hidden');
     $("#estimate-option").removeClass('hidden');
     $('.payments-received-on-ticket').addClass('hidden');
+
+    $('.second-search').addClass('hidden');
   });
 
   $("#return-option").click(function () {
@@ -85,6 +87,8 @@ $(document).ready(function() {
     $("#advance-option").removeClass('hidden');
     $("#estimate-option").removeClass('hidden');
     $('.payments-received-on-ticket').addClass('hidden');
+
+    $('.second-search').addClass('hidden');
   });
 
   $("#sale-option").click(function () {
@@ -122,6 +126,8 @@ $(document).ready(function() {
     $("#advance-option").removeClass('hidden');
     $("#estimate-option").removeClass('hidden');
     $('.payments-received-on-ticket').addClass('hidden');
+
+    $('.second-search').addClass('hidden');
   });
 
   $("#advance-option").click(function () {
@@ -160,6 +166,8 @@ $(document).ready(function() {
     $("#sale-option").removeClass('hidden');
     $("#return-option").removeClass('hidden');
     $("#estimate-option").removeClass('hidden');
+
+    $('.second-search').addClass('hidden');
   });
 
   $("#estimate-option").click(function () {
@@ -200,6 +208,8 @@ $(document).ready(function() {
     $("#advance-option").removeClass('hidden');
     $("#estimate-option").addClass('hidden');
     $('.payments-received-on-ticket').addClass('hidden');
+
+    $('.second-search').addClass('hidden');
   });
 
 
@@ -222,18 +232,21 @@ $(".hide-results").click(function () {
   $('.ticket-selected').removeClass('hidden');
   $('.payments-received-on-ticket').addClass('hidden');
 
-    if ($("#return").hasClass('active-sale-option')) {
-      $('.items-returns').removeClass('hidden');
-      $('.payments-received-on-ticket').addClass('hidden');
+  if ($("#return").hasClass('active-sale-option')) {
+    $('.items-returns').removeClass('hidden');
+    $('.payments-received-on-ticket').addClass('hidden');
+    $('.second-search').addClass('hidden');
 
-    } else if ($("#change").hasClass('active-sale-option')) {
-      $('.items-changes').removeClass('hidden');
-      $('.second-search').removeClass('hidden');
-      $('.payments-received-on-ticket').addClass('hidden');
+  } else if ($("#change").hasClass('active-sale-option')) {
+    $('.items-changes').removeClass('hidden');
+    $('.second-search').removeClass('hidden');
+    $('.payments-received-on-ticket').addClass('hidden');
 
-    } else if ($("#advance").hasClass('active-sale-option')) {
-      $('.payments-received-on-ticket').removeClass('hidden');
-    };
+  } else if ($("#advance").hasClass('active-sale-option')) {
+    $('.payments-received-on-ticket').removeClass('hidden');
+    $('.second-search').addClass('hidden');
+  };
+
 });
 
 /* Métodos para descuentos*/
