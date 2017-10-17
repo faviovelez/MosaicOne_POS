@@ -46,3 +46,8 @@ async function insert (columns, data, table){
   });
   return await query(`${localQuery})`);
 }
+
+async function findBy(column, data, table){
+  let localQuery = `SELECT * FROM ${table} WHERE ${column}='${data}'`;
+  return await query(`${localQuery}`);
+}

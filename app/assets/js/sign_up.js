@@ -62,6 +62,9 @@ $(function(){
 
         addUser(params).then(result => {
           showAlert('Éxito', 'Usuario creado correctamente', cloneAlert());
+          setTimeout(function(){
+            window.location.href = 'sign_in.html';
+          }, 1000);
         }, err => {
           showAlert('Error', err.detail, cloneAlert());
         });
