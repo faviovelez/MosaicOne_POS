@@ -1,6 +1,6 @@
 function createPassword(pass){
-  var bcrypt = require('bcryptjs');
-  var salt = bcrypt.genSaltSync(10);
+  let bcrypt = require('bcryptjs'),
+      salt = bcrypt.genSaltSync(10);
   return bcrypt.hashSync(pass, salt);
 }
 
