@@ -92,7 +92,7 @@
               <i class="fa fa-archive " aria-hidden="true"></i>
             </button>
           </span>
-          <input type="text" class="form-control main-search" placeholder="Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <input type="text" class="form-control main-search" placeholder="Producto o servicio" id="product_service_search"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
 
           <span class="input-group-btn extra-search hidden">
             <button class="btn btn-default pos-main-btn gray-btn" type="button" id="searchProducts">
@@ -205,9 +205,9 @@
               </a>
             </td>
             <td> Kraft </td>
-            <td> $ 26.50 </td>
+            <td id="product_price_1"> $ 26.50 </td>
             <td>
-              <input type="text" class="form-control smaller-form" placeholder="1">
+              <input type="text" class="form-control smaller-form" placeholder="1" id="quantity_">
             </td>
             <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_1"> 0% </a> </td>
             <td class="right"> $ 1,007.00 </td>
@@ -226,9 +226,9 @@
               </a>
              </td>
             <td> Transparente </td>
-            <td> $ 37.50 </td>
+            <td id="product_price_2"> $ 37.50 </td>
             <td>
-              <input type="text" class="form-control smaller-form" placeholder="1">
+              <input type="text" class="form-control smaller-form" placeholder="1" id="quantity_">
             </td>
             <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_2"> 0% </a> </td>
             <td class="right"> $ 375.00 </td>
@@ -250,7 +250,7 @@
               </a>
              </td>
             <td>
-              <input type="text" class="form-control smaller-form" placeholder="$ 100.00">
+              <input type="text" id="servive_price_1" class="form-control smaller-form" placeholder="$ 100.00" id="service_price">
             </td>
             <td>
               1
@@ -808,9 +808,9 @@
                     <span aria-hidden="true" class="white-light">&times;</span>
                   </button>
                 </div>
-                Tarjeta de Crédito
+                <span id="label_credit_payment_1"> Tarjeta de Crédito </span>
               </td>
-              <td class="right"> $ 800.00 </a> </td>
+              <td class="right" id="payment_1"> $ 800.00 </td>
             </tr>
             <tr>
               <td class="flex">
@@ -819,9 +819,9 @@
                     <span aria-hidden="true" class="white-light">&times;</span>
                   </button>
                 </div>
-                Efectivo
+                <span id="label_cash_payment_2"> Efectivo </span>
               </td>
-              <td class="right"> $ 60.00 </td>
+              <td class="right" id="payment_2"> $ 60.00 </td>
             </tr>
             <tr>
               <td class="bigger"> <strong> Por pagar: </strong> </td>
@@ -839,27 +839,27 @@
 
       <!-- Inicia la sección de formas de pago -->
       <div class="payment-form-wrapper">
-        <button type="button" class="btn btn-default custom-button" id="cash">
+        <button type="button" class="btn btn-default custom-button" id="cash" value="1">
           <i class="fa fa-money " aria-hidden="true"></i>
           Efectivo
         </button>
-        <button type="button" class="btn btn-default custom-button" id="debit">
+        <button type="button" class="btn btn-default custom-button" id="debit" value="18">
           <i class="fa fa-credit-card " aria-hidden="true"></i>
           Débito
         </button>
-        <button type="button" class="btn btn-default custom-button" id="credit">
+        <button type="button" class="btn btn-default custom-button" id="credit" value="4">
           <i class="fa fa-credit-card-alt " aria-hidden="true"></i>
           Crédito
         </button>
-        <button type="button" class="btn btn-default custom-button" id="check">
+        <button type="button" class="btn btn-default custom-button" id="check" value="2">
           <i class="fa fa-pencil-square-o " aria-hidden="true"></i>
           Cheque
         </button>
-        <button type="button" class="btn btn-default custom-button" id="transfer">
+        <button type="button" class="btn btn-default custom-button" id="transfer" value="3">
           <i class="fa fa-copy " aria-hidden="true"></i>
           Transferencia
         </button>
-        <button type="button" class="btn btn-default custom-button" id="creditSale">
+        <button type="button" class="btn btn-default custom-button" id="creditSale" value="21">
           <i class="fa fa-address-book-o " aria-hidden="true"></i>
           Venta a Crédito
         </button>
@@ -867,7 +867,7 @@
           <i class="fa fa-exchange " aria-hidden="true"></i>
           Devolución
         </button>
-        <button type="button" class="btn btn-default custom-button" id="other">
+        <button type="button" class="btn btn-default custom-button" id="other" value="21">
           <i class="fa fa-question-circle-o " aria-hidden="true"></i>
           Otra
         </button>
@@ -875,7 +875,7 @@
       <!-- Termina la sección de formas de pago -->
 
       <div class="input-group margin-bottom credit-days-container hidden">
-        <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)">
+        <input type="text" class="form-control" id="credit_days" placeholder="Ejemplo: 30 (solo número)">
         <span class="input-group-btn">
           <button class="btn btn-default color-button pos-main-btn" type="button" id="creditDays">Días de crédito</button>
         </span>
@@ -888,6 +888,13 @@
         </span>
       </div><!-- /input-group -->
 
+      <div class="actions select-register-container hidden">
+        <select class="myfield margin-top margin-bottom" name="business_type" id="select_terminal">
+          <option value="1">Terminal 1</option>
+          <option value="2">Terminal 2</option>
+        </select>
+      </div>
+
       <!-- Sección para agregar formas de pago o concluir la venta -->
       <div class="row process-sale">
         <div class="input-group">
@@ -898,7 +905,7 @@
           </span>
         </div><!-- /input-group -->
       </div><!-- /.row -->
-      <input type="text" class="form-control higher-form process-sale" placeholder="Comentarios"><br /><br />
+      <input type="text" class="form-control higher-form process-sale" placeholder="Comentarios" id="ticket_comments"><br /><br />
 
     </div> <!-- Termina right-container  -->
   </div><!-- Termina page-container  -->
@@ -913,8 +920,8 @@
        </div>
        <div class="modal-body">
          <div class="input-group">
-           <input type="text" class="form-control smaller-form round-form" placeholder="5%">
-           <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
+           <input type="text" id="individual-discount" class="form-control smaller-form round-form" placeholder="5%">
+           <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" id="discount_reason" class="modal-form-input">
          </div><!-- /input-group -->
        </div>
        <div class="modal-footer">
@@ -941,14 +948,14 @@
              <tr>
                <td colspan="2">
                  <p>
-                   <strong class="product_description">
+                   <strong class="product_description" id="description">
                      Bolsa para botella Kraft Satinada Navideña
                    </strong>
                  </p>
                </td>
              </tr>
              <tr>
-               <td class="padding-right">
+               <td class="padding-right" id="product_image">
                  <img src="../assets/img/product_small.png" alt="Imagen no disponible">
                </td>
                <td>
@@ -956,7 +963,7 @@
                   <strong>
                     Código:
                   </strong>
-                  <span class="product_unique_code">
+                  <span class="product_unique_code" id="unique_code">
                     3456
                   </span>
                  </p>
@@ -964,7 +971,7 @@
                    <strong>
                      Medidas:
                    </strong>
-                   <span class="product_measures">
+                   <span class="product_measures" id="product_measures">
                      34.0 x 24.5 x 17.4 cm
                    </span>
                  </p>
@@ -972,7 +979,7 @@
                    <strong>
                      Material:
                    </strong>
-                   <span class="product_main_material">
+                   <span class="product_main_material" id="main_material">
                     Corrugado
                    </span>
                  </p>
@@ -980,7 +987,7 @@
                    <strong>
                      Resistencia:
                    </strong>
-                   <span class="product_resistance_main_material">
+                   <span class="product_resistance_main_material" id="resistance">
                     12kg - 20 ECT
                    </span>
                  </p>
@@ -988,10 +995,10 @@
                   <strong>
                     Inventario:
                   </strong>
-                  <span class="stores_inventory_quantity">
+                  <span class="stores_inventory_quantity" id="inventory_quantity">
                     245
                   </span>
-                  <span class="product_unit">
+                  <span class="product_unit" id="units">
                     piezas
                   </span>
                  </p>
@@ -1115,7 +1122,7 @@
                    MAPE811023JR8
                  </td>
                  <td colspan="2">
-                   <select class="prospect_business_type" name="business_type" id="prospect_business_type">
+                   <select class="prospect_business_type" name="business_type" id="prospect_cfdi_use">
                      <option value="persona física">Gastos en general</option>
                      <option value="persona moral">Adquisición de mercancías</option>
                    </select>
@@ -1540,7 +1547,7 @@
          <div class="modal-content">
            <div class="modal-header">
              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-             <h4 class="modal-title">Alta de mercancías</h4>
+             <h4 class="modal-title">Entrada de mercancías</h4>
            </div>
            <div class="modal-body">
 
@@ -1548,7 +1555,7 @@
                <thead>
                  <tr>
                    <th colspan="4">
-                     <input type="text" class="form-control main-search" placeholder="Buscar Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+                     <input type="text" class="form-control main-search" id="entry_quantity" placeholder="Buscar Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
                    </th>
                  </tr>
                  <tr>
