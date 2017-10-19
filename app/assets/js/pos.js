@@ -12,7 +12,74 @@ $(document).ready(function() {
   }
 
   function createFullName(user){
-    return `${user.first_name} ${user.middle_name} ${user.last_name}`
+    return `${user.first_name} ${user.middle_name} ${user.last_name}`;
+  }
+
+  function getProducts(call){
+    getAll('products').then(products => {
+      options = [];
+      products.rows.forEach(product => {
+        options.push(
+          {
+            value: `${product.unique_code} ${product.description}`,
+            id:    product.id,
+            price: product.price,
+            color: product.exterior_color_or_design || 'Sin Diseno',
+            description: product.description
+          }
+        );
+      });
+      return call(options);
+    });
+  }
+
+  function createTotal(id){
+    let cuantity = $(`#cuantityTo_${id}`).val(),
+        price    = parseFloat(
+          $(`#priceTo_${id}`).html().replace(' $ ','')
+        );
+    return price * cuantity;
+  }
+
+  function addEvents(id){
+    $(`button[id=delete_${id}]`).click(function(){
+      $(`tr[id=product_${id}]`).remove();
+    });
+
+    $(`#cuantityTo_${id}`).keyup(function(){
+      $(`#totalTo_${id}`).html(
+        $(this).html() + createTotal(id)
+      );
+    });
+  }
+
+  function addTr(product){
+    return `<tr id="product_${product.id}"><td>` +
+      '<div class="close-icon">' +
+      `<button id="delete_${product.id}" type="button"` +
+      'class="close center-close" aria-label="Close">' +
+      '<span aria-hidden="true" class="white-light">&times;</span>' +
+      '</button>' +
+      '</div>' +
+      '</td>' +
+      '<td class="left">' +
+      '<a href="#" data-toggle="modal" data-target="#productShow"' +
+      `data-id="${product.id}" >` +
+      product.description +
+      '</a>' +
+      '</td>' +
+      `<td> ${product.color} </td>` +
+      `<td id="priceTo_${product.id}"> $ ${product.price} </td>` +
+      '<td>' +
+      '<input type="text" class="form-control smaller-form" ' +
+      `placeholder="1" id="cuantityTo_${product.id}"></td>` +
+      '<td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_1"> 0% </a> </td>' +
+      `<td class="right" id="totalTo_${product.id}"> $ </td>` +
+      '</tr>';
+  }
+
+  function formatSelection(state){
+    return '';
   }
 
  (function setInitialValues(){
@@ -25,6 +92,19 @@ $(document).ready(function() {
           store.get('current_user')
         )
       );
+
+      getProducts(list => {
+        $('#mainProductSearch').autocomplete({
+          lookup: list,
+          lookupLimit: 10,
+          onSelect: function (suggestion) {
+            $('#ticketList').append(addTr(suggestion));
+            addEvents(suggestion.id);
+            $(this).val('');
+          }
+        });
+      });
+
     });
   })();
 

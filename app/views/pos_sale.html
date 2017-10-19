@@ -92,7 +92,7 @@
               <i class="fa fa-archive " aria-hidden="true"></i>
             </button>
           </span>
-          <input type="text" class="form-control main-search" placeholder="Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <input type="text" class="form-control main-search" placeholder="Producto o servicio" id="mainProductSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
 
           <span class="input-group-btn extra-search hidden">
             <button class="btn btn-default pos-main-btn gray-btn" type="button" id="searchProducts">
@@ -190,74 +190,7 @@
             <th> Total </th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>
-              <div class="close-icon">
-                <button type="button" class="close center-close" aria-label="Close">
-                  <span aria-hidden="true" class="white-light">&times;</span>
-                </button>
-              </div>
-            </td>
-            <td class="left">
-              <a href="#" data-toggle="modal" data-target="#productShow">
-                Bolsa para botella Kraft Satinada Navideña
-              </a>
-            </td>
-            <td> Kraft </td>
-            <td> $ 26.50 </td>
-            <td>
-              <input type="text" class="form-control smaller-form" placeholder="1">
-            </td>
-            <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_1"> 0% </a> </td>
-            <td class="right"> $ 1,007.00 </td>
-          </tr>
-          <tr>
-            <td>
-              <div class="close-icon">
-                <button type="button" class="close center-close" aria-label="Close">
-                  <span aria-hidden="true" class="white-light">&times;</span>
-                </button>
-              </div>
-            </td>
-            <td class="left">
-              <a href="#" data-toggle="modal" data-target="#productShow">
-                Cilindro de acetato botella decorado Nav
-              </a>
-             </td>
-            <td> Transparente </td>
-            <td> $ 37.50 </td>
-            <td>
-              <input type="text" class="form-control smaller-form" placeholder="1">
-            </td>
-            <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_2"> 0% </a> </td>
-            <td class="right"> $ 375.00 </td>
-          </tr>
-          <tr>
-            <td>
-              <div class="close-icon">
-                <button type="button" class="close center-close" aria-label="Close">
-                  <span aria-hidden="true" class="white-light">&times;</span>
-                </button>
-              </div>
-            </td>
-            <td class="left">
-              Servicio de mensajería UPS (Nacional)
-            </td>
-            <td>
-              <a href="#" data-toggle="modal" data-target="#deliveryService" id="service_1">
-                <i class="fa fa-truck" aria-hidden="true"></i>
-              </a>
-             </td>
-            <td>
-              <input type="text" class="form-control smaller-form" placeholder="$ 100.00">
-            </td>
-            <td>
-              1
-            </td>
-            <td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_3"> 0% </a> </td>
-            <td class="right"> $ 100.00 </td>
-          </tr>
+        <tbody id="ticketList">
         </tbody>
       </table>
       <!-- Termina la tabla de ventas -->
@@ -1607,6 +1540,7 @@
 
     <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.3/jquery.autocomplete.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
     <script src="../../dbconnection.js" charset="utf-8"></script>
     <script src="../../users_gestor.js" charset="utf-8"></script>
