@@ -48,6 +48,24 @@ $(document).ready(function() {
     });
   }
 
+  function bigTotal(){
+    let subTotalInput = $('table.subtotal td.subtotal:first'),
+        subtotal      = 0;
+    $.each($(`td[id^=totalTo_]`), function(){
+      subtotal += parseFloat(
+        $(this).html().replace('$ ', '')
+      );
+    });
+    $(subTotalInput).html(`$ ${subtotal.toFixed(2)}`);
+    let iva = subtotal * 0.16;
+    $('table.subtotal td.subtotal.iva').html(
+      `$ ${iva.toFixed(2)}`
+    );
+    $('table.subtotal td.total').html(
+      `$ ${(subtotal + parseFloat(iva)).toFixed(2)}`
+    );
+  }
+
   function createTotal(id){
     let cuantity = $(`#cuantityTo_${id}`).val(),
         price    = parseFloat(
@@ -59,8 +77,10 @@ $(document).ready(function() {
     let total =  price * cuantity,
         discount = $(`#discount_${id}`)
       .html().replace(' %',''),
-      discountVal = parseFloat(discount) / 100 * total;
-    return (total - discountVal).toFixed(2);
+      discountVal = parseFloat(discount) / 100 * total,
+      productTotal    = total - discountVal;
+
+      return productTotal.toFixed(2);
   }
 
   function addEvents(id){
@@ -72,12 +92,14 @@ $(document).ready(function() {
       $(`#totalTo_${id}`).html(
         `$ ${createTotal(id)}`
       );
+      bigTotal();
     });
 
     $(`#priceToServiceTo_${id}`).keyup(function(){
       $(`#totalTo_${id}`).html(
         `$ ${createTotal(id)}`
       );
+      bigTotal();
     });
   }
 
@@ -123,6 +145,7 @@ $(document).ready(function() {
     $(`#totalTo_${id}`).html(
       `$ ${createTotal(id)}`
     );
+    bigTotal();
   });
 
   $('#discountChange').on('shown.bs.modal', function(e) {
