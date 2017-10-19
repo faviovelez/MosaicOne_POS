@@ -1,10 +1,10 @@
 const {Pool} = require('pg');
 
 const localPool = new Pool({
-  user: 'faviovelez',
+  user: 'oscar',
   host: 'localhost',
-  database: 'mosaicOnePOS_000',
-  password: 'bafio44741',
+  database: 'local_db',
+  password: '12345678',
   port: 5432,
 });
 
@@ -48,6 +48,12 @@ async function insert (columns, data, table){
 }
 
 async function findBy(column, data, table){
-  let localQuery = `SELECT * FROM ${table} WHERE ${column}='${data}'`;
+  let localQuery = `SELECT * FROM ${table} ` +
+    `WHERE ${column}='${data}'`;
   return await query(`${localQuery}`);
+}
+
+async function getAll(table, columns = '*'){
+  let localQuery = `SELECT ${columns} FROM ${table}`;
+  return await query(localQuery);
 }
