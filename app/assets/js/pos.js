@@ -15,7 +15,7 @@ $(document).ready(function() {
     return `${user.first_name} ${user.middle_name} ${user.last_name}`;
   }
 
-  function getProducts(call){
+  function getProductsAndServices(call){
     getAll('products').then(products => {
       options = [];
       products.rows.forEach(product => {
@@ -25,11 +25,26 @@ $(document).ready(function() {
             id:    product.id,
             price: product.price,
             color: product.exterior_color_or_design || 'Sin Diseno',
-            description: product.description
+            description: product.description,
+            table: 'products'
           }
         );
       });
-      return call(options);
+      getAll('services').then(services => {
+        services.rows.forEach(service => {
+          options.push(
+            {
+              value: `${service.unique_code} ${service.description}`,
+              id:    service.id,
+              table:  'services',
+              description: service.description
+            }
+          );
+        });
+      });
+      setTimeout(function(){
+        return call(options);
+      }, 300);
     });
   }
 
@@ -38,6 +53,9 @@ $(document).ready(function() {
         price    = parseFloat(
           $(`#priceTo_${id}`).html().replace(' $ ','')
         );
+    if (!price){
+      price = $(`#priceTo_${id} input`).val();
+    }
     return price * cuantity;
   }
 
@@ -48,14 +66,16 @@ $(document).ready(function() {
 
     $(`#cuantityTo_${id}`).keyup(function(){
       $(`#totalTo_${id}`).html(
-        $(this).html() + createTotal(id)
+        `$ ${createTotal(id)}`
       );
     });
   }
 
   $('#productShow').on('shown.bs.modal', function(e) {
-    let productId = e.relatedTarget.dataset.id;
-    findBy('id', productId, 'products').then(product => {
+    let relatedObject = e.relatedTarget.dataset,
+        productId     = relatedObject.id;
+
+    findBy('id', productId, relatedObject.table).then(product => {
       let productData = product.rows[0];
       $('.product_description').html(
         productData.description
@@ -77,7 +97,25 @@ $(document).ready(function() {
     });
   });
 
+
+  $('#discountChange').on('shown.bs.modal', function(e) {
+    let relatedObject = e.relatedTarget.dataset,
+        productId     = relatedObject.id;
+  });
+
+  function carIcon(id){
+    return '<a href="#" data-toggle="modal"' + 
+      'data-target="#deliveryService"' +
+      `id="service_1" data-id=${id}>` +
+      '<i class="fa fa-truck" aria-hidden="true"></i>' +
+      '</a>';
+  }
+
   function addTr(product){
+    let color = product.table === 'services' ? carIcon(product.id) :
+                                            product.color,
+        price = product.type === 'products' ? ` $ ${product.price}` :
+        '<input type="text" class="form-control smaller-form" placeholder="$ 100.00">';
     return `<tr id="product_${product.id}"><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +
@@ -88,16 +126,19 @@ $(document).ready(function() {
       '</td>' +
       '<td class="left">' +
       '<a href="#" data-toggle="modal" data-target="#productShow"' +
-      `data-id="${product.id}" >` +
+      `data-id="${product.id}" data-table="${product.table}" >` +
       product.description +
       '</a>' +
       '</td>' +
-      `<td> ${product.color} </td>` +
-      `<td id="priceTo_${product.id}"> $ ${product.price} </td>` +
+      `<td> ${color} </td>` +
+      `<td id="priceTo_${product.id}">${price}</td>` +
       '<td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}"></td>` +
-      '<td> <a href="#" data-toggle="modal" data-target="#discountChange" id="discount_1"> 0% </a> </td>' +
+      '<td> <a href="#" data-toggle="modal"' +
+      'data-target="#discountChange" ' +
+      `id="discount_1" data-id="${product.id}" ` +
+      `data-table="${product.table}" > 0% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}"> $ </td>` +
       '</tr>';
   }
@@ -117,7 +158,7 @@ $(document).ready(function() {
         )
       );
 
-      getProducts(list => {
+      getProductsAndServices(list => {
         $('#mainProductSearch').autocomplete({
           lookup: list,
           lookupLimit: 10,
