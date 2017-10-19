@@ -53,6 +53,30 @@ $(document).ready(function() {
     });
   }
 
+  $('#productShow').on('shown.bs.modal', function(e) {
+    let productId = e.relatedTarget.dataset.id;
+    findBy('id', productId, 'products').then(product => {
+      let productData = product.rows[0];
+      $('.product_description').html(
+        productData.description
+      );
+      $('.product_unique_code').html(
+        productData.unique_code
+      );
+      $('.product_main_material').html(
+        productData.main_material
+      );
+      $('.product_resistance_main_material').html(
+        productData.resistance_main_material
+      );
+      findBy('product_id', productId, 'stores_inventories').then(inventory => {
+        $('.stores_inventory_quantity').html(
+          inventory.rows[0].quantity
+        );
+      });
+    });
+  });
+
   function addTr(product){
     return `<tr id="product_${product.id}"><td>` +
       '<div class="close-icon">' +
