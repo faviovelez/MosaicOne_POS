@@ -56,7 +56,11 @@ $(document).ready(function() {
     if (!price){
       price = $(`#priceTo_${id} input`).val();
     }
-    return price * cuantity;
+    let total =  price * cuantity,
+        discount = $(`#discount_${id}`)
+      .html().replace(' %',''),
+      discountVal = parseFloat(discount) / 100 * total;
+    return (total - discountVal).toFixed(2);
   }
 
   function addEvents(id){
@@ -65,6 +69,12 @@ $(document).ready(function() {
     });
 
     $(`#cuantityTo_${id}`).keyup(function(){
+      $(`#totalTo_${id}`).html(
+        `$ ${createTotal(id)}`
+      );
+    });
+
+    $(`#priceToServiceTo_${id}`).keyup(function(){
       $(`#totalTo_${id}`).html(
         `$ ${createTotal(id)}`
       );
@@ -97,10 +107,32 @@ $(document).ready(function() {
     });
   });
 
+  $('#closeDiscount').click(function(e){
+    let modalBody = $(this).parent().parent().find(
+      '.modal-body'),
+        id  = $(modalBody).attr('id').replace('discountTo_',''),
+        tr = $(`#product_${id}`);
+    $(tr).append(
+      `<td class='hidden' id="discountReasonTo_${id}">` +
+        $(modalBody).find('#discountMotive').val() +
+      '</td>'
+    );
+    $(tr).find('a[id^=discount]').html(
+      `${$(modalBody).find('#discountCount').val()} %`
+    );
+    $(`#totalTo_${id}`).html(
+      `$ ${createTotal(id)}`
+    );
+  });
 
   $('#discountChange').on('shown.bs.modal', function(e) {
     let relatedObject = e.relatedTarget.dataset,
         productId     = relatedObject.id;
+    $(this).find('.modal-body').attr('id',
+      `discountTo_${productId}`
+    );
+
+    $('#discountMotive, #discountCount').val('');
   });
 
   function carIcon(id){
@@ -114,8 +146,9 @@ $(document).ready(function() {
   function addTr(product){
     let color = product.table === 'services' ? carIcon(product.id) :
                                             product.color,
-        price = product.type === 'products' ? ` $ ${product.price}` :
-        '<input type="text" class="form-control smaller-form" placeholder="$ 100.00">';
+        price = product.table === 'products' ? ` $ ${product.price}` :
+        '<input type="text" class="form-control ' +
+        `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
     return `<tr id="product_${product.id}"><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +
@@ -137,7 +170,7 @@ $(document).ready(function() {
       `placeholder="1" id="cuantityTo_${product.id}"></td>` +
       '<td> <a href="#" data-toggle="modal"' +
       'data-target="#discountChange" ' +
-      `id="discount_1" data-id="${product.id}" ` +
+      `id="discount_${product.id}" data-id="${product.id}" ` +
       `data-table="${product.table}" > 0% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}"> $ </td>` +
       '</tr>';

@@ -846,12 +846,12 @@
        </div>
        <div class="modal-body">
          <div class="input-group">
-           <input type="text" class="form-control smaller-form round-form" placeholder="5%">
-           <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
+           <input type="text" id='discountCount'class="form-control smaller-form round-form" placeholder="5%">
+           <input type="text" id='discountMotive' class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
          </div><!-- /input-group -->
        </div>
        <div class="modal-footer">
-         <button class="btn btn-default pos-main-btn" type="button">
+         <button type="button" id="closeDiscount" class="btn btn-default pos-main-btn" data-dismiss="modal">
            Confirmar
          </button>
        </div>
@@ -934,7 +934,7 @@
          </table>
        </div>
        <div class="modal-footer">
-         <button type="button" class="btn btn-default pos-main-btn" id="btnclose" data-dismiss="modal">
+         <button type="button" class="btn btn-default pos-main-btn" data-dismiss="modal">
            Confirmar
          </button>
        </div>
