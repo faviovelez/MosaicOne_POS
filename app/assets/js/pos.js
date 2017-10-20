@@ -48,6 +48,67 @@ $(document).ready(function() {
     });
   }
 
+  function addPaymentTr(){
+    let count = $('#paymentMethodList tr').length - 2,
+        type  = $('.payment-form-wrapper .selected')
+      .html().replace(/\s/g,'')
+      .replace('<iclass="fafa-money"aria-hidden="true"></i>','');
+    return `<tr id="paymentMethod_${count}">` +
+      '<td class="flex">' +
+      '<div class="close-icon">' +
+      '<button type="button" class="close center-close"' +
+      `aria-label="Close" id="closeTr_${count}">` +
+      '<span aria-hidden="true" class="white-light">&times;</span>' +
+      '</button></div>' +
+      `${type}</td>` +
+      '<td class="right cuantity" >' +
+      `$ ${$('#paymentMethodCuantity').val()}` +
+      '</td></tr>';
+  }
+
+  function resumePayment(){
+    let sum = 0;
+    $.each($('tr[id^=paymentMethod_]'), function(){
+      let currency = $(this).find('.cuantity').html().replace(
+        '$ ', ''
+      );
+      sum += parseFloat(currency);
+    });
+    let total = $('table.subtotal td.total').html().replace(
+      '$ ', ''
+    ),
+       rest = (parseFloat(total) - sum).toFixed(2);
+    if (rest < 0){
+      $('#paymentRest').html(
+        '<strong>$ 0</strong>'
+      );
+      $('#currencyChange').html(
+        `<strong>$ ${rest * -1}</strong>`
+      );
+      $('.paymentProcess').addClass('hidden');
+      $('#completeSale').removeClass('hidden');
+    } else {
+      $('#paymentRest').html(
+        `<strong>$ ${rest}</strong>`
+      );
+      $('#completeSale').addClass('hidden');
+      $('.paymentProcess').removeClass('hidden');
+    }
+  }
+
+  $('#addPayment').click(function(){
+    let count = $('#paymentMethodList tr').length - 2;
+    $('#paymentMethodList').prepend(addPaymentTr());
+    $('#paymentMethodCuantity').val('');
+
+    $(`#closeTr_${count}`).click(function(){
+      $(`tr[id=paymentMethod_${count}]`).remove();
+      resumePayment();
+    });
+
+    resumePayment();
+  });
+
   function bigTotal(){
     let subTotalInput = $('table.subtotal td.subtotal:first'),
         subtotal      = 0;
@@ -606,22 +667,6 @@ $(".hide-results").click(function () {
     $('#creditSale').removeClass('selected');
     $('.credit-days-container').addClass('hidden');
     $('.operation-number-container').addClass('hidden');
-  });
-
-/* Métodos para cambiar botón de pagos*/
-/* Si la cantidad de pagos (sumada) es mayor o igual al total, cambiar al botón completar venta */
-  $("#addPayment").click(function () {
-    $(this).addClass('hidden');
-    $('#completeSale').removeClass('hidden');
-    $('.credit-days-container').addClass('hidden');
-    $('#debit').removeClass('selected');
-    $('#credit').removeClass('selected');
-    $('#check').removeClass('selected');
-    $('#transfer').removeClass('selected');
-    $('#cash').removeClass('selected');
-    $('#other').removeClass('selected');
-    $('#creditSale').removeClass('selected');
-    $('#returnCash').removeClass('selected');
   });
 
   $(".show-payments").click(function () {
