@@ -57,3 +57,13 @@ async function getAll(table, columns = '*'){
   let localQuery = `SELECT ${columns} FROM ${table}`;
   return await query(localQuery);
 }
+
+async function updateBy(data, table, condition){
+  let localQuery = `UPDATE ${table} `;
+  for(var column in data) {
+    localQuery += `SET ${column} = '${data[column]}',`;
+  }
+  localQuery = localQuery.replace(/,$/,'');
+  localQuery += ` WHERE ${condition}`;
+  return await query(localQuery);
+}

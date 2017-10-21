@@ -88,7 +88,7 @@
       <div class="search-container">
         <div class="input-group">
           <span class="input-group-btn main-search">
-            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#warehouseEntry" data-placement="left" title="Entrada de mercancía" id="basic-addon1">
+            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#warehouseEntry" data-placement="left" title="Entrada de mercancía" id="productIntro">
               <i class="fa fa-archive " aria-hidden="true"></i>
             </button>
           </span>
@@ -1459,41 +1459,24 @@
                <thead>
                  <tr>
                    <th colspan="4">
-                     <input type="text" class="form-control main-search" placeholder="Buscar Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+                     <input type="text" class="form-control main-search" id='addProductSearch' placeholder="Buscar Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
                    </th>
                  </tr>
                  <tr>
                      <th> <br /></th>
                  </tr>
                  <tr class="head-blue">
-                   <th class="rounded-edges-left"> </th>
                    <th> Producto o Servicio </th>
                    <th> Color/Diseño </th>
                    <th class="rounded-edges-right"> Cantidad </th>
                  </tr>
                </thead>
-               <tbody>
-                 <tr>
-                   <td>
-                     <div class="close-icon">
-                       <button type="button" class="close center-close" aria-label="Close">
-                         <span aria-hidden="true" class="white-light">&times;</span>
-                       </button>
-                     </div>
-                    </td>
-                   <td class="left">
-                     Bolsa para botella Kraft Satinada Navideña
-                   </td>
-                   <td> Kraft </td>
-                   <td>
-                     <input type="text" class="form-control smaller-form" placeholder="1">
-                   </td>
-                 </tr>
+               <tbody id='addProductQuantity'>
                </tbody>
              </table>
 
              <div class="actions">
-               <input type="submit" name="commit" value="Confirmar alta" class="main-button" />
+               <input data-dismiss="modal" type="submit" name="commit" id="confirmAddProduct" value="Confirmar alta" class="main-button" />
              </div>
            </div>
 

@@ -1,4 +1,6 @@
 $(document).ready(function() {
+  const Inputmask = require('inputmask');
+
   async function initStore(){
 
     const store = new Store({
@@ -10,6 +12,57 @@ $(document).ready(function() {
 
     return store;
   }
+
+  function productAddChange(product){
+    return `<tr id="addProduct_${product.id}">` +
+      '<td class="left">' +
+      product.description +
+      '</td>' +
+      `<td> ${product.color} </td><td>` +
+      '<input type="text" class="form-control" id="addProductInput" smaller-form" placeholder="1">' +
+      '</td></tr>';
+  }
+
+  $('#confirmAddProduct').click(function(){
+    let id = $('tr[id^=addProduct]').attr(
+      'id'
+    ).replace(/\D/g,''),
+      table = 'stores_inventories',
+      condition = `product_id = ${id}`,
+      data = {
+        'quantity': parseInt(
+          $('#addProductInput').val().replace(/_/g,'')
+        )
+      };
+    findBy('product_id', id, 'stores_inventories').then(inventory => {
+      data.quantity += inventory.rows[0].quantity;
+      updateBy(data, table, condition).then(product => {
+      //Sucess update
+      }, err => {
+        //Error update
+      });
+    });
+  });
+
+  $('#addProductSearch').click(function(){
+
+      getProductsAndServices(list => {
+        $('#addProductSearch').autocomplete({
+          lookup: list,
+          lookupLimit: 10,
+          onSelect: function (suggestion) {
+            $('#addProductQuantity tr').remove();
+            $('#addProductQuantity').append(
+              productAddChange(suggestion)
+            );
+            let selector = document.getElementById("addProductInput");
+            var im = new Inputmask("99999999");
+            im.mask(selector);
+            $(this).val('');
+          }
+        });
+      });
+  });
 
   function createFullName(user){
     return `${user.first_name} ${user.middle_name} ${user.last_name}`;
