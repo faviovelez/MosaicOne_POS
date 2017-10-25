@@ -1,9 +1,10 @@
 {
-  "name": "lorikeet",
+  "name": "MosaicOne_POS",
   "version": "1.0.0",
   "main": "main.js",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "inputmask": "^3.3.10",
     "pg": "^7.3.0"
   }
 }

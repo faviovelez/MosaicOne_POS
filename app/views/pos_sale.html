@@ -88,11 +88,11 @@
       <div class="search-container">
         <div class="input-group">
           <span class="input-group-btn main-search">
-            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#warehouseEntry" data-placement="left" title="Entrada de mercancía" id="basic-addon1">
+            <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#warehouseEntry" data-placement="left" title="Entrada de mercancía" id="productIntro">
               <i class="fa fa-archive " aria-hidden="true"></i>
             </button>
           </span>
-          <input type="text" class="form-control main-search" placeholder="Producto o servicio" id="product_service_search"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <input type="text" class="form-control main-search" placeholder="Producto o servicio" id="mainProductSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
 
           <span class="input-group-btn extra-search hidden">
             <button class="btn btn-default pos-main-btn gray-btn" type="button" id="searchProducts">
@@ -190,7 +190,7 @@
             <th> Total </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="ticketList">
           <tr>
             <td>
               <div class="close-icon">
@@ -780,15 +780,15 @@
           <tbody>
             <tr>
               <td> Subtotal: </td>
-              <td class="right"> $ 1,500.00 </td>
+              <td class="right subtotal">$ 0.0</td>
             </tr>
             <tr>
               <td> IVA: </td>
-              <td class="right"> $160.00 </td>
+              <td class="right subtotal iva"> $ 0.0 </td>
             </tr>
             <tr>
               <td class="bigger"> <strong> Total: </strong> </td>
-              <td class="right bigger"> <strong> $ 1,060.00 </strong> </td>
+              <td class="right bigger total"> <strong>$ 0.00 </strong> </td>
             </tr>
           </tbody>
         </table>
@@ -800,7 +800,7 @@
               <th colspan="2"> Formas de pago: </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="paymentMethodList">
             <tr>
               <td class="flex">
                 <div class="close-icon">
@@ -825,11 +825,11 @@
             </tr>
             <tr>
               <td class="bigger"> <strong> Por pagar: </strong> </td>
-              <td class="right bigger"> <strong> $200.00 </strong> </td>
+              <td class="right bigger quantity" id="paymentRest"> <strong> $200.00 </strong> </td>
             </tr>
             <tr>
               <td class="bigger"> <strong> Cambio: </strong> </td>
-              <td class="right bigger"> <strong> $0.00 </strong> </td>
+              <td class="right bigger" id="currencyChange"> <strong> $0.00 </strong> </td>
             </tr>
           </tbody>
         </table>
@@ -838,8 +838,8 @@
       </div>  <!-- Termina el discounts-container -->
 
       <!-- Inicia la sección de formas de pago -->
-      <div class="payment-form-wrapper">
-        <button type="button" class="btn btn-default custom-button" id="cash" value="1">
+      <div class="payment-form-wrapper paymentProcess">
+        <button type="button" class="btn btn-default custom-button selected" id="cash">
           <i class="fa fa-money " aria-hidden="true"></i>
           Efectivo
         </button>
@@ -874,14 +874,14 @@
       </div>
       <!-- Termina la sección de formas de pago -->
 
-      <div class="input-group margin-bottom credit-days-container hidden">
-        <input type="text" class="form-control" id="credit_days" placeholder="Ejemplo: 30 (solo número)">
+      <div class="input-group margin-bottom credit-days-container hidden paymentProcess">
+        <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)">
         <span class="input-group-btn">
           <button class="btn btn-default color-button pos-main-btn" type="button" id="creditDays">Días de crédito</button>
         </span>
       </div><!-- /input-group -->
 
-      <div class="input-group margin-bottom operation-number-container hidden">
+      <div class="input-group margin-bottom operation-number-container hidden paymentProcess">
         <input type="text" class="form-control" placeholder="Referencia bancaria">
         <span class="input-group-btn">
           <button class="btn btn-default color-button pos-main-btn" type="button" id="operationNumber">Referencia</button>
@@ -898,14 +898,14 @@
       <!-- Sección para agregar formas de pago o concluir la venta -->
       <div class="row process-sale">
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="Ingrese monto de pago">
+          <input type="text" class="form-control paymentProcess" id="paymentMethodCuantity" placeholder="Ingrese monto de pago">
           <span class="input-group-btn">
             <button class="btn btn-default color-button pos-main-btn hidden" type="button" id="completeSale">Completar venta</button>
-            <button class="btn btn-default color-button pos-secondary-btn" type="button" id="addPayment">Agregar pago</button>
+            <button class="btn btn-default color-button pos-secondary-btn paymentProcess" type="button" id="addPayment">Agregar pago</button>
           </span>
         </div><!-- /input-group -->
       </div><!-- /.row -->
-      <input type="text" class="form-control higher-form process-sale" placeholder="Comentarios" id="ticket_comments"><br /><br />
+      <input type="text" class="form-control higher-form process-sale paymentProcess" placeholder="Comentarios"><br /><br />
 
     </div> <!-- Termina right-container  -->
   </div><!-- Termina page-container  -->
@@ -920,12 +920,12 @@
        </div>
        <div class="modal-body">
          <div class="input-group">
-           <input type="text" id="individual-discount" class="form-control smaller-form round-form" placeholder="5%">
-           <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" id="discount_reason" class="modal-form-input">
+           <input type="text" id='discountCount'class="form-control smaller-form round-form" placeholder="5%">
+           <input type="text" id='discountMotive' class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
          </div><!-- /input-group -->
        </div>
        <div class="modal-footer">
-         <button class="btn btn-default pos-main-btn" type="button">
+         <button type="button" id="closeDiscount" class="btn btn-default pos-main-btn" data-dismiss="modal">
            Confirmar
          </button>
        </div>
@@ -1008,7 +1008,7 @@
          </table>
        </div>
        <div class="modal-footer">
-         <button class="btn btn-default pos-main-btn" type="button">
+         <button type="button" class="btn btn-default pos-main-btn" data-dismiss="modal">
            Confirmar
          </button>
        </div>
@@ -1555,41 +1555,24 @@
                <thead>
                  <tr>
                    <th colspan="4">
-                     <input type="text" class="form-control main-search" id="entry_quantity" placeholder="Buscar Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+                     <input type="text" class="form-control main-search" id='addProductSearch' placeholder="Buscar Producto o servicio"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
                    </th>
                  </tr>
                  <tr>
                      <th> <br /></th>
                  </tr>
                  <tr class="head-blue">
-                   <th class="rounded-edges-left"> </th>
                    <th> Producto o Servicio </th>
                    <th> Color/Diseño </th>
                    <th class="rounded-edges-right"> Cantidad </th>
                  </tr>
                </thead>
-               <tbody>
-                 <tr>
-                   <td>
-                     <div class="close-icon">
-                       <button type="button" class="close center-close" aria-label="Close">
-                         <span aria-hidden="true" class="white-light">&times;</span>
-                       </button>
-                     </div>
-                    </td>
-                   <td class="left">
-                     Bolsa para botella Kraft Satinada Navideña
-                   </td>
-                   <td> Kraft </td>
-                   <td>
-                     <input type="text" class="form-control smaller-form" placeholder="1">
-                   </td>
-                 </tr>
+               <tbody id='addProductQuantity'>
                </tbody>
              </table>
 
              <div class="actions">
-               <input type="submit" name="commit" value="Confirmar alta" class="main-button" />
+               <input data-dismiss="modal" type="submit" name="commit" id="confirmAddProduct" value="Confirmar alta" class="main-button" />
              </div>
            </div>
 
@@ -1614,7 +1597,12 @@
 
     <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.3/jquery.autocomplete.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+    <script src="../../dbconnection.js" charset="utf-8"></script>
+    <script src="../../users_gestor.js" charset="utf-8"></script>
+    <script src="../../validator.js" charset="utf-8"></script>
+    <script src="../../store.js" charset="utf-8"></script>
     <script src="../assets/js/pos.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
