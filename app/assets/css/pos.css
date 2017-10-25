@@ -87,6 +87,10 @@
   border-bottom-left-radius: 10px !important;
 }
 
+.margin-top {
+  margin-top: 10px;
+}
+
 .gray-btn {
   background-color: lightgray !important;
   border: 1px solid lightgray !important;
