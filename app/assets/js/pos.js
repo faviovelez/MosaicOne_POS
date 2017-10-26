@@ -37,7 +37,8 @@ $(document).ready(function() {
     findBy('product_id', id, 'stores_inventories').then(inventory => {
       data.quantity += inventory.rows[0].quantity;
       updateBy(data, table, condition).then(product => {
-      //Sucess update
+        //Sucess update
+        $('#addProductQuantity tr').remove();
       }, err => {
         //Error update
       });
