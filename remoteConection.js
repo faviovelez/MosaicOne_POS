@@ -1,16 +1,16 @@
 const {Pool} = require('pg');
 require('dotenv').config();
 
-const localPool = new Pool({
-  user: process.env.DB_LOCAL_USER,
+const remotePool = new Pool({
+  user: process.env.DB_REMOTE_USER,
   host: 'localhost',
-  database: process.env.DB_LOCAL_DB,
-  password: process.env.DB_LOCAL_PASS,
+  database: process.env.DB_REMOTE_DB,
+  password: process.env.DB_REMOTE_PASS,
   port: 5432,
 });
 
 async function query (q) {
-  const client = await localPool.connect();
+  const client = await remotePool.connect();
   let res;
   try {
     await client.query('BEGIN');
