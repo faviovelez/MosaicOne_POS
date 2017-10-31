@@ -17,13 +17,45 @@ $(function(){
       .removeClass('hidden');
   }
 
-  function cloneAllTables(id){
-    let queries = {
-      'stores': `SELECT * FROM stores WHERE id = ${id}`,
-      'roles' : 'SELECT * FROM roles WHERE name = '
+  function lotQueries(store){
+    return {
+      'roles' : "SELECT * FROM roles " +
+      "WHERE name IN ('store', 'store-admin')",
+      'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
+      `id = ${store.delivery_address_id}`,
+      'business_units': 'SELECT * FROM business_units WHERE ' +
+      `id = ${store.business_unit_id}`,
+      'store_types':  'SELECT * FROM store_types WHERE ' +
+      `id = ${store.store_type_id}`,
+      'cost_types':   'SELECT * FROM cost_types WHERE ' +
+      `id = ${store.cost_type_id}`,
+      'business_groups': 'SELECT * FROM business_groups WHERE ' +
+      `id = ${store.business_group_id}`,
+      'prospects': 'SELECT * FROM prospects WHERE ' +
+      `store_id = ${store.id}`,
+      'products' : 'SELECT * FROM products WHERE supplier_id IN (1,2)',
+      'services' : 'SELECT * FROM services WHERE ' +
+      'store_id IS NULL AND shared = true',
+      'stores_inventories': 'SELECT * FROM stores_inventories ' +
+      `WHERE store_id = ${store.id}`,
+      'stores_warehouse_entries': 'SELECT * FROM stores_warehouse_entries ' +
+      `WHERE store_id = ${store.id}`,
+      'store_movements': 'SELECT * FROM store_movements ' +
+      `WHERE store_id = ${store.id}`,
+      'cash_registers': 'SELECT * FROM cash_registers ' +
+      `WHERE store_id = ${store.id}`,
+      'cfdi_uses': 'SELECT * FROM cfdi_uses',
+      'banks':    'SELECT * FROM banks'
     };
+  }
 
-    window.location.href = 'sign_up.html';
+  function cloneAllTables(queries){
+
+    query(queries.business_units).then(result => {
+      queries.billing_addresses = 'SELECT * FROM billing_addresses ' +
+                 `WHERE id = ${result.rows[0].billing_address_id}`;
+      window.location.href = 'sign_up.html';
+    });
   }
 
   $('#validateInstall').click(function(){
@@ -45,7 +77,13 @@ $(function(){
       if (code ===0){
 
         findBy('install_code', installCode, 'stores').then(result => {
-          cloneAllTables(result.rows[0].id);
+          let store = result.rows[0];
+
+          if (store) {
+            cloneAllTables(lotQueries(result.rows[0]));
+          } else {
+            showAlert('Error', 'Revisar el codigo ingresado sea valido', cloneAlert());
+          }
         }, err => {
           if(err){
             showAlert('Error', err, cloneAlert());
