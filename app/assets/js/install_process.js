@@ -54,11 +54,25 @@ $(function(){
     query(queries.business_units).then(result => {
       queries.billing_addresses = 'SELECT * FROM billing_addresses ' +
                  `WHERE id = ${result.rows[0].billing_address_id}`;
-      window.location.href = 'sign_up.html';
+      for(key in queries){
+        if (key === 'stores_warehouse_entries'){
+          setTimeout(function(){
+            window.location.href = 'sign_up.html'
+          }, 1000);
+        }
+        query(queries[key]).then(result => {
+          result.rows.forEach(row => {
+            for (rowKey in row) {
+              debugger
+            }
+          });
+        });
+      }
     });
   }
 
   $('#validateInstall').click(function(){
+    $(this).prop('disabled', false);
     let script = `psql -U ${process.env.DB_LOCAL_USER} ${process.env.DB_LOCAL_DB} ` +
       `< ./tmp_files/${process.env.DB_FILE_NAME}`;
     showAlert('Info', 'Proceso de replicacion de base de datos iniciado', cloneAlert());
