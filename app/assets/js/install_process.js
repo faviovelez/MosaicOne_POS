@@ -49,24 +49,42 @@ $(function(){
     };
   }
 
-  function cloneAllTables(queries){
+  function cloneTable(name, fields, values){
+  }
 
-    query(queries.business_units).then(result => {
+  function cloneAllTables(queries, call){
+
+    query(queries.business_units).then(mainResult => {
       queries.billing_addresses = 'SELECT * FROM billing_addresses ' +
-                 `WHERE id = ${result.rows[0].billing_address_id}`;
-      for(key in queries){
-        if (key === 'stores_warehouse_entries'){
-          setTimeout(function(){
-            window.location.href = 'sign_up.html'
-          }, 1000);
-        }
-        query(queries[key]).then(result => {
-          result.rows.forEach(row => {
-            for (rowKey in row) {
-              debugger
-            }
+                 `WHERE id = ${mainResult.rows[0].billing_address_id}`;
+      queriesTest = [];
+      count = 0;
+      for(var key in queries){
+
+        query(queries[key], true, key).then(tablesResult => {
+          tablesResult.rows.forEach(row => {
+
+            createInsert(
+              Object.keys(row),
+              Object.values(row),
+              tablesResult.table
+            ).then(localQuery => {
+
+              queriesTest.push(localQuery);
+              if (count++ === 753){
+                queriesTest.forEach(tempquery => {
+                  debugger
+                } );
+              }
+
+              //query(localQuery, false).then(result => {
+                //debugger
+              //});
+
+            });
           });
         });
+
       }
     });
   }
@@ -94,7 +112,9 @@ $(function(){
           let store = result.rows[0];
 
           if (store) {
-            cloneAllTables(lotQueries(result.rows[0]));
+            cloneAllTables(lotQueries(result.rows[0]), function(){
+              window.location.href = 'sign_up.html';
+            });
           } else {
             showAlert('Error', 'Revisar el codigo ingresado sea valido', cloneAlert());
           }
