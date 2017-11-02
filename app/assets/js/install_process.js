@@ -69,13 +69,7 @@ $(function(){
               Object.values(row),
               tablesResult.table
             ).then(localQuery => {
-
-              queriesTest.push(localQuery);
-              if (count++ === 753){
-                queriesTest.forEach(tempquery => {
-                  debugger
-                } );
-              }
+              debugger
 
               //query(localQuery, false).then(result => {
                 //debugger
@@ -93,7 +87,7 @@ $(function(){
     $(this).prop('disabled', false);
     let script = `psql -U ${process.env.DB_LOCAL_USER} ${process.env.DB_LOCAL_DB} ` +
       `< ./tmp_files/${process.env.DB_FILE_NAME}`;
-    showAlert('Info', 'Proceso de replicacion de base de datos iniciado', cloneAlert());
+    showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;
 
     dbRestore = exec(script,
@@ -116,7 +110,7 @@ $(function(){
               window.location.href = 'sign_up.html';
             });
           } else {
-            showAlert('Error', 'Revisar el codigo ingresado sea valido', cloneAlert());
+            showAlert('Error', 'Revisar que el código ingresado sea válido', cloneAlert());
           }
         }, err => {
           if(err){
