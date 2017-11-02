@@ -41,7 +41,6 @@ $(function(){
         resultPass
       ) ){
         loginUser(user.rows[0]);
-        window.location.href = 'pos_sale.html';
       } else {
         showAlert('Error', 'Datos incorrectos validar nuevamente' , cloneAlert());
       }
