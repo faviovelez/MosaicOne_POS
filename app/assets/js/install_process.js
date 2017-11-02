@@ -49,9 +49,6 @@ $(function(){
     };
   }
 
-  function cloneTable(name, fields, values){
-  }
-
   function cloneAllTables(queries, call){
 
     query(queries.business_units).then(mainResult => {
@@ -59,9 +56,12 @@ $(function(){
                  `WHERE id = ${mainResult.rows[0].billing_address_id}`;
       queriesTest = [];
       count = 0;
+      limit = 0;
       for(var key in queries){
 
         query(queries[key], true, key).then(tablesResult => {
+          limit += tablesResult.rows.length;
+
           tablesResult.rows.forEach(row => {
 
             createInsert(
@@ -69,11 +69,12 @@ $(function(){
               Object.values(row),
               tablesResult.table
             ).then(localQuery => {
-              debugger
 
-              //query(localQuery, false).then(result => {
-                //debugger
-              //});
+              query(localQuery, false).then(result => {
+                if (count++ === limit-1){
+                  call();
+                }
+              });
 
             });
           });
@@ -110,7 +111,7 @@ $(function(){
               window.location.href = 'sign_up.html';
             });
           } else {
-            showAlert('Error', 'Revisar que el código ingresado sea válido', cloneAlert());
+            showAlert('Error', 'Revisa que el código ingresado sea válido', cloneAlert());
           }
         }, err => {
           if(err){
