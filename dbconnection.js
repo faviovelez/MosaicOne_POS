@@ -33,10 +33,16 @@ async function insert (columns, data, table){
   columns.forEach(fieldName => {
     localQuery += `, ${fieldName}`;
   });
-  localQuery += `) VALUES ( '${data.shift()}'`;
+  localQuery += `, created_at, updated_at) VALUES ( '${data.shift()}'`;
   data.forEach(data => {
     localQuery += `, '${data}'`;
   });
+  let createDate = new Date,
+      updateDate = new Date
+
+  localQuery += `, '${createDate.toUTCString()}',`;
+  localQuery += `'${createDate.toUTCString()}'`;
+  debugger
   return await query(`${localQuery})`);
 }
 

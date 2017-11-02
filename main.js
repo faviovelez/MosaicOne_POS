@@ -18,7 +18,7 @@ app.on('ready', () => {
 
   mainWindow.setResizable(false);
 
-  mainWindow.loadURL(`file://${app.getAppPath()}/app/views/initial_install.html`);
+  mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_up.html`);
 
   mainWindow.on('closed', () => { mainWindow = null; });
 });

@@ -49,14 +49,19 @@ async function createInsert (columns, data, table){
   });
   localQuery += `) VALUES ( '${data.shift()}'`;
   data.forEach(data => {
-    if (typeof data === 'boolean'){
-      localQuery += ', ';
-      localQuery += data;
-    }
-    if (typeof data === 'object' && data !== null){
-      localQuery += `, '${data.toUTCString()}'`;
-    } else {
-      localQuery += `, '${data}'`;
+    switch(data){
+      case null:
+      case true:
+      case false:
+        localQuery += ', ';
+        localQuery += data;
+        break;
+      default:
+        if (typeof data === 'object'){
+          localQuery += `, '${data.toUTCString()}'`;
+        } else {
+          localQuery += `, '${data}'`;
+        }
     }
   });
   return `${localQuery})`;

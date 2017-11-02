@@ -5,9 +5,9 @@ function createPassword(pass){
 }
 
 async function addUser(params){
-  params.password = createPassword(params.password);
+  params.encrypted_password = createPassword(params.encrypted_password);
   let columns = ['email', 'first_name', 'middle_name', 
-    'last_name', 'password'],
+    'last_name', 'encrypted_password'],
       data = [];
   columns.forEach(attr => {
     data.push(params[attr]);

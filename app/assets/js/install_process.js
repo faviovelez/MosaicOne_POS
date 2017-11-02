@@ -59,9 +59,12 @@ $(function(){
                  `WHERE id = ${mainResult.rows[0].billing_address_id}`;
       queriesTest = [];
       count = 0;
+      limit = 0;
       for(var key in queries){
 
         query(queries[key], true, key).then(tablesResult => {
+          limit += tablesResult.rows.length;
+
           tablesResult.rows.forEach(row => {
 
             createInsert(
@@ -70,16 +73,11 @@ $(function(){
               tablesResult.table
             ).then(localQuery => {
 
-              queriesTest.push(localQuery);
-              if (count++ === 753){
-                queriesTest.forEach(tempquery => {
-                  debugger
-                } );
-              }
-
-              //query(localQuery, false).then(result => {
-                //debugger
-              //});
+              query(localQuery, false).then(result => {
+                if (count++ === limit-1){
+                  call();
+                }
+              });
 
             });
           });
