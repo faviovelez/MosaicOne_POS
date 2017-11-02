@@ -40,9 +40,8 @@ async function insert (columns, data, table){
   let createDate = new Date,
       updateDate = new Date
 
-  localQuery += `, '${createDate.toUTCString()}',`;
-  localQuery += `'${createDate.toUTCString()}'`;
-  debugger
+  localQuery += `, '${createDate.toString().replace(' GMT-0600 (CST)','')}',`;
+  localQuery += `'${updateDate.toString().replace(' GMT-0600 (CST)','')}'`;
   return await query(`${localQuery})`);
 }
 
