@@ -49,9 +49,6 @@ $(function(){
     };
   }
 
-  function cloneTable(name, fields, values){
-  }
-
   function cloneAllTables(queries, call){
 
     query(queries.business_units).then(mainResult => {

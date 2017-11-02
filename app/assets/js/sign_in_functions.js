@@ -28,30 +28,12 @@ $(function(){
     return error;
   }
 
-  async function initStore(){
-
-    const store = new Store({
-      configName: 'user-localStore',
-      defaults: {
-        windowBounds: { width: 1024, height: 768 }
-      }
-    });
-
-    return store;
-  }
-
-  async function loginUser(user){
-    initStore().then(store => {
-      store.set('current_user', user);
-    });
-  }
-
   $('#loginAction').click(function(){
     let email = $('#user_email').val();
     findBy('email', email, 'users').then(user => {
       let bcrypt = require('bcryptjs'),
           pass   = $('#user_password').val();
-          resultPass = user.rows.length > 0 ? user.rows[0].password
+          resultPass = user.rows.length > 0 ? user.rows[0].encrypted_password
                                             : '';
 
       if (bcrypt.compareSync(

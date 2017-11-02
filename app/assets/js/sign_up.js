@@ -62,9 +62,13 @@ $(function(){
 
         addUser(params).then(result => {
           showAlert('Éxito', 'Usuario creado correctamente', cloneAlert());
-          setTimeout(function(){
-            window.location.href = 'pos_sale.html';
-          }, 1000);
+
+          findBy('email', $('#user_email').val(), 'users').then(user => {
+            setTimeout(function(){
+              loginUser(user.rows[0]).then({});
+            }, 1000);
+
+          });
         }, err => {
           showAlert('Error', err.detail, cloneAlert());
         });
