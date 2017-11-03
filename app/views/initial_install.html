@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title> POS Sistema DC </title>
+  <link rel="stylesheet" href="../vendor/assets/css/bootstrap.css">
+  <link rel="stylesheet" href="../vendor/assets/css/font-awesome.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/sign_in.css">
+</head>
+<body class="background-img">
+
+  <!-- Inicia Navbar -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <div class="corner-logo">
+          <a href="#">
+            <img src="../assets/img/sistema-dc-3.png" alt="Logo Sistema DC" class="logo img-responsive">
+          </a>
+        </div>
+      </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="sign_in.html">Bienvenido</a>
+          </li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+  <!-- Termina Navbar -->
+
+  <div class="alerts-container">
+    <div class="alert alert-info hidden" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <span class='title'>Tienes que iniciar sesión o registrarte para poder continuar.</span>
+    </div>
+  </div>
+
+  <div class="centered-without-margin">
+
+    <img alt="Logo Diseños de Cartón" class="second-logo" src="../assets/img/logo-disenos-decarton.png" />
+    <div class="container-log-in">
+
+      <div class="sign-in-tittle-div">
+        <h2 class="reg-title">Punto de Venta Sistema DC</h2>
+      </div>
+
+      <form class="new_user" id="new_user" action="#" accept-charset="UTF-8" method="post">
+        <input name="utf8" type="hidden" value="&#x2713;" />
+        <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+
+        <div class="field sign-in">
+          <label for="installCodeId">Codigo de Instalacion</label><br />
+          <input placeholder="XXXX-XXXX-XXXX-XXXX" class="long-sign-in" type="text" value="" name="installCode" id="installCodeId" />
+        </div>
+
+        <div class="actions">
+          <input type="submit" name="commit" value="Validar" id="validateInstall" class="main-button" />
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+  <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
+  <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
+  <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+  <script src="../../remoteConection.js" charset="utf-8"></script>
+  <script src="../assets/js/install_process.js" charset="utf-8"></script>
+
+  <script>if (window.module) module = window.module;</script>
+
+</body>
+</html>

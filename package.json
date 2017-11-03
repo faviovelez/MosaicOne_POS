@@ -2,9 +2,21 @@
   "name": "MosaicOne_POS",
   "version": "1.0.0",
   "main": "main.js",
+  "author": "MosaicOne <me@mosaicone.com>",
+  "description": "Application POS to MosaicOne007 desktop application",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "dotenv": "^4.0.0",
     "inputmask": "^3.3.10",
     "pg": "^7.3.0"
-  }
+  },
+  "scripts": {
+    "pack": "build",
+    "dist": "build"
+  },
+  "devDependencies": {
+    "electron": "^1.7.9",
+    "electron-builder": "^19.41.0"
+  },
+  "build": {}
 }

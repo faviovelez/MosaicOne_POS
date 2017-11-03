@@ -1,18 +1,11 @@
 const {Pool} = require('pg');
+require('dotenv').config();
 
 const localPool = new Pool({
-  user: 'oscar',
+  user: process.env.DB_LOCAL_USER,
   host: 'localhost',
-  database: 'local_db',
-  password: '12345678',
-  port: 5432,
-});
-
-const remotePool = new Pool({
-  user: 'faviovelez',
-  host: 'localhost',
-  database: 'mosaicone007_development',
-  password: 'bafio44741',
+  database: process.env.DB_LOCAL_DB,
+  password: process.env.DB_LOCAL_PASS,
   port: 5432,
 });
 
@@ -40,10 +33,15 @@ async function insert (columns, data, table){
   columns.forEach(fieldName => {
     localQuery += `, ${fieldName}`;
   });
-  localQuery += `) VALUES ( '${data.shift()}'`;
+  localQuery += `, created_at, updated_at) VALUES ( '${data.shift()}'`;
   data.forEach(data => {
     localQuery += `, '${data}'`;
   });
+  let createDate = new Date,
+      updateDate = new Date
+
+  localQuery += `, '${createDate.toString().replace(' GMT-0600 (CST)','')}',`;
+  localQuery += `'${updateDate.toString().replace(' GMT-0600 (CST)','')}'`;
   return await query(`${localQuery})`);
 }
 

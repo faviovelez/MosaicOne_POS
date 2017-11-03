@@ -47,11 +47,11 @@ $(function(){
     }
 
     let params = {
-      first_name   : $('#user_first_name').val(),
-      last_name    : $('#user_last_name').val(),
-      email        : $('#user_email').val(),
-      password     : $('#user_password').val(),
-      pass_confirm : $('#user_password_confirm').val()
+      first_name            : $('#user_first_name').val(),
+      last_name             : $('#user_last_name').val(),
+      email                 : $('#user_email').val(),
+      encrypted_password    : $('#user_password').val(),
+      pass_confirm          : $('#user_password_confirm').val()
     };
 
     checkFillAll(params).then(error => {
@@ -62,9 +62,13 @@ $(function(){
 
         addUser(params).then(result => {
           showAlert('Éxito', 'Usuario creado correctamente', cloneAlert());
-          setTimeout(function(){
-            window.location.href = 'pos_sale.html';
-          }, 1000);
+
+          findBy('email', $('#user_email').val(), 'users').then(user => {
+            setTimeout(function(){
+              loginUser(user.rows[0]).then({});
+            }, 1000);
+
+          });
         }, err => {
           showAlert('Error', err.detail, cloneAlert());
         });

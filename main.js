@@ -1,11 +1,13 @@
+require('dotenv').config();
+
 const electron = require('electron'),
   app = electron.app,
   {Pool} = require('pg'),
   localPool = new Pool({
-    user: 'faviovelez',
+    user: process.env.DB_LOCAL_USER,
     host: 'localhost',
-    database: 'mosaicOnePOS_000',
-    password: 'bafio44741',
+    database: process.env.DB_LOCAL_DB,
+    password: process.env.DB_LOCAL_PASS,
     port: 5432,
   }),
   BrowserWindow = electron.BrowserWindow;
@@ -46,16 +48,18 @@ app.on('window-all-closed',() => {
 app.on('ready', () => {
 
   mainWindow = new BrowserWindow({
-    icon:'app/assets/img/business.png',
+    icon:   'app/assets/img/business.png',
     height: 768,
-    width: 1024
+    width: 1266
   });
+
+  mainWindow.setResizable(false);
 
   hasUser().then(res => {
     if (res) {
       mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_in.html`);
     } else {
-      mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_up.html`);
+      mainWindow.loadURL(`file://${app.getAppPath()}/app/views/initial_install.html`);
     }
   });
 
