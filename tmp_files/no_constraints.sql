@@ -213,7 +213,11 @@ CREATE TABLE billing_addresses (
     country character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    tax_regime_id integer
+    tax_regime_id integer,
+    certificate character varying,
+    key character varying,
+    certificate_password character varying,
+    certificate_number character varying
 );
 
 
@@ -3258,7 +3262,8 @@ CREATE TABLE stores (
     inspection_approved boolean,
     overprice double precision DEFAULT 0.0,
     series character varying,
-    last_bill integer DEFAULT 0
+    last_bill integer DEFAULT 0,
+    install_code character varying
 );
 
 
@@ -4695,7 +4700,7 @@ SELECT pg_catalog.setval('bill_sales_id_seq', 1, false);
 -- Data for Name: billing_addresses; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY billing_addresses (id, type_of_person, business_name, rfc, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, created_at, updated_at, tax_regime_id) FROM stdin;
+COPY billing_addresses (id, type_of_person, business_name, rfc, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, created_at, updated_at, tax_regime_id, certificate, key, certificate_password, certificate_number) FROM stdin;
 \.
 
 

@@ -19,6 +19,8 @@ $(function(){
 
   function lotQueries(store){
     return {
+      'stores' : "SELECT * FROM stores " +
+      `WHERE id=${store.id}`,
       'roles' : "SELECT * FROM roles " +
       "WHERE name IN ('store', 'store-admin')",
       'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
