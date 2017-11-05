@@ -162,6 +162,13 @@ $(document).ready(function() {
     resumePayment();
   });
 
+  $('#globalDiscount confirm').click(function(){
+    $('a[id^=discount]').html(
+      $('#globalDiscount input:first').val()
+    );
+    debugger
+  });
+
   function bigTotal(){
     let subTotalInput = $('table.subtotal td.subtotal:first'),
         subtotal      = 0;
@@ -280,12 +287,24 @@ $(document).ready(function() {
       '</a>';
   }
 
+  function findProductInList(product, call){
+    debugger
+    if (productInList.length === 1){
+      return call(true);
+    }
+    return call(false);
+  }
+
   function addTr(product){
     let color = product.table === 'services' ? carIcon(product.id) :
-                                            product.color,
-        price = product.table === 'products' ? ` $ ${product.price}` :
-        '<input type="text" class="form-control ' +
-        `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
+      product.color,
+      productInList = $(`#product_${product.id}`),
+      price = product.table === 'products' ? ` $ ${product.price}` :
+      '<input type="text" class="form-control ' +
+      `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
+    if (productInList.length === 1) {
+      return '';
+    }
     return `<tr id="product_${product.id}"><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +

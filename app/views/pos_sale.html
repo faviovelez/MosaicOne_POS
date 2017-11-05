@@ -699,7 +699,7 @@
           <tbody>
             <tr>
               <td> Descuento total ticket % </td>
-              <td class="right"> <a href="#" data-toggle="modal" data-target="#ticketDiscountChange" id="discount_ticket">Aplicar descuento</a> </td>
+              <td class="right"> <a href="#" data-toggle="modal" data-target="#ticketDiscountChange" >Aplicar descuento</a> </td>
             </tr>
             <tr>
               <td> Total descuento </td>
@@ -936,17 +936,17 @@
          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
          <h4 class="modal-title">Descuento total ticket</h4>
        </div>
-       <div class="modal-body">
+       <div class="modal-body" id='globalDiscount'>
            <p>
              Aplicar descuento a todo el ticket.
            </p>
          <div class="input-group">
-           <input type="text" class="form-control smaller-form round-form" placeholder="5%">
+           <input type="text" class="form-control smaller-form round-form"  placeholder="5%">
            <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
          </div><!-- /input-group -->
        </div>
        <div class="modal-footer">
-         <button class="btn btn-default pos-main-btn" type="button">
+         <button class="btn btn-default pos-main-btn confirm" type="button">
            Confirmar
          </button>
        </div>
