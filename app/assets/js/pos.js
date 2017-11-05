@@ -37,11 +37,12 @@ $(document).ready(function() {
     findBy('product_id', id, 'stores_inventories').then(inventory => {
       data.quantity += inventory.rows[0].quantity;
       updateBy(data, table, condition).then(product => {
-      //Sucess update
+        $('#addProductQuantity tr').remove();
       }, err => {
-        //Error update
+        $('#addProductQuantity tr').remove();
       });
     });
+    $('#addProductQuantity tr').remove();
   });
 
   $('#addProductSearch').click(function(){
@@ -51,7 +52,6 @@ $(document).ready(function() {
           lookup: list,
           lookupLimit: 10,
           onSelect: function (suggestion) {
-            $('#addProductQuantity tr').remove();
             $('#addProductQuantity').append(
               productAddChange(suggestion)
             );
