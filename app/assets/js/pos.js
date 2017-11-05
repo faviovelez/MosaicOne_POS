@@ -175,16 +175,16 @@ $(document).ready(function() {
     $('table.subtotal td.subtotal.iva').html(
       `$ ${iva.toFixed(2)}`
     );
-    $('table.subtotal td.total').html(
+    $('table.subtotal td.total, #paymentRest').html(
       `$ ${(subtotal + parseFloat(iva)).toFixed(2)}`
     );
   }
 
   function createTotal(id){
     let cuantity = $(`#cuantityTo_${id}`).val(),
-        price    = parseFloat(
-          $(`#priceTo_${id}`).html().replace(' $ ','')
-        );
+      price    = parseFloat(
+        $(`#priceTo_${id}`).html().replace(' $ ','')
+      );
     if (!price){
       price = $(`#priceTo_${id} input`).val();
     }
