@@ -162,11 +162,17 @@ $(document).ready(function() {
     resumePayment();
   });
 
-  $('#globalDiscount confirm').click(function(){
-    $('a[id^=discount]').html(
-      $('#globalDiscount input:first').val()
-    );
-    debugger
+  $('#ticketDiscountChange .confirm').click(function(){
+    $.each($('a[id^=discount]'), function(){
+      $(this).html(
+        $('#globalDiscount input:first').val() + ' %'
+      );
+      let id = $(this).attr('id').replace(/\D/g,'');
+      $(`#totalTo_${id}`).html(
+        `$ ${createTotal(id, true)}`
+      );
+    });
+    $('#ticketDiscountChange').modal('toggle');
   });
 
   function bigTotal(){
@@ -187,7 +193,7 @@ $(document).ready(function() {
     );
   }
 
-  function createTotal(id){
+  function createTotal(id, manualDiscount = false){
     let cuantity = $(`#cuantityTo_${id}`).val(),
       price    = parseFloat(
         $(`#priceTo_${id}`).html().replace(' $ ','')
@@ -201,7 +207,16 @@ $(document).ready(function() {
       discountVal = parseFloat(discount) / 100 * total,
       productTotal    = total - discountVal;
 
-      return productTotal.toFixed(2);
+    if (manualDiscount){
+      let globalManual = parseFloat(
+        $('#manualDiscountQuantity').html().replace(' $ ','')
+      );
+      $('#manualDiscountQuantity').html(
+        ` $ ${(globalManual += discountVal).toFixed(2)}`
+      );
+    }
+
+    return productTotal.toFixed(2);
   }
 
   function addEvents(id){
@@ -287,14 +302,6 @@ $(document).ready(function() {
       '</a>';
   }
 
-  function findProductInList(product, call){
-    debugger
-    if (productInList.length === 1){
-      return call(true);
-    }
-    return call(false);
-  }
-
   function addTr(product){
     let color = product.table === 'services' ? carIcon(product.id) :
       product.color,
@@ -320,7 +327,9 @@ $(document).ready(function() {
       '</a>' +
       '</td>' +
       `<td> ${color} </td>` +
-      `<td id="priceTo_${product.id}">${price}</td>` +
+      `<td id="priceTo_${product.id}">${parseFloat(
+        price.replace(' $ ','')
+      ).toFixed(2)}</td>` +
       '<td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}"></td>` +
