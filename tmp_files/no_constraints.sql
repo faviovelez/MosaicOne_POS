@@ -3635,7 +3635,10 @@ CREATE TABLE tickets (
     cash_register_id integer,
     ticket_number integer,
     cfdi_use_id integer,
-    comments character varying
+    comments character varying,
+    payments_amount double precision,
+    discount_applied double precision,
+    cash_return double precision
 );
 
 
@@ -6405,7 +6408,7 @@ SELECT pg_catalog.setval('terminals_id_seq', 1, false);
 -- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id, bill_id, ticket_type, created_at, updated_at, cash_register_id, ticket_number, cfdi_use_id, comments) FROM stdin;
+COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id, bill_id, ticket_type, created_at, updated_at, cash_register_id, ticket_number, cfdi_use_id, comments, payments_ammount, discount_applied, cash_return) FROM stdin;
 \.
 
 
