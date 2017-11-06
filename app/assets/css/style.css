@@ -17,6 +17,10 @@ nav {
 html {
 }
 
+.progress {
+  margin-top: 4.8%;
+}
+
 .alerts-container {
   position: absolute;
   top: 9%;
