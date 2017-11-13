@@ -231,8 +231,11 @@ $(document).ready(function() {
           /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
         )}`
       );
+
       $('#savedSubtotal').html(
-        ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "")) + discountVal).toFixed(
+        ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "") + parseFloat(
+          $('#discountSum').html().replace('$ ', '')
+        ))).toFixed(
           2
         ).replace(
           /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
