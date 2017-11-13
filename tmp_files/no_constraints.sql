@@ -14,14 +14,14 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -213,11 +213,7 @@ CREATE TABLE billing_addresses (
     country character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    tax_regime_id integer,
-    certificate character varying,
-    key character varying,
-    certificate_password character varying,
-    certificate_number character varying
+    tax_regime_id integer
 );
 
 
@@ -251,16 +247,10 @@ ALTER SEQUENCE billing_addresses_id_seq OWNED BY billing_addresses.id;
 CREATE TABLE bills (
     id integer NOT NULL,
     status character varying,
-    initial_price double precision,
     discount_applied double precision,
-    price_before_taxes double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    type_of_bill character varying,
     prospect_id integer,
-    classification character varying,
-    amount double precision,
-    quantity integer,
     pdf character varying,
     xml character varying,
     issuing_company_id integer,
@@ -268,7 +258,6 @@ CREATE TABLE bills (
     store_id integer,
     sequence character varying,
     folio character varying,
-    expedition_zip_id integer,
     payment_condition_id integer,
     payment_method_id integer,
     payment_form_id integer,
@@ -276,16 +265,9 @@ CREATE TABLE bills (
     cfdi_use_id integer,
     tax_id integer,
     pac_id integer,
-    fiscal_folio character varying,
-    digital_stamp character varying,
-    sat_stamp character varying,
-    original_chain character varying,
     relation_type_id integer,
-    child_bills_id integer,
-    parent_id integer,
     references_field character varying,
     type_of_bill_id integer,
-    certificate character varying,
     currency_id integer,
     id_trib_reg_num character varying,
     confirmation_key character varying,
@@ -294,11 +276,62 @@ CREATE TABLE bills (
     automatic_discount_applied double precision,
     manual_discount_applied double precision,
     taxes_transferred double precision,
-    taxes_witheld double precision
+    taxes_witheld double precision,
+    sat_certificate_number character varying,
+    certificate_number character varying,
+    qr_string character varying,
+    original_chain text,
+    sat_stampl text,
+    digital_stamp text,
+    subtotal double precision,
+    total double precision,
+    sat_zipcode_id integer,
+    date_signed timestamp without time zone,
+    leyend character varying,
+    uuid character varying,
+    taxes double precision,
+    payed boolean DEFAULT false,
+    parent_id integer
 );
 
 
 ALTER TABLE bills OWNER TO faviovelez;
+
+--
+-- Name: bills_children; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE bills_children (
+    id integer NOT NULL,
+    bill_id integer,
+    children_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE bills_children OWNER TO faviovelez;
+
+--
+-- Name: bills_children_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE bills_children_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE bills_children_id_seq OWNER TO faviovelez;
+
+--
+-- Name: bills_children_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE bills_children_id_seq OWNED BY bills_children.id;
+
 
 --
 -- Name: bills_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
@@ -1772,14 +1805,16 @@ CREATE TABLE movements (
     automatic_discount double precision DEFAULT 0.0,
     manual_discount double precision DEFAULT 0.0,
     discount_rule_id integer,
-    amount double precision,
     seller_user_id integer,
     buyer_user_id integer,
     rule_could_be boolean DEFAULT false,
     ticket_id integer,
     tax_id integer,
     taxes double precision,
-    total_cost double precision
+    total_cost double precision,
+    total double precision,
+    subtotal double precision,
+    entry_movement_id integer
 );
 
 
@@ -1825,7 +1860,11 @@ CREATE TABLE orders (
     confirm boolean,
     delivery_notes text,
     bill_id integer,
-    delivery_attempt_id integer
+    delivery_attempt_id integer,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    discount_applied double precision
 );
 
 
@@ -1898,7 +1937,8 @@ CREATE TABLE pacs (
     certificate character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    active boolean DEFAULT true
+    active boolean DEFAULT true,
+    rfc character varying
 );
 
 
@@ -2039,7 +2079,6 @@ ALTER SEQUENCE payment_methods_id_seq OWNED BY payment_methods.id;
 CREATE TABLE payments (
     id integer NOT NULL,
     payment_date date,
-    amount double precision,
     bill_received_id integer,
     supplier_id integer,
     created_at timestamp without time zone NOT NULL,
@@ -2055,7 +2094,8 @@ CREATE TABLE payments (
     operation_number character varying,
     payment_number integer,
     bank_id integer,
-    credit_days integer
+    credit_days integer,
+    total double precision
 );
 
 
@@ -2113,7 +2153,9 @@ CREATE TABLE pending_movements (
     seller_user_id integer,
     buyer_user_id integer,
     ticket_id integer,
-    total_cost double precision
+    total_cost double precision,
+    total double precision,
+    subtotal double precision
 );
 
 
@@ -2385,7 +2427,8 @@ CREATE TABLE products (
     current boolean,
     store_id integer,
     supplier_id integer,
-    unit_id integer
+    unit_id integer,
+    "group" boolean DEFAULT false
 );
 
 
@@ -2599,7 +2642,6 @@ CREATE TABLE requests (
     quantity integer,
     inner_length double precision,
     inner_width double precision,
-    inner_height character varying,
     outer_length double precision,
     outer_width double precision,
     outer_height double precision,
@@ -2668,7 +2710,8 @@ CREATE TABLE requests (
     third_internal_price double precision,
     second_sales_price double precision,
     third_sales_price double precision,
-    price_selected integer
+    price_selected integer,
+    inner_height double precision
 );
 
 
@@ -2803,6 +2846,42 @@ ALTER TABLE roles_id_seq OWNER TO faviovelez;
 --
 
 ALTER SEQUENCE roles_id_seq OWNED BY roles.id;
+
+
+--
+-- Name: sales_movements; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE sales_movements (
+    id integer NOT NULL,
+    sales_id integer,
+    movement_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE sales_movements OWNER TO faviovelez;
+
+--
+-- Name: sales_movements_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE sales_movements_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE sales_movements_id_seq OWNER TO faviovelez;
+
+--
+-- Name: sales_movements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE sales_movements_id_seq OWNED BY sales_movements.id;
 
 
 --
@@ -2979,17 +3058,16 @@ CREATE TABLE service_offereds (
     discount_applied double precision DEFAULT 0.0,
     rule_could_be boolean,
     final_price double precision,
-    amount double precision,
     service_type character varying,
-    return_ticket_id integer,
-    change_ticket_id integer,
     tax_id integer,
     taxes double precision,
     cost double precision,
     ticket_id integer,
     total_cost double precision,
     quantity integer,
-    discount_reason character varying
+    discount_reason character varying,
+    total double precision,
+    subtotal double precision
 );
 
 
@@ -3078,9 +3156,6 @@ CREATE TABLE store_movements (
     discount_applied double precision DEFAULT 0.0,
     rule_could_be boolean,
     final_price double precision,
-    amount double precision,
-    return_ticket_id integer,
-    change_ticket_id integer,
     tax_id integer,
     taxes double precision,
     cost double precision,
@@ -3089,7 +3164,9 @@ CREATE TABLE store_movements (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     total_cost double precision,
-    discount_reason character varying
+    discount_reason character varying,
+    total double precision,
+    subtotal double precision
 );
 
 
@@ -3263,7 +3340,19 @@ CREATE TABLE stores (
     overprice double precision DEFAULT 0.0,
     series character varying,
     last_bill integer DEFAULT 0,
-    install_code character varying
+    install_code character varying,
+    certificate character varying,
+    key character varying,
+    certificate_password character varying,
+    certificate_number character varying,
+    certificate_content text,
+    bill_last_folio integer DEFAULT 0,
+    credit_note_last_folio integer DEFAULT 0,
+    debit_note_last_folio integer DEFAULT 0,
+    return_last_folio integer DEFAULT 0,
+    pay_bill_last_folio integer DEFAULT 0,
+    advance_e_last_folio integer DEFAULT 0,
+    advance_i_last_folio integer DEFAULT 0
 );
 
 
@@ -3638,11 +3727,49 @@ CREATE TABLE tickets (
     comments character varying,
     payments_amount double precision,
     discount_applied double precision,
-    cash_return double precision
+    cash_return double precision,
+    payed boolean DEFAULT false,
+    parent_id integer
 );
 
 
 ALTER TABLE tickets OWNER TO faviovelez;
+
+--
+-- Name: tickets_children; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE tickets_children (
+    id integer NOT NULL,
+    ticket_id integer,
+    children_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE tickets_children OWNER TO faviovelez;
+
+--
+-- Name: tickets_children_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE tickets_children_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE tickets_children_id_seq OWNER TO faviovelez;
+
+--
+-- Name: tickets_children_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE tickets_children_id_seq OWNED BY tickets_children.id;
+
 
 --
 -- Name: tickets_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
@@ -4021,6 +4148,13 @@ ALTER TABLE ONLY billing_addresses ALTER COLUMN id SET DEFAULT nextval('billing_
 --
 
 ALTER TABLE ONLY bills ALTER COLUMN id SET DEFAULT nextval('bills_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY bills_children ALTER COLUMN id SET DEFAULT nextval('bills_children_id_seq'::regclass);
 
 
 --
@@ -4447,6 +4581,13 @@ ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('roles_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
+ALTER TABLE ONLY sales_movements ALTER COLUMN id SET DEFAULT nextval('sales_movements_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
 ALTER TABLE ONLY sales_targets ALTER COLUMN id SET DEFAULT nextval('sales_targets_id_seq'::regclass);
 
 
@@ -4587,6 +4728,13 @@ ALTER TABLE ONLY tickets ALTER COLUMN id SET DEFAULT nextval('tickets_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
+ALTER TABLE ONLY tickets_children ALTER COLUMN id SET DEFAULT nextval('tickets_children_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
 ALTER TABLE ONLY type_of_bills ALTER COLUMN id SET DEFAULT nextval('type_of_bills_id_seq'::regclass);
 
 
@@ -4703,7 +4851,7 @@ SELECT pg_catalog.setval('bill_sales_id_seq', 1, false);
 -- Data for Name: billing_addresses; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY billing_addresses (id, type_of_person, business_name, rfc, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, created_at, updated_at, tax_regime_id, certificate, key, certificate_password, certificate_number) FROM stdin;
+COPY billing_addresses (id, type_of_person, business_name, rfc, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, created_at, updated_at, tax_regime_id) FROM stdin;
 \.
 
 
@@ -4718,8 +4866,23 @@ SELECT pg_catalog.setval('billing_addresses_id_seq', 1, false);
 -- Data for Name: bills; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY bills (id, status, initial_price, discount_applied, price_before_taxes, created_at, updated_at, type_of_bill, prospect_id, classification, amount, quantity, pdf, xml, issuing_company_id, receiving_company_id, store_id, sequence, folio, expedition_zip_id, payment_condition_id, payment_method_id, payment_form_id, tax_regime_id, cfdi_use_id, tax_id, pac_id, fiscal_folio, digital_stamp, sat_stamp, original_chain, relation_type_id, child_bills_id, parent_id, references_field, type_of_bill_id, certificate, currency_id, id_trib_reg_num, confirmation_key, exchange_rate, country_id, automatic_discount_applied, manual_discount_applied, taxes_transferred, taxes_witheld) FROM stdin;
+COPY bills (id, status, discount_applied, created_at, updated_at, prospect_id, pdf, xml, issuing_company_id, receiving_company_id, store_id, sequence, folio, payment_condition_id, payment_method_id, payment_form_id, tax_regime_id, cfdi_use_id, tax_id, pac_id, relation_type_id, references_field, type_of_bill_id, currency_id, id_trib_reg_num, confirmation_key, exchange_rate, country_id, automatic_discount_applied, manual_discount_applied, taxes_transferred, taxes_witheld, sat_certificate_number, certificate_number, qr_string, original_chain, sat_stampl, digital_stamp, subtotal, total, sat_zipcode_id, date_signed, leyend, uuid, taxes, payed, parent_id) FROM stdin;
 \.
+
+
+--
+-- Data for Name: bills_children; Type: TABLE DATA; Schema: public; Owner: faviovelez
+--
+
+COPY bills_children (id, bill_id, children_id, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: bills_children_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
+--
+
+SELECT pg_catalog.setval('bills_children_id_seq', 1, false);
 
 
 --
@@ -5288,7 +5451,7 @@ SELECT pg_catalog.setval('materials_resistances_id_seq', 1, false);
 -- Data for Name: movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY movements (id, product_id, quantity, movement_type, created_at, updated_at, order_id, user_id, cost, unique_code, store_id, initial_price, supplier_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, confirm, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, amount, seller_user_id, buyer_user_id, rule_could_be, ticket_id, tax_id, taxes, total_cost) FROM stdin;
+COPY movements (id, product_id, quantity, movement_type, created_at, updated_at, order_id, user_id, cost, unique_code, store_id, initial_price, supplier_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, confirm, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, rule_could_be, ticket_id, tax_id, taxes, total_cost, total, subtotal, entry_movement_id) FROM stdin;
 \.
 
 
@@ -5303,7 +5466,7 @@ SELECT pg_catalog.setval('movements_id_seq', 1, false);
 -- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY orders (id, status, delivery_address_id, created_at, updated_at, category, prospect_id, request_id, billing_address_id, carrier_id, store_id, confirm, delivery_notes, bill_id, delivery_attempt_id) FROM stdin;
+COPY orders (id, status, delivery_address_id, created_at, updated_at, category, prospect_id, request_id, billing_address_id, carrier_id, store_id, confirm, delivery_notes, bill_id, delivery_attempt_id, total, subtotal, taxes, discount_applied) FROM stdin;
 \.
 
 
@@ -5333,7 +5496,7 @@ SELECT pg_catalog.setval('orders_users_id_seq', 1, false);
 -- Data for Name: pacs; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY pacs (id, name, certificate, created_at, updated_at, active) FROM stdin;
+COPY pacs (id, name, certificate, created_at, updated_at, active, rfc) FROM stdin;
 \.
 
 
@@ -5393,7 +5556,7 @@ SELECT pg_catalog.setval('payment_methods_id_seq', 1, false);
 -- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY payments (id, payment_date, amount, bill_received_id, supplier_id, created_at, updated_at, user_id, store_id, business_unit_id, payment_form_id, payment_type, bill_id, terminal_id, ticket_id, operation_number, payment_number, bank_id, credit_days) FROM stdin;
+COPY payments (id, payment_date, bill_received_id, supplier_id, created_at, updated_at, user_id, store_id, business_unit_id, payment_form_id, payment_type, bill_id, terminal_id, ticket_id, operation_number, payment_number, bank_id, credit_days, total) FROM stdin;
 \.
 
 
@@ -5408,7 +5571,7 @@ SELECT pg_catalog.setval('payments_id_seq', 1, false);
 -- Data for Name: pending_movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY pending_movements (id, product_id, quantity, created_at, updated_at, order_id, cost, unique_code, store_id, initial_price, supplier_id, movement_type, user_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, ticket_id, total_cost) FROM stdin;
+COPY pending_movements (id, product_id, quantity, created_at, updated_at, order_id, cost, unique_code, store_id, initial_price, supplier_id, movement_type, user_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, ticket_id, total_cost, total, subtotal) FROM stdin;
 \.
 
 
@@ -5498,7 +5661,7 @@ SELECT pg_catalog.setval('production_requests_id_seq', 1, false);
 -- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY products (id, former_code, unique_code, description, product_type, exterior_material_color, interior_material_color, impression, exterior_color_or_design, main_material, resistance_main_material, inner_length, inner_width, inner_height, outer_length, outer_width, outer_height, design_type, number_of_pieces, accesories_kit, created_at, updated_at, price, bag_length, bag_width, bag_height, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, classification, line, image, pieces_per_package, business_unit_id, warehouse_id, cost, rack, level, sat_key_id, sat_unit_key_id, current, store_id, supplier_id, unit_id) FROM stdin;
+COPY products (id, former_code, unique_code, description, product_type, exterior_material_color, interior_material_color, impression, exterior_color_or_design, main_material, resistance_main_material, inner_length, inner_width, inner_height, outer_length, outer_width, outer_height, design_type, number_of_pieces, accesories_kit, created_at, updated_at, price, bag_length, bag_width, bag_height, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, classification, line, image, pieces_per_package, business_unit_id, warehouse_id, cost, rack, level, sat_key_id, sat_unit_key_id, current, store_id, supplier_id, unit_id, "group") FROM stdin;
 \.
 
 
@@ -5573,7 +5736,7 @@ SELECT pg_catalog.setval('request_users_id_seq', 1, false);
 -- Data for Name: requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY requests (id, product_type, product_what, product_length, product_width, product_height, product_weight, for_what, quantity, inner_length, inner_width, inner_height, outer_length, outer_width, outer_height, bag_length, bag_width, bag_height, main_material, resistance_main_material, secondary_material, resistance_secondary_material, third_material, resistance_third_material, impression, inks, impression_finishing, delivery_date, maximum_sales_price, observations, notes, prospect_id, created_at, updated_at, final_quantity, payment_uploaded, authorisation_signed, date_finished, internal_cost, internal_price, sales_price, impression_where, design_like, resistance_like, rigid_color, paper_type_rigid, store_id, require_design, exterior_material_color, interior_material_color, status, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, name_type, contraencolado, authorised_without_doc, how_many, authorised_without_pay, boxes_stow, specification, what_measures, specification_document, sensitive_fields_changed, payment, authorisation, authorised, last_status, product_id, estimate_doc_id, second_quantity, third_quantity, second_internal_cost, third_internal_cost, second_internal_price, third_internal_price, second_sales_price, third_sales_price, price_selected) FROM stdin;
+COPY requests (id, product_type, product_what, product_length, product_width, product_height, product_weight, for_what, quantity, inner_length, inner_width, outer_length, outer_width, outer_height, bag_length, bag_width, bag_height, main_material, resistance_main_material, secondary_material, resistance_secondary_material, third_material, resistance_third_material, impression, inks, impression_finishing, delivery_date, maximum_sales_price, observations, notes, prospect_id, created_at, updated_at, final_quantity, payment_uploaded, authorisation_signed, date_finished, internal_cost, internal_price, sales_price, impression_where, design_like, resistance_like, rigid_color, paper_type_rigid, store_id, require_design, exterior_material_color, interior_material_color, status, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, name_type, contraencolado, authorised_without_doc, how_many, authorised_without_pay, boxes_stow, specification, what_measures, specification_document, sensitive_fields_changed, payment, authorisation, authorised, last_status, product_id, estimate_doc_id, second_quantity, third_quantity, second_internal_cost, third_internal_cost, second_internal_price, third_internal_price, second_sales_price, third_sales_price, price_selected, inner_height) FROM stdin;
 \.
 
 
@@ -5627,6 +5790,21 @@ COPY roles (id, name, description, created_at, updated_at, translation) FROM std
 --
 
 SELECT pg_catalog.setval('roles_id_seq', 1, false);
+
+
+--
+-- Data for Name: sales_movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
+--
+
+COPY sales_movements (id, sales_id, movement_id, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: sales_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
+--
+
+SELECT pg_catalog.setval('sales_movements_id_seq', 1, false);
 
 
 --
@@ -5694,488 +5872,6 @@ SELECT pg_catalog.setval('sat_zipcodes_id_seq', 1, false);
 --
 
 COPY schema_migrations (version) FROM stdin;
-20170531025802
-20170531031624
-20170601212349
-20170601212535
-20170605195623
-20170606013447
-20170606175343
-20170606191231
-20170606202219
-20170606202253
-20170606202314
-20170606202348
-20170606202409
-20170606202424
-20170606222359
-20170606222414
-20170606222448
-20170606235623
-20170612165915
-20170613174532
-20170613174742
-20170613175958
-20170613180037
-20170613180108
-20170613180543
-20170613181245
-20170613182114
-20170613183052
-20170613183111
-20170613184818
-20170613185231
-20170613185920
-20170613190419
-20170613190437
-20170613213257
-20170613213541
-20170613213633
-20170613213810
-20170613214000
-20170613214310
-20170613214849
-20170613215357
-20170613215510
-20170613224310
-20170613230227
-20170613230416
-20170613231152
-20170613234425
-20170613234500
-20170613234551
-20170613235137
-20170613235318
-20170614154011
-20170616000424
-20170616164937
-20170616170556
-20170616181621
-20170616181752
-20170616182014
-20170616182048
-20170616182149
-20170616182241
-20170617030657
-20170617031848
-20170617035951
-20170617041920
-20170619152515
-20170619152616
-20170619153221
-20170619153336
-20170619153401
-20170619153610
-20170619153626
-20170619175053
-20170621152725
-20170621160411
-20170621161545
-20170621163707
-20170621164624
-20170621201610
-20170621201630
-20170622165422
-20170622165617
-20170622183548
-20170622183627
-20170622183846
-20170622184513
-20170622184999
-20170626180035
-20170626180600
-20170626181238
-20170626181515
-20170627221430
-20170628172934
-20170630195828
-20170630203024
-20170630203106
-20170630205120
-20170630205145
-20170630212731
-20170630212905
-20170630213026
-20170630213104
-20170630220602
-20170630220626
-20170630220731
-20170630220745
-20170630234518
-20170630235651
-20170630235853
-20170701171754
-20170701222345
-20170702192823
-20170702193229
-20170702193719
-20170702194035
-20170702195519
-20170702214640
-20170702214757
-20170702214804
-20170703182847
-20170703183452
-20170703183507
-20170703183530
-20170703183551
-20170703184407
-20170703184421
-20170703184743
-20170703184817
-20170704165213
-20170705161826
-20170707173912
-20170707193305
-20170707193321
-20170707200256
-20170707220546
-20170707222445
-20170709162255
-20170712191901
-20170712214155
-20170712222556
-20170713200057
-20170713212029
-20170713213326
-20170713223156
-20170713223950
-20170717200925
-20170717210310
-20170718160325
-20170718160616
-20170718160727
-20170718162024
-20170718165540
-20170718171013
-20170718171102
-20170718203206
-20170718203244
-20170718205024
-20170719014339
-20170720225255
-20170720225258
-20170721203138
-20170722222459
-20170722222542
-20170722222905
-20170722223709
-20170722223918
-20170725164436
-20170725164451
-20170725170349
-20170725170537
-20170725170832
-20170725171222
-20170725173123
-20170725173149
-20170725173342
-20170725173350
-20170725174617
-20170725174640
-20170725174907
-20170725175114
-20170725175342
-20170725175431
-20170725175547
-20170725180156
-20170725180255
-20170725182359
-20170725182649
-20170725182949
-20170725184321
-20170725184410
-20170725185014
-20170725185121
-20170725185350
-20170725185526
-20170725185538
-20170725185711
-20170725185747
-20170725190232
-20170725190438
-20170725190911
-20170725191623
-20170725221333
-20170725222403
-20170725230731
-20170726002220
-20170726002235
-20170726002700
-20170726220155
-20170726220206
-20170726220722
-20170726220755
-20170727191419
-20170727191502
-20170727191946
-20170730150241
-20170730234235
-20170731002849
-20170731003204
-20170731004159
-20170731005620
-20170731005638
-20170731010432
-20170731010600
-20170731223949
-20170731224314
-20170802190703
-20170806143935
-20170807193155
-20170809023547
-20170809023829
-20170809023928
-20170809023941
-20170809023957
-20170809030746
-20170809034225
-20170809034533
-20170809035109
-20170809035520
-20170810184126
-20170810191451
-20170810231811
-20170810231927
-20170810232221
-20170810235555
-20170811000745
-20170812193124
-20170812202900
-20170814170620
-20170814172259
-20170814172332
-20170814173110
-20170814174447
-20170814174536
-20170816001235
-20170816001502
-20170816002927
-20170816005722
-20170816011629
-20170816020400
-20170816034454
-20170816193736
-20170817025245
-20170817043858
-20170817044058
-20170817151458
-20170817161922
-20170817173051
-20170818190019
-20170818215552
-20170818223053
-20170818225732
-20170818230502
-20170819173433
-20170826192943
-20170830152656
-20170830185706
-20170830190026
-20170901170112
-20170905185945
-20170905191329
-20170906144248
-20170906185652
-20170907204154
-20170911011402
-20170914171610
-20170914173139
-20170916180728
-20170916181433
-20170916183247
-20170916183312
-20170916183336
-20170916183358
-20170916183431
-20170916183511
-20170916183810
-20170916184029
-20170916184649
-20170916185123
-20170916185247
-20170916185511
-20170916190329
-20170916190646
-20170916190733
-20170916190908
-20170916190999
-20170916193319
-20170916193625
-20170916193658
-20170916193726
-20170916193733
-20170916193901
-20170916194610
-20170916211712
-20170916212114
-20170918214612
-20170920181537
-20170920181921
-20170920184014
-20170920213640
-20170920213700
-20170921182521
-20170921182535
-20170922001748
-20170922010718
-20170922011432
-20170922013427
-20170922014320
-20170922030627
-20170922031436
-20170922032452
-20170922033343
-20170922033641
-20170922034148
-20170925232640
-20170925233014
-20170925233024
-20170925234908
-20170925235830
-20170926001001
-20170926005142
-20170926005708
-20170926010544
-20170926010940
-20170926011538
-20170926014412
-20170926015722
-20170926020158
-20170926020205
-20170926032300
-20170926032502
-20170926032821
-20170926033629
-20170926033635
-20170926184717
-20170926190834
-20170926220759
-20170926224637
-20170927223231
-20170928171627
-20170928234610
-20170929015800
-20170929020108
-20170929030905
-20170929201135
-20170929204914
-20170929205021
-20170929205801
-20170930000725
-20170930001505
-20170930203231
-20170930204636
-20170930204656
-20170930205403
-20170930210853
-20171002144457
-20171002161816
-20171002162009
-20171003001230
-20171003001257
-20171003001304
-20171003001315
-20171003001324
-20171003001338
-20171003001355
-20171003001632
-20171003001655
-20171003002521
-20171003003007
-20171003003346
-20171003013151
-20171003013430
-20171003015103
-20171003161517
-20171003161708
-20171003161732
-20171003161743
-20171003161802
-20171003161809
-20171003162139
-20171003164125
-20171003164135
-20171003164156
-20171003164341
-20171003182149
-20171003182310
-20171003182500
-20171003183147
-20171003213625
-20171003213653
-20171003213849
-20171003213927
-20171003220551
-20171003220827
-20171003220912
-20171003221020
-20171004011948
-20171008212152
-20171009020046
-20171009172044
-20171009172712
-20171009172753
-20171010032301
-20171010032353
-20171011160211
-20171012172303
-20171012172838
-20171012172958
-20171012173219
-20171012175438
-20171012175514
-20171012181023
-20171012181037
-20171012181921
-20171012182353
-20171012182651
-20171012183216
-20171012183223
-20171012183652
-20171012183752
-20171012183959
-20171012190622
-20171012191100
-20171012191107
-20171012191538
-20171012191600
-20171012191607
-20171012192132
-20171012215745
-20171012222216
-20171012224230
-20171012224249
-20171013000811
-20171013010605
-20171013145444
-20171013211505
-20171013215707
-20171013215723
-20171013215736
-20171013220039
-20171013220537
-20171013220543
-20171013220552
-20171013220610
-20171014001618
-20171014002330
-20171015232822
-20171016153654
-20171017023649
-20171017023720
-20171017023820
-20171017023946
-20171017023956
-20171017024005
-20171018014406
-20171018014440
-20171018014447
-20171018163430
-20171018163502
-20171019201219
-20171019235913
-20171020012824
 \.
 
 
@@ -6183,7 +5879,7 @@ COPY schema_migrations (version) FROM stdin;
 -- Data for Name: service_offereds; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY service_offereds (id, service_id, store_id, created_at, updated_at, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, amount, service_type, return_ticket_id, change_ticket_id, tax_id, taxes, cost, ticket_id, total_cost, quantity, discount_reason) FROM stdin;
+COPY service_offereds (id, service_id, store_id, created_at, updated_at, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, service_type, tax_id, taxes, cost, ticket_id, total_cost, quantity, discount_reason, total, subtotal) FROM stdin;
 \.
 
 
@@ -6213,7 +5909,7 @@ SELECT pg_catalog.setval('services_id_seq', 1, false);
 -- Data for Name: store_movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY store_movements (id, product_id, quantity, movement_type, order_id, ticket_id, store_id, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, amount, return_ticket_id, change_ticket_id, tax_id, taxes, cost, supplier_id, product_request_id, created_at, updated_at, total_cost, discount_reason) FROM stdin;
+COPY store_movements (id, product_id, quantity, movement_type, order_id, ticket_id, store_id, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, tax_id, taxes, cost, supplier_id, product_request_id, created_at, updated_at, total_cost, discount_reason, total, subtotal) FROM stdin;
 \.
 
 
@@ -6273,7 +5969,7 @@ SELECT pg_catalog.setval('store_use_inventories_id_seq', 1, false);
 -- Data for Name: stores; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY stores (id, created_at, updated_at, store_code, store_name, delivery_address_id, business_unit_id, store_type_id, email, cost_type_id, cost_type_selected_since, months_in_inventory, reorder_point, critical_point, contact_first_name, contact_middle_name, contact_last_name, direct_phone, extension, type_of_person, second_last_name, business_group_id, cell_phone, zip_code, period_sales_achievement, inspection_approved, overprice, series, last_bill) FROM stdin;
+COPY stores (id, created_at, updated_at, store_code, store_name, delivery_address_id, business_unit_id, store_type_id, email, cost_type_id, cost_type_selected_since, months_in_inventory, reorder_point, critical_point, contact_first_name, contact_middle_name, contact_last_name, direct_phone, extension, type_of_person, second_last_name, business_group_id, cell_phone, zip_code, period_sales_achievement, inspection_approved, overprice, series, last_bill, install_code, certificate, key, certificate_password, certificate_number, certificate_content, bill_last_folio, credit_note_last_folio, debit_note_last_folio, return_last_folio, pay_bill_last_folio, advance_e_last_folio, advance_i_last_folio) FROM stdin;
 \.
 
 
@@ -6408,8 +6104,23 @@ SELECT pg_catalog.setval('terminals_id_seq', 1, false);
 -- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id, bill_id, ticket_type, created_at, updated_at, cash_register_id, ticket_number, cfdi_use_id, comments, payments_ammount, discount_applied, cash_return) FROM stdin;
+COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id, bill_id, ticket_type, created_at, updated_at, cash_register_id, ticket_number, cfdi_use_id, comments, payments_amount, discount_applied, cash_return, payed, parent_id) FROM stdin;
 \.
+
+
+--
+-- Data for Name: tickets_children; Type: TABLE DATA; Schema: public; Owner: faviovelez
+--
+
+COPY tickets_children (id, ticket_id, children_id, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: tickets_children_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
+--
+
+SELECT pg_catalog.setval('tickets_children_id_seq', 1, false);
 
 
 --
@@ -6577,6 +6288,14 @@ ALTER TABLE ONLY bill_sales
 
 ALTER TABLE ONLY billing_addresses
     ADD CONSTRAINT billing_addresses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bills_children_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY bills_children
+    ADD CONSTRAINT bills_children_pkey PRIMARY KEY (id);
 
 
 --
@@ -6852,14 +6571,6 @@ ALTER TABLE ONLY images
 
 
 --
--- Name: interior_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
---
-
-ALTER TABLE ONLY interior_colors
-    ADD CONSTRAINT interior_colors_pkey PRIMARY KEY (id);
-
-
---
 -- Name: inventories_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
@@ -7068,6 +6779,14 @@ ALTER TABLE ONLY roles
 
 
 --
+-- Name: sales_movements_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY sales_movements
+    ADD CONSTRAINT sales_movements_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: sales_targets_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
@@ -7220,6 +6939,14 @@ ALTER TABLE ONLY terminals
 
 
 --
+-- Name: tickets_children_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY tickets_children
+    ADD CONSTRAINT tickets_children_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
@@ -7355,17 +7082,24 @@ CREATE INDEX index_billing_addresses_on_tax_regime_id ON billing_addresses USING
 
 
 --
+-- Name: index_bills_children_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_bills_children_on_bill_id ON bills_children USING btree (bill_id);
+
+
+--
+-- Name: index_bills_children_on_children_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_bills_children_on_children_id ON bills_children USING btree (children_id);
+
+
+--
 -- Name: index_bills_on_cfdi_use_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_cfdi_use_id ON bills USING btree (cfdi_use_id);
-
-
---
--- Name: index_bills_on_child_bills_id; Type: INDEX; Schema: public; Owner: faviovelez
---
-
-CREATE INDEX index_bills_on_child_bills_id ON bills USING btree (child_bills_id);
 
 
 --
@@ -7380,13 +7114,6 @@ CREATE INDEX index_bills_on_country_id ON bills USING btree (country_id);
 --
 
 CREATE INDEX index_bills_on_currency_id ON bills USING btree (currency_id);
-
-
---
--- Name: index_bills_on_expedition_zip_id; Type: INDEX; Schema: public; Owner: faviovelez
---
-
-CREATE INDEX index_bills_on_expedition_zip_id ON bills USING btree (expedition_zip_id);
 
 
 --
@@ -7450,6 +7177,13 @@ CREATE INDEX index_bills_on_receiving_company_id ON bills USING btree (receiving
 --
 
 CREATE INDEX index_bills_on_relation_type_id ON bills USING btree (relation_type_id);
+
+
+--
+-- Name: index_bills_on_sat_zipcode_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_bills_on_sat_zipcode_id ON bills USING btree (sat_zipcode_id);
 
 
 --
@@ -7849,6 +7583,13 @@ CREATE INDEX index_movements_on_buyer_user_id ON movements USING btree (buyer_us
 --
 
 CREATE INDEX index_movements_on_discount_rule_id ON movements USING btree (discount_rule_id);
+
+
+--
+-- Name: index_movements_on_entry_movement_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_movements_on_entry_movement_id ON movements USING btree (entry_movement_id);
 
 
 --
@@ -8391,24 +8132,24 @@ CREATE INDEX index_return_tickets_on_ticket_id ON return_tickets USING btree (ti
 
 
 --
+-- Name: index_sales_movements_on_movement_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_sales_movements_on_movement_id ON sales_movements USING btree (movement_id);
+
+
+--
+-- Name: index_sales_movements_on_sales_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_sales_movements_on_sales_id ON sales_movements USING btree (sales_id);
+
+
+--
 -- Name: index_sales_targets_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_sales_targets_on_store_id ON sales_targets USING btree (store_id);
-
-
---
--- Name: index_service_offereds_on_change_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
---
-
-CREATE INDEX index_service_offereds_on_change_ticket_id ON service_offereds USING btree (change_ticket_id);
-
-
---
--- Name: index_service_offereds_on_return_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
---
-
-CREATE INDEX index_service_offereds_on_return_ticket_id ON service_offereds USING btree (return_ticket_id);
 
 
 --
@@ -8468,13 +8209,6 @@ CREATE INDEX index_services_on_store_id ON services USING btree (store_id);
 
 
 --
--- Name: index_store_movements_on_change_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
---
-
-CREATE INDEX index_store_movements_on_change_ticket_id ON store_movements USING btree (change_ticket_id);
-
-
---
 -- Name: index_store_movements_on_order_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
@@ -8493,13 +8227,6 @@ CREATE INDEX index_store_movements_on_product_id ON store_movements USING btree 
 --
 
 CREATE INDEX index_store_movements_on_product_request_id ON store_movements USING btree (product_request_id);
-
-
---
--- Name: index_store_movements_on_return_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
---
-
-CREATE INDEX index_store_movements_on_return_ticket_id ON store_movements USING btree (return_ticket_id);
 
 
 --
@@ -8685,6 +8412,20 @@ CREATE INDEX index_terminals_on_store_id ON terminals USING btree (store_id);
 
 
 --
+-- Name: index_tickets_children_on_children_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_tickets_children_on_children_id ON tickets_children USING btree (children_id);
+
+
+--
+-- Name: index_tickets_children_on_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_tickets_children_on_ticket_id ON tickets_children USING btree (ticket_id);
+
+
+--
 -- Name: index_tickets_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
@@ -8703,6 +8444,13 @@ CREATE INDEX index_tickets_on_cash_register_id ON tickets USING btree (cash_regi
 --
 
 CREATE INDEX index_tickets_on_cfdi_use_id ON tickets USING btree (cfdi_use_id);
+
+
+--
+-- Name: index_tickets_on_parent_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_tickets_on_parent_id ON tickets USING btree (parent_id);
 
 
 --
@@ -8860,35 +8608,11 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
--- Name: fk_rails_27628bcf10; Type: FK CONSTRAINT; Schema: public; Owner: faviovelez
+-- Name: fk_rails_358229166a; Type: FK CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
-ALTER TABLE ONLY services
-    ADD CONSTRAINT fk_rails_27628bcf10 FOREIGN KEY (business_unit_id) REFERENCES business_units(id);
-
-
---
--- Name: fk_rails_7acf3c35f6; Type: FK CONSTRAINT; Schema: public; Owner: faviovelez
---
-
-ALTER TABLE ONLY services
-    ADD CONSTRAINT fk_rails_7acf3c35f6 FOREIGN KEY (sat_unit_key_id) REFERENCES sat_unit_keys(id);
-
-
---
--- Name: fk_rails_9db343ab98; Type: FK CONSTRAINT; Schema: public; Owner: faviovelez
---
-
-ALTER TABLE ONLY services
-    ADD CONSTRAINT fk_rails_9db343ab98 FOREIGN KEY (store_id) REFERENCES stores(id);
-
-
---
--- Name: fk_rails_f02974afac; Type: FK CONSTRAINT; Schema: public; Owner: faviovelez
---
-
-ALTER TABLE ONLY services
-    ADD CONSTRAINT fk_rails_f02974afac FOREIGN KEY (sat_key_id) REFERENCES sat_keys(id);
+ALTER TABLE ONLY interior_colors
+    ADD CONSTRAINT fk_rails_358229166a FOREIGN KEY (material_id) REFERENCES materials(id);
 
 
 --
@@ -8904,3 +8628,4 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 -- PostgreSQL database dump complete
 --
+

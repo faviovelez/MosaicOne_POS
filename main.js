@@ -100,16 +100,16 @@ app.on('ready', () => {
   mainWindow.setResizable(false);
 
   hasUser().then(res => {
-    //if (res) {
-    query('SELECT * FROM stores').then(storeRecord => {
-      initStore().then(store => {
-        store.set('store', storeRecord.rows[0]);
-        mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_up.html`);
+    if (res) {
+      query('SELECT * FROM stores').then(storeRecord => {
+        initStore().then(store => {
+          store.set('store', storeRecord.rows[0]);
+          mainWindow.loadURL(`file://${app.getAppPath()}/app/views/sign_in.html`);
+        });
       });
-    });
-    //} else {
-      //mainWindow.loadURL(`file://${app.getAppPath()}/app/views/initial_install.html`);
-    //}
+    } else {
+      mainWindow.loadURL(`file://${app.getAppPath()}/app/views/initial_install.html`);
+    }
   });
 
   mainWindow.on('closed', () => { mainWindow = null; });

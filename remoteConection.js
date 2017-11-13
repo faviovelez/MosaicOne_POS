@@ -45,7 +45,7 @@ async function createInsert (columns, data, table){
   let localQuery = `INSERT INTO public.${table}(`;
   localQuery += columns.shift();
   columns.forEach(fieldName => {
-    localQuery += `, ${fieldName}`;
+    localQuery += `, "${fieldName}"`;
   });
   localQuery += `) VALUES ( '${data.shift()}'`;
   data.forEach(data => {

@@ -328,6 +328,8 @@ $(document).ready(function() {
         )
       );
 
+      $('#store').html(store.get('store').store_name);
+
       getProductsAndServices(list => {
         $('#mainProductSearch').autocomplete({
           lookup: list,

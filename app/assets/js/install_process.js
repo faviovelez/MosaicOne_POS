@@ -1,4 +1,15 @@
 $(function(){
+async function initStore(){
+
+  const store = new Store({
+    configName: 'user-localStore',
+    defaults: {
+      windowBounds: { width: 1024, height: 768 }
+    }
+  });
+
+  return store;
+}
 
   function cloneAlert(){
     let alerts = $('.alert').length + 1;
@@ -17,8 +28,10 @@ $(function(){
       .removeClass('hidden');
   }
 
-  function lotQueries(store){
+function lotQueries(store){
     return {
+      'stores' : "SELECT * FROM stores " +
+      `WHERE id=${store.id}`,
       'roles' : "SELECT * FROM roles " +
       "WHERE name IN ('store', 'store-admin')",
       'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
@@ -51,6 +64,19 @@ $(function(){
 
   function cloneAllTables(queries, call){
 
+    (function(){
+      var current_progress = 0;
+      var interval = setInterval(function() {
+        current_progress += 1;
+        $("#dynamic")
+          .css("width", current_progress + "%")
+          .attr("aria-valuenow", current_progress)
+          .text(current_progress + "%");
+        if (current_progress >= 100)
+          clearInterval(interval);
+      }, 400);
+    }());
+
     query(queries.business_units).then(mainResult => {
       queries.billing_addresses = 'SELECT * FROM billing_addresses ' +
                  `WHERE id = ${mainResult.rows[0].billing_address_id}`;
@@ -74,6 +100,8 @@ $(function(){
                 if (count++ === limit-1){
                   call();
                 }
+              }, err => {
+                debugger
               });
 
             });
@@ -86,19 +114,6 @@ $(function(){
 
   $('#validateInstall').click(function(){
     $(this).prop('disabled', false);
-
-    (function(){
-     var current_progress = 0;
-     var interval = setInterval(function() {
-       current_progress += 1;
-       $("#dynamic")
-       .css("width", current_progress + "%")
-       .attr("aria-valuenow", current_progress)
-       .text(current_progress + "%");
-       if (current_progress >= 100)
-         clearInterval(interval);
-       }, 400);
-     }());
 
     let script = `psql -U ${process.env.DB_LOCAL_USER} ${process.env.DB_LOCAL_DB} ` +
       `< ./tmp_files/${process.env.DB_FILE_NAME}`;
@@ -118,15 +133,19 @@ $(function(){
       if (code ===0){
 
         findBy('install_code', installCode, 'stores').then(result => {
-          let store = result.rows[0];
+          initStore().then(storage => {
+            let store = result.rows[0];
 
-          if (store) {
-            cloneAllTables(lotQueries(result.rows[0]), function(){
-              window.location.href = 'sign_up.html';
-            });
-          } else {
-            showAlert('Error', 'Revisa que el código ingresado sea válido', cloneAlert());
-          }
+            if (store) {
+              storage.set('store', store);
+
+              cloneAllTables(lotQueries(result.rows[0]), function(){
+                window.location.href = 'sign_up.html';
+              });
+            } else {
+              showAlert('Error', 'Revisa que el código ingresado sea válido', cloneAlert());
+            }
+          });
         }, err => {
           if(err){
             showAlert('Error', err, cloneAlert());
