@@ -234,9 +234,6 @@ $(document).ready(function() {
   function addEvents(id){
     $(`button[id=delete_${id}]`).click(function(){
       $(`tr[id=product_${id}]`).remove();
-      $(`#totalTo_${id}`).html(
-        `$ ${createTotal(id)}`
-      );
       bigTotal();
     });
 
