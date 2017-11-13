@@ -37,11 +37,12 @@ $(document).ready(function() {
     findBy('product_id', id, 'stores_inventories').then(inventory => {
       data.quantity += inventory.rows[0].quantity;
       updateBy(data, table, condition).then(product => {
-      //Sucess update
+        $('#addProductQuantity tr').remove();
       }, err => {
-        //Error update
+        $('#addProductQuantity tr').remove();
       });
     });
+    $('#addProductQuantity tr').remove();
   });
 
   $('#addProductSearch').click(function(){
@@ -51,7 +52,6 @@ $(document).ready(function() {
           lookup: list,
           lookupLimit: 10,
           onSelect: function (suggestion) {
-            $('#addProductQuantity tr').remove();
             $('#addProductQuantity').append(
               productAddChange(suggestion)
             );
@@ -162,6 +162,19 @@ $(document).ready(function() {
     resumePayment();
   });
 
+  $('#ticketDiscountChange .confirm').click(function(){
+    $.each($('a[id^=discount]'), function(){
+      $(this).html(
+        $('#globalDiscount input:first').val() + ' %'
+      );
+      let id = $(this).attr('id').replace(/\D/g,'');
+      $(`#totalTo_${id}`).html(
+        `$ ${createTotal(id, true)}`
+      );
+    });
+    $('#ticketDiscountChange').modal('toggle');
+  });
+
   function bigTotal(){
     let subTotalInput = $('table.subtotal td.subtotal:first'),
         subtotal      = 0;
@@ -175,16 +188,16 @@ $(document).ready(function() {
     $('table.subtotal td.subtotal.iva').html(
       `$ ${iva.toFixed(2)}`
     );
-    $('table.subtotal td.total').html(
+    $('table.subtotal td.total, #paymentRest').html(
       `$ ${(subtotal + parseFloat(iva)).toFixed(2)}`
     );
   }
 
-  function createTotal(id){
+  function createTotal(id, manualDiscount = false){
     let cuantity = $(`#cuantityTo_${id}`).val(),
-        price    = parseFloat(
-          $(`#priceTo_${id}`).html().replace(' $ ','')
-        );
+      price    = parseFloat(
+        $(`#priceTo_${id}`).html().replace(' $ ','')
+      );
     if (!price){
       price = $(`#priceTo_${id} input`).val();
     }
@@ -194,7 +207,16 @@ $(document).ready(function() {
       discountVal = parseFloat(discount) / 100 * total,
       productTotal    = total - discountVal;
 
-      return productTotal.toFixed(2);
+    if (manualDiscount){
+      let globalManual = parseFloat(
+        $('#manualDiscountQuantity').html().replace(' $ ','')
+      );
+      $('#manualDiscountQuantity').html(
+        ` $ ${(globalManual += discountVal).toFixed(2)}`
+      );
+    }
+
+    return productTotal.toFixed(2);
   }
 
   function addEvents(id){
@@ -282,10 +304,14 @@ $(document).ready(function() {
 
   function addTr(product){
     let color = product.table === 'services' ? carIcon(product.id) :
-                                            product.color,
-        price = product.table === 'products' ? ` $ ${product.price}` :
-        '<input type="text" class="form-control ' +
-        `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
+      product.color,
+      productInList = $(`#product_${product.id}`),
+      price = product.table === 'products' ? ` $ ${product.price}` :
+      '<input type="text" class="form-control ' +
+      `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
+    if (productInList.length === 1) {
+      return '';
+    }
     return `<tr id="product_${product.id}"><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +
@@ -301,7 +327,9 @@ $(document).ready(function() {
       '</a>' +
       '</td>' +
       `<td> ${color} </td>` +
-      `<td id="priceTo_${product.id}">${price}</td>` +
+      `<td id="priceTo_${product.id}">${parseFloat(
+        price.replace(' $ ','')
+      ).toFixed(2)}</td>` +
       '<td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}"></td>` +

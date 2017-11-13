@@ -31,7 +31,15 @@ async function initStore(){
 function lotQueries(store){
     return {
       'stores' : "SELECT * FROM stores " +
-      `WHERE id=${store.id}`,
+      function storesColumns(){
+        return "id, created_at, updated_at, store_code, store_name" +
+        ", delivery_address_id, business_unit_id, store_type_id" +
+        ", email, cost_type_id, cost_type_selected_since, months_in_inventory"+
+        ", reorder_point, critical_point, contact_first_name, contact_middle_name"+
+        ", contact_last_name, direct_phone, extension, type_of_person, second_last_name"+
+        ", business_group_id, cell_phone, zip_code, period_sales_achievement" +
+        ", inspection_approved, overprice, series, last_bill, install_code";
+      }
       'roles' : "SELECT * FROM roles " +
       "WHERE name IN ('store', 'store-admin')",
       'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
