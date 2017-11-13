@@ -115,7 +115,9 @@ $(document).ready(function() {
       '</button></div>' +
       `${type}</td>` +
       '<td class="right cuantity" >' +
-      `$ ${$('#paymentMethodCuantity').val()}` +
+      `$ ${$('#paymentMethodCuantity').val().replace(
+         /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+       )}` +
       '</td></tr>';
   }
 
@@ -124,28 +126,36 @@ $(document).ready(function() {
     $.each($('tr[id^=paymentMethod_]'), function(){
       let currency = $(this).find('.cuantity').html().replace(
         '$ ', ''
-      );
+      ).replace(',', '');
       sum += parseFloat(currency);
     });
     let total = $('table.subtotal td.total').html().replace(
       '$ ', ''
-    ),
+    ).replace(',',''),
        rest = (parseFloat(total) - sum).toFixed(2);
     if (rest < 0){
       $('#paymentRest').html(
         '<strong>$ 0</strong>'
       );
       $('#currencyChange').html(
-        `<strong>$ ${rest * -1}</strong>`
+        `<strong>$ ${(rest * -1).toFixed(2).replace(
+            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+          )}</strong>`
       );
       $('.paymentProcess').addClass('hidden');
       $('#completeSale').removeClass('hidden');
     } else {
+      $('#currencyChange').html(
+        '<strong> $0.00 </strong>'
+      );
       $('#paymentRest').html(
-        `<strong>$ ${rest}</strong>`
+        `<strong>$ ${rest.replace(
+            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+         )}</strong>`
       );
       $('#completeSale').addClass('hidden');
       $('.paymentProcess').removeClass('hidden');
+      $('.payment-form-wrapper.paymentProcess button.selected').click();
     }
   }
 
