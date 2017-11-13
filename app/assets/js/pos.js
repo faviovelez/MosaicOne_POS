@@ -197,12 +197,6 @@ $(document).ready(function() {
       2
     ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`);
 
-    let discount = parseFloat($('#discountSum').text().replace("$ ", ""));
-    let savedSubtotal = subtotal + discount;
-    $('table.subtotal #savedSubtotal').html(
-      `$ ${savedSubtotal.toFixed(2)}`
-    );
-
     let iva = subtotal * 0.16;
     $('table.subtotal td.subtotal.iva').html(
       `$ ${iva.toFixed(2).replace(
@@ -229,6 +223,21 @@ $(document).ready(function() {
       .html().replace(' %',''),
       discountVal = parseFloat(discount) / 100 * total,
       productTotal    = total - discountVal;
+
+      $('#discountSum').html(
+        ` $ ${(parseFloat($('#discountSum').html().replace("$ ", "")) + discountVal).toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
+      );
+      $('#savedSubtotal').html(
+        ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "")) + discountVal).toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
+      );
     if (manualDiscount){
       let globalManual = parseFloat(
         $('#manualDiscountQuantity').html().replace(' $ ','')
