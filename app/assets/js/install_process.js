@@ -98,9 +98,23 @@ $(function(){
 
   $('#validateInstall').click(function(){
     $(this).prop('disabled', false);
+
+    (function(){
+     var current_progress = 0;
+     var interval = setInterval(function() {
+       current_progress += 1;
+       $("#dynamic")
+       .css("width", current_progress + "%")
+       .attr("aria-valuenow", current_progress)
+       .text(current_progress + "%");
+       if (current_progress >= 100)
+         clearInterval(interval);
+       }, 400);
+     }());
+
     let script = `psql -U ${process.env.DB_LOCAL_USER} ${process.env.DB_LOCAL_DB} ` +
       `< ./tmp_files/${process.env.DB_FILE_NAME}`;
-    showAlert('Info', 'Proceso de replicacion de base de datos iniciado', cloneAlert());
+    showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;
 
     dbRestore = exec(script,
@@ -123,7 +137,7 @@ $(function(){
               window.location.href = 'sign_up.html';
             });
           } else {
-            showAlert('Error', 'Revisar el codigo ingresado sea valido', cloneAlert());
+            showAlert('Error', 'Revisa que el código ingresado sea válido', cloneAlert());
           }
         }, err => {
           if(err){
