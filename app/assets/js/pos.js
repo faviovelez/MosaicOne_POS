@@ -180,16 +180,22 @@ $(document).ready(function() {
         subtotal      = 0;
     $.each($(`td[id^=totalTo_]`), function(){
       subtotal += parseFloat(
-        $(this).html().replace('$ ', '')
+        $(this).html().replace('$ ', '').replace(/,/g,'')
       );
     });
-    $(subTotalInput).html(`$ ${subtotal.toFixed(2)}`);
+    $(subTotalInput).html(`$ ${subtotal.toFixed(
+      2
+    ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`);
     let iva = subtotal * 0.16;
     $('table.subtotal td.subtotal.iva').html(
-      `$ ${iva.toFixed(2)}`
+      `$ ${iva.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+      )}`
     );
     $('table.subtotal td.total, #paymentRest').html(
-      `$ ${(subtotal + parseFloat(iva)).toFixed(2)}`
+      `$ ${(subtotal + parseFloat(iva)).toFixed(
+        2
+      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
     );
   }
 
@@ -216,12 +222,18 @@ $(document).ready(function() {
       );
     }
 
-    return productTotal.toFixed(2);
+    return productTotal.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    );
   }
 
   function addEvents(id){
     $(`button[id=delete_${id}]`).click(function(){
       $(`tr[id=product_${id}]`).remove();
+      $(`#totalTo_${id}`).html(
+        `$ ${createTotal(id)}`
+      );
+      bigTotal();
     });
 
     $(`#cuantityTo_${id}`).keyup(function(){
