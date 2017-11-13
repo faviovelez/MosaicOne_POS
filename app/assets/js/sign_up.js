@@ -70,7 +70,7 @@ $(function(){
 
           });
         }, err => {
-          showAlert('Error', err.detail, cloneAlert());
+          showAlert('Error', err, cloneAlert());
         });
 
       }

@@ -9,6 +9,49 @@ const localPool = new Pool({
   port: 5432,
 });
 
+const storeIdsTables = [
+  "bill_receiveds",
+  "bills",
+  "cash_registers",
+  "change_tickets",
+  "deposits",
+  "discount_rules",
+  "estimate_docs",
+  "expenses",
+  "inventory_configurations",
+  "movements",
+  "orders",
+  "payments",
+  "products",
+  "prospects",
+  "requests",
+  "return_tickets",
+  "service_offereds",
+  "services",
+  "store_movements",
+  "stores_inventories",
+  "stores_suppliers",
+  "stores_warehouse_entries",
+  "suppliers",
+  "terminals",
+  "tickets",
+  "users",
+  "warehouses",
+  "withdrawals"
+];
+
+async function initStore(){
+
+  const store = new Store({
+    configName: 'user-localStore',
+    defaults: {
+      windowBounds: { width: 1024, height: 768 }
+    }
+  });
+
+  return store;
+}
+
 async function query (q) {
   const client = await localPool.connect();
   let res;
@@ -27,21 +70,35 @@ async function query (q) {
   return res;
 }
 
-async function insert (columns, data, table){
-  let localQuery = `INSERT INTO public.${table}(`;
+async function insert (columns, data, table, call){
+  let localQuery = `INSERT INTO public.${table}(`,
+      store;
+
+  store = await initStore();
   localQuery += columns.shift();
   columns.forEach(fieldName => {
     localQuery += `, ${fieldName}`;
   });
-  localQuery += `, created_at, updated_at) VALUES ( '${data.shift()}'`;
+
+  if ($.inArray(table, storeIdsTables) > -1) {
+    localQuery += `, created_at, updated_at, store_id) VALUES ( '${data.shift()}'`;
+  } else {
+    localQuery += `, created_at, updated_at) VALUES ( '${data.shift()}'`;
+  }
+
   data.forEach(data => {
     localQuery += `, '${data}'`;
   });
-  let createDate = new Date,
-      updateDate = new Date
+  let createDate = new Date(),
+    updateDate = new Date();
 
   localQuery += `, '${createDate.toString().replace(' GMT-0600 (CST)','')}',`;
   localQuery += `'${updateDate.toString().replace(' GMT-0600 (CST)','')}'`;
+  if ($.inArray(table, storeIdsTables) > -1) {
+    let storeId = store.get('store').id;
+    localQuery += `, '${storeId}'`;
+  }
+
   return await query(`${localQuery})`);
 }
 

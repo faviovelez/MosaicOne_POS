@@ -42,4 +42,3 @@ async function loginUser(user, goTo = 'pos_sale.html'){
     store.set('current_user', user);
   });
 }
-
