@@ -115,7 +115,9 @@ $(document).ready(function() {
       '</button></div>' +
       `${type}</td>` +
       '<td class="right cuantity" >' +
-      `$ ${$('#paymentMethodCuantity').val()}` +
+      `$ ${$('#paymentMethodCuantity').val().replace(
+         /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+       )}` +
       '</td></tr>';
   }
 
@@ -124,28 +126,36 @@ $(document).ready(function() {
     $.each($('tr[id^=paymentMethod_]'), function(){
       let currency = $(this).find('.cuantity').html().replace(
         '$ ', ''
-      );
+      ).replace(',', '');
       sum += parseFloat(currency);
     });
     let total = $('table.subtotal td.total').html().replace(
       '$ ', ''
-    ),
+    ).replace(',',''),
        rest = (parseFloat(total) - sum).toFixed(2);
-    if (rest < 0){
+    if (parseFloat(rest) <= 0){
       $('#paymentRest').html(
         '<strong>$ 0</strong>'
       );
       $('#currencyChange').html(
-        `<strong>$ ${rest * -1}</strong>`
+        `<strong>$ ${(rest * -1).toFixed(2).replace(
+            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+          )}</strong>`
       );
       $('.paymentProcess').addClass('hidden');
       $('#completeSale').removeClass('hidden');
     } else {
+      $('#currencyChange').html(
+        '<strong> $0.00 </strong>'
+      );
       $('#paymentRest').html(
-        `<strong>$ ${rest}</strong>`
+        `<strong>$ ${rest.replace(
+            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+         )}</strong>`
       );
       $('#completeSale').addClass('hidden');
       $('.paymentProcess').removeClass('hidden');
+      $('.payment-form-wrapper.paymentProcess button.selected').click();
     }
   }
 
@@ -180,16 +190,22 @@ $(document).ready(function() {
         subtotal      = 0;
     $.each($(`td[id^=totalTo_]`), function(){
       subtotal += parseFloat(
-        $(this).html().replace('$ ', '')
+        $(this).html().replace('$ ', '').replace(/,/g,'')
       );
     });
-    $(subTotalInput).html(`$ ${subtotal.toFixed(2)}`);
+    $(subTotalInput).html(`$ ${subtotal.toFixed(
+      2
+    ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`);
     let iva = subtotal * 0.16;
     $('table.subtotal td.subtotal.iva').html(
-      `$ ${iva.toFixed(2)}`
+      `$ ${iva.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+      )}`
     );
     $('table.subtotal td.total, #paymentRest').html(
-      `$ ${(subtotal + parseFloat(iva)).toFixed(2)}`
+      `$ ${(subtotal + parseFloat(iva)).toFixed(
+        2
+      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
     );
   }
 
@@ -212,16 +228,23 @@ $(document).ready(function() {
         $('#manualDiscountQuantity').html().replace(' $ ','')
       );
       $('#manualDiscountQuantity').html(
-        ` $ ${(globalManual += discountVal).toFixed(2)}`
+        ` $ ${(globalManual += discountVal).toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
       );
     }
 
-    return productTotal.toFixed(2);
+    return productTotal.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    );
   }
 
   function addEvents(id){
     $(`button[id=delete_${id}]`).click(function(){
       $(`tr[id=product_${id}]`).remove();
+      bigTotal();
     });
 
     $(`#cuantityTo_${id}`).keyup(function(){
@@ -295,7 +318,7 @@ $(document).ready(function() {
   });
 
   function carIcon(id){
-    return '<a href="#" data-toggle="modal"' + 
+    return '<a href="#" data-toggle="modal"' +
       'data-target="#deliveryService"' +
       `id="service_1" data-id=${id}>` +
       '<i class="fa fa-truck" aria-hidden="true"></i>' +
