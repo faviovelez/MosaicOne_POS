@@ -188,8 +188,8 @@ $(document).ready(function() {
   function createRealSubtotal(){
 
     $('#savedSubtotal').html(
-      ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "").replace(',','')) + parseFloat(
-          $('#discountSum').html().replace('$ ', '').replace(',','')
+      ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "").replace(/,/g,'')) + parseFloat(
+          $('#discountSum').html().replace('$ ', '').replace(/,/g,'')
         )).toFixed(
           2
         ).replace(
@@ -245,7 +245,7 @@ $(document).ready(function() {
       productTotal    = total - discountVal;
 
       $('#discountSum').html(
-        ` $ ${(parseFloat($('#discountSum').html().replace("$ ", "").replace(',', '')) + discountVal).toFixed(
+        ` $ ${(parseFloat($('#discountSum').html().replace("$ ", "").replace(/,/g,'')) + discountVal).toFixed(
           2
         ).replace(
           /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
