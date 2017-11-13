@@ -185,6 +185,20 @@ $(document).ready(function() {
     $('#ticketDiscountChange').modal('toggle');
   });
 
+  function createRealSubtotal(){
+
+    $('#savedSubtotal').html(
+      ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "")) + parseFloat(
+          $('#discountSum').html().replace('$ ', '')
+        )).toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
+    );
+
+  }
+
   function bigTotal(){
     let subTotalInput = $('table.subtotal #SubtotalSum'),
         subtotal      = 0;
@@ -208,7 +222,13 @@ $(document).ready(function() {
         2
       ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
     );
+
+    createRealSubtotal();
   }
+
+  $('#discountSum').on("DOMSubtreeModified",function(){
+    createRealSubtotal();
+  });
 
   function createTotal(id, manualDiscount = false){
     let cuantity = $(`#cuantityTo_${id}`).val(),
@@ -232,15 +252,6 @@ $(document).ready(function() {
         )}`
       );
 
-      $('#savedSubtotal').html(
-        ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "") + parseFloat(
-          $('#discountSum').html().replace('$ ', '')
-        ))).toFixed(
-          2
-        ).replace(
-          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-        )}`
-      );
     if (manualDiscount){
       let globalManual = parseFloat(
         $('#manualDiscountQuantity').html().replace(' $ ','')
