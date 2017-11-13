@@ -218,7 +218,11 @@ $(document).ready(function() {
         $('#manualDiscountQuantity').html().replace(' $ ','')
       );
       $('#manualDiscountQuantity').html(
-        ` $ ${(globalManual += discountVal).toFixed(2)}`
+        ` $ ${(globalManual += discountVal).toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
       );
     }
 
