@@ -186,7 +186,7 @@ $(document).ready(function() {
   });
 
   function bigTotal(){
-    let subTotalInput = $('table.subtotal td.subtotal:first'),
+    let subTotalInput = $('table.subtotal #SubtotalSum'),
         subtotal      = 0;
     $.each($(`td[id^=totalTo_]`), function(){
       subtotal += parseFloat(
@@ -196,6 +196,13 @@ $(document).ready(function() {
     $(subTotalInput).html(`$ ${subtotal.toFixed(
       2
     ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`);
+
+    let discount = parseFloat($('#discountSum').text().replace("$ ", ""));
+    let savedSubtotal = subtotal + discount;
+    $('table.subtotal #savedSubtotal').html(
+      `$ ${savedSubtotal.toFixed(2)}`
+    );
+
     let iva = subtotal * 0.16;
     $('table.subtotal td.subtotal.iva').html(
       `$ ${iva.toFixed(2).replace(
@@ -222,7 +229,6 @@ $(document).ready(function() {
       .html().replace(' %',''),
       discountVal = parseFloat(discount) / 100 * total,
       productTotal    = total - discountVal;
-
     if (manualDiscount){
       let globalManual = parseFloat(
         $('#manualDiscountQuantity').html().replace(' $ ','')
@@ -305,6 +311,8 @@ $(document).ready(function() {
       `$ ${createTotal(id)}`
     );
     bigTotal();
+    $('#discountRow').removeClass('hidden');
+    $('#SubtotalRow').removeClass('hidden');
   });
 
   $('#discountChange').on('shown.bs.modal', function(e) {
