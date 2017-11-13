@@ -133,7 +133,7 @@ $(document).ready(function() {
       '$ ', ''
     ).replace(',',''),
        rest = (parseFloat(total) - sum).toFixed(2);
-    if (rest < 0){
+    if (parseFloat(rest) <= 0){
       $('#paymentRest').html(
         '<strong>$ 0</strong>'
       );
@@ -318,7 +318,7 @@ $(document).ready(function() {
   });
 
   function carIcon(id){
-    return '<a href="#" data-toggle="modal"' + 
+    return '<a href="#" data-toggle="modal"' +
       'data-target="#deliveryService"' +
       `id="service_1" data-id=${id}>` +
       '<i class="fa fa-truck" aria-hidden="true"></i>' +
