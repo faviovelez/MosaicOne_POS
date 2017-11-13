@@ -18,14 +18,16 @@ function createPassword(pass){
 
 async function addUser(params){
   params.encrypted_password = createPassword(params.encrypted_password);
-  let columns = ['email', 'first_name', 'middle_name', 
+  let columns = ['email', 'first_name', 'middle_name',
     'last_name', 'encrypted_password', 'role_id'],
       data = [];
   params.role_id = 4;
   columns.forEach(attr => {
     data.push(params[attr]);
   });
+  debugger
   return insert(columns, data, 'users');
+
 }
 
 async function hasUser(){
