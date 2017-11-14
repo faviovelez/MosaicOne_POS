@@ -186,6 +186,27 @@ $(document).ready(function() {
   });
 
   function createRealSubtotal(){
+    let discount = 0;
+    $.each($(`td[id^=priceTo]`), function(){
+      let price       = parseFloat($(this).html()),
+          tr          = $(this).parent(),
+          cuantity    = parseInt($(tr).find(
+            'input[id^=cuantityTo]'
+          ).val()),
+          total       = price * cuantity,
+          discountval = parseFloat($(tr.find(
+            'a[id^=discount]'
+          ))
+          .html().replace(' %',''));
+      discount += (parseFloat(discountval) / 100 * total);
+    });
+    $('#discountSum').html(
+      ` $ ${discount.toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
+    );
 
     $('#savedSubtotal').html(
       ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "").replace(/,/g,'')) + parseFloat(
@@ -226,10 +247,6 @@ $(document).ready(function() {
     createRealSubtotal();
   }
 
-  $('#discountSum').on("DOMSubtreeModified",function(){
-    createRealSubtotal();
-  });
-
   function createTotal(id, manualDiscount = false){
     let cuantity = $(`#cuantityTo_${id}`).val(),
       price    = parseFloat(
@@ -243,14 +260,6 @@ $(document).ready(function() {
       .html().replace(' %',''),
       discountVal = parseFloat(discount) / 100 * total,
       productTotal    = total - discountVal;
-
-      $('#discountSum').html(
-        ` $ ${(parseFloat($('#discountSum').html().replace("$ ", "").replace(/,/g,'')) + discountVal).toFixed(
-          2
-        ).replace(
-          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-        )}`
-      );
 
     if (manualDiscount){
       let globalManual = parseFloat(
