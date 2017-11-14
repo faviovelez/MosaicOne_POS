@@ -41,6 +41,51 @@ async function query (q, remote = true, table = '') {
   return res;
 }
 
+
+async function toWebDatabase(){
+  let rows,
+    tablesListQuery = "SELECT table_name" +
+    " FROM information_schema.tables" +
+    " WHERE table_schema='public'" +
+    " AND table_type='BASE TABLE'";
+      tablesList = await query(tablesListQuery, false);
+  tablesList.rows.forEach(async table => {
+
+    try {
+
+      let rows = await toDayRows(table.table_name);
+      rows.rows.forEach(async register => {
+
+        delete register.id;
+        let insertQuery = await createInsert(
+          Object.keys(register),
+          Object.values(register),
+          table.table_name
+        );
+
+        await query(insertQuery);
+
+      });
+
+    } catch(err) {
+      console.log(table);
+    }
+
+
+  });
+}
+
+async function toDayRows(table){
+  let today = new Date(),
+    day   = today.getDate(),
+    month = today.getMonth() + 1,
+    year  = today.getFullYear();
+  localQuery = `SELECT * FROM ${table}` +
+    ` WHERE created_at >= '${year}-${month}-${day}'` +
+    ` AND created_at < '${year}-${month}-${day + 1}'`;
+  return await query(localQuery, false);
+}
+
 async function createInsert (columns, data, table){
   let localQuery = `INSERT INTO public.${table}(`;
   localQuery += columns.shift();
