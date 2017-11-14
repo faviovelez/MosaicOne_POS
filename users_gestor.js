@@ -37,7 +37,7 @@ async function hasUser(){
   }
 }
 
-async function loginUser(user, goTo = 'pos_sale.html'){
+async function loginUser(user, goTo = 'open_register.html'){
   initStore().then(store => {
     window.location.href = goTo;
     store.set('current_user', user);
