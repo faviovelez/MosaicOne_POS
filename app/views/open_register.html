@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="../assets/css/cash_register.css">
   <link rel="stylesheet" href="../assets/css/open_register.css">
   <link rel="stylesheet" href="../assets/css/bottom-nav.css">
+  <link rel="stylesheet" href="../vendor/assets/css/bootstrap-datetimepicker.min.css">
 </head>
 <body>
 
@@ -105,8 +106,24 @@
 
         <div class="actions">
           <input type="submit" name="commit" value="Abrir caja" class="main-button" />
+          <input type="submit" name="commit" id='closeDay' value="Cerrar Dia" class="main-button" />
         </div>
       </form>
+      <div class="field"> </br>
+          Fechas de Respaldo
+          <div class='input-group date' id='datetimepicker1'>
+            <input type='text' class="form-control" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+          <div class='input-group date' id='datetimepicker2'>
+            <input type='text' class="form-control" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+      </div>
     </div>
 
     <div class="side-img-container">
@@ -128,6 +145,14 @@
     <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+    <script src="../vendor/assets/js/moment.min.js" charset="utf-8"></script>
+    <script src="../vendor/assets/js/es.js" charset="utf-8"></script>
+    <script src="../vendor/assets/js/bootstrap-datetimepicker.js" charset="utf-8"></script>
+    <script src="../../remoteConection.js" charset="utf-8"></script>
+    <script src="../../users_gestor.js" charset="utf-8"></script>
+    <script src="../../validator.js" charset="utf-8"></script>
+    <script src="../../store.js" charset="utf-8"></script>
+    <script src="../assets/js/openRegister.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
 
