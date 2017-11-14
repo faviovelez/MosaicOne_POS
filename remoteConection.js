@@ -41,7 +41,6 @@ async function query (q, remote = true, table = '') {
   return res;
 }
 
-
 async function toWebDatabase(){
   let rows,
     tablesListQuery = "SELECT table_name" +
@@ -63,7 +62,11 @@ async function toWebDatabase(){
           table.table_name
         );
 
-        await query(insertQuery);
+        try {
+          await query(insertQuery);
+        } catch (err) {
+          console.log(table);
+        }
 
       });
 
