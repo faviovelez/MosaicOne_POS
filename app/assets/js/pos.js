@@ -185,8 +185,43 @@ $(document).ready(function() {
     $('#ticketDiscountChange').modal('toggle');
   });
 
+  function createRealSubtotal(){
+    let discount = 0;
+    $.each($(`td[id^=priceTo]`), function(){
+      let price       = parseFloat($(this).html()),
+          tr          = $(this).parent(),
+          cuantity    = parseInt($(tr).find(
+            'input[id^=cuantityTo]'
+          ).val()),
+          total       = price * cuantity,
+          discountval = parseFloat($(tr.find(
+            'a[id^=discount]'
+          ))
+          .html().replace(' %',''));
+      discount += (parseFloat(discountval) / 100 * total);
+    });
+    $('#discountSum').html(
+      ` $ ${discount.toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
+    );
+
+    $('#savedSubtotal').html(
+      ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "").replace(/,/g,'')) + parseFloat(
+          $('#discountSum').html().replace('$ ', '').replace(/,/g,'')
+        )).toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
+    );
+
+  }
+
   function bigTotal(){
-    let subTotalInput = $('table.subtotal td.subtotal:first'),
+    let subTotalInput = $('table.subtotal #SubtotalSum'),
         subtotal      = 0;
     $.each($(`td[id^=totalTo_]`), function(){
       subtotal += parseFloat(
@@ -196,6 +231,7 @@ $(document).ready(function() {
     $(subTotalInput).html(`$ ${subtotal.toFixed(
       2
     ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`);
+
     let iva = subtotal * 0.16;
     $('table.subtotal td.subtotal.iva').html(
       `$ ${iva.toFixed(2).replace(
@@ -207,6 +243,8 @@ $(document).ready(function() {
         2
       ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
     );
+
+    createRealSubtotal();
   }
 
   function createTotal(id, manualDiscount = false){
@@ -305,6 +343,8 @@ $(document).ready(function() {
       `$ ${createTotal(id)}`
     );
     bigTotal();
+    $('#discountRow').removeClass('hidden');
+    $('#SubtotalRow').removeClass('hidden');
   });
 
   $('#discountChange').on('shown.bs.modal', function(e) {

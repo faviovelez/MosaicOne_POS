@@ -713,7 +713,15 @@
           <tbody>
             <tr>
               <td> Subtotal: </td>
-              <td class="right subtotal">$ 0.0</td>
+              <td class="right subtotal" id="savedSubtotal">$ 0.0</td>
+            </tr>
+            <tr class="hidden" id="discountRow">
+              <td> Descuento: </td>
+              <td class="right discount" id="discountSum">$ 0.0</td>
+            </tr>
+            <tr class="hidden" id="SubtotalRow">
+              <td style="width: 65%"> Subtotal con descuento: </td>
+              <td class="right discount" id="SubtotalSum">$ 0.0</td>
             </tr>
             <tr>
               <td> IVA: </td>
