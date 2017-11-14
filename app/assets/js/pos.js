@@ -41,15 +41,14 @@ $(document).ready(function() {
           [inventory.rows[0].product_id, $('#addProductInput').val().replace(/_/g,''), warehouse_entry_table.rowCount],
           'warehouse_entries'
         );
-
-      data.quantity += inventory.rows[0].quantity;
-      updateBy(data, table, condition).then(product => {
-        $('#addProductQuantity tr').remove();
-      }, err => {
-        $('#addProductQuantity tr').remove();
-      });
+        data.quantity += inventory.rows[0].quantity;
+        updateBy(data, table, condition).then(product => {
+          $('#addProductQuantity tr').remove();
+        }, err => {
+          $('#addProductQuantity tr').remove();
+        });
+      })
     });
-    $('#addProductQuantity tr').remove();
   });
 
   $('#addProductSearch').click(function(){
