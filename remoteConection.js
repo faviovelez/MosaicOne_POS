@@ -63,6 +63,13 @@ async function toWebDatabase(){
         );
 
         try {
+          if (table.table_name === 'tickets') {
+            debugger
+          } else if (table.table_name === 'payments') {
+            debugger
+          } else if (table.table_name === 'store_movements') {
+            debugger
+          }
           await query(insertQuery);
         } catch (err) {
           console.log(table);
@@ -86,7 +93,14 @@ async function toDayRows(table){
   localQuery = `SELECT * FROM ${table}` +
     ` WHERE created_at >= '${year}-${month}-${day}'` +
     ` AND created_at < '${year}-${month}-${day + 1}'`;
-  return await query(localQuery, false);
+    if (table.table_name === 'tickets') {
+      debugger
+    } else if (table.table_name === 'payments') {
+      debugger
+    } else if (table.table_name === 'store_movements') {
+      debugger
+    }
+    return await query(localQuery, false);
 }
 
 async function createInsert (columns, data, table){
