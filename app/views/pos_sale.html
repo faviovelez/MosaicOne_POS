@@ -600,7 +600,7 @@
             <i class="fa fa-user-plus" aria-hidden="true"></i>
           </button>
         </span>
-        <input type="text" class="form-control" placeholder="Agregar cliente"><!-- Agregar aquí el select2 de clientes (prospects)-->
+        <input type="text" class="form-control" id='prospectsList' placeholder="Agregar cliente"><!-- Agregar aquí el select2 de clientes (prospects)-->
         <span class="input-group-btn pause-stop">
           <button class="btn btn-default space-left pos-main-btn right-edge orange-btn" type="button" data-toggle="modal" data-placement="left" title="Guardar ticket" data-target="#saveTicket">
             <i class="fa fa-pause" aria-hidden="true"></i>
@@ -615,30 +615,7 @@
       <div class="prospect-tag-container">
 
         <table class="prospect-table">
-          <tbody>
-            <tr>
-              <td class="icon-close-td">
-                <div class="close-icon" id="prospectCloseIcon">
-                  <button type="button" class="close center-close" aria-label="Close">
-                    <span aria-hidden="true" class="white-light">&times;</span>
-                  </button>
-                </div>
-              </td>
-              <td class="prospect_name">
-                Pedro Martínez
-              </td>
-              <td>
-                <select name="bill_tag" class="myfield" id="prospect_bill_tag">
-                  <option value="1">Sin factura</option>
-                  <option value="2">Facturar</option>
-                </select>
-              </td>
-              <td>
-                <a href="#" data-toggle="modal" data-target="#billCfdiUse">
-                  Detalles
-                </a>
-              </td>
-            </tr>
+          <tbody id='prospectList'>
           </tbody>
         </table>
 
@@ -1501,6 +1478,7 @@
     <script src="../../validator.js" charset="utf-8"></script>
     <script src="../../store.js" charset="utf-8"></script>
     <script src="../assets/js/pos.js" charset="utf-8"></script>
+    <script src="../assets/js/pos_customers.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
 
