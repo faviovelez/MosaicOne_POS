@@ -133,13 +133,11 @@ function lotQueries(store, call){
                   .text(current_progress + "%");
               }, err => {
               });
-
             });
           });
         });
 
       }
-
     });
 
   }
