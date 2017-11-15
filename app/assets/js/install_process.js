@@ -1,6 +1,4 @@
 $(function(){
-  const app = require('electron').app;
-
   async function initStore(){
 
     const store = new Store({
