@@ -1,15 +1,17 @@
 $(function(){
-async function initStore(){
+  const app = require('electron').app;
 
-  const store = new Store({
-    configName: 'user-localStore',
-    defaults: {
-      windowBounds: { width: 1024, height: 768 }
-    }
-  });
+  async function initStore(){
 
-  return store;
-}
+    const store = new Store({
+      configName: 'user-localStore',
+      defaults: {
+        windowBounds: { width: 1024, height: 768 }
+      }
+    });
+
+    return store;
+  }
 
   function cloneAlert(){
     let alerts = $('.alert').length + 1;
@@ -125,11 +127,15 @@ function lotQueries(store){
   $('#validateInstall').click(function(){
     $(this).prop('disabled', false);
 
-    let script = `psql -U ${process.env.DB_LOCAL_USER} ${process.env.DB_LOCAL_DB} ` +
-      `< ./tmp_files/${process.env.DB_FILE_NAME}`;
+    let basePath = process.env.PORTABLE_EXECUTABLE_DIR ? process.env.PORTABLE_EXECUTABLE_DIR : './',
+        path = `${basePath}tmp_files/${process.env.DB_FILE_NAME}`;
+
+    script = `psql -U ${process.env.DB_LOCAL_USER} ${process.env.DB_LOCAL_DB} ` +
+      `< ${path}`;
     showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;
 
+    console.log(path);
     dbRestore = exec(script,
       function(err, stdout, stderr) {
         if(err){
