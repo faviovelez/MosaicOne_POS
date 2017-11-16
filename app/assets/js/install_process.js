@@ -109,7 +109,6 @@ function lotQueries(store, call){
 
       current_progress = 8;
 
-      console.log(limit);
       for(var key in queries){
 
         query(queries[key], true, key).then(tablesResult => {
@@ -126,7 +125,7 @@ function lotQueries(store, call){
                 if (count++ === limit - 1){
                   call();
                 }
-                current_progress += (count * 92 / limit);
+                current_progress += parseInt(count * 92 / limit);
 
                 $("#dynamic")
                   .css("width", current_progress + "%")
