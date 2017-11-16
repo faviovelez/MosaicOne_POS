@@ -38,8 +38,8 @@ $(function(){
     ", inspection_approved, overprice, series, last_bill, install_code";
   }
 
-function lotQueries(store){
-    return {
+function lotQueries(store, call){
+    return call({
       'stores' : "SELECT * FROM stores " +
       `WHERE id=${store.id}`,
       'roles' : "SELECT * FROM roles " +
@@ -69,7 +69,7 @@ function lotQueries(store){
       `WHERE store_id = ${store.id}`,
       'cfdi_uses': 'SELECT * FROM cfdi_uses',
       'banks':    'SELECT * FROM banks'
-    };
+    });
   }
 
   function cloneAllTables(queries, call){
@@ -149,9 +149,13 @@ function lotQueries(store){
 
             if (store) {
               storage.set('store', store);
-              cloneAllTables(lotQueries(result.rows[0]), function(){
-                window.location.href = 'sign_up.html';
-              });
+              lotQueries(result.rows[0], function(queries){
+
+                cloneAllTables(queries, function(){
+                  window.location.href = 'sign_up.html';
+                })
+
+              })
             } else {
               showAlert('Error', 'Revisa que el código ingresado sea válido', cloneAlert());
             }
