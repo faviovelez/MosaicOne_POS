@@ -14,14 +14,14 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -3352,7 +3352,10 @@ CREATE TABLE stores (
     return_last_folio integer DEFAULT 0,
     pay_bill_last_folio integer DEFAULT 0,
     advance_e_last_folio integer DEFAULT 0,
-    advance_i_last_folio integer DEFAULT 0
+    advance_i_last_folio integer DEFAULT 0,
+    initial_inventory character varying,
+    current_inventory character varying,
+    prospects character varying
 );
 
 
@@ -8628,4 +8631,3 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 -- PostgreSQL database dump complete
 --
-

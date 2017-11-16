@@ -111,7 +111,6 @@ function lotQueries(store){
                   call();
                 }
               }, err => {
-                debugger
               });
 
             });
@@ -125,15 +124,13 @@ function lotQueries(store){
   $('#validateInstall').click(function(){
     $(this).prop('disabled', false);
 
-    let basePath = process.env.PORTABLE_EXECUTABLE_DIR ? process.env.PORTABLE_EXECUTABLE_DIR : './',
-        path = `${basePath}tmp_files/${process.env.DB_FILE_NAME}`;
+    let path = `./tmp_files/mosaiconepos.sql`;
 
-    script = `psql -U ${process.env.DB_LOCAL_USER} ${process.env.DB_LOCAL_DB} ` +
+    script = `psql -U faviovelez -d mosaiconepos ` +
       `< ${path}`;
     showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;
 
-    console.log(path);
     dbRestore = exec(script,
       function(err, stdout, stderr) {
         if(err){
@@ -152,7 +149,6 @@ function lotQueries(store){
 
             if (store) {
               storage.set('store', store);
-
               cloneAllTables(lotQueries(result.rows[0]), function(){
                 window.location.href = 'sign_up.html';
               });
