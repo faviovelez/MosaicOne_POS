@@ -1,15 +1,15 @@
 $(function(){
-async function initStore(){
+  async function initStore(){
 
-  const store = new Store({
-    configName: 'user-localStore',
-    defaults: {
-      windowBounds: { width: 1024, height: 768 }
-    }
-  });
+    const store = new Store({
+      configName: 'user-localStore',
+      defaults: {
+        windowBounds: { width: 1024, height: 768 }
+      }
+    });
 
-  return store;
-}
+    return store;
+  }
 
   function cloneAlert(){
     let alerts = $('.alert').length + 1;
@@ -38,14 +38,15 @@ async function initStore(){
     ", inspection_approved, overprice, series, last_bill, install_code";
   }
 
-function lotQueries(store){
-    return {
+function lotQueries(store, call){
+    return call({
       'stores' : "SELECT * FROM stores " +
       `WHERE id=${store.id}`,
       'roles' : "SELECT * FROM roles " +
       "WHERE name IN ('store', 'store-admin')",
       'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
       `id = ${store.delivery_address_id}`,
+      'billing_addresses': 'SELECT * FROM billing_addresses',
       'business_units': 'SELECT * FROM business_units WHERE ' +
       `id = ${store.business_unit_id}`,
       'store_types':  'SELECT * FROM store_types WHERE ' +
@@ -69,34 +70,48 @@ function lotQueries(store){
       `WHERE store_id = ${store.id}`,
       'cfdi_uses': 'SELECT * FROM cfdi_uses',
       'banks':    'SELECT * FROM banks'
-    };
+    });
   }
 
-  function cloneAllTables(queries, call){
+  function getQueryCount(store){
+    return 'SELECT SUM(rows) as total_rows FROM (' +
+      " SELECT COUNT (*) as rows FROM billing_addresses UNION ALL" +
+      ` SELECT COUNT (*) as rows FROM stores WHERE id = ${store.id} UNION ALL` +
+      " SELECT COUNT (*) as rows FROM roles WHERE name IN ('store', 'store-admin') UNION ALL" +
+      ` SELECT COUNT (*) as rows FROM delivery_addresses WHERE id = ${store.delivery_address_id} UNION ALL`+
+      ` SELECT COUNT (*) as rows FROM business_units WHERE id=${store.business_unit_id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM store_types WHERE id = ${store.store_type_id} UNION ALL`+
+      ` SELECT COUNT (*) as rows FROM cost_types WHERE id = ${store.cost_type_id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM business_groups WHERE id = ${store.business_group_id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM prospects WHERE store_id = ${store.id} UNION ALL` +
+      ' SELECT COUNT (*) as rows FROM products WHERE supplier_id IN (1,2) UNION ALL' +
+      ' SELECT COUNT (*) as rows FROM services WHERE store_id IS NULL AND shared = true UNION ALL' +
+      ` SELECT COUNT (*) as rows FROM stores_inventories WHERE store_id = ${store.id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM stores_warehouse_entries WHERE store_id = ${store.id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM store_movements WHERE store_id = ${store.id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM cash_registers WHERE store_id = ${store.id} UNION ALL` +
+      ' SELECT COUNT (*) as rows FROM cfdi_uses UNION ALL' +
+      ' SELECT COUNT (*) as rows FROM banks' +
+    ') as u';
+  }
 
-    (function(){
-      var current_progress = 0;
-      var interval = setInterval(function() {
-        current_progress += 1;
-        $("#dynamic")
-          .css("width", current_progress + "%")
-          .attr("aria-valuenow", current_progress)
-          .text(current_progress + "%");
-        if (current_progress >= 100)
-          clearInterval(interval);
-      }, 400);
-    }());
+  function cloneAllTables(queries, call, queryCount){
 
-    query(queries.business_units).then(mainResult => {
-      queries.billing_addresses = 'SELECT * FROM billing_addresses ' +
-                 `WHERE id = ${mainResult.rows[0].billing_address_id}`;
-      queriesTest = [];
+    query(queryCount).then(limitCount => {
+
       count = 0;
-      limit = 0;
+      limit = parseInt(limitCount.rows[0].total_rows);
+
+      $("#dynamic")
+        .css("width", 8 + "%")
+        .attr("aria-valuenow", 8)
+        .text(8 + "%");
+
+      current_progress = 8;
+
       for(var key in queries){
 
         query(queries[key], true, key).then(tablesResult => {
-          limit += tablesResult.rows.length;
 
           tablesResult.rows.forEach(row => {
 
@@ -107,11 +122,16 @@ function lotQueries(store){
             ).then(localQuery => {
 
               query(localQuery, false).then(result => {
-                if (count++ === limit-1){
+                if (count++ === limit - 1){
                   call();
                 }
+                current_progress += parseInt(count * 92 / limit);
+
+                $("#dynamic")
+                  .css("width", current_progress + "%")
+                  .attr("aria-valuenow", current_progress)
+                  .text(current_progress + "%");
               }, err => {
-                debugger
               });
 
             });
@@ -119,19 +139,27 @@ function lotQueries(store){
         });
 
       }
+
     });
+
   }
 
   $('#validateInstall').click(function(){
     $(this).prop('disabled', false);
 
-    let script = `psql -U ${process.env.DB_LOCAL_USER} ${process.env.DB_LOCAL_DB} ` +
-      `< ./tmp_files/${process.env.DB_FILE_NAME}`;
+    let path = `./tmp_files/mosaiconepos.sql`;
+
+    script = `psql -U faviovelez -d mosaiconepos ` +
+      `< ${path}`;
     showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;
 
     dbRestore = exec(script,
       function(err, stdout, stderr) {
+        $("#dynamic")
+          .css("width", 2 + "%")
+          .attr("aria-valuenow", 2)
+          .text(2 + "%");
         if(err){
           showAlert('Error', stderr, cloneAlert());
         }
@@ -148,9 +176,17 @@ function lotQueries(store){
 
             if (store) {
               storage.set('store', store);
+              lotQueries(result.rows[0], function(queries){
 
-              cloneAllTables(lotQueries(result.rows[0]), function(){
-                window.location.href = 'sign_up.html';
+                $("#dynamic")
+                  .css("width", 5 + "%")
+                  .attr("aria-valuenow", 5)
+                  .text(5 + "%");
+
+                cloneAllTables(queries, function(){
+                  window.location.href = 'sign_up.html';
+                }, getQueryCount(store));
+
               });
             } else {
               showAlert('Error', 'Revisa que el código ingresado sea válido', cloneAlert());
