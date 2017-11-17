@@ -195,72 +195,78 @@ $(document).ready(function() {
     initStore().then(store => {
       user = store.get('current_user').id;
       store_id = store.get('store').id;
+
+      store.set('lastTicket', parseInt(
+        $('#ticketNum').html()
+      ));
+      // agregar un find by para buscar el id de business_unit
+      window.location.reload(true);
     });
 
     // agregar un find by para buscar el id de business_unit
 
-    var sumTotalPayments = 0;
-    insert(['subtotal', 'taxes', 'total', 'tax_id', 'ticket_type', 'payments_amount', 'cash_return', 'ticket_number', user],
-      [parseFloat($('#savedSubtotal').text().replace(" $ ","").replace(",", "")),    parseFloat($('.right.subtotal.iva').text().replace("$ ", "").replace(",", "")), parseFloat($('.right.bigger.total').text().replace("$ ","").replace(",", "")), 2, 'venta', sumTotalPayments, parseFloat($('#currencyChange').text().replace("$ ", "").replace(",","")), parseInt($('#ticketNum').text().replace(" ", ""))],
-      'tickets');
+    //var sumTotalPayments = 0;
+    //insert(['subtotal', 'taxes', 'total', 'tax_id', 'ticket_type', 'payments_amount', 'cash_return', 'ticket_number', user],
+      //[parseFloat($('#savedSubtotal').text().replace(" $ ","").replace(",", "")),    parseFloat($('.right.subtotal.iva').text().replace("$ ", "").replace(",", "")), parseFloat($('.right.bigger.total').text().replace("$ ","").replace(",", "")), 2, 'venta', sumTotalPayments, parseFloat($('#currencyChange').text().replace("$ ", "").replace(",","")), parseInt($('#ticketNum').text().replace(" ", ""))],
+      //'tickets');
 
-      let p = 1;
-    $.each($('tr[id^=product_]'), function(){
-      let prodId = parseInt($(`tr[id^=product_]:nth-child(${p})`).attr('id').replace("product_", ""));
-      let unitPrice = parseFloat($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(4)').text().replace("$ ","").replace(",",""));
-      let quantity =  parseInt($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(5)').children().val());
-      discPercent =   (parseFloat($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(6)').children().text().replace(" %", "")) / 100);
+      //let p = 1;
+    //$.each($('tr[id^=product_]'), function(){
+      //let prodId = parseInt($(`tr[id^=product_]:nth-child(${p})`).attr('id').replace("product_", ""));
+      //let unitPrice = parseFloat($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(4)').text().replace("$ ","").replace(",",""));
+      //let quantity =  parseInt($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(5)').children().val());
+      //discPercent =   (parseFloat($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(6)').children().text().replace(" %", "")) / 100);
 
-      subtotal = (unitPrice * quantity);
-      final_price = (unitPrice * (1 - discPercent));
-      discount = (subtotal * discPercent);
-      taxes = ((subtotal - discount) * 0.16);
-      total = (subtotal - discount + taxes);
+      //subtotal = (unitPrice * quantity);
+      //final_price = (unitPrice * (1 - discPercent));
+      //discount = (subtotal * discPercent);
+      //taxes = ((subtotal - discount) * 0.16);
+      //total = (subtotal - discount + taxes);
 
-      fixed_subtotal = parseFloat(subtotal.toFixed(2));
-      fixed_discount = parseFloat(discount.toFixed(2));
-      fixed_taxes = parseFloat(taxes.toFixed(2));
-      fixed_total = parseFloat(total.toFixed(2));
-      insert(
-        ['product_id', 'quantity', 'initial_price', 'final_price', 'subtotal', 'taxes', 'total', 'discount_applied', 'manual_discount', 'movement_type', 'tax_id', 'automatic_discount', 'cost', 'total_cost'],
-        [prodId, quantity, unitPrice, final_price, fixed_subtotal, fixed_taxes, fixed_total, fixed_discount, fixed_discount, 'venta', 2, 0.0, 0.0, 0.0],
-        'store_movements'
-      );
-      p += 1;
-    });
-    let pa = 1;
-    // reemplazar las comas //
-    $.each($('tr[id^=paymentMethod_]'), function(){
-      let total_pay = parseFloat($(`tr[id^=paymentMethod_]:nth-child(${pa})`).children('td.right.cuantity').text().replace("$ ", "").replace(",",""));
+      //fixed_subtotal = parseFloat(subtotal.toFixed(2));
+      //fixed_discount = parseFloat(discount.toFixed(2));
+      //fixed_taxes = parseFloat(taxes.toFixed(2));
+      //fixed_total = parseFloat(total.toFixed(2));
+      //insert(
+        //['product_id', 'quantity', 'initial_price', 'final_price', 'subtotal', 'taxes', 'total', 'discount_applied', 'manual_discount', 'movement_type', 'tax_id', 'automatic_discount', 'cost', 'total_cost'],
+        //[prodId, quantity, unitPrice, final_price, fixed_subtotal, fixed_taxes, fixed_total, fixed_discount, fixed_discount, 'venta', 2, 0.0, 0.0, 0.0],
+        //'store_movements'
+      //);
+      //p += 1;
+    //});
+    //let pa = 1;
+     //reemplazar las comas //
+    //$.each($('tr[id^=paymentMethod_]'), function(){
+      //let total_pay = parseFloat($(`tr[id^=paymentMethod_]:nth-child(${pa})`).children('td.right.cuantity').text().replace("$ ", "").replace(",",""));
 
-      sumTotalPayments += total_pay;
+      //sumTotalPayments += total_pay;
 
-      let desc = $(`tr[id^=paymentMethod_]:nth-child(${pa})`).children().children().text().replace("×", "");
+      //let desc = $(`tr[id^=paymentMethod_]:nth-child(${pa})`).children().children().text().replace("×", "");
 
-      let pay_form = 0;
-      if (desc == "VentaaCrédito") {
-        pay_form_id = 21;
-      } else if (desc == "Efectivo") {
-        pay_form_id = 1;
-      } else if (desc == "Débito") {
-        pay_form_id = 18;
-      } else if (desc == "Crédito") {
-        pay_form_id = 4;
-      } else if (desc == "Cheque") {
-        pay_form_id = 2;
-      } else if (desc == "Transferencia") {
-        pay_form_id = 3;
-      } else if (desc == "Otra") {
-        pay_form_id = 21;
-      }
+      //let pay_form = 0;
+      //if (desc == "VentaaCrédito") {
+        //pay_form_id = 21;
+      //} else if (desc == "Efectivo") {
+        //pay_form_id = 1;
+      //} else if (desc == "Débito") {
+        //pay_form_id = 18;
+      //} else if (desc == "Crédito") {
+        //pay_form_id = 4;
+      //} else if (desc == "Cheque") {
+        //pay_form_id = 2;
+      //} else if (desc == "Transferencia") {
+        //pay_form_id = 3;
+      //} else if (desc == "Otra") {
+        //pay_form_id = 21;
+      //}
 
-      insert(
-        ['payment_form_id', 'total', 'payment_type'],[pay_form_id, total_pay, 'pago'], 'payments'
-      );
-      pa += 1;
+      //insert(
+        //['payment_form_id', 'total', 'payment_type'],[pay_form_id, total_pay, 'pago'], 'payments'
+      //);
+      //pa += 1;
 
-    });
-    insert(['payments_amount'], [sumTotalPayments], 'tickets');
+    //});
+    //insert(['payments_amount'], [sumTotalPayments], 'tickets');
   });
 
   function createRealSubtotal(){
@@ -495,6 +501,13 @@ $(document).ready(function() {
         createFullName(
           store.get('current_user')
         )
+      );
+
+      let lastTicket = store.get('lastTicket') ? store.get('lastTicket')
+                       : 0;
+
+      $('#ticketNum').html(
+        ` ${lastTicket + 1} `
       );
 
       $('#store').html(store.get('store').store_name);
