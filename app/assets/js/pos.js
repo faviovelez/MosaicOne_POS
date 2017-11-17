@@ -516,6 +516,10 @@ $(document).ready(function() {
         ` ${lastTicket + 1} `
       );
 
+      $('#cashRegisterNum').html(
+        ` ${store.get('cash')} `
+      );
+
       $('#store').html(store.get('store').store_name);
 
       getProductsAndServices(list => {

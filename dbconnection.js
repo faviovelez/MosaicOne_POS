@@ -122,3 +122,18 @@ async function updateBy(data, table, condition){
   localQuery += ` WHERE ${condition}`;
   return await query(localQuery);
 }
+
+async function newRegister(table){
+  let localQuery = 'SELECT column_name FROM information_schema.columns' +
+  " WHERE table_schema = 'public'" +
+  `  AND table_name   = '${table}'`;
+  let fields = await query(localQuery);
+  let fieldsArray = fields.rows.map(field => {
+    return field.column_name;
+  });
+  object = {};
+  fieldsArray.forEach(field => {
+    object[field] = '';
+  });
+  return object;
+}
