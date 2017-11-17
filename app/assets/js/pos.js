@@ -400,6 +400,12 @@ $(document).ready(function() {
         $('.stores_inventory_quantity').html(
           inventory.rows[0].quantity
         );
+        $('.stores_inventory_rack').html(
+          inventory.rows[0].rack
+        );
+        $('.stores_inventory_level').html(
+          inventory.rows[0].level
+        );
       });
     });
   });
