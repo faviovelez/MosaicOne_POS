@@ -50,6 +50,14 @@ $(function(){
     locale: 'es'
   });
 
+  $('#openCash').click(function(){
+    initStore().then(store => {
+      store.set('cash', $('#register_open_cash_register').val());
+      window.location.href = 'open_sale.html';
+      return false;
+    });
+  });
+
   $('#closeDay').click(function(){
     toWebDatabase().then(() => {
       setTimeout(function(){
