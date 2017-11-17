@@ -147,7 +147,7 @@ function lotQueries(store, call){
 
     let path = `./tmp_files/mosaiconepos.sql`;
 
-    script = `psql -U oscar -d local_db ` +
+    script = `psql -U faviovelez -d mosaiconepos ` +
       `< ${path}`;
     showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;

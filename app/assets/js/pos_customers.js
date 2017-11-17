@@ -257,22 +257,44 @@ $(function(){
 
   $('#newProspect').on('shown.bs.modal', function(e) {
     let prospectId = e.relatedTarget.dataset.id;
-    findBy('id', prospectId, 'prospects').then(prospect => {
-      prospectInfo = prospect.rows[0];
-      if (prospect.rows[0].billing_address_id) {
-        findBy('id',
-          prospect.rows[0].billing_address_id,
-          'billing_addresses'
-        ).then(billing_address => {
-          $('#prospectForm').html(
-            prospectInfoForm(prospectInfo, billing_address.rows[0])
-          );
-        });
-      }
-    });
+    if (prospectId){
+
+      findBy('id', prospectId, 'prospects').then(prospect => {
+        prospectInfo = prospect.rows[0];
+        if (prospect.rows[0].billing_address_id) {
+          findBy('id',
+            prospect.rows[0].billing_address_id,
+            'billing_addresses'
+          ).then(billing_address => {
+            $('#prospectForm').html(
+              prospectInfoForm(prospectInfo, billing_address.rows[0])
+            );
+          });
+        }
+      });
+
+    }
   });
 
   $('#prospectSave').click(function(){
+    if ($('#prospectList tr').length === 0) {
+
+      let object = {
+        value: createFullName({
+          contact_first_name:  $('#prospect_contact_first_name').val(),
+          contact_middle_name: $('#prospect_contact_middle_name').val(),
+          contact_last_name:   $('#prospect_contact_last_name').val()
+        }),
+        id: 100
+      };
+
+      $('#prospectList').append(addTr(object));
+
+      $('#prospectCloseIcon').click(function(){
+        $('#prospectList tr').remove();
+      });
+
+    }
     $('#newProspect').modal('toggle');
     return false;
   });
@@ -280,6 +302,21 @@ $(function(){
   $('#confirmProspectData').click(function(){
     $('#billCfdiUse').modal('toggle');
     return false;
+  });
+
+  $('#initAddNewProspect').click(function(){
+    $('#prospectList tr').remove();
+
+    newRegister('prospects').then(prospect => {
+      prospectInfo = prospect;
+
+      newRegister('billing_addresses').then(billing_address => {
+        $('#prospectForm').html(
+          prospectInfoForm(prospectInfo, billing_address)
+        );
+      });
+
+    });
   });
 
   function cfdiTr(billing_address){
