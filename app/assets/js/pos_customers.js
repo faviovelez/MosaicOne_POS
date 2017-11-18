@@ -361,39 +361,53 @@ $(function(){
     });
   });
 
-  function cfdiTr(billing_address){
-     return '<tr>' +
-       '<td class="center">' +
-         '<strong>' +
-           'Nombre o razón social:' +
-         '</strong>' +
-       '</td>' +
-       '<td class="center">' +
-         '<strong>' +
-           'RFC:' +
-         '</strong>' +
-       '</td>' +
-       '<td class="center">' +
-         '<strong>' +
-           'Uso de CFDI:' +
-         '</strong>' +
-       '</td>' +
-     '</tr>' +
-     '<tr>' +
-       '<td class="prospect_name center">' +
-        billing_address.business_name +
-       '</td>' +
-       '<td class="center">' +
-         billing_address.rfc +
-       '</td>' +
-       '<td colspan="2">' +
-         '<select class="prospect_business_type" name="business_type" id="prospect_cfdi_use">' +
-           '<option value="persona física">Gastos en general</option>' +
-           '<option value="persona moral">Adquisición de mercancías</option>' +
-         '</select>' +
-       '</td>' +
-     '</tr>';
+  function fillCfdiUses(call){
+    getAll('cfdi_uses').then(cfdiUses => {
+      let html = '';
+
+      cfdiUses.rows.forEach(cfdiUse => {
+        html += `<option value="${cfdiUse.id}">${cfdiUse.description}</option>`;
+      });
+
+      return call(html);
+    });
   }
+
+  function cfdiTr(billing_address, call){
+    fillCfdiUses(function(cfdiUsesOptions){
+      return call('<tr>' +
+        '<td class="center">' +
+        '<strong>' +
+        'Nombre o razón social:' +
+        '</strong>' +
+        '</td>' +
+        '<td class="center">' +
+        '<strong>' +
+        'RFC:' +
+        '</strong>' +
+        '</td>' +
+        '<td class="center">' +
+        '<strong>' +
+        'Uso de CFDI:' +
+        '</strong>' +
+        '</td>' +
+        '</tr>' +
+        '<tr>' +
+        '<td class="prospect_name center">' +
+        billing_address.business_name +
+        '</td>' +
+        '<td class="center">' +
+        billing_address.rfc +
+        '</td>' +
+        '<td colspan="2">' +
+        '<select class="prospect_business_type" style="width: 200px;" name="business_type" id="prospect_cfdi_use">' +
+        cfdiUsesOptions +
+        '</select>' +
+        '</td>' +
+        '</tr>');
+    });
+  }
+
   $('#billCfdiUse').on('shown.bs.modal', function(e) {
     let prospectId = e.relatedTarget.dataset.id;
     findBy('id', prospectId, 'prospects').then(prospect => {
@@ -403,9 +417,12 @@ $(function(){
           'billing_addresses'
         ).then(billing_address => {
           $('#cfdiProspectData tr').remove();
-          $('#cfdiProspectData').append(cfdiTr(
-            billing_address.rows[0]
-          ));
+          cfdiTr(
+            billing_address.rows[0],
+            function(tr){
+              $('#cfdiProspectData').append(tr);
+            }
+          );
         });
 
       } else {
@@ -414,7 +431,12 @@ $(function(){
           rfc          : 'AAAA999999AAA'
         };
         $('#cfdiProspectData tr').remove();
-        $('#cfdiProspectData').append(cfdiTr(dummyInfo));
+          cfdiTr(
+            dummyInfo,
+            function(tr){
+              $('#cfdiProspectData').append(tr);
+            }
+          );
       }
 
       $('#openNewProspectModal').attr('data-id', prospect.rows[0].id);
