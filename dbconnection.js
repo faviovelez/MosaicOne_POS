@@ -2,10 +2,10 @@ const {Pool} = require('pg');
 require('dotenv').config();
 
 const localPool = new Pool({
-  user: 'faviovelez',
+  user: 'oscar',
   host: 'localhost',
-  database: 'mosaiconepos',
-  password: 'bafio44741',
+  database: 'local_db',
+  password: '12345678"',
   port: 5432,
 });
 
@@ -152,9 +152,9 @@ async function getAll(table, columns = '*'){
 }
 
 async function updateBy(data, table, condition){
-  let localQuery = `UPDATE ${table} `;
+  let localQuery = `UPDATE ${table} SET`;
   for(var column in data) {
-    localQuery += `SET ${column} = '${data[column]}',`;
+    localQuery += ` ${column} = '${data[column]}',`;
   }
   localQuery = localQuery.replace(/,$/,'');
   localQuery += ` WHERE ${condition}`;

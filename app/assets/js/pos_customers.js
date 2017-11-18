@@ -266,6 +266,8 @@ $(function(){
             prospect.rows[0].billing_address_id,
             'billing_addresses'
           ).then(billing_address => {
+            $('#prospectForm').attr('data-id', `formToProspect_${prospectInfo.id}`);
+
             $('#prospectForm').html(
               prospectInfoForm(prospectInfo, billing_address.rows[0])
             );
@@ -277,6 +279,41 @@ $(function(){
   });
 
   $('#prospectSave').click(function(){
+    let prospectId = $('#prospectForm').attr('data-id').replace(/\D/g,'');
+
+    if (prospectId){
+      let data = {
+        legal_or_business_name: $('#prospect_legal_or_business_name').val(),
+        prospect_type:          $('#prospect_prospect_type').val(),
+        business_type:          $('#prospect_business_type').val(),
+        contact_first_name:     $('#prospect_contact_first_name').val(),
+        contact_middle_name:    $('#prospect_contact_middle_name').val(),
+        contact_last_name:      $('#prospect_contact_last_name').val(),
+        second_last_name:       $('#prospect_second_last_name').val(),
+        contact_position:       $('#prospect_contact_position').val(),
+        email:                  $('#prospect_email').val(),
+        direct_phone:           $('#prospect_direct_phone').val(),
+        extension:              $('#prospect_extension').val(),
+        cell_phone:             $('#prospect_cell_phone').val(),
+      };
+
+      updateBy(data, 'prospects', `id = ${prospectId}`).then(prospect => {
+        debugger
+        let data = {
+          rfc:                  $('#prospect_billing_address_rfc').val(),
+          street:               $('#prospect_billing_address_street').val(),
+          exterior_number:      $('#prospect_billing_address_exterior_number').val(),
+          interior_number:      $('#prospect_billing_address_interior_number').val(),
+          zipcode:              $('#prospect_billing_address_zipcode').val(),
+          neighborhood:         $('#prospect_billing_address_neighborhood').val(),
+          city:                 $('#prospect_billing_address_city').val(),
+          state:                $('#prospect_billing_address_state').val(),
+          country:              $('#prospect_billing_address_country').val()
+        };
+      });
+
+    }
+
     if ($('#prospectList tr').length === 0) {
 
       let object = {
@@ -311,6 +348,8 @@ $(function(){
       prospectInfo = prospect;
 
       newRegister('billing_addresses').then(billing_address => {
+        $('#prospectForm').attr('data-id', `formToProspect_${prospectInfo.id}`);
+
         $('#prospectForm').html(
           prospectInfoForm(prospectInfo, billing_address)
         );
