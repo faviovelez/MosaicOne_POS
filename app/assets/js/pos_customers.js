@@ -279,41 +279,106 @@ $(function(){
     }
   });
 
+  function getProspectData() {
+    return {
+      legal_or_business_name: $('#prospect_legal_or_business_name').val(),
+      prospect_type:          $('#prospect_prospect_type').val(),
+      business_type:          $('#prospect_business_type').val(),
+      contact_first_name:     $('#prospect_contact_first_name').val(),
+      contact_middle_name:    $('#prospect_contact_middle_name').val(),
+      contact_last_name:      $('#prospect_contact_last_name').val(),
+      second_last_name:       $('#prospect_second_last_name').val(),
+      contact_position:       $('#prospect_contact_position').val(),
+      email:                  $('#prospect_email').val(),
+      direct_phone:           $('#prospect_direct_phone').val(),
+      extension:              $('#prospect_extension').val(),
+      cell_phone:             $('#prospect_cell_phone').val(),
+    };
+  }
+
+  function getBillingAddressData(){
+    return {
+      rfc:                  $('#prospect_billing_address_rfc').val(),
+      street:               $('#prospect_billing_address_street').val(),
+      exterior_number:      $('#prospect_billing_address_exterior_number').val(),
+      interior_number:      $('#prospect_billing_address_interior_number').val(),
+      zipcode:              $('#prospect_billing_address_zipcode').val(),
+      neighborhood:         $('#prospect_billing_address_neighborhood').val(),
+      city:                 $('#prospect_billing_address_city').val(),
+      state:                $('#prospect_billing_address_state').val(),
+      country:              $('#prospect_billing_address_country').val()
+    };
+  }
+
+  function cloneAlert(){
+    let alerts = $('.alert').length + 1;
+    $('.alerts-container').prepend(
+      `<div class="alert" id="alertNo_${alerts}" hidden>` +
+      `${$('.alert').html()} </div>`
+    );
+    return $('.alert:first').attr('id');
+  }
+
+  function showAlert(type, message, alertId){
+    $(`#${alertId} span.title`).html(`${type}: ${message}`);
+    $(`#${alertId}`)
+      .show()
+      .addClass('alert-danger')
+      .removeClass('hidden');
+  }
+
+  async function checkFillAll(objects){
+    let error = false;
+    for (var key in objects) {
+      let validation = notNull(objects[key], key);
+      if (!validation.result){
+        error = true;
+        showAlert(validation.type, validation.message, cloneAlert());
+      }
+    }
+    return error;
+  }
+
+  function validateProspect(call){
+    let params = {
+      business_type:          $('#prospect_business_type').val(),
+      contact_first_name:     $('#prospect_contact_first_name').val(),
+      contact_last_name:      $('#prospect_contact_last_name').val(),
+      legal_or_business_name: $('#prospect_legal_or_business_name').val(),
+    };
+    checkFillAll(params).then(error => {
+
+      if (!error) {
+        let thisOrThatFill = thisOrThat(
+          '#prospect_direct_phone',
+          '#prospect_cell_phone'
+        );
+
+        if (!thisOrThatFill.result) {
+          showAlert(thisOrThatFill.type, thisOrThatFill.message, cloneAlert());
+          return call(false);
+        }
+        return call(true);
+      }
+    });
+  }
+
   $('#prospectSave').click(function(){
     let prospectId = $('#prospectForm').attr('data-id'),
         billing_addressId = $('#prospectForm').attr('data-billing_address-id');
 
     if (prospectId){
-      let data = {
-        legal_or_business_name: $('#prospect_legal_or_business_name').val(),
-        prospect_type:          $('#prospect_prospect_type').val(),
-        business_type:          $('#prospect_business_type').val(),
-        contact_first_name:     $('#prospect_contact_first_name').val(),
-        contact_middle_name:    $('#prospect_contact_middle_name').val(),
-        contact_last_name:      $('#prospect_contact_last_name').val(),
-        second_last_name:       $('#prospect_second_last_name').val(),
-        contact_position:       $('#prospect_contact_position').val(),
-        email:                  $('#prospect_email').val(),
-        direct_phone:           $('#prospect_direct_phone').val(),
-        extension:              $('#prospect_extension').val(),
-        cell_phone:             $('#prospect_cell_phone').val(),
-      };
 
-      updateBy(data, 'prospects', `id = ${prospectId}`).then(() => {});
+      validateProspect(function(validate){
 
-      data = {
-        rfc:                  $('#prospect_billing_address_rfc').val(),
-        street:               $('#prospect_billing_address_street').val(),
-        exterior_number:      $('#prospect_billing_address_exterior_number').val(),
-        interior_number:      $('#prospect_billing_address_interior_number').val(),
-        zipcode:              $('#prospect_billing_address_zipcode').val(),
-        neighborhood:         $('#prospect_billing_address_neighborhood').val(),
-        city:                 $('#prospect_billing_address_city').val(),
-        state:                $('#prospect_billing_address_state').val(),
-        country:              $('#prospect_billing_address_country').val()
-      };
+        if (validate){
+          updateBy(getProspectData(), 'prospects', `id = ${prospectId}`).then(() => {});
+          updateBy(getBillingAddressData(), 'billing_addresses', `id = ${billing_addressId}`).then(() => {});
+        }
 
-      updateBy(data, 'billing_addresses', `id = ${billing_addressId}`).then(() => {});
+      });
+
+
     }
 
     if ($('#prospectList tr').length === 0) {
