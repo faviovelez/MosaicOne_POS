@@ -1,5 +1,17 @@
 $(function(){
 
+  async function initStore(){
+
+    const store = new Store({
+      configName: 'user-localStore',
+      defaults: {
+        windowBounds: { width: 1024, height: 768 }
+      }
+    });
+
+    return store;
+  }
+
   function createFullName(data){
     return (`${data.contact_first_name} ` +
     `${data.contact_middle_name} ` +
@@ -298,15 +310,17 @@ $(function(){
 
   function getBillingAddressData(){
     return {
-      rfc:                  $('#prospect_billing_address_rfc').val(),
-      street:               $('#prospect_billing_address_street').val(),
-      exterior_number:      $('#prospect_billing_address_exterior_number').val(),
-      interior_number:      $('#prospect_billing_address_interior_number').val(),
-      zipcode:              $('#prospect_billing_address_zipcode').val(),
-      neighborhood:         $('#prospect_billing_address_neighborhood').val(),
-      city:                 $('#prospect_billing_address_city').val(),
-      state:                $('#prospect_billing_address_state').val(),
-      country:              $('#prospect_billing_address_country').val()
+      business_name:   $('#prospect_legal_or_business_name').val(),
+      type_of_person:  $('#prospect_business_type').val(),
+      rfc:             $('#prospect_billing_address_rfc').val(),
+      street:          $('#prospect_billing_address_street').val(),
+      exterior_number: $('#prospect_billing_address_exterior_number').val(),
+      interior_number: $('#prospect_billing_address_interior_number').val(),
+      zipcode:         $('#prospect_billing_address_zipcode').val(),
+      neighborhood:    $('#prospect_billing_address_neighborhood').val(),
+      city:            $('#prospect_billing_address_city').val(),
+      state:           $('#prospect_billing_address_state').val(),
+      country:         $('#prospect_billing_address_country').val()
     };
   }
 
@@ -339,6 +353,19 @@ $(function(){
     return error;
   }
 
+  function validateBillingAddress(call){
+    let params = {
+      type_of_person: $('#prospect_business_type').val(),
+      business_name:  $('#prospect_legal_or_business_name').val(),
+      rfc:            $('#prospect_billing_address_rfc').val(),
+    };
+    checkFillAll(params).then(error => {
+
+      return call(!error);
+
+    });
+  }
+
   function validateProspect(call){
     let params = {
       business_type:          $('#prospect_business_type').val(),
@@ -360,6 +387,42 @@ $(function(){
         }
         return call(true);
       }
+      return call(false);
+    });
+  }
+
+  function createBillingAddress(prospectId){
+    validateBillingAddress(function(validate){
+      if (validate){
+
+        let billingAddressData = getBillingAddressData();
+
+        query('SELECT MAX(id) FROM billing_addresses').then(maxId => {
+          let columns = Object.keys(billingAddressData),
+            values  = Object.values(billingAddressData);
+
+          billingAddressId = maxId.rows[0].max + 1;
+          columns.push('id');
+          values.push(billingAddressId);
+
+          insert(
+            columns,
+            values,
+            'billing_addresses'
+          ).then(billingAddress => {
+            updateBy(
+              {
+                billing_address_id: billingAddressId
+              },
+              'prospects',
+              `id = ${prospectId}`
+            );
+          });
+
+        });
+      } else {
+        showAlert('Error', 'Es posible que el prospecto no tenga datos de facturacion', cloneAlert());
+      }
     });
   }
 
@@ -367,19 +430,50 @@ $(function(){
     let prospectId = $('#prospectForm').attr('data-id'),
         billing_addressId = $('#prospectForm').attr('data-billing_address-id');
 
-    if (prospectId){
+    validateProspect(function(validate){
 
-      validateProspect(function(validate){
+      if (validate){
 
-        if (validate){
-          updateBy(getProspectData(), 'prospects', `id = ${prospectId}`).then(() => {});
-          updateBy(getBillingAddressData(), 'billing_addresses', `id = ${billing_addressId}`).then(() => {});
+        let prospectData = getProspectData();
+
+        if (prospectId){
+          updateBy(prospectData, 'prospects', `id = ${prospectId}`).then(() => {});
+          if (billing_addressId) {
+            updateBy(billingAddressData, 'billing_addresses', `id = ${billing_addressId}`).then(() => {});
+          } else {
+            createBillingAddress(prospectId);
+          }
+        } else {
+          query('SELECT MAX(id) FROM prospects').then(maxId => {
+            initStore().then(store => {
+
+              let columns = Object.keys(prospectData),
+                values  = Object.values(prospectData);
+
+              columns.push('id');
+              columns.push('business_unit_id');
+              prospectLastId = maxId.rows[0].max + 1;
+
+              values.push(prospectLastId);
+              values.push(store.get('store').business_unit_id);
+
+              insert(
+                columns,
+                values,
+                'prospects'
+              ).then(() => {
+
+                createBillingAddress(prospectLastId);
+
+              });
+
+            });
+          });
         }
 
-      });
+      }
 
-
-    }
+    });
 
     if ($('#prospectList tr').length === 0) {
 
