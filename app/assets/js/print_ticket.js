@@ -332,12 +332,16 @@ var html =
 
 win.loadURL("data:text/html;charset=utf-8," + encodeURI(html));
 
+let contents = win.webContents;
+
 function printTicket(){
   // if document is loaded start printing.
   win.webContents.on('did-finish-load', () => {
     // change true for windows testing
-    win.webContents.print({silent: true, deviceName: ''});
+    debugger
+    win.webContents.print({silent: false, deviceName: ''});
     // close window after print order.
+    debugger
     win = null;
   });
 };

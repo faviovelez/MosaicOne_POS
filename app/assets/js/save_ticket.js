@@ -17,10 +17,11 @@ function saveTicket(){
 
   p = 1;
   $.each($('tr[id^=product_]'), function(){
+
     prodId = parseInt($(`tr[id^=product_]:nth-child(${p})`).attr('id').replace("product_", ""));
     unitPrice = parseFloat($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(4)').text().replace("$ ","").replace(",",""));
     quantity = parseInt($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(5)').children().val());
-    discPercent = (parseFloat($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(6)').children( ).text().replace(" %", "")) / 100);
+    discPercent = (parseFloat($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(6)').children().text().replace(" %", "")) / 100);
 
     subtotal = (unitPrice * quantity);
     finalPrice = (unitPrice * (1 - discPercent));
@@ -32,10 +33,15 @@ function saveTicket(){
     fixedDiscount = parseFloat(discount.toFixed(2));
     fixedTaxes = parseFloat(taxes.toFixed(2));
     fixedTotal = parseFloat(total.toFixed(2));
-    insert(['product_id', 'quantity', 'initial_price', 'final_price', 'subtotal', 'taxes', 'total', 'discount_applied', 'manual_discount', 'movement_type', 'tax_id', 'automatic_discount', 'cost', 'total_cost'],
-            [prodId, quantity, unitPrice, finalPrice, fixedSubtotal, fixedTaxes, fixedTotal, fixedDiscount, fixedDiscount, 'venta', 2, 0.0, 0.0, 0.0],
-            'store_movements'
-          ).then({});
+
+    findBy('ticket_number', ticketNumber, 'tickets').then(lastTicket => {
+      debugger
+      insert(['ticket_id', 'product_id', 'quantity', 'initial_price', 'final_price', 'subtotal', 'taxes', 'total', 'discount_applied', 'manual_discount', 'movement_type', 'tax_id', 'automatic_discount', 'cost', 'total_cost'],
+              [ticketNumber, prodId, quantity, unitPrice, finalPrice, fixedSubtotal, fixedTaxes, fixedTotal, fixedDiscount, fixedDiscount, 'venta', 2, 0, 0, 0],
+              'store_movements'
+            ).then({});
+        });
+        debugger
     p += 1;
   });
 
@@ -65,21 +71,25 @@ function saveTicket(){
       } else if (desc == "Otra") {
         payFormId = 21;
       }
-      insert(['payment_form_id', 'total', 'payment_type'],
+      insert(['ticket_id', 'payment_form_id', 'total', 'payment_type'],
              [payFormId, totalPay, 'pago'],
              'payments'
-           ).then({});
+           ).then(payment => {
+             debugger
+           });
       pa += 1;
     });
-    findBy(
-            'ticket_number',
-            parseInt($('#ticketNum').text().replace(" ", "")),
-            'tickets'
-          ).then(ticketFinded => {
-                insert(
-                        'payments_amount',
-                        paymentsAmount,
-                        'tickets'
-                      ).then({});
-          });
+    payed = false;
+    if (paymentsAmount == total) {
+      payed = true;
+    };
+    findBy('ticket_number', ticketNumber, 'tickets').then(ticketFinded => {
+      debugger
+      insert(
+              ['payments_amount', 'payed']
+              [payments, payed],
+              'tickets'
+            ).then({});
+    });
+    printTicket();
 };
