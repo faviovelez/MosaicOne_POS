@@ -42,7 +42,6 @@ $(function(){
   }
 
   function prospectInfoForm(prospect, billing_address){
-    $('#legal_or_business_name').val(prospect.business_type);
     return '<h4> Datos generales </h4>' +
       '<table class="prospect-details-table">' +
       '<thead>' +
@@ -67,7 +66,7 @@ $(function(){
       '</td>' +
       '<td>' +
       '<input placeholder="Giro comercial" class="form-control round-form transparent-field" type="text" value="' +
-      clearData(prospect.business_type) +
+      clearData(prospect.prospect_type) +
       '" name="prospect[prospect_type]" id="prospect_prospect_type" />' +
       '</td>' +
       '<td>' +
@@ -284,6 +283,7 @@ $(function(){
             $('#prospectForm').html(
               prospectInfoForm(prospectInfo, billing_address.rows[0])
             );
+            $('#prospect_business_type').val(prospectInfo.business_type);
           });
         }
       });
@@ -426,6 +426,19 @@ $(function(){
     });
   }
 
+  function loadTr(object){
+    if ($('#prospectList tr').length === 0) {
+
+      $('#prospectList').append(addTr(object));
+
+      $('#prospectCloseIcon').click(function(){
+        $('#prospectList tr').remove();
+      });
+
+    }
+    $('#newProspect').modal('toggle');
+  }
+
   $('#prospectSave').click(function(){
     let prospectId = $('#prospectForm').attr('data-id'),
         billing_addressId = $('#prospectForm').attr('data-billing_address-id');
@@ -437,12 +450,21 @@ $(function(){
         let prospectData = getProspectData();
 
         if (prospectId){
+
           updateBy(prospectData, 'prospects', `id = ${prospectId}`).then(() => {});
           if (billing_addressId) {
-            updateBy(billingAddressData, 'billing_addresses', `id = ${billing_addressId}`).then(() => {});
+            updateBy(getBillingAddressData(), 'billing_addresses', `id = ${billing_addressId}`).then(() => {});
           } else {
             createBillingAddress(prospectId);
           }
+          prospectData.id = prospectId;
+          loadTr(
+            {
+              value: createFullName(prospectData),
+              id:    prospectData.id
+            }
+          );
+
         } else {
           query('SELECT MAX(id) FROM prospects').then(maxId => {
             initStore().then(store => {
@@ -464,6 +486,18 @@ $(function(){
               ).then(() => {
 
                 createBillingAddress(prospectLastId);
+                findBy(
+                  'id',
+                  prospectLastId,
+                  'prospects'
+                ).then(prospect => {
+                  loadTr(
+                    {
+                      value: createFullName(prospect.rows[0]),
+                      id:    prospect.rows[0].id
+                    }
+                  );
+                });
 
               });
 
@@ -475,25 +509,6 @@ $(function(){
 
     });
 
-    if ($('#prospectList tr').length === 0) {
-
-      let object = {
-        value: createFullName({
-          contact_first_name:  $('#prospect_contact_first_name').val(),
-          contact_middle_name: $('#prospect_contact_middle_name').val(),
-          contact_last_name:   $('#prospect_contact_last_name').val()
-        }),
-        id: 100
-      };
-
-      $('#prospectList').append(addTr(object));
-
-      $('#prospectCloseIcon').click(function(){
-        $('#prospectList tr').remove();
-      });
-
-    }
-    $('#newProspect').modal('toggle');
     return false;
   });
 

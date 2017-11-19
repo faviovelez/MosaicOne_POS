@@ -2,10 +2,10 @@ const {Pool} = require('pg');
 require('dotenv').config();
 
 const localPool = new Pool({
-  user: 'oscar',
+  user: 'faviovelez',
   host: 'localhost',
-  database: 'local_db',
-  password: '12345678"',
+  database: 'mosaiconepos',
+  password: 'bafio44741',
   port: 5432,
 });
 
