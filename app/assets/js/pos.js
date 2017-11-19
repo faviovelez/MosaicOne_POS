@@ -196,15 +196,17 @@ $(document).ready(function() {
       user = store.get('current_user').id;
       store_id = store.get('store').id;
 
-      saveTicket();
+      saveTicket(function() {
+        store.set('lastTicket', parseInt(
+          $('#ticketNum').html()
+        ));
 
-      store.set('lastTicket', parseInt(
-        $('#ticketNum').html()
-      ));
+        // agregar un find by para buscar el id de business_unit
+          window.location.reload(true);
+        });
 
-      // agregar un find by para buscar el id de business_unit
-      window.location.reload(true);
-    });
+      });
+
 
   });
 
