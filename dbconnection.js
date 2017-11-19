@@ -98,7 +98,6 @@ async function insert (columns, data, table, call){
     let storeId = store.get('store').id;
     localQuery += `, '${storeId}'`;
   }
-  debugger
   return await query(`${localQuery})`);
 }
 
