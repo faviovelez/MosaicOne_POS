@@ -26,8 +26,9 @@ $(function(){
       prospects.rows.forEach(prospect => {
         prospectObtions.push(
           {
-            value: createFullName(prospect),
-            id:    prospect.id
+            value:    createFullName(prospect),
+            showInfo: prospect.legal_or_business_name,
+            id:       prospect.id
           }
         );
       });
@@ -405,6 +406,8 @@ $(function(){
           columns.push('id');
           values.push(billingAddressId);
 
+          $('#prospectForm').attr('data-billing_address-id', billingAddressId);
+
           insert(
             columns,
             values,
@@ -439,8 +442,12 @@ $(function(){
     $('#newProspect').modal('toggle');
   }
 
+  $('#openNewProspectModal').click(function(){
+    $('#billCfdiUse').modal('toggle');
+  });
+
   $('#prospectSave').click(function(){
-    let prospectId = $('#prospectForm').attr('data-id'),
+    let prospectId        = $('#prospectForm').attr('data-id'),
         billing_addressId = $('#prospectForm').attr('data-billing_address-id');
 
     validateProspect(function(validate){
@@ -460,11 +467,12 @@ $(function(){
           prospectData.id = prospectId;
           loadTr(
             {
-              value: createFullName(prospectData),
-              id:    prospectData.id
+              showInfo: prospectData.legal_or_business_name,
+              id:       prospectData.id
             }
           );
 
+          $('#billCfdiUse').modal('toggle');
         } else {
           query('SELECT MAX(id) FROM prospects').then(maxId => {
             initStore().then(store => {
@@ -478,6 +486,8 @@ $(function(){
 
               values.push(prospectLastId);
               values.push(store.get('store').business_unit_id);
+
+              $('#prospectForm').attr('data-id', prospectLastId);
 
               insert(
                 columns,
@@ -493,8 +503,8 @@ $(function(){
                 ).then(prospect => {
                   loadTr(
                     {
-                      value: createFullName(prospect.rows[0]),
-                      id:    prospect.rows[0].id
+                      showInfo: prospect.rows[0].legal_or_business_name,
+                      id:       prospect.rows[0].id
                     }
                   );
                 });
@@ -583,7 +593,7 @@ $(function(){
   }
 
   $('#billCfdiUse').on('shown.bs.modal', function(e) {
-    let prospectId = e.relatedTarget.dataset.id;
+    let prospectId = $('a[data-target="#billCfdiUse"]').attr('data-id');
     findBy('id', prospectId, 'prospects').then(prospect => {
       if (prospect.rows[0].billing_address_id) {
         findBy('id',
@@ -627,7 +637,7 @@ $(function(){
         '</div>' +
       '</td>' +
       '<td class="prospect_name">' +
-        object.value +
+        object.showInfo +
       '</td>' +
       '<td>' +
         '<select name="bill_tag" class="myfield" id="prospect_bill_tag">' +
