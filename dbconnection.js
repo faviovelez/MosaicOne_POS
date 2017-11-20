@@ -6,7 +6,7 @@ const localPool = new Pool({
   host: 'localhost',
   database: 'mosaiconepos',
   password: 'bafio44741',
-  port: 5432,
+  port: 5432
 });
 
 const storeIdsTables = [
@@ -105,6 +105,14 @@ async function findBy(column, data, table){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
   return await query(`${localQuery}`);
+}
+
+async function getOnly(table, ids){
+  let localQuery = `SELECT * FROM ${table}` +
+      ` WHERE id IN (${ids})`;
+
+  result = await query(localQuery);
+  return result.rows;
 }
 
 async function getAll(table, columns = '*'){
