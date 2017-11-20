@@ -6,8 +6,10 @@ let win = null;
 // Create window
 win = new remote.BrowserWindow({width: 800, height: 600, show: false });
 
-var html =
-  '<!DOCTYPE html>' +
+var html = '';
+
+function initTicket(ticketInfo) {
+  return '<!DOCTYPE html>' +
   '<html lang="es">' +
   '<head>' +
     '<meta charset="UTF-8">' +
@@ -329,12 +331,15 @@ var html =
     '</table>' +
   '</body>' +
   '</html>';
+}
 
-win.loadURL("data:text/html;charset=utf-8," + encodeURI(html));
 
-let contents = win.webContents;
+function printTicket(ticketInfo){
+  win.loadURL("data:text/html;charset=utf-8," + encodeURI(initTicket(
+    ticketInfo
+  )));
 
-function printTicket(){
+  let contents = win.webContents;
   // if document is loaded start printing.
   win.webContents.on('did-finish-load', () => {
     // change true for windows testing
@@ -343,6 +348,6 @@ function printTicket(){
     // close window after print order.
     win = null;
   });
-};
+}
 
 // Print logic finishes

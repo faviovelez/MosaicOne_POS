@@ -191,21 +191,27 @@ $(document).ready(function() {
   });
 
   $('#completeSale').click(function() {
+    validateQuantity(function(hasInventory){
 
-    initStore().then(store => {
-      user = store.get('current_user').id;
-      store_id = store.get('store').id;
+      if (hasInventory){
 
-      saveTicket(function() {
-        store.set('lastTicket', parseInt(
-          $('#ticketNum').html()
-        ));
+        initStore().then(store => {
+          user = store.get('current_user').id;
+          store_id = store.get('store').id;
 
-        // agregar un find by para buscar el id de business_unit
-          window.location.reload(true);
+          saveTicket(function() {
+            store.set('lastTicket', parseInt(
+              $('#ticketNum').html()
+            ));
+
+            window.location.reload(true);
+          });
+
         });
 
-      });
+      }
+    });
+
   });
 
   function createRealSubtotal(){
