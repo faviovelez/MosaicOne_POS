@@ -1,4 +1,5 @@
-let json = {};
+let json = {},
+    tempProductId = 0;
 
 function iterateInventories(products, call){
   count = 0;
@@ -108,6 +109,7 @@ function validateQuantity (call) {
 
 function assignCost(call) {
   for (var productId in json){
+    tempProductId = productId;
     let localQuery = ' SELECT stores_warehouse_entries.product_id,' +
                      ' stores_warehouse_entries.id,' +
                      ' stores_warehouse_entries.quantity,' +
@@ -119,28 +121,14 @@ function assignCost(call) {
                      `stores_warehouse_entries.product_id = ${productId} ` + 
                      ' ORDER BY stores_warehouse_entries.id ';
     query(localQuery).then(entries => {
-      let productId       = entries.rows[0].product_id,
+      let productId       = entries.rowCount === 0 ? tempProductId :
+                            entries.rows[0].product_id,
           sellQuantity    = json[productId].sellQuantity,
           inventory       = json[productId].quantity,
           totalCost       = 0,
-          processQuantity = sellQuantity;
-
-      entries.rows.forEach(entry => {
-        let quantity  = entry.quantity,
-            cost      = entry.cost,
-            productId = entry.product_id;
-
-        if (processQuantity > quantity) {
-          totalCost += (quantity * cost);
-        } else {
-          totalCost += (processQuantity * cost);
-        }
-        processQuantity -= quantity;
-      });
-
-      let calculateCost = totalCost / sellQuantity,
-          discountType     = $('.discounts-form-wrapper button.selected')
-                         .attr('id'),
+          processQuantity = sellQuantity,
+          discountType    = $('.discounts-form-wrapper button.selected')
+                            .attr('id'),
           discountPercent = parseFloat(json[productId].discount) / 100,
           unitPrice       = json[productId].price,
           subtotal        = (unitPrice * sellQuantity),
@@ -153,32 +141,58 @@ function assignCost(call) {
             product_id         : productId,
             quantity           : sellQuantity,
             movement_type      : 'Venta',
-            initial_price      : json[productId].price,
+            initial_price      : json[productId].price.toFixed(2),
             automatic_discount : 0,
             manual_discount    : 0,
             discount_applied   : fixedDiscount,
-            final_price        : finalPrice,
+            final_price        : finalPrice.toFixed(2),
             tax_id             : 2,
             taxes              : taxes.toFixed(2),
-            cost               : calculateCost,
+            cost               : 0,
             supplier_id        : json[productId].supplier_id,
-            total_cost         : totalCost.toFixed(2),
+            total_cost         : totalCost,
             discount_reason    : json[productId].discountReason,
             total              : total.toFixed(2),
             subtotal           : subtotal.toFixed(2)
           };
 
-      if (discountType !== 'none'){
-        data[`${discountType}_discount`] = fixedDiscount;
+      if (entries.rowCount === 0) {
+        insert(
+          Object.keys(data),
+          Object.values(data),
+          'store_movements'
+        ).then(store_movemet => {
+
+        });
+      } else {
+        entries.rows.forEach(entry => {
+          let quantity  = entry.quantity,
+            cost      = entry.cost,
+            productId = entry.product_id;
+
+          if (processQuantity > quantity) {
+            totalCost += (quantity * cost);
+          } else {
+            totalCost += (processQuantity * cost);
+          }
+          processQuantity -= quantity;
+        });
+
+        data.total_cost = totalCost;
+        data.cost       = (totalCost / sellQuantity).toFixed(2);
+
+        if (discountType !== 'none'){
+          data[`${discountType}_discount`] = fixedDiscount;
+        }
+
+        insert(
+          Object.keys(data),
+          Object.values(data),
+          'store_movements'
+        ).then(store_movemet => {
+
+        });
       }
-
-      insert(
-        Object.keys(data),
-        Object.values(data),
-        'store_movements'
-      ).then(store_movemet => {
-
-      });
 
     });
 
