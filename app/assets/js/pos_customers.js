@@ -1,4 +1,5 @@
 $(function(){
+  let cfdiUseSelect = '';
 
   async function initStore(){
 
@@ -286,6 +287,15 @@ $(function(){
             );
             $('#prospect_business_type').val(prospectInfo.business_type);
           });
+        } else {
+          newRegister('billing_addresses').then(billing_address => {
+            $('#prospectForm').attr('data-id', prospectInfo.id);
+            $('#prospectForm').attr('data-billing_address-id', billing_address.id);
+
+            $('#prospectForm').html(
+              prospectInfoForm(prospectInfo, billing_address)
+            );
+          });
         }
       });
 
@@ -501,6 +511,7 @@ $(function(){
                   prospectLastId,
                   'prospects'
                 ).then(prospect => {
+                  createProspectList();
                   loadTr(
                     {
                       showInfo: prospect.rows[0].legal_or_business_name,
@@ -604,7 +615,7 @@ $(function(){
           cfdiTr(
             billing_address.rows[0],
             function(tr){
-              $('#cfdiProspectData').append(tr);
+              loadCfdiTr(tr);
             }
           );
         });
@@ -618,7 +629,7 @@ $(function(){
           cfdiTr(
             dummyInfo,
             function(tr){
-              $('#cfdiProspectData').append(tr);
+              loadCfdiTr(tr);
             }
           );
       }
@@ -627,7 +638,16 @@ $(function(){
     });
   });
 
+  function loadCfdiTr(tr){
+    $('#cfdiProspectData').append(tr);
+    $('#prospect_cfdi_use').val(cfdiUseSelect);
+    $('#prospect_cfdi_use').change(function(){
+      cfdiUseSelect = $(this).val();
+    });
+  }
+
   function addTr(object){
+    cfdiUseSelect = '';
     return '<tr>' +
       '<td class="icon-close-td">' +
         '<div class="close-icon" id="prospectCloseIcon">' +
@@ -653,20 +673,24 @@ $(function(){
     '</tr>';
   }
 
-  getProspectList(lista => {
-    $('#prospectsList').autocomplete({
-      lookup: lista,
-      lookupLimit: 10,
-      onSelect: function (suggestion) {
-        $('#prospectList tr').remove();
-        $('#prospectList').append(addTr(suggestion));
-
-        $('#prospectCloseIcon').click(function(){
+  function createProspectList() {
+    getProspectList(lista => {
+      $('#prospectsList').autocomplete({
+        lookup: lista,
+        lookupLimit: 10,
+        onSelect: function (suggestion) {
           $('#prospectList tr').remove();
-        });
+          $('#prospectList').append(addTr(suggestion));
 
-        $(this).val('');
-      }
+          $('#prospectCloseIcon').click(function(){
+            $('#prospectList tr').remove();
+          });
+
+          $(this).val('');
+        }
+      });
     });
-  });
+  }
+
+  createProspectList();
 });
