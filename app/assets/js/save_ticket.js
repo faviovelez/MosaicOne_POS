@@ -6,6 +6,8 @@ function iterateInventories(products, call){
     json[product.id].description              = product.description;
     json[product.id].exterior_color_or_design = product.exterior_color_or_design;
     json[product.id].unique_code              = product.unique_code;
+    json[product.id].supplier_id              = product.supplier_id;
+    json[product.id].price                    = product.price;
 
     findBy('product_id', product.id, 'stores_inventories').then(inventory => {
 
@@ -35,7 +37,8 @@ function createTicketProductJson(call){
     json[id] = {
       sellQuantity : $(this).find($('td input[id^=cuantityTo]')).val(),
       sellTo       : $(this).find('td[id^=totalTo]').html().replace('$ ',''),
-      discount     : $(this).find('td a[id^=discount_]').html().replace(/\s|%/g,'')
+      discount     : $(this).find('td a[id^=discount_]').html().replace(/\s|%/g,''),
+      discountReason : $(this).find('td[id^=discountReasonTo]').html()
     };
   });
 
@@ -103,23 +106,83 @@ function validateQuantity (call) {
   });
 }
 
-function assignCost() {
-  // Asigna el costo de venta (tomado del store_movement relacionado a el (o los) stores_warehouse_entry)(es) del que se está dando de baja al vender)
+function assignCost(call) {
+  for (var productId in json){
+    let localQuery = ' SELECT stores_warehouse_entries.product_id,' +
+                     ' stores_warehouse_entries.id,' +
+                     ' stores_warehouse_entries.quantity,' +
+                     ' store_movements.cost FROM ' +
+                     ' stores_warehouse_entries' +
+                     ' INNER JOIN store_movements ON' +
+                     ' stores_warehouse_entries.store_movement_id' + 
+                     ' = store_movements.id WHERE ' +
+                     `stores_warehouse_entries.product_id = ${productId} ` + 
+                     ' ORDER BY stores_warehouse_entries.id ';
+    query(localQuery).then(entries => {
+      let productId       = entries.rows[0].product_id,
+          sellQuantity    = json[productId].sellQuantity,
+          inventory       = json[productId].quantity,
+          totalCost       = 0,
+          processQuantity = sellQuantity;
 
-  query('SELECT stores_warehouse_entries.id, stores_warehouse_entries.quantity, store_movements.cost FROM stores_warehouse_entries INNER JOIN store_movements ON stores_warehouse_entries.store_movement_id = store_movements.id WHERE stores_warehouse_entries.product_id = #{prodId} ORDER BY stores_warehouse_entries.id ').then(entries => {
-    n = 0;
-    while (n < entries.rows.length) {
-      // Aquí debe ir la lógica para iterar cada store warehouse entry y crear un store_movement con el costo total de los productos vendidos:
-      //ejemplo:
-      // venta de 30 unidades de producto x, hay 50 unidades en inventario en 2 stores_warehouse_entries:
-      // warehouse_entry.id = 1, warehouse_entry.quantity = 20, warehouse_entry.store_movement.cost = 1.00
-      // warehouse_entry.id = 2, warehouse_entry.quantity = 30, warehouse_entry.store_movement.cost = 2.00
-      // El store_movement de venta debe tener como 'total_cost' = ((20 * 1.00) + (30 * 2.00)), es decir 80.0
-      // El campo 'cost' debe tener this.total_cost / this.quantity (80.0 / 50) es decir 1.60
+      entries.rows.forEach(entry => {
+        let quantity  = entry.quantity,
+            cost      = entry.cost,
+            productId = entry.product_id;
 
-      // Esta lógica se debe integrar a la función loopSales para asignar los campos 'cost' y 'total_cost'
-    }
-  });
+        if (processQuantity > quantity) {
+          totalCost += (quantity * cost);
+        } else {
+          totalCost += (processQuantity * cost);
+        }
+        processQuantity -= quantity;
+      });
+
+      let calculateCost = totalCost / sellQuantity,
+          discountType     = $('.discounts-form-wrapper button.selected')
+                         .attr('id'),
+          discountPercent = parseFloat(json[productId].discount) / 100,
+          unitPrice       = json[productId].price,
+          subtotal        = (unitPrice * sellQuantity),
+          finalPrice      = (unitPrice * (1 - discountPercent)),
+          discount        = (subtotal * discountPercent),
+          taxes           = ((subtotal - discount) * 0.16),
+          total           = (subtotal - discount + taxes),
+          fixedDiscount   = parseFloat(discount.toFixed(2)),
+          data = {
+            product_id         : productId,
+            quantity           : sellQuantity,
+            movement_type      : 'Venta',
+            initial_price      : json[productId].price,
+            automatic_discount : 0,
+            manual_discount    : 0,
+            discount_applied   : fixedDiscount,
+            final_price        : finalPrice,
+            tax_id             : 2,
+            taxes              : taxes.toFixed(2),
+            cost               : calculateCost,
+            supplier_id        : json[productId].supplier_id,
+            total_cost         : totalCost.toFixed(2),
+            discount_reason    : json[productId].discountReason,
+            total              : total.toFixed(2),
+            subtotal           : subtotal.toFixed(2)
+          };
+
+      if (discountType !== 'none'){
+        data[`${discountType}_discount`] = fixedDiscount;
+      }
+
+      insert(
+        Object.keys(data),
+        Object.values(data),
+        'store_movements'
+      ).then(store_movemet => {
+
+      });
+
+    });
+
+  }
 }
 
 function loopSales(salesCall) {

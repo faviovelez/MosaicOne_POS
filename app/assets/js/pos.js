@@ -196,15 +196,19 @@ $(document).ready(function() {
       if (hasInventory){
 
         initStore().then(store => {
-          user = store.get('current_user').id;
-          store_id = store.get('store').id;
+          let user     = store.get('current_user').id,
+              storeId  = store.get('store').id;
 
-          saveTicket(function() {
-            store.set('lastTicket', parseInt(
-              $('#ticketNum').html()
-            ));
+          assignCost(function(){
 
-            window.location.reload(true);
+            saveTicket(function() {
+              store.set('lastTicket', parseInt(
+                $('#ticketNum').html()
+              ));
+
+              window.location.reload(true);
+            });
+
           });
 
         });
@@ -365,7 +369,12 @@ $(document).ready(function() {
     let modalBody = $(this).parent().parent().find(
       '.modal-body'),
         id  = $(modalBody).attr('id').replace('discountTo_',''),
-        tr = $(`#product_${id}`);
+        tr = $(`#product_${id}`),
+        discountReason = $(tr).find('td[id^=discountReasonTo]');
+
+    if (discountReason) {
+      $(discountReason).remove();
+    }
     $(tr).append(
       `<td class='hidden' id="discountReasonTo_${id}">` +
         $(modalBody).find('#discountMotive').val() +
