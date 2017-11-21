@@ -109,9 +109,8 @@ function validateQuantity (call) {
 
 function assignCost(call) {
   for (var productId in json){
-    tempProductId = productId;
-    let localQuery = ' SELECT stores_warehouse_entries.product_id,' +
-                     ' stores_warehouse_entries.id,' +
+    let localQuery = ' SELECT stores_warehouse_entries.product_id' +
+                     ` as idIs${productId}, stores_warehouse_entries.id,` +
                      ' stores_warehouse_entries.quantity,' +
                      ' store_movements.cost FROM ' +
                      ' stores_warehouse_entries' +
@@ -121,8 +120,8 @@ function assignCost(call) {
                      `stores_warehouse_entries.product_id = ${productId} ` + 
                      ' ORDER BY stores_warehouse_entries.id ';
     query(localQuery).then(entries => {
-      let productId       = entries.rowCount === 0 ? tempProductId :
-                            entries.rows[0].product_id,
+      let productId       = entries.fields[0].name.replace(/\D/g,''),
+          discountReason  = json[productId].discountReason,
           sellQuantity    = json[productId].sellQuantity,
           inventory       = json[productId].quantity,
           totalCost       = 0,
@@ -151,10 +150,13 @@ function assignCost(call) {
             cost               : 0,
             supplier_id        : json[productId].supplier_id,
             total_cost         : totalCost,
-            discount_reason    : json[productId].discountReason,
             total              : total.toFixed(2),
             subtotal           : subtotal.toFixed(2)
           };
+
+      if (discountReason){
+        data.discount_reason = discountReason;
+      }
 
       if (entries.rowCount === 0) {
         insert(
@@ -165,20 +167,26 @@ function assignCost(call) {
 
         });
       } else {
-        entries.rows.forEach(entry => {
-          let quantity  = entry.quantity,
-            cost      = entry.cost,
-            productId = entry.product_id;
+        let BreakException = {};
+        try {
+          entries.rows.forEach(entry => {
+            let quantity  = entry.quantity,
+              cost        = entry.cost,
+              productId   = entry.product_id;
 
-          if (processQuantity > quantity) {
-            totalCost += (quantity * cost);
-          } else {
-            totalCost += (processQuantity * cost);
-          }
-          processQuantity -= quantity;
-        });
+            if (processQuantity > quantity) {
+              totalCost += (quantity * cost);
+              processQuantity -= quantity;
+            } else {
+              totalCost += (processQuantity * cost);
+              throw BreakException;
+            }
+          });
+        } catch (err){
+          if (err !== BreakException) throw e;
+        }
 
-        data.total_cost = totalCost;
+        data.total_cost = totalCost.toFixed(2);
         data.cost       = (totalCost / sellQuantity).toFixed(2);
 
         if (discountType !== 'none'){
