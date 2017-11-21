@@ -108,17 +108,19 @@ function validateQuantity (call) {
   });
 }
 
-function createWareHouseEntry(movementId, productId){
-  let data = {
-    product_id        : productId,
-    quantity          : json[productId].storeMovement.quantity,
-    store_movement_id : movementId
-  };
-  insert(
-    Object.keys(data),
-    Object.values(data),
-    'stores_warehouse_entries'
-  );
+function updateStoreInventories(productId, quantity){
+  quantity = quantity;
+
+  findBy('product_id', productId, 'stores_inventories').then(inventory => {
+    updateBy(
+      {
+        quantity: (inventory.rows[0].quantity - quantity)
+      },
+      'stores_inventories',
+      `id = ${inventory.rows[0].id}`
+    );
+  });
+
 }
 
 function createStoreMovement(data, productId){
@@ -129,10 +131,6 @@ function createStoreMovement(data, productId){
     Object.values(data),
     'store_movements'
   ).then(storeMovement => {
-    createWareHouseEntry(
-      storeMovement.lastId,
-      json[productId].storeMovement.product_id
-    );
   });
 }
 
@@ -195,13 +193,27 @@ function assignCost(call) {
           entries.rows.forEach(entry => {
             let quantity  = entry.quantity,
               cost        = entry.cost,
-              productId   = entry.product_id;
+              entryId     = entry.id;
 
-            if (processQuantity > quantity) {
+            if (processQuantity >= quantity) {
               totalCost += (quantity * cost);
+              deleteBy('stores_warehouse_entries', entryId);
+              updateStoreInventories(
+                productId, quantity
+              );
               processQuantity -= quantity;
             } else {
               totalCost += (processQuantity * cost);
+              updateStoreInventories(
+                productId, processQuantity
+              );
+              updateBy(
+                {
+                  quantity: (quantity - processQuantity)
+                },
+                'stores_warehouse_entries',
+                `id = ${entryId}`
+              );
               throw BreakException;
             }
           });

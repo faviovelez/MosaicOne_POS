@@ -161,6 +161,12 @@ async function updateBy(data, table, condition){
   return await query(localQuery);
 }
 
+async function deleteBy(table, id) {
+  let localQuery = `DELETE FROM ${table}` +
+                   ` WHERE id = ${id}`;
+  return await query(localQuery);
+}
+
 async function newRegister(table){
   let localQuery = 'SELECT column_name FROM information_schema.columns' +
   " WHERE table_schema = 'public'" +
