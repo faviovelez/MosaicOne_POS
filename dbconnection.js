@@ -52,28 +52,43 @@ async function initStore(){
   return store;
 }
 
-async function query (q) {
+async function query (q, lastId = 0) {
   const client = await localPool.connect();
   let res;
+
   try {
     await client.query('BEGIN');
     try {
       res = await client.query(q);
+      res.err = false;
       await client.query('COMMIT');
     } catch (err) {
       await client.query('ROLLBACK');
-      throw err;
+      if (err.toString().indexOf('pkey') > -1){
+        res = {
+          err : true
+        };
+      } else {
+        throw err;
+      }
     }
   } finally {
     client.release();
   }
+  if (lastId !== 0) {
+    res.lastId = lastId;
+  }
   return res;
 }
 
-async function insert (columns, data, table, call){
+async function insert (columns, data, table){
   let localQuery = `INSERT INTO public.${table}(`,
-      store;
+      store,
+      recordId;
 
+  if ($.inArray(columns, 'id') === -1) {
+    localQuery += 'id, ';
+  }
   store = await initStore();
   localQuery += columns.shift();
   columns.forEach(fieldName => {
@@ -81,9 +96,17 @@ async function insert (columns, data, table, call){
   });
 
   if ($.inArray(table, storeIdsTables) > -1) {
-    localQuery += `, created_at, updated_at, store_id) VALUES ( '${data.shift()}'`;
+    localQuery += ', created_at, updated_at, store_id)';
   } else {
-    localQuery += `, created_at, updated_at) VALUES ( '${data.shift()}'`;
+    localQuery += ', created_at, updated_at)';
+  }
+
+  if ($.inArray(columns, 'id') === -1) {
+    let lastId   = await query(`SELECT MAX(id) as id FROM ${table}`);
+    recordId = (lastId.rows[0].id + 1);
+    localQuery += ` VALUES ('${recordId}', '${data.shift()}'`;
+  } else {
+    localQuery += ` VALUES ('${data.shift()}'`;
   }
 
   data.forEach(data => {
@@ -98,7 +121,15 @@ async function insert (columns, data, table, call){
     let storeId = store.get('store').id;
     localQuery += `, '${storeId}'`;
   }
-  return await query(`${localQuery})`);
+  let queryResult = await query(`${localQuery})`, recordId);
+
+  while (queryResult.err) {
+    let newId = queryResult.lastId + 1;
+    localQuery = localQuery.replace(queryResult.lastId, newId);
+    queryResult = await query(`${localQuery})`, newId);
+  }
+
+  return queryResult;
 }
 
 async function findBy(column, data, table){

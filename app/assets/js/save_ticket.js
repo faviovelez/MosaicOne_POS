@@ -1,4 +1,4 @@
-let json = {},
+let json          = {},
     tempProductId = 0;
 
 function iterateInventories(products, call){
@@ -36,9 +36,9 @@ function createTicketProductJson(call){
       id
     );
     json[id] = {
-      sellQuantity : $(this).find($('td input[id^=cuantityTo]')).val(),
-      sellTo       : $(this).find('td[id^=totalTo]').html().replace('$ ',''),
-      discount     : $(this).find('td a[id^=discount_]').html().replace(/\s|%/g,''),
+      sellQuantity   : $(this).find($('td input[id^=cuantityTo]')).val(),
+      sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ',''),
+      discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%/g,''),
       discountReason : $(this).find('td[id^=discountReasonTo]').html()
     };
   });
@@ -79,7 +79,8 @@ function quantityMessage(call){
 }
 
 function validateQuantity (call) {
-
+  json = {};
+  $('#modalInfo').remove();
   quantityMessage(
     function(message, openModal){
      $('body').append('<div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="modalInfoLabel">' +
@@ -104,6 +105,34 @@ function validateQuantity (call) {
     }
     return call(!openModal);
 
+  });
+}
+
+function createWareHouseEntry(movementId, productId){
+  let data = {
+    product_id        : productId,
+    quantity          : json[productId].storeMovement.quantity,
+    store_movement_id : movementId
+  };
+  insert(
+    Object.keys(data),
+    Object.values(data),
+    'stores_warehouse_entries'
+  );
+}
+
+function createStoreMovement(data, productId){
+  json[productId].storeMovement = data;
+  productId = productId;
+  insert(
+    Object.keys(data),
+    Object.values(data),
+    'store_movements'
+  ).then(storeMovement => {
+    createWareHouseEntry(
+      storeMovement.lastId,
+      json[productId].storeMovement.product_id
+    );
   });
 }
 
@@ -159,13 +188,7 @@ function assignCost(call) {
       }
 
       if (entries.rowCount === 0) {
-        insert(
-          Object.keys(data),
-          Object.values(data),
-          'store_movements'
-        ).then(store_movemet => {
-
-        });
+        createStoreMovement(data, productId);
       } else {
         let BreakException = {};
         try {
@@ -192,14 +215,7 @@ function assignCost(call) {
         if (discountType !== 'none'){
           data[`${discountType}_discount`] = fixedDiscount;
         }
-
-        insert(
-          Object.keys(data),
-          Object.values(data),
-          'store_movements'
-        ).then(store_movemet => {
-
-        });
+        createStoreMovement(data, productId);
       }
 
     });
