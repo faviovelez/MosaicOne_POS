@@ -166,10 +166,10 @@ function assignCost(call) {
           data = {
             product_id         : productId,
             quantity           : sellQuantity,
-            movement_type      : 'Venta',
+            movement_type      : 'venta',
             initial_price      : json[productId].price.toFixed(2),
             automatic_discount : 0,
-            manual_discount    : 0,
+            manual_discount    : fixedDiscount,
             discount_applied   : fixedDiscount,
             final_price        : finalPrice.toFixed(2),
             tax_id             : 2,
