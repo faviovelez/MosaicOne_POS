@@ -256,7 +256,7 @@ function insertsPayments(userId, store, call) {
         'Crédito'         : 4,
         'Cheque'          : 2,
         'Transferencia'   : 3,
-        'VentaaCrédito' : 21,
+        'Venta a Crédito' : 21,
         'Otra'            : 21
         },
       data = {

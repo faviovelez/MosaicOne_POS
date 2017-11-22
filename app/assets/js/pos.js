@@ -111,6 +111,9 @@ $(document).ready(function() {
     let count = $('#paymentMethodList tr').length - 2,
         type  = $('.payment-form-wrapper .selected')
       .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
+    if (type === 'VentaaCrédito') {
+      type = 'Venta a Crédito';
+    }
     return `<tr id="paymentMethod_${count}" data-type="${type}">` +
       '<td class="flex">' +
       '<div class="close-icon">' +
