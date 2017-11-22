@@ -1,5 +1,5 @@
 let json          = {},
-    tempProductId = 0;
+    count         = 0;
 
 function iterateInventories(products, call){
   count = 0;
@@ -123,7 +123,7 @@ function updateStoreInventories(productId, quantity){
 
 }
 
-function createStoreMovement(data, productId){
+function createStoreMovement(data, productId, call){
   json[productId].storeMovement = data;
   productId = productId;
   insert(
@@ -131,10 +131,15 @@ function createStoreMovement(data, productId){
     Object.values(data),
     'store_movements'
   ).then(storeMovement => {
+    count++;
+    if (count === Object.keys(json).length){
+      call();
+    }
   });
 }
 
 function assignCost(call) {
+  count = 0;
   for (var productId in json){
     let localQuery = ' SELECT stores_warehouse_entries.product_id' +
                      ` as idIs${productId}, stores_warehouse_entries.id,` +
@@ -186,7 +191,7 @@ function assignCost(call) {
       }
 
       if (entries.rowCount === 0) {
-        createStoreMovement(data, productId);
+        createStoreMovement(data, productId, call);
       } else {
         let BreakException = {};
         try {
@@ -227,7 +232,7 @@ function assignCost(call) {
         if (discountType !== 'none'){
           data[`${discountType}_discount`] = fixedDiscount;
         }
-        createStoreMovement(data, productId);
+        createStoreMovement(data, productId, call);
       }
 
     });
@@ -235,77 +240,54 @@ function assignCost(call) {
   }
 }
 
-function loopSales(salesCall) {
-  p = 1;
-  salesFinish = $('tr[id^=product_]').length;
-  $.each($('tr[id^=product_]'), function(){
-    prodId = parseInt($(`tr[id^=product_]:nth-child(${p})`).attr('id').replace("product_", ""));
-    unitPrice = parseFloat($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(4)').text().replace("$ ","").replace(",",""));
-    quantity = parseInt($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(5)').children().val());
-    discPercent = (parseFloat($(`tr[id^=product_]:nth-child(${p})`).children('td:nth-child(6)').children().text().replace(" %", "")) / 100);
-
-    subtotal = (unitPrice * quantity);
-    finalPrice = (unitPrice * (1 - discPercent));
-    discount = (subtotal * discPercent);
-    taxes = ((subtotal - discount) * 0.16);
-    total = (subtotal - discount + taxes);
-    paymentsAmount = 0;
-
-    fixedSubtotal = parseFloat(subtotal.toFixed(2));
-    fixedDiscount = parseFloat(discount.toFixed(2));
-    fixedTaxes = parseFloat(taxes.toFixed(2));
-    fixedTotal = parseFloat(total.toFixed(2));
-    query('SELECT MAX(id) as id FROM tickets').then(maxId => {
-      insert(['ticket_id', 'product_id', 'quantity', 'initial_price', 'final_price', 'subtotal', 'taxes', 'total', 'discount_applied', 'manual_discount', 'movement_type', 'tax_id', 'automatic_discount', 'cost', 'total_cost'],
-        [maxId.rows[0].id, prodId, quantity, unitPrice, finalPrice, fixedSubtotal, fixedTaxes, fixedTotal, fixedDiscount, fixedDiscount, 'venta', 2, 0, 0, 0],
-        'store_movements'
-      ).then(() =>{
-        p += 1;
-      });
-    });
-    if (p == salesFinish) {
-      return salesCall();
-    }
-  });
+function clearDate(date){
+  let strDate = date.toString();
+  return strDate.replace(' GMT-0600 (CST)','');
 }
 
-function loopPayments(paymentCall) {
-  pa = 1;
-  paymentFinish = $('tr[id^=paymentMethod_]').length;
+function insertsPayments(userId, store, call) {
   $.each($('tr[id^=paymentMethod_]'), function(){
-    totalPay = parseFloat($(`tr[id^=paymentMethod_]:nth-child(${pa})`).children('td.right.cuantity').text().replace("$ ", "").replace(",",""));
 
-    paymentsAmount += totalPay;
-    desc = $(`tr[id^=paymentMethod_]:nth-child(${pa})`).children().children().text().replace("×", "");
+    let type        = $(this).attr('data-type'),
+        terminal    = $('#select_terminal').val(),
+        paymentJson = {
+          'Efectivo'        : 1,
+          'Débito'          : 18,
+          'Crédito'         : 4,
+          'Cheque'          : 2,
+          'Transferencia'   : 3,
+          'VentaaCrédito' : 21,
+          'Otra'            : 21
+        };
 
-    payFormId = 0;
-    if (desc == "VentaaCrédito") {
-      payFormId = 21;
-    } else if (desc == "Efectivo") {
-      payFormId = 1;
-    } else if (desc == "Débito") {
-      payFormId = 18;
-    } else if (desc == "Crédito") {
-      payFormId = 4;
-    } else if (desc == "Cheque") {
-      payFormId = 2;
-    } else if (desc == "Transferencia") {
-      payFormId = 3;
-    } else if (desc == "Otra") {
-      payFormId = 21;
-    }
-    query('SELECT MAX(id) as id FROM tickets').then(maxId => {
-      insert(['ticket_id', 'payment_form_id', 'total', 'payment_type'],
-        [maxId.rows[0].id, payFormId, totalPay, 'pago'],
+    for (var productId in json){
+      let data = {
+        payment_date     : clearDate(new Date()),
+        supplier_id      : json[productId].supplier_id,
+        user_id          : userId,
+        business_unit_id : store.business_unit_id,
+        payment_form_id  : paymentJson[type],
+        payment_type     : 'pago',
+        payment_number   : parseInt($(this).attr('id').replace(/\D/g, '')) + 1,
+        total            : $(this).find('td.cuantity').html().replace('$ ','')
+      };
+
+      if (type === 'Débito' || type === 'Crédito'){
+        data.terminal_id = $(this).find('td[id^=terminal]').html();
+      } else if (type === 'Cheque' || type === 'Transferencia') {
+        data.operation_number = $(this).find('td[id^=reference]').html();
+      } else if (type === 'VentaaCrédito') {
+        data.credit_days = $(this).find('td[id^=creditDays]').html();
+      }
+
+      insert(
+        Object.keys(data),
+        Object.values(data),
         'payments'
-      ).then(() => {
-        pa += 1;
-      });
-    });
+      ).then(() => {});
+    }
+
   });
-  if (pa == paymentFinish) {
-    return paymentCall();
-  }
 }
 
 function updateTicket(ticketCall) {

@@ -110,8 +110,8 @@ $(document).ready(function() {
   function addPaymentTr(){
     let count = $('#paymentMethodList tr').length - 2,
         type  = $('.payment-form-wrapper .selected')
-      .html().replace(/\s/g,'');
-    return `<tr id="paymentMethod_${count}">` +
+      .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
+    return `<tr id="paymentMethod_${count}" data-type="${type}">` +
       '<td class="flex">' +
       '<div class="close-icon">' +
       '<button type="button" class="close center-close"' +
@@ -123,7 +123,8 @@ $(document).ready(function() {
       `$ ${$('#paymentMethodCuantity').val().replace(
          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
        )}` +
-      '</td></tr>';
+      '</td>' +
+      '</tr>';
   }
 
   function resumePayment(){
@@ -165,8 +166,32 @@ $(document).ready(function() {
   }
 
   $('#addPayment').click(function(){
-    let count = $('#paymentMethodList tr').length - 2;
+    let count = $('#paymentMethodList tr').length - 2,
+        type  = $('.payment-form-wrapper .selected')
+      .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
+
     $('#paymentMethodList').prepend(addPaymentTr());
+
+    if (type === 'Débito' || type === 'Crédito'){
+      $(`tr[id=paymentMethod_${count}]`).append(
+        `<td id="terminal_${count}" class="hidden">${$('#select_terminal').val()}</td>`
+      );
+    }
+    if (type === 'Cheque' || type === 'Transferencia') {
+      let referenceSelector  = 'input[type=text][placeholder="Referencia bancaria"]',
+          referencia  = $(referenceSelector).val();
+      $(`tr[id=paymentMethod_${count}]`).append(
+        `<td id="reference_${count}" class="hidden">${referencia}</td>`
+      );
+    }
+    if (type === 'VentaaCrédito') {
+      let creditDaysSelector = 'input[type=text][placeholder="Ejemplo: 30 (solo número)"]',
+        creditDays         = parseInt($(creditDaysSelector).val());
+
+      $(`tr[id=paymentMethod_${count}]`).append(
+        `<td id="creditDays_${count}" class="hidden">${creditDays}</td>`
+      );
+    }
     $('#paymentMethodCuantity').val('');
 
     $(`#closeTr_${count}`).click(function(){
@@ -196,17 +221,22 @@ $(document).ready(function() {
       if (hasInventory){
 
         initStore().then(store => {
-          let user     = store.get('current_user').id,
-              storeId  = store.get('store').id;
+          let user        = store.get('current_user').id,
+              storeObject = store.get('store'),
+              storeId     = store.id;
 
           assignCost(function(){
 
-            saveTicket(function() {
-              store.set('lastTicket', parseInt(
-                $('#ticketNum').html()
-              ));
+            insertsPayments(user, storeObject, function(){
 
-              window.location.reload(true);
+              saveTicket(function() {
+                store.set('lastTicket', parseInt(
+                  $('#ticketNum').html()
+                ));
+
+                window.location.reload(true);
+              });
+
             });
 
           });
