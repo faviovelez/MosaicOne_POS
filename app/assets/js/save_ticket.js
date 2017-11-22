@@ -251,41 +251,37 @@ function insertsPayments(userId, store, call) {
     let type        = $(this).attr('data-type'),
         terminal    = $('#select_terminal').val(),
         paymentJson = {
-          'Efectivo'        : 1,
-          'Débito'          : 18,
-          'Crédito'         : 4,
-          'Cheque'          : 2,
-          'Transferencia'   : 3,
-          'VentaaCrédito' : 21,
-          'Otra'            : 21
-        };
+        'Efectivo'        : 1,
+        'Débito'          : 18,
+        'Crédito'         : 4,
+        'Cheque'          : 2,
+        'Transferencia'   : 3,
+        'VentaaCrédito' : 21,
+        'Otra'            : 21
+        },
+      data = {
+      payment_date     : clearDate(new Date()),
+      user_id          : userId,
+      business_unit_id : store.business_unit_id,
+      payment_form_id  : paymentJson[type],
+      payment_type     : 'pago',
+      payment_number   : parseInt($(this).attr('id').replace(/\D/g, '')) + 1,
+      total            : $(this).find('td.cuantity').html().replace('$ ','').replace(/,/g,'')
+    };
 
-    for (var productId in json){
-      let data = {
-        payment_date     : clearDate(new Date()),
-        supplier_id      : json[productId].supplier_id,
-        user_id          : userId,
-        business_unit_id : store.business_unit_id,
-        payment_form_id  : paymentJson[type],
-        payment_type     : 'pago',
-        payment_number   : parseInt($(this).attr('id').replace(/\D/g, '')) + 1,
-        total            : $(this).find('td.cuantity').html().replace('$ ','')
-      };
-
-      if (type === 'Débito' || type === 'Crédito'){
-        data.terminal_id = $(this).find('td[id^=terminal]').html();
-      } else if (type === 'Cheque' || type === 'Transferencia') {
-        data.operation_number = $(this).find('td[id^=reference]').html();
-      } else if (type === 'VentaaCrédito') {
-        data.credit_days = $(this).find('td[id^=creditDays]').html();
-      }
-
-      insert(
-        Object.keys(data),
-        Object.values(data),
-        'payments'
-      ).then(() => {});
+    if (type === 'Débito' || type === 'Crédito'){
+      data.terminal_id = $(this).find('td[id^=terminal]').html();
+    } else if (type === 'Cheque' || type === 'Transferencia') {
+      data.operation_number = $(this).find('td[id^=reference]').html();
+    } else if (type === 'VentaaCrédito') {
+      data.credit_days = $(this).find('td[id^=creditDays]').html();
     }
+
+    insert(
+      Object.keys(data),
+      Object.values(data),
+      'payments'
+    ).then(() => {});
 
   });
 }
