@@ -294,20 +294,20 @@
           <input name="utf8" type="hidden" value="&#x2713;" />
           <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
 
-          <select name="bank_options" class="myfield" id="bank_select">
-            <option value="1">Banamex</option>
-            <option value="2">Santander</option>
-          </select>
+          <label for="terminal_name">Nombre de la terminal</label><br>
+          <input placeholder="Ejemplo: 79864516" class="form-control round-form transparent-field" type="text" value="" name="terminal_number" id="terminal_name" />
           <br /><br />
 
-          <label for="new_cash_deposit">Número de afiliación</label><br>
+          <label for="new_terminal_number">Número de afiliación</label><br>
           <input placeholder="Ejemplo: 79864516" class="form-control round-form transparent-field" type="text" value="" name="terminal_number" id="new_terminal_number" />
 
-          <label for="new_cash_deposit">Comisión</label><br>
-          <input placeholder="Ejemplo: 3.6%" class="form-control round-form transparent-field" type="text" value="" name="terminal_number" id="new_terminal_number" />
+          <label for="credit_comission">Comisión Tarjeta Credito</label><br>
+          <input placeholder="Ejemplo: 3.6%" class="form-control round-form transparent-field" type="text" value="" name="terminal_number" id="credit_comission" />
+          <label for="debit_comission">Comisión Tarjeta Debito</label><br>
+          <input placeholder="Ejemplo: 3.6%" class="form-control round-form transparent-field" type="text" value="" name="terminal_number" id="debit_comission" />
 
           <div class="actions">
-            <input type="submit" name="commit" value="Agregar terminal" class="main-button" />
+            <input type="submit" name="commit" value="Agregar terminal" class="main-button" id="addTerminalSave" />
           </div>
 
         </form>
@@ -414,7 +414,10 @@
   <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
   <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
   <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+  <script src="../../dbconnection.js" charset="utf-8"></script>
   <script src="../assets/js/options.js" charset="utf-8"></script>
+  <script src="../../validator.js" charset="utf-8"></script>
+  <script src="../../store.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
 

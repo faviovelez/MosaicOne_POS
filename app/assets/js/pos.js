@@ -168,7 +168,9 @@ $(document).ready(function() {
   $('#addPayment').click(function(){
     let count = $('#paymentMethodList tr').length - 2,
         type  = $('.payment-form-wrapper .selected')
-      .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
+      .html().replace(/\s/g,'').replace(/.*<\/i>/,''),
+      referenceSelector  = 'input[type=text][placeholder="Referencia bancaria"]',
+      creditDaysSelector = 'input[type=text][placeholder="Ejemplo: 30 (solo número)"]';
 
     $('#paymentMethodList').prepend(addPaymentTr());
 
@@ -178,14 +180,12 @@ $(document).ready(function() {
       );
     }
     if (type === 'Cheque' || type === 'Transferencia') {
-      let referenceSelector  = 'input[type=text][placeholder="Referencia bancaria"]',
           referencia  = $(referenceSelector).val();
       $(`tr[id=paymentMethod_${count}]`).append(
         `<td id="reference_${count}" class="hidden">${referencia}</td>`
       );
     }
     if (type === 'VentaaCrédito') {
-      let creditDaysSelector = 'input[type=text][placeholder="Ejemplo: 30 (solo número)"]',
         creditDays         = parseInt($(creditDaysSelector).val());
 
       $(`tr[id=paymentMethod_${count}]`).append(
@@ -193,6 +193,8 @@ $(document).ready(function() {
       );
     }
     $('#paymentMethodCuantity').val('');
+    $(referenceSelector).val('');
+    $(creditDaysSelector).val('');
 
     $(`#closeTr_${count}`).click(function(){
       $(`tr[id=paymentMethod_${count}]`).remove();
@@ -505,6 +507,14 @@ $(document).ready(function() {
       );
 
       $('#store').html(store.get('store').store_name);
+
+      getAll('terminals').then(terminals => {
+        terminals.rows.forEach(terminal => {
+          $('#select_terminal').append(
+            `<option value="${terminal.id}">${terminal.name}</option>`
+          );
+        });
+      });
 
       getProductsAndServices(list => {
         $('#mainProductSearch').autocomplete({
