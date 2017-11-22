@@ -273,7 +273,7 @@ function insertsPayments(userId, store, call) {
       data.terminal_id = $(this).find('td[id^=terminal]').html();
     } else if (type === 'Cheque' || type === 'Transferencia') {
       data.operation_number = $(this).find('td[id^=reference]').html();
-    } else if (type === 'VentaaCrédito') {
+    } else if (type === 'Venta a Crédito') {
       data.credit_days = $(this).find('td[id^=creditDays]').html();
     }
 
