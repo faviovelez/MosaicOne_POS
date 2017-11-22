@@ -138,7 +138,36 @@ function createStoreMovement(data, productId, call){
   });
 }
 
-function assignCost(call) {
+function insertTicket(userId, call){
+  let data = {
+    user_id       : userId,
+    subtotal      : $('#savedSubtotal').html().replace(/\s|\$/g,''),
+    tax_id        : 2,
+    taxes         : $('.subtotal.iva').html().replace(/\s|\$/g,''),
+    total         : $('.bigger.total').html().replace(/\s|\$/g,''),
+    ticket_type   : 'venta',
+    ticket_number : parseInt($('#ticketNum').html()),
+    comments      : $('input[placeholder=Comentarios]').val(),
+    payments_amount : $('#sumPayments').html(),
+    cash_return     : $('#currencyChange strong').html().replace(/\s|\$/g,''),
+    payed           : 'FALSE'
+  };
+
+  if ($('#prospectList a').length === 1) {
+    let prospectId   = $('#prospectList a').attr('data-id');
+    data.prospect_id = prospectId;
+  }
+
+  insert(
+    Object.keys(data),
+    Object.values(data),
+    'tickets'
+  ).then(ticket => {
+    call(ticket.lastId);
+  });
+}
+
+function assignCost(ticketId, call) {
   count = 0;
   for (var productId in json){
     let localQuery = ' SELECT stores_warehouse_entries.product_id' +
@@ -149,7 +178,7 @@ function assignCost(call) {
                      ' INNER JOIN store_movements ON' +
                      ' stores_warehouse_entries.store_movement_id' + 
                      ' = store_movements.id WHERE ' +
-                     `stores_warehouse_entries.product_id = ${productId} ` + 
+                     `stores_warehouse_entries.product_id = ${productId} ` +
                      ' ORDER BY stores_warehouse_entries.id ';
     query(localQuery).then(entries => {
       let productId       = entries.fields[0].name.replace(/\D/g,''),
@@ -172,6 +201,7 @@ function assignCost(call) {
             product_id         : productId,
             quantity           : sellQuantity,
             movement_type      : 'venta',
+            ticket_id          : ticketId,
             initial_price      : json[productId].price.toFixed(2),
             automatic_discount : 0,
             manual_discount    : fixedDiscount,
@@ -245,7 +275,10 @@ function clearDate(date){
   return strDate.replace(' GMT-0600 (CST)','');
 }
 
-function insertsPayments(userId, store, call) {
+function insertsPayments(ticketId, userId, store, call) {
+  limit = $('tr[id^=paymentMethod_]').length;
+  count = 0;
+
   $.each($('tr[id^=paymentMethod_]'), function(){
 
     let type        = $(this).attr('data-type'),
@@ -265,6 +298,7 @@ function insertsPayments(userId, store, call) {
       business_unit_id : store.business_unit_id,
       payment_form_id  : paymentJson[type],
       payment_type     : 'pago',
+      ticket_id        : ticketId,
       payment_number   : parseInt($(this).attr('id').replace(/\D/g, '')) + 1,
       total            : $(this).find('td.cuantity').html().replace('$ ','').replace(/,/g,'')
     };
@@ -281,7 +315,12 @@ function insertsPayments(userId, store, call) {
       Object.keys(data),
       Object.values(data),
       'payments'
-    ).then(() => {});
+    ).then(() => {
+      count++;
+      if (limit === count){
+        return call();
+      }
+    });
 
   });
 }

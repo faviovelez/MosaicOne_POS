@@ -142,6 +142,7 @@ $(document).ready(function() {
       '$ ', ''
     ).replace(',',''),
        rest = (parseFloat(total) - sum).toFixed(2);
+    $('#sumPayments').html(sum);
     if (parseFloat(rest) <= 0){
       $('#paymentRest').html(
         '<strong>$ 0</strong>'
@@ -230,16 +231,18 @@ $(document).ready(function() {
               storeObject = store.get('store'),
               storeId     = store.id;
 
-          assignCost(function(){
+          insertTicket(user, function(ticketId){
 
-            insertsPayments(user, storeObject, function(){
+            assignCost(ticketId, function(){
 
-              saveTicket(function() {
+              insertsPayments(ticketId, user, storeObject, function(){
+
                 store.set('lastTicket', parseInt(
                   $('#ticketNum').html()
                 ));
 
                 window.location.reload(true);
+
               });
 
             });
