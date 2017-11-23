@@ -110,8 +110,11 @@ $(document).ready(function() {
   function addPaymentTr(){
     let count = $('#paymentMethodList tr').length - 2,
         type  = $('.payment-form-wrapper .selected')
-      .html().replace(/\s/g,'');
-    return `<tr id="paymentMethod_${count}">` +
+      .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
+    if (type === 'VentaaCrédito') {
+      type = 'Venta a Crédito';
+    }
+    return `<tr id="paymentMethod_${count}" data-type="${type}">` +
       '<td class="flex">' +
       '<div class="close-icon">' +
       '<button type="button" class="close center-close"' +
@@ -123,7 +126,8 @@ $(document).ready(function() {
       `$ ${$('#paymentMethodCuantity').val().replace(
          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
        )}` +
-      '</td></tr>';
+      '</td>' +
+      '</tr>';
   }
 
   function resumePayment(){
@@ -138,6 +142,7 @@ $(document).ready(function() {
       '$ ', ''
     ).replace(',',''),
        rest = (parseFloat(total) - sum).toFixed(2);
+    $('#sumPayments').html(sum);
     if (parseFloat(rest) <= 0){
       $('#paymentRest').html(
         '<strong>$ 0</strong>'
@@ -165,9 +170,35 @@ $(document).ready(function() {
   }
 
   $('#addPayment').click(function(){
-    let count = $('#paymentMethodList tr').length - 2;
+    let count = $('#paymentMethodList tr').length - 2,
+        type  = $('.payment-form-wrapper .selected')
+      .html().replace(/\s/g,'').replace(/.*<\/i>/,''),
+      referenceSelector  = 'input[type=text][placeholder="Referencia bancaria"]',
+      creditDaysSelector = 'input[type=text][placeholder="Ejemplo: 30 (solo número)"]';
+
     $('#paymentMethodList').prepend(addPaymentTr());
+
+    if (type === 'Débito' || type === 'Crédito'){
+      $(`tr[id=paymentMethod_${count}]`).append(
+        `<td id="terminal_${count}" class="hidden">${$('#select_terminal').val()}</td>`
+      );
+    }
+    if (type === 'Cheque' || type === 'Transferencia') {
+          referencia  = $(referenceSelector).val();
+      $(`tr[id=paymentMethod_${count}]`).append(
+        `<td id="reference_${count}" class="hidden">${referencia}</td>`
+      );
+    }
+    if (type === 'VentaaCrédito') {
+        creditDays         = parseInt($(creditDaysSelector).val());
+
+      $(`tr[id=paymentMethod_${count}]`).append(
+        `<td id="creditDays_${count}" class="hidden">${creditDays}</td>`
+      );
+    }
     $('#paymentMethodCuantity').val('');
+    $(referenceSelector).val('');
+    $(creditDaysSelector).val('');
 
     $(`#closeTr_${count}`).click(function(){
       $(`tr[id=paymentMethod_${count}]`).remove();
@@ -196,15 +227,26 @@ $(document).ready(function() {
       if (hasInventory){
 
         initStore().then(store => {
-          user = store.get('current_user').id;
-          store_id = store.get('store').id;
+          let user        = store.get('current_user').id,
+              storeObject = store.get('store'),
+              storeId     = store.id;
 
-          saveTicket(function() {
-            store.set('lastTicket', parseInt(
-              $('#ticketNum').html()
-            ));
+          insertTicket(user, function(ticketId){
 
-            window.location.reload(true);
+            assignCost(ticketId, function(){
+
+              insertsPayments(ticketId, user, storeObject, function(){
+
+                store.set('lastTicket', parseInt(
+                  $('#ticketNum').html()
+                ));
+
+                window.location.reload(true);
+
+              });
+
+            });
+
           });
 
         });
@@ -365,7 +407,12 @@ $(document).ready(function() {
     let modalBody = $(this).parent().parent().find(
       '.modal-body'),
         id  = $(modalBody).attr('id').replace('discountTo_',''),
-        tr = $(`#product_${id}`);
+        tr = $(`#product_${id}`),
+        discountReason = $(tr).find('td[id^=discountReasonTo]');
+
+    if (discountReason) {
+      $(discountReason).remove();
+    }
     $(tr).append(
       `<td class='hidden' id="discountReasonTo_${id}">` +
         $(modalBody).find('#discountMotive').val() +
@@ -466,6 +513,14 @@ $(document).ready(function() {
       );
 
       $('#store').html(store.get('store').store_name);
+
+      getAll('terminals').then(terminals => {
+        terminals.rows.forEach(terminal => {
+          $('#select_terminal').append(
+            `<option value="${terminal.id}">${terminal.name}</option>`
+          );
+        });
+      });
 
       getProductsAndServices(list => {
         $('#mainProductSearch').autocomplete({

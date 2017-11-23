@@ -25,7 +25,7 @@ async function addUser(params){
   columns.forEach(attr => {
     data.push(params[attr]);
   });
-  debugger
+
   return insert(columns, data, 'users');
 
 }

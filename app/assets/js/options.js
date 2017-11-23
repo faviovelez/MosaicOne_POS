@@ -1,4 +1,56 @@
 $(document).ready(function() {
+  async function initStore(){
+
+    const store = new Store({
+      configName: 'user-localStore',
+      defaults: {
+        windowBounds: { width: 1024, height: 768 }
+      }
+    });
+
+    return store;
+  }
+
+  function createFullName(user){
+    return `${user.first_name} ${user.middle_name} ${user.last_name}`;
+  }
+
+  (function setInitialValues(){
+    initStore().then(store => {
+      $('#username').html(
+        '<i class="fa fa-user-circle-o bigger-icon"' +
+        'aria-hidden="true"></i> ' +
+        'Bienvenido, ' +
+        createFullName(
+          store.get('current_user')
+        )
+      );
+
+      $('#store').html(store.get('store').store_name);
+    });
+  })();
+
+  $('#addTerminalSave').click(function(){
+    let data = {
+      name             : $('#terminal_name').val(),
+      number           : $('#new_terminal_number').val(),
+      debit_comission  : $('#debit_comission').val(),
+      credit_comission : $('#credit_comission').val()
+    };
+
+    insert(
+      Object.keys(data),
+      Object.values(data),
+      'terminals'
+    ).then(() => {
+      $('#terminal_name').val('');
+      $('#new_terminal_number').val('');
+      $('#debit_comission').val('');
+      $('#credit_comission').val('');
+    });
+
+    return false;
+  });
 
   $("#cashAlert").click(function () {
     $(this).addClass('active-list');
