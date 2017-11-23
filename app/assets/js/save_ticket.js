@@ -145,7 +145,6 @@ function setPayedLogic(data){
         realPayment           =  data.payments_amount - creditPaymentQuantity;
     if (realPayment <= data.total) {
       data.payed = false;
-      data.ticket_type = 'credito';
       data.payments_amount = realPayment;
     }
   }
@@ -294,29 +293,29 @@ function insertsPayments(ticketId, userId, store, call) {
   limit = $('tr[id^=paymentMethod_]').length;
   count = 0;
 
-  $.each($('tr[id^=paymentMethod_]'), function(){
+  $.each($('tr[id^=paymentMethod_]'), function(index){
 
     let type        = $(this).attr('data-type'),
         terminal    = $('#select_terminal').val(),
         paymentJson = {
-        'Efectivo'        : 1,
-        'Débito'          : 18,
-        'Crédito'         : 4,
-        'Cheque'          : 2,
-        'Transferencia'   : 3,
-        'Venta a Crédito' : 21,
-        'Otra'            : 21
+          'Efectivo'        : 1,
+          'Débito'          : 18,
+          'Crédito'         : 4,
+          'Cheque'          : 2,
+          'Transferencia'   : 3,
+          'Venta a Crédito' : 21,
+          'Otra'            : 21
         },
-      data = {
-      payment_date     : clearDate(new Date()),
-      user_id          : userId,
-      business_unit_id : store.business_unit_id,
-      payment_form_id  : paymentJson[type],
-      payment_type     : 'pago',
-      ticket_id        : ticketId,
-      payment_number   : count + 1,
-      total            : $(this).find('td.cuantity').html().replace('$ ','').replace(/,/g,'')
-    };
+        data = {
+          payment_date     : clearDate(new Date()),
+          user_id          : userId,
+          business_unit_id : store.business_unit_id,
+          payment_form_id  : paymentJson[type],
+          payment_type     : 'pago',
+          ticket_id        : ticketId,
+          payment_number   : (index + 1),
+          total            : $(this).find('td.cuantity').html().replace('$ ','').replace(/,/g,'')
+        };
 
     if (type === 'Débito' || type === 'Crédito'){
       data.terminal_id = $(this).find('td[id^=terminal]').html();
@@ -324,6 +323,7 @@ function insertsPayments(ticketId, userId, store, call) {
       data.operation_number = $(this).find('td[id^=reference]').html();
     } else if (type === 'Venta a Crédito') {
       data.credit_days = $(this).find('td[id^=creditDays]').html();
+      data.payment_type = 'credito';
     }
 
     insert(
@@ -338,53 +338,4 @@ function insertsPayments(ticketId, userId, store, call) {
     });
 
   });
-}
-
-function updateTicket(ticketCall) {
-  payed = false;
-  if (paymentsAmount == total) {
-    payed = true;
-  }
-  query('SELECT MAX(id) as id FROM tickets').then(maxId => {
-    let id = maxId.rows[0].id,
-      table = 'tickets',
-      condition = `id = ${id}`,
-      data = {
-        'payments_amount': paymentsAmount,
-        'payed': payed,
-      };
-    findBy('id', id, 'tickets').then(() => {
-      updateBy(data, table, condition).then(() =>{
-      });
-    });
-  });
-  return ticketCall();
-}
-
-function saveTicket(call){
-  subtotal = parseFloat($('#savedSubtotal').text().replace(" $ ","").replace(",", ""));
-  taxes = parseFloat($('.right.subtotal.iva').text().replace("$ ", "").replace(",", ""));
-  total = parseFloat($('.right.bigger.total').text().replace("$ ","").replace(",", ""));
-  taxId = 2;
-  ticketType = 'venta';
-  paymentsAmount = 0;
-  cashReturn = parseFloat($('#currencyChange').text().replace("$ ", "").replace(",",""));
-  ticketNumber = parseInt($('#ticketNum').text().replace(" ", ""));
-
-  insert(['subtotal', 'taxes', 'total', 'tax_id', 'ticket_type', 'payments_amount',
-    'cash_return','ticket_number', 'user_id'],
-    [subtotal, taxes, total, taxId, ticketType, paymentsAmount,
-      cashReturn, ticketNumber, user],
-    'tickets'
-  ).then(() => {
-    loopPayments(function () {
-      updateTicket(function () {
-        loopSales(function () {
-          printTicket();
-          return call();
-        });
-      });
-    });
-  });
-
 }
