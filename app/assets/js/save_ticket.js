@@ -138,6 +138,19 @@ function createStoreMovement(data, productId, call){
   });
 }
 
+function setPayedLogic(data){
+  let creditPaymentSelector = 'tr[id^=paymentMethod][data-type="Venta a Crédito"]';
+  if ($(creditPaymentSelector).length > 0){
+    let creditPaymentQuantity = $(creditPaymentSelector).find('td.cuantity').html().replace(/\s|\$|,/,''),
+        realPayment           =  data.payments_amount - creditPaymentQuantity;
+    if (realPayment <= data.total) {
+      data.payed = false;
+      data.ticket_type = 'credito';
+      data.payments_amount = realPayment;
+    }
+  }
+}
+
 function insertTicket(userId, call){
   let data = {
     user_id       : userId,
@@ -146,13 +159,14 @@ function insertTicket(userId, call){
     taxes         : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
     total         : $('.bigger.total').html().replace(/\s|\$|,/g,''),
     ticket_type   : 'venta',
+    payed         : true,
     ticket_number : parseInt($('#ticketNum').html()),
     comments      : $('input[placeholder=Comentarios]').val(),
     payments_amount : $('#sumPayments').html(),
     cash_return     : $('#currencyChange strong').html().replace(/\s|\$/g,''),
   };
 
-  data.payed = parseFloat(data.total) <= parseFloat(data.payments_amount);
+  setPayedLogic(data);
 
   if ($('#prospectList a').length === 1) {
     let prospectId   = $('#prospectList a').attr('data-id');
