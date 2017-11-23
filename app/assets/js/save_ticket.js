@@ -141,10 +141,10 @@ function createStoreMovement(data, productId, call){
 function insertTicket(userId, call){
   let data = {
     user_id       : userId,
-    subtotal      : $('#savedSubtotal').html().replace(/\s|\$/g,''),
+    subtotal      : $('#savedSubtotal').html().replace(/\s|\$|,/g,''),
     tax_id        : 2,
-    taxes         : $('.subtotal.iva').html().replace(/\s|\$/g,''),
-    total         : $('.bigger.total').html().replace(/\s|\$/g,''),
+    taxes         : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
+    total         : $('.bigger.total').html().replace(/\s|\$|,/g,''),
     ticket_type   : 'venta',
     ticket_number : parseInt($('#ticketNum').html()),
     comments      : $('input[placeholder=Comentarios]').val(),
@@ -152,6 +152,8 @@ function insertTicket(userId, call){
     cash_return     : $('#currencyChange strong').html().replace(/\s|\$/g,''),
     payed           : 'FALSE'
   };
+
+  debugger
 
   if ($('#prospectList a').length === 1) {
     let prospectId   = $('#prospectList a').attr('data-id');
