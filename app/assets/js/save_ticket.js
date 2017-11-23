@@ -37,8 +37,8 @@ function createTicketProductJson(call){
     );
     json[id] = {
       sellQuantity   : $(this).find($('td input[id^=cuantityTo]')).val(),
-      sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ',''),
-      discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%/g,''),
+      sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,''),
+      discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,''),
       discountReason : $(this).find('td[id^=discountReasonTo]').html()
     };
   });
@@ -162,7 +162,7 @@ function insertTicket(userId, call){
     ticket_number : parseInt($('#ticketNum').html()),
     comments      : $('input[placeholder=Comentarios]').val(),
     payments_amount : $('#sumPayments').html(),
-    cash_return     : $('#currencyChange strong').html().replace(/\s|\$/g,''),
+    cash_return     : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
   };
 
   setPayedLogic(data);
@@ -323,7 +323,7 @@ function insertsPayments(ticketId, userId, store, call) {
       data.operation_number = $(this).find('td[id^=reference]').html();
     } else if (type === 'Venta a Crédito') {
       data.credit_days = $(this).find('td[id^=creditDays]').html();
-      data.payment_type = 'credito';
+      data.payment_type = 'crédito';
     }
 
     insert(
