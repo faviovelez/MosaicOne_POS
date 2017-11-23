@@ -150,10 +150,9 @@ function insertTicket(userId, call){
     comments      : $('input[placeholder=Comentarios]').val(),
     payments_amount : $('#sumPayments').html(),
     cash_return     : $('#currencyChange strong').html().replace(/\s|\$/g,''),
-    payed           : 'FALSE'
   };
 
-  debugger
+  data.payed = parseFloat(data.total) <= parseFloat(data.payments_amount);
 
   if ($('#prospectList a').length === 1) {
     let prospectId   = $('#prospectList a').attr('data-id');
@@ -301,7 +300,7 @@ function insertsPayments(ticketId, userId, store, call) {
       payment_form_id  : paymentJson[type],
       payment_type     : 'pago',
       ticket_id        : ticketId,
-      payment_number   : parseInt($(this).attr('id').replace(/\D/g, '')) + 1,
+      payment_number   : count + 1,
       total            : $(this).find('td.cuantity').html().replace('$ ','').replace(/,/g,'')
     };
 
