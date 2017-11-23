@@ -27,7 +27,7 @@ $(function(){
       prospects.rows.forEach(prospect => {
         prospectObtions.push(
           {
-            value:    createFullName(prospect),
+            value:    prospect.legal_or_business_name,
             showInfo: prospect.legal_or_business_name,
             id:       prospect.id
           }
@@ -413,8 +413,6 @@ $(function(){
             values  = Object.values(billingAddressData);
 
           billingAddressId = maxId.rows[0].max + 1;
-          columns.push('id');
-          values.push(billingAddressId);
 
           $('#prospectForm').attr('data-billing_address-id', billingAddressId);
 
@@ -490,11 +488,9 @@ $(function(){
               let columns = Object.keys(prospectData),
                 values  = Object.values(prospectData);
 
-              columns.push('id');
               columns.push('business_unit_id');
               prospectLastId = maxId.rows[0].max + 1;
 
-              values.push(prospectLastId);
               values.push(store.get('store').business_unit_id);
 
               $('#prospectForm').attr('data-id', prospectLastId);
