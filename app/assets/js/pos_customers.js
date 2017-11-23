@@ -302,8 +302,17 @@ $(function(){
     }
   });
 
+  function removeEmpty(object){
+    for (var key in object){
+      if (object[key] === ''){
+        debugger
+        delete object[key];
+      }
+    }
+  }
+
   function getProspectData() {
-    return {
+    return removeEmpty({
       legal_or_business_name: $('#prospect_legal_or_business_name').val(),
       prospect_type:          $('#prospect_prospect_type').val(),
       business_type:          $('#prospect_business_type').val(),
@@ -316,11 +325,11 @@ $(function(){
       direct_phone:           $('#prospect_direct_phone').val(),
       extension:              $('#prospect_extension').val(),
       cell_phone:             $('#prospect_cell_phone').val(),
-    };
+    });
   }
 
   function getBillingAddressData(){
-    return {
+    return removeEmpty({
       business_name:   $('#prospect_legal_or_business_name').val(),
       type_of_person:  $('#prospect_business_type').val(),
       rfc:             $('#prospect_billing_address_rfc').val(),
@@ -332,7 +341,7 @@ $(function(){
       city:            $('#prospect_billing_address_city').val(),
       state:           $('#prospect_billing_address_state').val(),
       country:         $('#prospect_billing_address_country').val()
-    };
+    });
   }
 
   function cloneAlert(){
