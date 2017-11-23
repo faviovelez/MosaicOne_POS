@@ -163,9 +163,14 @@ function insertTicket(userId, call){
     comments      : $('input[placeholder=Comentarios]').val(),
     payments_amount : $('#sumPayments').html(),
     cash_return     : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
+    cfdi_use_id     : $('#prospect_cfdi_use').val()
   };
 
   setPayedLogic(data);
+
+  if (typeof data.cfdi_use_id === 'undefined') {
+    delete data.cfdi_use_id;
+  }
 
   if ($('#prospectList a').length === 1) {
     let prospectId   = $('#prospectList a').attr('data-id');
