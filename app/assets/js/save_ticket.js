@@ -141,7 +141,7 @@ function createStoreMovement(data, productId, call){
 function setPayedLogic(data){
   let creditPaymentSelector = 'tr[id^=paymentMethod][data-type="Venta a Crédito"]';
   if ($(creditPaymentSelector).length > 0){
-    let creditPaymentQuantity = $(creditPaymentSelector).find('td.cuantity').html().replace(/\s|\$|,/,''),
+    let creditPaymentQuantity = $(creditPaymentSelector).find('td.cuantity').html().replace(/\s|\$|,/g,''),
         realPayment           =  data.payments_amount - creditPaymentQuantity;
     if (realPayment <= data.total) {
       data.payed = false;
