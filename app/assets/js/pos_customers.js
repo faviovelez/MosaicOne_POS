@@ -305,10 +305,10 @@ $(function(){
   function removeEmpty(object){
     for (var key in object){
       if (object[key] === ''){
-        debugger
         delete object[key];
       }
     }
+    return object;
   }
 
   function getProspectData() {
