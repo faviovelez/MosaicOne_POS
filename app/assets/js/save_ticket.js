@@ -251,7 +251,7 @@ function assignCost(ticketId, call) {
 
             if (processQuantity >= quantity) {
               totalCost += (quantity * cost);
-              deleteBy('stores_warehouse_entries', entryId);
+              deleteBy('stores_warehouse_entries', `id = ${entryId}`);
               updateStoreInventories(
                 productId, quantity
               );

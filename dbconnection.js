@@ -164,9 +164,9 @@ async function updateBy(data, table, condition){
   return await query(localQuery);
 }
 
-async function deleteBy(table, id) {
+async function deleteBy(table, condition) {
   let localQuery = `DELETE FROM ${table}` +
-                   ` WHERE id = ${id}`;
+                   ` WHERE ${condition}`;
   return await query(localQuery);
 }
 

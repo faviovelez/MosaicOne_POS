@@ -1,11 +1,25 @@
 $(function(){
+  $('#cancelTicket').on('shown.bs.modal', function(e) {
+    let ticketId = e.relatedTarget.dataset.id;
+    $('#ticketCancelConfirm').attr('data-id', ticketId);
+  });
+
+  $('#ticketCancelConfirm').click(function(){
+    let ticketId = $(this).attr('data-id');
+
+    deleteBy('store_movements', `ticket_id = ${ticketId}`).then(() => {});
+    deleteBy('payments', `ticket_id = ${ticketId}`).then(() => {});
+    deleteBy('tickets', `id = ${ticketId}`).then(() => {});
+    $(`#ticket${ticketId}`).remove();
+    $('#cancelTicket').modal('hide');
+  });
 
   function createFullName(user){
     return `${user.first_name} ${user.middle_name} ${user.last_name}`;
   }
 
   function savedTicketTr(ticket){
-      return `<tr ="ticket${ticket.id}"><td> ${ticket.id} </td>` +
+      return `<tr id="ticket${ticket.id}"><td> ${ticket.id} </td>` +
       `'<td> ${ticket.date} </td>` +
       `<td> ${ticket.time} </td>` +
       `<td> ${ticket.products} </td>` +
