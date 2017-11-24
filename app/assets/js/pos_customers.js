@@ -498,9 +498,11 @@ $(function(){
                 values  = Object.values(prospectData);
 
               columns.push('business_unit_id');
+              columns.push('business_group_id');
               prospectLastId = maxId.rows[0].max + 1;
 
               values.push(store.get('store').business_unit_id);
+              values.push(store.get('store').business_group_id);
 
               $('#prospectForm').attr('data-id', prospectLastId);
 
