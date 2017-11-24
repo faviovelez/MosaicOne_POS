@@ -48,3 +48,16 @@ function size(size, min) {
     }
   );
 }
+
+function thisOrThat(thisSelector, thatSelector){
+  let thisName = i18nEsMx()[thisSelector.replace('#', '')],
+      thatName = i18nEsMx()[thatSelector.replace('#', '')];
+
+  return evalue(
+    $(thisSelector).val() !== '' || $(thatSelector).val() !== '',
+    {
+      true:  `Sí tiene ${thisName} o ${thatName}`,
+      false: `Favor de llenar ${thisName} o ${thatName}`
+    }
+  );
+}

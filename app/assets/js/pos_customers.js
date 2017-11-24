@@ -1,4 +1,17 @@
 $(function(){
+  let cfdiUseSelect = '';
+
+  async function initStore(){
+
+    const store = new Store({
+      configName: 'user-localStore',
+      defaults: {
+        windowBounds: { width: 1024, height: 768 }
+      }
+    });
+
+    return store;
+  }
 
   function createFullName(data){
     return (`${data.contact_first_name} ` +
@@ -14,8 +27,9 @@ $(function(){
       prospects.rows.forEach(prospect => {
         prospectObtions.push(
           {
-            value: createFullName(prospect),
-            id:    prospect.id
+            value:    prospect.legal_or_business_name,
+            showInfo: prospect.legal_or_business_name,
+            id:       prospect.id
           }
         );
       });
@@ -30,7 +44,6 @@ $(function(){
   }
 
   function prospectInfoForm(prospect, billing_address){
-    $('#legal_or_business_name').val(prospect.business_type);
     return '<h4> Datos generales </h4>' +
       '<table class="prospect-details-table">' +
       '<thead>' +
@@ -55,7 +68,7 @@ $(function(){
       '</td>' +
       '<td>' +
       '<input placeholder="Giro comercial" class="form-control round-form transparent-field" type="text" value="' +
-      clearData(prospect.business_type) +
+      clearData(prospect.prospect_type) +
       '" name="prospect[prospect_type]" id="prospect_prospect_type" />' +
       '</td>' +
       '<td>' +
@@ -266,8 +279,21 @@ $(function(){
             prospect.rows[0].billing_address_id,
             'billing_addresses'
           ).then(billing_address => {
+            $('#prospectForm').attr('data-id', prospectInfo.id);
+            $('#prospectForm').attr('data-billing_address-id', billing_address.rows[0].id);
+
             $('#prospectForm').html(
               prospectInfoForm(prospectInfo, billing_address.rows[0])
+            );
+            $('#prospect_business_type').val(prospectInfo.business_type);
+          });
+        } else {
+          newRegister('billing_addresses').then(billing_address => {
+            $('#prospectForm').attr('data-id', prospectInfo.id);
+            $('#prospectForm').attr('data-billing_address-id', billing_address.id);
+
+            $('#prospectForm').html(
+              prospectInfoForm(prospectInfo, billing_address)
             );
           });
         }
@@ -276,17 +302,152 @@ $(function(){
     }
   });
 
-  $('#prospectSave').click(function(){
-    if ($('#prospectList tr').length === 0) {
+  function removeEmpty(object){
+    for (var key in object){
+      if (object[key] === ''){
+        delete object[key];
+      }
+    }
+    return object;
+  }
 
-      let object = {
-        value: createFullName({
-          contact_first_name:  $('#prospect_contact_first_name').val(),
-          contact_middle_name: $('#prospect_contact_middle_name').val(),
-          contact_last_name:   $('#prospect_contact_last_name').val()
-        }),
-        id: 100
-      };
+  function getProspectData() {
+    return removeEmpty({
+      legal_or_business_name: $('#prospect_legal_or_business_name').val(),
+      prospect_type:          $('#prospect_prospect_type').val(),
+      business_type:          $('#prospect_business_type').val(),
+      contact_first_name:     $('#prospect_contact_first_name').val(),
+      contact_middle_name:    $('#prospect_contact_middle_name').val(),
+      contact_last_name:      $('#prospect_contact_last_name').val(),
+      second_last_name:       $('#prospect_second_last_name').val(),
+      contact_position:       $('#prospect_contact_position').val(),
+      email:                  $('#prospect_email').val(),
+      direct_phone:           $('#prospect_direct_phone').val(),
+      extension:              $('#prospect_extension').val(),
+      cell_phone:             $('#prospect_cell_phone').val(),
+    });
+  }
+
+  function getBillingAddressData(){
+    return removeEmpty({
+      business_name:   $('#prospect_legal_or_business_name').val(),
+      type_of_person:  $('#prospect_business_type').val(),
+      rfc:             $('#prospect_billing_address_rfc').val(),
+      street:          $('#prospect_billing_address_street').val(),
+      exterior_number: $('#prospect_billing_address_exterior_number').val(),
+      interior_number: $('#prospect_billing_address_interior_number').val(),
+      zipcode:         $('#prospect_billing_address_zipcode').val(),
+      neighborhood:    $('#prospect_billing_address_neighborhood').val(),
+      city:            $('#prospect_billing_address_city').val(),
+      state:           $('#prospect_billing_address_state').val(),
+      country:         $('#prospect_billing_address_country').val()
+    });
+  }
+
+  function cloneAlert(){
+    let alerts = $('.alert').length + 1;
+    $('.alerts-container').prepend(
+      `<div class="alert" id="alertNo_${alerts}" hidden>` +
+      `${$('.alert').html()} </div>`
+    );
+    return $('.alert:first').attr('id');
+  }
+
+  function showAlert(type, message, alertId){
+    $(`#${alertId} span.title`).html(`${type}: ${message}`);
+    $(`#${alertId}`)
+      .show()
+      .addClass('alert-danger')
+      .removeClass('hidden');
+  }
+
+  async function checkFillAll(objects){
+    let error = false;
+    for (var key in objects) {
+      let validation = notNull(objects[key], key);
+      if (!validation.result){
+        error = true;
+        showAlert(validation.type, validation.message, cloneAlert());
+      }
+    }
+    return error;
+  }
+
+  function validateBillingAddress(call){
+    let params = {
+      type_of_person: $('#prospect_business_type').val(),
+      business_name:  $('#prospect_legal_or_business_name').val(),
+      rfc:            $('#prospect_billing_address_rfc').val(),
+    };
+    checkFillAll(params).then(error => {
+
+      return call(!error);
+
+    });
+  }
+
+  function validateProspect(call){
+    let params = {
+      business_type:          $('#prospect_business_type').val(),
+      contact_first_name:     $('#prospect_contact_first_name').val(),
+      contact_last_name:      $('#prospect_contact_last_name').val(),
+      legal_or_business_name: $('#prospect_legal_or_business_name').val(),
+    };
+    checkFillAll(params).then(error => {
+
+      if (!error) {
+        let thisOrThatFill = thisOrThat(
+          '#prospect_direct_phone',
+          '#prospect_cell_phone'
+        );
+
+        if (!thisOrThatFill.result) {
+          showAlert(thisOrThatFill.type, thisOrThatFill.message, cloneAlert());
+          return call(false);
+        }
+        return call(true);
+      }
+      return call(false);
+    });
+  }
+
+  function createBillingAddress(prospectId){
+    validateBillingAddress(function(validate){
+      if (validate){
+
+        let billingAddressData = getBillingAddressData();
+
+        query('SELECT MAX(id) FROM billing_addresses').then(maxId => {
+          let columns = Object.keys(billingAddressData),
+            values  = Object.values(billingAddressData);
+
+          billingAddressId = maxId.rows[0].max + 1;
+
+          $('#prospectForm').attr('data-billing_address-id', billingAddressId);
+
+          insert(
+            columns,
+            values,
+            'billing_addresses'
+          ).then(billingAddress => {
+            updateBy(
+              {
+                billing_address_id: billingAddressId
+              },
+              'prospects',
+              `id = ${prospectId}`
+            );
+          });
+
+        });
+      } else {
+        showAlert('Error', 'Es posible que el prospecto no tenga datos de facturacion', cloneAlert());
+      }
+    });
+  }
+
+  function loadTr(object){
+    if ($('#prospectList tr').length === 0) {
 
       $('#prospectList').append(addTr(object));
 
@@ -296,6 +457,86 @@ $(function(){
 
     }
     $('#newProspect').modal('toggle');
+  }
+
+  $('#openNewProspectModal').click(function(){
+    $('#billCfdiUse').modal('toggle');
+  });
+
+  $('#prospectSave').click(function(){
+    let prospectId        = $('#prospectForm').attr('data-id'),
+        billing_addressId = $('#prospectForm').attr('data-billing_address-id');
+
+    validateProspect(function(validate){
+
+      if (validate){
+
+        let prospectData = getProspectData();
+
+        if (prospectId){
+
+          updateBy(prospectData, 'prospects', `id = ${prospectId}`).then(() => {});
+          if (billing_addressId) {
+            updateBy(getBillingAddressData(), 'billing_addresses', `id = ${billing_addressId}`).then(() => {});
+          } else {
+            createBillingAddress(prospectId);
+          }
+          prospectData.id = prospectId;
+          loadTr(
+            {
+              showInfo: prospectData.legal_or_business_name,
+              id:       prospectData.id
+            }
+          );
+
+          $('#billCfdiUse').modal('toggle');
+        } else {
+          query('SELECT MAX(id) FROM prospects').then(maxId => {
+            initStore().then(store => {
+
+              let columns = Object.keys(prospectData),
+                values  = Object.values(prospectData);
+
+              columns.push('business_unit_id');
+              columns.push('business_group_id');
+              prospectLastId = maxId.rows[0].max + 1;
+
+              values.push(store.get('store').business_unit_id);
+              values.push(store.get('store').business_group_id);
+
+              $('#prospectForm').attr('data-id', prospectLastId);
+
+              insert(
+                columns,
+                values,
+                'prospects'
+              ).then(() => {
+
+                createBillingAddress(prospectLastId);
+                findBy(
+                  'id',
+                  prospectLastId,
+                  'prospects'
+                ).then(prospect => {
+                  createProspectList();
+                  loadTr(
+                    {
+                      showInfo: prospect.rows[0].legal_or_business_name,
+                      id:       prospect.rows[0].id
+                    }
+                  );
+                });
+
+              });
+
+            });
+          });
+        }
+
+      }
+
+    });
+
     return false;
   });
 
@@ -311,6 +552,9 @@ $(function(){
       prospectInfo = prospect;
 
       newRegister('billing_addresses').then(billing_address => {
+        $('#prospectForm').attr('data-id', prospectInfo.id);
+        $('#prospectForm').attr('data-billing_address-id', billing_address.id);
+
         $('#prospectForm').html(
           prospectInfoForm(prospectInfo, billing_address)
         );
@@ -319,41 +563,55 @@ $(function(){
     });
   });
 
-  function cfdiTr(billing_address){
-     return '<tr>' +
-       '<td class="center">' +
-         '<strong>' +
-           'Nombre o razón social:' +
-         '</strong>' +
-       '</td>' +
-       '<td class="center">' +
-         '<strong>' +
-           'RFC:' +
-         '</strong>' +
-       '</td>' +
-       '<td class="center">' +
-         '<strong>' +
-           'Uso de CFDI:' +
-         '</strong>' +
-       '</td>' +
-     '</tr>' +
-     '<tr>' +
-       '<td class="prospect_name center">' +
-        billing_address.business_name +
-       '</td>' +
-       '<td class="center">' +
-         billing_address.rfc +
-       '</td>' +
-       '<td colspan="2">' +
-         '<select class="prospect_business_type" name="business_type" id="prospect_cfdi_use">' +
-           '<option value="persona física">Gastos en general</option>' +
-           '<option value="persona moral">Adquisición de mercancías</option>' +
-         '</select>' +
-       '</td>' +
-     '</tr>';
+  function fillCfdiUses(call){
+    getAll('cfdi_uses').then(cfdiUses => {
+      let html = '';
+
+      cfdiUses.rows.forEach(cfdiUse => {
+        html += `<option value="${cfdiUse.id}">${cfdiUse.description}</option>`;
+      });
+
+      return call(html);
+    });
   }
+
+  function cfdiTr(billing_address, call){
+    fillCfdiUses(function(cfdiUsesOptions){
+      return call('<tr>' +
+        '<td class="center">' +
+        '<strong>' +
+        'Nombre o razón social:' +
+        '</strong>' +
+        '</td>' +
+        '<td class="center">' +
+        '<strong>' +
+        'RFC:' +
+        '</strong>' +
+        '</td>' +
+        '<td class="center">' +
+        '<strong>' +
+        'Uso de CFDI:' +
+        '</strong>' +
+        '</td>' +
+        '</tr>' +
+        '<tr>' +
+        '<td class="prospect_name center">' +
+        billing_address.business_name +
+        '</td>' +
+        '<td class="center">' +
+        billing_address.rfc +
+        '</td>' +
+        '<td colspan="2">' +
+        '<select class="prospect_business_type" style="width: 200px;" name="business_type" id="prospect_cfdi_use">' +
+        cfdiUsesOptions +
+        '</select>' +
+        '</td>' +
+        '</tr>');
+    });
+  }
+
   $('#billCfdiUse').on('shown.bs.modal', function(e) {
-    let prospectId = e.relatedTarget.dataset.id;
+    let prospectId = $('a[data-target="#billCfdiUse"]').attr('data-id');
     findBy('id', prospectId, 'prospects').then(prospect => {
       if (prospect.rows[0].billing_address_id) {
         findBy('id',
@@ -361,9 +619,12 @@ $(function(){
           'billing_addresses'
         ).then(billing_address => {
           $('#cfdiProspectData tr').remove();
-          $('#cfdiProspectData').append(cfdiTr(
-            billing_address.rows[0]
-          ));
+          cfdiTr(
+            billing_address.rows[0],
+            function(tr){
+              loadCfdiTr(tr);
+            }
+          );
         });
 
       } else {
@@ -372,14 +633,28 @@ $(function(){
           rfc          : 'AAAA999999AAA'
         };
         $('#cfdiProspectData tr').remove();
-        $('#cfdiProspectData').append(cfdiTr(dummyInfo));
+          cfdiTr(
+            dummyInfo,
+            function(tr){
+              loadCfdiTr(tr);
+            }
+          );
       }
 
       $('#openNewProspectModal').attr('data-id', prospect.rows[0].id);
     });
   });
 
+  function loadCfdiTr(tr){
+    $('#cfdiProspectData').append(tr);
+    $('#prospect_cfdi_use').val(cfdiUseSelect);
+    $('#prospect_cfdi_use').change(function(){
+      cfdiUseSelect = $(this).val();
+    });
+  }
+
   function addTr(object){
+    cfdiUseSelect = '';
     return '<tr>' +
       '<td class="icon-close-td">' +
         '<div class="close-icon" id="prospectCloseIcon">' +
@@ -389,7 +664,7 @@ $(function(){
         '</div>' +
       '</td>' +
       '<td class="prospect_name">' +
-        object.value +
+        object.showInfo +
       '</td>' +
       '<td>' +
         '<select name="bill_tag" class="myfield" id="prospect_bill_tag">' +
@@ -405,20 +680,24 @@ $(function(){
     '</tr>';
   }
 
-  getProspectList(lista => {
-    $('#prospectsList').autocomplete({
-      lookup: lista,
-      lookupLimit: 10,
-      onSelect: function (suggestion) {
-        $('#prospectList tr').remove();
-        $('#prospectList').append(addTr(suggestion));
-
-        $('#prospectCloseIcon').click(function(){
+  function createProspectList() {
+    getProspectList(lista => {
+      $('#prospectsList').autocomplete({
+        lookup: lista,
+        lookupLimit: 10,
+        onSelect: function (suggestion) {
           $('#prospectList tr').remove();
-        });
+          $('#prospectList').append(addTr(suggestion));
 
-        $(this).val('');
-      }
+          $('#prospectCloseIcon').click(function(){
+            $('#prospectList tr').remove();
+          });
+
+          $(this).val('');
+        }
+      });
     });
-  });
+  }
+
+  createProspectList();
 });

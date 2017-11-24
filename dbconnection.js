@@ -152,9 +152,9 @@ async function getAll(table, columns = '*'){
 }
 
 async function updateBy(data, table, condition){
-  let localQuery = `UPDATE ${table} `;
+  let localQuery = `UPDATE ${table} SET`;
   for(var column in data) {
-    localQuery += `SET ${column} = '${data[column]}',`;
+    localQuery += ` ${column} = '${data[column]}',`;
   }
   localQuery = localQuery.replace(/,$/,'');
   localQuery += ` WHERE ${condition}`;
