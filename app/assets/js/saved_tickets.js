@@ -76,7 +76,6 @@ $(function(){
       ticketId,
       'store_movements'
     ).then(storeMovements => {
-      limit = storeMovements.rowCount;
       json[
         ticketId
       ].products = storeMovements.rowCount;
@@ -85,14 +84,13 @@ $(function(){
       ].pieces = 0;
 
       storeMovements.rows.forEach(storeMovement => {
-
         json[
           ticketId
         ].pieces += storeMovement.quantity;
-
       });
 
-      call();
+      return call();
+
     });
   }
 
@@ -114,15 +112,17 @@ $(function(){
         call();
       });
     } else {
-      call();
+      return call();
     }
   }
 
   if ($('#savedTicketsList').length === 1) {
 
     (function loadTickets(call){
+      count = 0;
       json = {};
       getAll('tickets', '*', "ticket_type = 'pending'").then(tickets => {
+        limit = tickets.rowCount;
         tickets.rows.forEach(ticket => {
           let ticketId = ticket.id;
           initStore().then(store => {
@@ -141,7 +141,10 @@ $(function(){
 
             setStoreMovementsData(ticketId, function(){
               setProspectData(ticket.prospect_id, ticketId, function(){
-                call();
+                count++;
+                if (limit === count){
+                  call();
+                }
               });
             });
 
@@ -152,7 +155,6 @@ $(function(){
       });
     })(function(){
       for (var key in json){
-        debugger
         $('#savedTicketsList').append(savedTicketTr(json[key]));
       }
     });
