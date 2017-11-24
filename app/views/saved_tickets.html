@@ -96,76 +96,7 @@
           <th> Acciones </th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td> 147 </td>
-          <td> 01/10/2017 </td>
-          <td> 04:20 pm </td>
-          <td> 4 </td>
-          <td> 8 </td>
-          <td> María Antonieta </td>
-          <td class="right"> $ 1,007.00 </td>
-          <td> Favio Velez </td>
-          <td> Facturar cuando llegue pedido 456 </td>
-          <td>
-            <span class="input-group-btn">
-              <button class="btn btn-default space-left pos-main-btn right-edge green-btn" type="button" data-toggle="modal" data-placement="left" title="Reactivar ticket" data-target="#activateTicket">
-                <i class="fa fa-play" aria-hidden="true"></i>
-              </button>
-            </span>
-            <span class="input-group-btn">
-              <button class="btn btn-default pos-main-btn left-edge red-btn" type="button" data-toggle="modal" data-placement="left" title="Cancelar ticket" data-target="#cancelTicket">
-                <i class="fa fa-stop" aria-hidden="true"></i>
-              </button>
-            </span>
-          </td>
-        </tr>
-        <tr>
-          <td> 148 </td>
-          <td> 05/10/2017 </td>
-          <td> 10:15 am </td>
-          <td> 3 </td>
-          <td> 24 </td>
-          <td> - </td>
-          <td class="right"> $ 967.50 </td>
-          <td> Favio Velez </td>
-          <td> - </td>
-          <td>
-            <span class="input-group-btn">
-              <button class="btn btn-default space-left pos-main-btn right-edge green-btn" type="button" data-toggle="modal" data-placement="left" title="Reactivar ticket" data-target="#activateTicket">
-                <i class="fa fa-play" aria-hidden="true"></i>
-              </button>
-            </span>
-            <span class="input-group-btn">
-              <button class="btn btn-default pos-main-btn left-edge red-btn" type="button" data-toggle="modal" data-placement="left" title="Cancelar ticket" data-target="#cancelTicket">
-                <i class="fa fa-stop" aria-hidden="true"></i>
-              </button>
-            </span>
-          </td>
-        </tr>
-        <tr>
-          <td> 149 </td>
-          <td> 06/10/2017 </td>
-          <td> 11:17 am </td>
-          <td> 1 </td>
-          <td> 20 </td>
-          <td> Jorge Hernandez </td>
-          <td class="right"> $ 423.50 </td>
-          <td> Juan Perez </td>
-          <td> Cliente regresa por la tarde </td>
-          <td>
-            <span class="input-group-btn">
-              <button class="btn btn-default space-left pos-main-btn right-edge green-btn" type="button" data-toggle="modal" data-placement="left" title="Reactivar ticket" data-target="#activateTicket">
-                <i class="fa fa-play" aria-hidden="true"></i>
-              </button>
-            </span>
-            <span class="input-group-btn">
-              <button class="btn btn-default pos-main-btn left-edge red-btn" type="button" data-toggle="modal" data-placement="left" title="Cancelar ticket" data-target="#cancelTicket">
-                <i class="fa fa-stop" aria-hidden="true"></i>
-              </button>
-            </span>
-          </td>
-        </tr>
+      <tbody id="savedTicketsList">
         <tr>
           <td> <br /> </td>
         </tr>
@@ -252,7 +183,9 @@
     <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
-    <script src="../assets/js/pos.js" charset="utf-8"></script>
+    <script src="../../store.js" charset="utf-8"></script>
+    <script src="../../dbconnection.js" charset="utf-8"></script>
+    <script src="../assets/js/saved_tickets.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
 
