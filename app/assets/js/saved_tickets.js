@@ -73,6 +73,22 @@ $(function(){
     });
   }
 
+  function fillDiscountFields(ticketInfo){
+
+    $('.subtotal tr.hidden').removeClass('hidden');
+    $('#discountSum').html(
+      ` $ ${ticketInfo.discount_applied.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`);
+
+    let subtotal = ticketInfo.subtotal - ticketInfo.discount_applied;
+
+    $('#SubtotalSum').html(
+      ` $ ${ticketInfo.subtotal.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`);
+  }
+
   if (window.location.href.indexOf('ticket_id') > -1){
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
         localQuery = 'SELECT * FROM products INNER JOIN' +
@@ -86,6 +102,39 @@ $(function(){
         $('#ticketList').append(addTr(product));
         addEvents(product.id);
       });
+    });
+
+    findBy('id', ticketId, 'tickets').then(ticket => {
+      let ticketInfo = ticket.rows[0];
+      if (ticketInfo.discount_applied) {
+        fillDiscountFields(ticketInfo);
+      }
+
+      $('.bigger.total strong').html(
+        ` $ ${ticketInfo.total.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+      )}`);
+
+      $('.subtotal.iva').html(
+        ` $ ${ticketInfo.taxes.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+      )}`);
+
+      $('#savedSubtotal').html(
+        ` $ ${ticketInfo.subtotal.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+      )}`);
+
+      $('#currencyChange strong').html(
+        ` $ ${ticketInfo.cash_return.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+      )}`);
+
+      $('#sumPayments').html(
+        ` $ ${ticketInfo.payments_amount.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+      )}`);
+
     });
 
   }

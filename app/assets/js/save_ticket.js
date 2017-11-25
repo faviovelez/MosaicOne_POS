@@ -151,19 +151,22 @@ function setPayedLogic(data){
 }
 
 function insertTicket(userId, call, type){
-  let data = {
-    user_id       : userId,
-    subtotal      : $('#savedSubtotal').html().replace(/\s|\$|,/g,''),
-    tax_id        : 2,
-    taxes         : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
-    total         : $('.bigger.total').html().replace(/\s|\$|,/g,''),
-    ticket_type   : type,
-    payed         : true,
-    ticket_number : parseInt($('#ticketNum').html()),
-    comments      : $('input[placeholder=Comentarios]').val(),
-    payments_amount : $('#sumPayments').html(),
-    cash_return     : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
-    cfdi_use_id     : $('#prospect_cfdi_use').val()
+  let paymentsAmount = $('#sumPayments').html() === "" ? 0 
+                       : $('#sumPayments').html(),
+      data = {
+        user_id          : userId,
+        subtotal         : $('#savedSubtotal').html().replace(/\s|\$|,/g,''),
+        discount_applied : $('#discountSum').html().replace(/\s|\$|,/g,''),
+        tax_id           : 2,
+        taxes            : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
+        total            : $('.bigger.total').html().replace(/\s|\$|,/g,''),
+        ticket_type      : type,
+        payed            : true,
+        ticket_number    : parseInt($('#ticketNum').html()),
+        comments         : $('input[placeholder=Comentarios]').val(),
+        payments_amount  : paymentsAmount,
+        cash_return      : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
+      cfdi_use_id     : $('#prospect_cfdi_use').val()
   };
 
   setPayedLogic(data);
@@ -297,6 +300,10 @@ function clearDate(date){
 function insertsPayments(ticketId, userId, store, call) {
   limit = $('tr[id^=paymentMethod_]').length;
   count = 0;
+
+  if (limit === 0){
+    return call();
+  }
 
   $.each($('tr[id^=paymentMethod_]'), function(index){
 
