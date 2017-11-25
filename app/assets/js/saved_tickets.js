@@ -1,7 +1,103 @@
 $(function(){
-  $('#cancelTicket').on('shown.bs.modal', function(e) {
+
+  function recalculateTotal(product, percent){
+    let total = product.price.toFixed(2) * product.quantity;
+
+    return total * (1 - percent / 100);
+  }
+
+  function recalculateDescount(product){
+    let realTotal = product.total - product.taxes,
+        percentPayment = realTotal * 100 / product.subtotal;
+
+    return 100 - parseInt(percentPayment.toFixed(0));
+  }
+
+  function addTr(product){
+    let percent = recalculateDescount(product),
+      total = recalculateTotal(product, percent),
+      color = product.table === 'services' ? carIcon(product.id) :
+      product.exterior_color_or_design,
+      price = product.table === 'products' ? ` $ ${product.price}` :
+      '<input type="text" class="form-control ' +
+      `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
+    return `<tr id="product_${product.id}"><td>` +
+      '<div class="close-icon">' +
+      `<button id="delete_${product.id}" type="button"` +
+      'class="close center-close" aria-label="Close">' +
+      '<span aria-hidden="true" class="white-light">&times;</span>' +
+      '</button>' +
+      '</div>' +
+      '</td>' +
+      '<td class="left">' +
+      '<a href="#" data-toggle="modal" data-target="#productShow"' +
+      `data-id="${product.id}" data-table="${product.table}" >` +
+      product.description +
+      '</a>' +
+      '</td>' +
+      `<td> ${color} </td>` +
+      `<td id="priceTo_${product.id}">${parseFloat(
+        price.replace(' $ ','')
+      ).toFixed(2)}</td>` +
+      '<td>' +
+      '<input type="text" class="form-control smaller-form" ' +
+      `placeholder="1" id="cuantityTo_${product.id}" ` +
+      `value="${product.quantity}"></td>` +
+      '<td> <a href="#" data-toggle="modal"' +
+      'data-target="#discountChange" ' +
+      `id="discount_${product.id}" data-id="${product.id}" ` +
+      `data-table="${product.table}" > ${percent}% </a> </td>` +
+      `<td class="right" id="totalTo_${product.id}">` +
+      `$ ${total.toFixed(2)} </td>` +
+      '</tr>';
+  }
+
+  function addEvents(id){
+    $(`button[id=delete_${id}]`).click(function(){
+      $(`tr[id=product_${id}]`).remove();
+      bigTotal();
+    });
+
+    $(`#cuantityTo_${id}`).keyup(function(){
+      $(`#totalTo_${id}`).html(
+        `$ ${createTotal(id)}`
+      );
+      bigTotal();
+    });
+
+    $(`#priceToServiceTo_${id}`).keyup(function(){
+      $(`#totalTo_${id}`).html(
+        `$ ${createTotal(id)}`
+      );
+      bigTotal();
+    });
+  }
+
+  if (window.location.href.indexOf('ticket_id') > -1){
+    let ticketId = window.location.href.replace(/\D/g,''),
+        localQuery = 'SELECT * FROM products INNER JOIN' +
+                     ' store_movements ON products.id = ' +
+                     ' store_movements.product_id WHERE' + 
+                     ` ticket_id = ${ticketId}`;
+    query(localQuery).then(storeMovementProducts => {
+      storeMovementProducts.rows.forEach(product => {
+        product.table = 'products';
+
+        $('#ticketList').append(addTr(product));
+        addEvents(suggestion.id);
+      });
+    });
+
+  }
+
+  $('#activateTicket').on('shown.bs.modal', function(e) {
     let ticketId = e.relatedTarget.dataset.id;
-    $('#ticketCancelConfirm').attr('data-id', ticketId);
+    $('#ticketConfirmButton').attr('data-id', ticketId);
+  });
+
+  $('#ticketConfirmButton').click(function(){
+    let ticketId = $(this).attr('data-id');
+    window.location.href = `pos_sale.html?ticket_id=${ticketId}`;
   });
 
   $('#ticketCancelConfirm').click(function(){
