@@ -341,13 +341,17 @@ $(function(){
 
           assignCost(ticketId, function(){
 
-            insertsPayments(ticketId, user, storeObject, function(){
+            insertsServiceOffereds(ticketId, function(){
 
-              store.set('lastTicket', parseInt(
-                $('#ticketNum').html()
-              ));
+              insertsPayments(ticketId, user, storeObject, function(){
 
-              window.location.reload(true);
+                store.set('lastTicket', parseInt(
+                  $('#ticketNum').html()
+                ));
+
+                window.location.reload(true);
+
+              });
 
             });
 
