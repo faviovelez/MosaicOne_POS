@@ -100,6 +100,11 @@ $(function(){
     window.location.href = `pos_sale.html?ticket_id=${ticketId}`;
   });
 
+  $('#cancelTicket').on('shown.bs.modal', function(e) {
+    let ticketId = e.relatedTarget.dataset.id;
+    $('#ticketCancelConfirm').attr('data-id', ticketId);
+  });
+
   $('#ticketCancelConfirm').click(function(){
     let ticketId = $(this).attr('data-id');
 
