@@ -74,7 +74,7 @@ $(function(){
   }
 
   if (window.location.href.indexOf('ticket_id') > -1){
-    let ticketId = window.location.href.replace(/\D/g,''),
+    let ticketId = window.location.href.replace(/.*ticket_id=/,'');
         localQuery = 'SELECT * FROM products INNER JOIN' +
                      ' store_movements ON products.id = ' +
                      ' store_movements.product_id WHERE' + 
@@ -84,7 +84,7 @@ $(function(){
         product.table = 'products';
 
         $('#ticketList').append(addTr(product));
-        addEvents(suggestion.id);
+        addEvents(product.id);
       });
     });
 
