@@ -247,7 +247,7 @@ $(document).ready(function() {
 
             });
 
-          });
+          }, 'venta');
 
         });
 

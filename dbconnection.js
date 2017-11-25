@@ -2,10 +2,10 @@ const {Pool} = require('pg');
 require('dotenv').config();
 
 const localPool = new Pool({
-  user: 'faviovelez',
+  user: 'oscar',
   host: 'localhost',
-  database: 'mosaiconepos',
-  password: 'bafio44741',
+  database: 'local_db',
+  password: '12345678"',
   port: 5432,
 });
 
@@ -146,8 +146,11 @@ async function getOnly(table, ids){
   return result.rows;
 }
 
-async function getAll(table, columns = '*'){
+async function getAll(table, columns = '*', condition = false){
   let localQuery = `SELECT ${columns} FROM ${table}`;
+  if (condition){
+    localQuery += ` WHERE ${condition}`;
+  }
   return await query(localQuery);
 }
 

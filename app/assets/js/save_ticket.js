@@ -28,6 +28,7 @@ function iterateInventories(products, call){
 }
 
 function createTicketProductJson(call){
+  json = {};
   let idsCollection = [];
 
   $.each($('#ticketList tr'), function(){
@@ -79,7 +80,6 @@ function quantityMessage(call){
 }
 
 function validateQuantity (call) {
-  json = {};
   $('#modalInfo').remove();
   quantityMessage(
     function(message, openModal){
@@ -150,14 +150,14 @@ function setPayedLogic(data){
   }
 }
 
-function insertTicket(userId, call){
+function insertTicket(userId, call, type){
   let data = {
     user_id       : userId,
     subtotal      : $('#savedSubtotal').html().replace(/\s|\$|,/g,''),
     tax_id        : 2,
     taxes         : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
     total         : $('.bigger.total').html().replace(/\s|\$|,/g,''),
-    ticket_type   : 'venta',
+    ticket_type   : type,
     payed         : true,
     ticket_number : parseInt($('#ticketNum').html()),
     comments      : $('input[placeholder=Comentarios]').val(),
