@@ -269,7 +269,9 @@ $(document).ready(function() {
   function createRealSubtotal(){
     let discount = 0;
     $.each($(`td[id^=priceTo]`), function(){
-      let price       = parseFloat($(this).html()),
+      let price       = parseFloat($(this).html()).toString() === 'NaN' ?
+                        $(this).find('input').val() :
+                        parseFloat($(this).html()),
           tr          = $(this).parent(),
           cuantity    = parseInt($(tr).find(
             'input[id^=cuantityTo]'
@@ -279,6 +281,10 @@ $(document).ready(function() {
             'a[id^=discount]'
           ))
           .html().replace(' %',''));
+      if (total.toString() === 'NaN'){
+        total = 0;
+      }
+
       discount += (parseFloat(discountval) / 100 * total);
     });
     $('#discountSum').html(

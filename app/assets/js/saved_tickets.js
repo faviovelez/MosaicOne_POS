@@ -1,9 +1,15 @@
 $(function(){
 
-  function recalculateTotal(product, percent){
-    let total = product.price.toFixed(2) * product.quantity;
+  function recalculateTotal(product, percent, table){
+    if (table === 'products'){
+      let total = product.price.toFixed(2) * product.quantity;
 
-    return total * (1 - percent / 100);
+      return total * (1 - percent / 100);
+    } else {
+      let total = product.initial_price.toFixed(2) * product.quantity;
+
+      return total * (1 - percent / 100);
+    }
   }
 
   function recalculateDescount(product){
@@ -13,14 +19,55 @@ $(function(){
     return 100 - parseInt(percentPayment.toFixed(0));
   }
 
+  function carIcon(id, company){
+    if (company === '') {
+      return '';
+    }
+
+    return '<a href="#" data-toggle="modal"' +
+      'data-target="#deliveryService"' +
+      `id="service_1" data-id=${id}>` +
+      '<i class="fa fa-truck" aria-hidden="true"></i>' +
+      '</a>';
+  }
+
+  function translatePrice(price){
+    let convertPrice =  parseFloat(
+            price.replace(' $ ','')
+          ).toFixed(2);
+
+    if (convertPrice === "NaN") {
+      return price;
+    }
+    return convertPrice;
+  }
+
   function addTr(product){
     let percent = recalculateDescount(product),
-      total = recalculateTotal(product, percent),
-      color = product.table === 'services' ? carIcon(product.id) :
-      product.exterior_color_or_design,
-      price = product.table === 'products' ? ` $ ${product.price}` :
-      '<input type="text" class="form-control ' +
-      `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
+        total = recalculateTotal(product, percent, product.table),
+        color = product.table === 'services' ? carIcon(product.id, product.company) :
+        product.exterior_color_or_design,
+        price = '',
+        productInList = $(`#product_${product.id}`);
+
+    if (productInList.length === 1) {
+      if (product.table === 'products'){
+        return '';
+      } else {
+        product.id = `${product.id}_${product.id}`;
+      }
+    }
+
+    product.id = `${product.id}_${product.table}`;
+
+
+    if (product.table === 'services'){
+      price ='<input type="text" class="form-control ' +
+      `smaller-form" id="priceToServiceTo_${product.id}" value="$ ${product.initial_price}">`;
+    } else {
+      price = ` $ ${product.price}`;
+    }
+
     return `<tr id="product_${product.id}"><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +
@@ -36,10 +83,8 @@ $(function(){
       '</a>' +
       '</td>' +
       `<td> ${color} </td>` +
-      `<td id="priceTo_${product.id}">${parseFloat(
-        price.replace(' $ ','')
-      ).toFixed(2)}</td>` +
-      '<td>' +
+      `<td id="priceTo_${product.id}"> ${translatePrice(price)}` +
+      '</td><td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}" ` +
       `value="${product.quantity}"></td>` +
@@ -89,18 +134,89 @@ $(function(){
     )}`);
   }
 
+  function resumePayment(){
+    let sum = 0;
+    $.each($('tr[id^=paymentMethod_]'), function(){
+      let currency = $(this).find('.cuantity').html().replace(
+        '$ ', ''
+      ).replace(',', '');
+      sum += parseFloat(currency);
+    });
+    let total = $('table.subtotal td.total strong').html().replace(
+      '$ ', ''
+    ).replace(',',''),
+       rest = (parseFloat(total) - sum).toFixed(2);
+    $('#sumPayments').html(sum);
+    if (parseFloat(rest) <= 0){
+      $('#paymentRest').html(
+        '<strong>$ 0</strong>'
+      );
+      $('#currencyChange').html(
+        `<strong>$ ${(rest * -1).toFixed(2).replace(
+            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+          )}</strong>`
+      );
+      $('.paymentProcess').addClass('hidden');
+      $('#completeSale').removeClass('hidden');
+    } else {
+      $('#currencyChange').html(
+        '<strong> $0.00 </strong>'
+      );
+      $('#paymentRest').html(
+        `<strong>$ ${rest.replace(
+            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+         )}</strong>`
+      );
+      $('#completeSale').addClass('hidden');
+      $('.paymentProcess').removeClass('hidden');
+      $('.payment-form-wrapper.paymentProcess button.selected').click();
+    }
+  }
+
+  function addPaymentTr(payment){
+    let count = payment.payment_number,
+        type  = payment.type;
+
+    return `<tr id="paymentMethod_${count}" data-type="${type}">` +
+      '<td class="flex">' +
+      '<div class="close-icon">' +
+      '<button type="button" class="close center-close"' +
+      `aria-label="Close" id="closeTr_${count}">` +
+      '<span aria-hidden="true" class="white-light">&times;</span>' +
+      '</button></div>' +
+      `${type}</td>` +
+      '<td class="right cuantity" >' +
+      `$ ${payment.total}` +
+      '</td>' +
+      '</tr>';
+  }
+
   if (window.location.href.indexOf('ticket_id') > -1){
-    let ticketId = window.location.href.replace(/.*ticket_id=/,'');
+    let ticketId = window.location.href.replace(/.*ticket_id=/,''),
         localQuery = 'SELECT * FROM products INNER JOIN' +
                      ' store_movements ON products.id = ' +
                      ' store_movements.product_id WHERE' + 
                      ` ticket_id = ${ticketId}`;
+
     query(localQuery).then(storeMovementProducts => {
       storeMovementProducts.rows.forEach(product => {
         product.table = 'products';
 
         $('#ticketList').append(addTr(product));
         addEvents(product.id);
+      });
+    });
+
+    localQuery = 'SELECT * FROM services INNER JOIN' +
+      ' service_offereds ON services.id = ' +
+      ' service_offereds.service_id WHERE' + 
+      ` ticket_id = ${ticketId}`;
+    query(localQuery).then(serviceOffereds => {
+      serviceOffereds.rows.forEach(service => {
+        service.table = 'services';
+
+        $('#ticketList').append(addTr(service));
+        addEvents(service.id);
       });
     });
 
@@ -135,6 +251,49 @@ $(function(){
         /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
       )}`);
 
+      findBy('ticket_id', ticketInfo.id, 'payments').then(payments => {
+        payments.rows.forEach(payment => {
+          payment.type = {
+            1  : 'Efectivo',
+            18 : 'Débito',
+            4  : 'Crédito',
+            2  : 'Cheque',
+            3  : 'Transferencia',
+            21 : 'Venta a Crédito'
+          }[payment.payment_form_id];
+
+          $('#paymentMethodList').prepend(addPaymentTr(payment));
+
+          let type = payment.type;
+
+          if (type === 'Débito' || type === 'Crédito'){
+            $(`tr[id=paymentMethod_${count}]`).append(
+              `<td id="terminal_${count}" class="hidden">${$('#select_terminal').val()}</td>`
+            );
+          }
+          if (type === 'Cheque' || type === 'Transferencia') {
+            referencia  = $(referenceSelector).val();
+            $(`tr[id=paymentMethod_${count}]`).append(
+              `<td id="reference_${count}" class="hidden">${referencia}</td>`
+            );
+          }
+          if (type === 'VentaaCrédito') {
+            creditDays         = parseInt($(creditDaysSelector).val());
+
+            $(`tr[id=paymentMethod_${count}]`).append(
+              `<td id="creditDays_${count}" class="hidden">${creditDays}</td>`
+            );
+          }
+
+          $(`#closeTr_${count}`).click(function(){
+            $(`tr[id=paymentMethod_${count}]`).remove();
+            resumePayment();
+          });
+
+          resumePayment();
+        });
+      });
+
     });
 
   }
@@ -159,6 +318,7 @@ $(function(){
 
     deleteBy('store_movements', `ticket_id = ${ticketId}`).then(() => {});
     deleteBy('payments', `ticket_id = ${ticketId}`).then(() => {});
+    deleteBy('service_offereds', `ticket_id = ${ticketId}`).then(() => {});
     deleteBy('tickets', `id = ${ticketId}`).then(() => {});
     $(`#ticket${ticketId}`).remove();
     $('#cancelTicket').modal('hide');
