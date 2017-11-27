@@ -180,12 +180,12 @@ function insertTicket(userId, call, type){
         discount_applied : $('#discountSum').html().replace(/\s|\$|,/g,''),
         tax_id           : 2,
         taxes            : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
-        total            : $('.bigger.total').html().replace(/\s|\$|,/g,''),
+        total            : $('.bigger.total strong').html().replace(/\s|\$|,/g,''),
         ticket_type      : type,
         payed            : true,
         ticket_number    : parseInt($('#ticketNum').html()),
         comments         : $('input[placeholder=Comentarios]').val(),
-        payments_amount  : paymentsAmount,
+        payments_amount  : paymentsAmount.toString().replace(/\s|\$|,/g,''),
         cash_return      : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
       cfdi_use_id     : $('#prospect_cfdi_use').val()
   };
@@ -224,8 +224,11 @@ function specialQuery(productId){
 }
 
 function insertsServiceOffereds(ticketId, call){
-  count = 0;
+  if ($.isEmptyObject(servicesJson)){
+    call();
+  }
 
+  count = 0;
   for (var serviceId in servicesJson){
 
     let discountReason  = servicesJson[serviceId].discountReason,

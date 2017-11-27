@@ -141,7 +141,7 @@ $(document).ready(function() {
       ).replace(',', '');
       sum += parseFloat(currency);
     });
-    let total = $('table.subtotal td.total').html().replace(
+    let total = $('table.subtotal td.total strong').html().replace(
       '$ ', ''
     ).replace(',',''),
        rest = (parseFloat(total) - sum).toFixed(2);
@@ -238,13 +238,17 @@ $(document).ready(function() {
 
             assignCost(ticketId, function(){
 
-              insertsPayments(ticketId, user, storeObject, function(){
+              insertsServiceOffereds(ticketId, function(){
 
-                store.set('lastTicket', parseInt(
-                  $('#ticketNum').html()
-                ));
+                insertsPayments(ticketId, user, storeObject, function(){
 
-                window.location.reload(true);
+                  store.set('lastTicket', parseInt(
+                    $('#ticketNum').html()
+                  ));
+
+                  window.location.reload(true);
+
+                });
 
               });
 
@@ -335,9 +339,9 @@ $(document).ready(function() {
       )}`
     );
     $('table.subtotal td.total, #paymentRest').html(
-      `$ ${(subtotal + parseFloat(iva)).toFixed(
+      `<strong>$ ${(subtotal + parseFloat(iva)).toFixed(
         2
-      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
+      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}</strong>`
     );
 
     createRealSubtotal();

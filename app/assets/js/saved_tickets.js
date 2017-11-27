@@ -19,6 +19,33 @@ $(function(){
     return 100 - parseInt(percentPayment.toFixed(0));
   }
 
+  function addProspectTr(object){
+    cfdiUseSelect = '';
+    return '<tr>' +
+      '<td class="icon-close-td">' +
+        '<div class="close-icon" id="prospectCloseIcon">' +
+          '<button type="button" class="close center-close" aria-label="Close">' +
+            '<span aria-hidden="true" class="white-light">&times;</span>' +
+          '</button>' +
+        '</div>' +
+      '</td>' +
+      '<td class="prospect_name">' +
+        object.legal_or_business_name +
+      '</td>' +
+      '<td>' +
+        '<select name="bill_tag" class="myfield" id="prospect_bill_tag">' +
+          '<option value="1">Sin factura</option>' +
+          '<option value="2">Facturar</option>' +
+        '</select>' +
+      '</td>' +
+      '<td>' +
+        `<a href="#" data-toggle="modal" data-id='${object.id}' data-target="#billCfdiUse">` +
+          'Detalles' +
+        '</a>' +
+      '</td>' +
+    '</tr>';
+  }
+
   function carIcon(id, company){
     if (company === '') {
       return '';
@@ -60,7 +87,6 @@ $(function(){
 
     product.id = `${product.id}_${product.table}`;
 
-
     if (product.table === 'services'){
       price ='<input type="text" class="form-control ' +
       `smaller-form" id="priceToServiceTo_${product.id}" value="$ ${product.initial_price}">`;
@@ -95,6 +121,34 @@ $(function(){
       `<td class="right" id="totalTo_${product.id}">` +
       `$ ${total.toFixed(2)} </td>` +
       '</tr>';
+  }
+
+  function bigTotal(){
+    let subTotalInput = $('table.subtotal #SubtotalSum'),
+        subtotal      = 0;
+    $.each($(`td[id^=totalTo_]`), function(){
+      let productTotal = parseFloat(
+        $(this).html().replace('$ ', '').replace(/,/g,'')
+      );
+      subtotal += productTotal.toString() === 'NaN' ? 0 : productTotal;
+    });
+    $(subTotalInput).html(`$ ${subtotal.toFixed(
+      2
+    ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`);
+
+    let iva = subtotal * 0.16;
+    $('table.subtotal td.subtotal.iva').html(
+      `$ ${iva.toFixed(2).replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+      )}`
+    );
+    $('table.subtotal td.total, #paymentRest').html(
+      `<strong>$ ${(subtotal + parseFloat(iva)).toFixed(
+        2
+      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}</strong>`
+    );
+
+    createRealSubtotal();
   }
 
   function addEvents(id){
@@ -201,6 +255,7 @@ $(function(){
     query(localQuery).then(storeMovementProducts => {
       storeMovementProducts.rows.forEach(product => {
         product.table = 'products';
+        product.id    = product.product_id;
 
         $('#ticketList').append(addTr(product));
         addEvents(product.id);
@@ -214,6 +269,7 @@ $(function(){
     query(localQuery).then(serviceOffereds => {
       serviceOffereds.rows.forEach(service => {
         service.table = 'services';
+        product.id    = service.service_id;
 
         $('#ticketList').append(addTr(service));
         addEvents(service.id);
@@ -222,6 +278,19 @@ $(function(){
 
     findBy('id', ticketId, 'tickets').then(ticket => {
       let ticketInfo = ticket.rows[0];
+
+      $('#ticketNum').html(` ${ticketInfo.ticket_number}`);
+
+      findBy('id', ticketInfo.prospect_id, 'prospects').then(prospect => {
+
+        $('#prospectList').append(addProspectTr(prospect.rows[0]));
+
+        $('#prospectCloseIcon').click(function(){
+          $('#prospectList tr').remove();
+        });
+
+      });
+
       if (ticketInfo.discount_applied) {
         fillDiscountFields(ticketInfo);
       }
@@ -313,15 +382,26 @@ $(function(){
     $('#ticketCancelConfirm').attr('data-id', ticketId);
   });
 
-  $('#ticketCancelConfirm').click(function(){
-    let ticketId = $(this).attr('data-id');
-
+  function deleteTicket(ticketId){
     deleteBy('store_movements', `ticket_id = ${ticketId}`).then(() => {});
     deleteBy('payments', `ticket_id = ${ticketId}`).then(() => {});
     deleteBy('service_offereds', `ticket_id = ${ticketId}`).then(() => {});
     deleteBy('tickets', `id = ${ticketId}`).then(() => {});
     $(`#ticket${ticketId}`).remove();
     $('#cancelTicket').modal('hide');
+  }
+
+  $('#ticketCancel').click(function(){
+    let ticketId = window.location.href.replace(/.*ticket_id=/,'');
+
+    deleteTicket(ticketId);
+    window.location.href = 'pos_sale.html';
+  });
+
+  $('#ticketCancelConfirm').click(function(){
+    let ticketId = $(this).attr('data-id');
+
+    deleteTicket(ticketId);
   });
 
   function createFullName(user){
@@ -485,11 +565,13 @@ $(function(){
 
   }
 
-  $('#ticketCancel').click(function(){
-    window.location.reload(true);
-  });
-
   $('#ticketSave').click(function(){
+    let ticketId = window.location.href.replace(/.*ticket_id=/,'');
+
+    if (!isNaN(parseInt(ticketId))){
+      deleteTicket(ticketId);
+    }
+
     createTicketProductJson(function(){
 
       initStore().then(store => {
@@ -509,7 +591,7 @@ $(function(){
                   $('#ticketNum').html()
                 ));
 
-                window.location.reload(true);
+                window.location.href = 'pos_sale.html';
 
               });
 
