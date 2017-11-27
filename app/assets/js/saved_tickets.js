@@ -89,7 +89,7 @@ $(function(){
 
     if (product.table === 'services'){
       price ='<input type="text" class="form-control ' +
-      `smaller-form" id="priceToServiceTo_${product.id}" value="$ ${product.initial_price}">`;
+      `smaller-form" id="priceToServiceTo_${product.id}" value="${product.initial_price}">`;
     } else {
       price = ` $ ${product.price}`;
     }
@@ -269,7 +269,7 @@ $(function(){
     query(localQuery).then(serviceOffereds => {
       serviceOffereds.rows.forEach(service => {
         service.table = 'services';
-        product.id    = service.service_id;
+        service.id    = service.service_id;
 
         $('#ticketList').append(addTr(service));
         addEvents(service.id);
@@ -281,15 +281,19 @@ $(function(){
 
       $('#ticketNum').html(` ${ticketInfo.ticket_number}`);
 
-      findBy('id', ticketInfo.prospect_id, 'prospects').then(prospect => {
+      if (ticketInfo.prospect_id){
 
-        $('#prospectList').append(addProspectTr(prospect.rows[0]));
+        findBy('id', ticketInfo.prospect_id, 'prospects').then(prospect => {
 
-        $('#prospectCloseIcon').click(function(){
-          $('#prospectList tr').remove();
+          $('#prospectList').append(addProspectTr(prospect.rows[0]));
+
+          $('#prospectCloseIcon').click(function(){
+            $('#prospectList tr').remove();
+          });
+
         });
 
-      });
+      }
 
       if (ticketInfo.discount_applied) {
         fillDiscountFields(ticketInfo);
@@ -333,24 +337,22 @@ $(function(){
 
           $('#paymentMethodList').prepend(addPaymentTr(payment));
 
-          let type = payment.type;
+          let type  = payment.type,
+              count = payment.payment_number;
 
           if (type === 'Débito' || type === 'Crédito'){
             $(`tr[id=paymentMethod_${count}]`).append(
-              `<td id="terminal_${count}" class="hidden">${$('#select_terminal').val()}</td>`
+              `<td id="terminal_${count}" class="hidden">${payment.terminal_id}</td>`
             );
           }
           if (type === 'Cheque' || type === 'Transferencia') {
-            referencia  = $(referenceSelector).val();
             $(`tr[id=paymentMethod_${count}]`).append(
-              `<td id="reference_${count}" class="hidden">${referencia}</td>`
+              `<td id="reference_${count}" class="hidden">${payment.operation_number}</td>`
             );
           }
           if (type === 'VentaaCrédito') {
-            creditDays         = parseInt($(creditDaysSelector).val());
-
             $(`tr[id=paymentMethod_${count}]`).append(
-              `<td id="creditDays_${count}" class="hidden">${creditDays}</td>`
+              `<td id="creditDays_${count}" class="hidden">${payment.credit_days}</td>`
             );
           }
 
