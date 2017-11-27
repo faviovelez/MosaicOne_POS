@@ -1,21 +1,24 @@
-let json          = {},
-    count         = 0;
+let productsJson  = {},
+    servicesJson  = {},
+    count        = 0;
 
 function iterateInventories(products, call){
   count = 0;
   products.forEach(product => {
-    json[product.id].description              = product.description;
-    json[product.id].exterior_color_or_design = product.exterior_color_or_design;
-    json[product.id].unique_code              = product.unique_code;
-    json[product.id].supplier_id              = product.supplier_id;
-    json[product.id].price                    = product.price;
+    let jsonId = product.id;
+    productsJson[jsonId].description              = product.description;
+    productsJson[jsonId].exterior_color_or_design = product.exterior_color_or_design;
+    productsJson[jsonId].unique_code              = product.unique_code;
+    productsJson[jsonId].supplier_id              = product.supplier_id;
+    productsJson[jsonId].price                    = product.price;
 
     findBy('product_id', product.id, 'stores_inventories').then(inventory => {
 
-      inventory = inventory.rows[0];
+      let inventoryObject = inventory.rows[0],
+          jsonId = inventoryObject.product_id;
 
-      json[inventory.product_id].inventory_id = inventory.id;
-      json[inventory.product_id].quantity     = inventory.quantity;
+      productsJson[jsonId].inventory_id = inventoryObject.id;
+      productsJson[jsonId].quantity     = inventoryObject.quantity;
 
       count++;
       if (count === products.length) {
@@ -32,23 +35,43 @@ function createTicketProductJson(call){
   let idsCollection = [];
 
   $.each($('#ticketList tr'), function(){
-    let id = $(this).attr('id').replace(/\D/g,'');
-    idsCollection.push(
-      id
-    );
-    json[id] = {
-      sellQuantity   : $(this).find($('td input[id^=cuantityTo]')).val(),
-      sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,''),
-      discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,''),
-      discountReason : $(this).find('td[id^=discountReasonTo]').html()
-    };
+    let id = $(this).attr('id').replace(/product_|_products|_services/g,''),
+        regex = new RegExp(`.*${id}_`),
+        table = $(this).attr('id').replace(regex, '');
+
+    if(table === 'products') {
+
+      productsJson[id] = {
+        sellQuantity   : $(this).find($('td input[id^=cuantityTo]')).val(),
+        sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,''),
+        discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,''),
+        discountReason : $(this).find('td[id^=discountReasonTo]').html()
+      };
+
+      idsCollection.push(
+        id
+      );
+
+    } else {
+      servicesJson[id] = {
+        sellQuantity   : $(this).find($('td input[id^=cuantityTo]')).val(),
+        sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,''),
+        discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,''),
+        discountReason : $(this).find('td[id^=discountReasonTo]').html(),
+        selector       : $(this).attr('id')
+      };
+    }
+
   });
 
-  getOnly('products', idsCollection).then(products => {
-    iterateInventories(products, function(){
-      return call();
+  if (idsCollection.length > 0){
+    getOnly('products', idsCollection).then(products => {
+      iterateInventories(products, function(){
+        return call();
+      });
     });
-  });
+  }
+
 }
 
 function quantityMessage(call){
@@ -56,13 +79,13 @@ function quantityMessage(call){
     let needed = false,
         message = '<h1>Faltante de producto en relacion</h1>';
 
-    for (var productId in json) {
+    for (var productId in productsJson) {
 
-      let actualInventory          = json[productId].quantity,
-        trySellQuantity            = json[productId].sellQuantity,
-        unique_code                = json[productId].unique_code,
-        description                = json[productId].description,
-        exterior_color_or_design   = json[productId].exterior_color_or_design;
+      let actualInventory          = productsJson[productId].quantity,
+        trySellQuantity            = productsJson[productId].sellQuantity,
+        unique_code                = productsJson[productId].unique_code,
+        description                = productsJson[productId].description,
+        exterior_color_or_design   = productsJson[productId].exterior_color_or_design;
 
       if (actualInventory < trySellQuantity) {
 
@@ -123,16 +146,14 @@ function updateStoreInventories(productId, quantity){
 
 }
 
-function createStoreMovement(data, productId, call){
-  json[productId].storeMovement = data;
-  productId = productId;
+function createStoreMovement(data, call){
   insert(
     Object.keys(data),
     Object.values(data),
     'store_movements'
   ).then(storeMovement => {
     count++;
-    if (count === Object.keys(json).length){
+    if (count === Object.keys(productsJson).length){
       call();
     }
   });
@@ -151,19 +172,22 @@ function setPayedLogic(data){
 }
 
 function insertTicket(userId, call, type){
-  let data = {
-    user_id       : userId,
-    subtotal      : $('#savedSubtotal').html().replace(/\s|\$|,/g,''),
-    tax_id        : 2,
-    taxes         : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
-    total         : $('.bigger.total').html().replace(/\s|\$|,/g,''),
-    ticket_type   : type,
-    payed         : true,
-    ticket_number : parseInt($('#ticketNum').html()),
-    comments      : $('input[placeholder=Comentarios]').val(),
-    payments_amount : $('#sumPayments').html(),
-    cash_return     : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
-    cfdi_use_id     : $('#prospect_cfdi_use').val()
+  let paymentsAmount = $('#sumPayments').html() === "" ? 0 
+                       : $('#sumPayments').html(),
+      data = {
+        user_id          : userId,
+        subtotal         : $('#savedSubtotal').html().replace(/\s|\$|,/g,''),
+        discount_applied : $('#discountSum').html().replace(/\s|\$|,/g,''),
+        tax_id           : 2,
+        taxes            : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
+        total            : $('.bigger.total strong').html().replace(/\s|\$|,/g,''),
+        ticket_type      : type,
+        payed            : true,
+        ticket_number    : parseInt($('#ticketNum').html()),
+        comments         : $('input[placeholder=Comentarios]').val(),
+        payments_amount  : paymentsAmount.toString().replace(/\s|\$|,/g,''),
+        cash_return      : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
+      cfdi_use_id     : $('#prospect_cfdi_use').val()
   };
 
   setPayedLogic(data);
@@ -186,61 +210,131 @@ function insertTicket(userId, call, type){
   });
 }
 
+function specialQuery(productId){
+  return ' SELECT stores_warehouse_entries.product_id' +
+    ` as idIs${productId}, stores_warehouse_entries.id,` +
+    ' stores_warehouse_entries.quantity,' +
+    ' store_movements.cost FROM ' +
+    ' stores_warehouse_entries' +
+    ' INNER JOIN store_movements ON' +
+    ' stores_warehouse_entries.store_movement_id' + 
+    ' = store_movements.id WHERE ' +
+    `stores_warehouse_entries.product_id = ${productId} ` +
+    ' ORDER BY stores_warehouse_entries.id ';
+}
+
+function insertsServiceOffereds(ticketId, call){
+  if ($.isEmptyObject(servicesJson)){
+    call();
+  }
+
+  count = 0;
+  for (var serviceId in servicesJson){
+
+    let discountReason  = servicesJson[serviceId].discountReason,
+      sellQuantity    = servicesJson[serviceId].sellQuantity,
+      totalCost       = 0,
+      processQuantity = sellQuantity,
+      discountType    = $('.discounts-form-wrapper button.selected')
+      .attr('id'),
+      discountPercent = parseFloat(servicesJson[serviceId].discount) / 100,
+      unitPrice       = $(`#${servicesJson[serviceId].selector}`).find(
+        'td[id^=priceTo] input'
+      ).val(),
+      subtotal        = (unitPrice * sellQuantity),
+      finalPrice      = (unitPrice * (1 - discountPercent)),
+      discount        = (subtotal * discountPercent),
+      taxes           = ((subtotal - discount) * 0.16),
+      total           = (subtotal - discount + taxes),
+      fixedDiscount   = parseFloat(discount.toFixed(2)),
+      data = {
+        service_id         : serviceId.replace(/_.*/,''),
+        quantity           : sellQuantity,
+        service_type       : 'venta',
+        ticket_id          : ticketId,
+        initial_price      : unitPrice,
+        automatic_discount : 0,
+        manual_discount    : fixedDiscount,
+        discount_applied   : fixedDiscount,
+        final_price        : finalPrice.toFixed(2),
+        tax_id             : 2,
+        taxes              : taxes.toFixed(2),
+        cost               : 0,
+        total_cost         : totalCost,
+        total              : total.toFixed(2),
+        subtotal           : subtotal.toFixed(2)
+      };
+
+    if (discountReason){
+      data.discount_reason = discountReason;
+    }
+
+    if (discountType !== 'none'){
+      data[`${discountType}_discount`] = fixedDiscount;
+    }
+
+    insert(
+      Object.keys(data),
+      Object.values(data),
+      'service_offereds'
+    ).then(storeMovement => {
+      count++;
+      if (count === Object.keys(servicesJson).length){
+        call();
+      }
+    });
+
+  }
+}
+
 function assignCost(ticketId, call) {
   count = 0;
-  for (var productId in json){
-    let localQuery = ' SELECT stores_warehouse_entries.product_id' +
-                     ` as idIs${productId}, stores_warehouse_entries.id,` +
-                     ' stores_warehouse_entries.quantity,' +
-                     ' store_movements.cost FROM ' +
-                     ' stores_warehouse_entries' +
-                     ' INNER JOIN store_movements ON' +
-                     ' stores_warehouse_entries.store_movement_id' + 
-                     ' = store_movements.id WHERE ' +
-                     `stores_warehouse_entries.product_id = ${productId} ` +
-                     ' ORDER BY stores_warehouse_entries.id ';
+
+  for (var productId in productsJson){
+    let localQuery = specialQuery(productId);
+
     query(localQuery).then(entries => {
-      let productId       = entries.fields[0].name.replace(/\D/g,''),
-          discountReason  = json[productId].discountReason,
-          sellQuantity    = json[productId].sellQuantity,
-          inventory       = json[productId].quantity,
-          totalCost       = 0,
-          processQuantity = sellQuantity,
-          discountType    = $('.discounts-form-wrapper button.selected')
-                            .attr('id'),
-          discountPercent = parseFloat(json[productId].discount) / 100,
-          unitPrice       = json[productId].price,
-          subtotal        = (unitPrice * sellQuantity),
-          finalPrice      = (unitPrice * (1 - discountPercent)),
-          discount        = (subtotal * discountPercent),
-          taxes           = ((subtotal - discount) * 0.16),
-          total           = (subtotal - discount + taxes),
-          fixedDiscount   = parseFloat(discount.toFixed(2)),
-          data = {
-            product_id         : productId,
-            quantity           : sellQuantity,
-            movement_type      : 'venta',
-            ticket_id          : ticketId,
-            initial_price      : json[productId].price.toFixed(2),
-            automatic_discount : 0,
-            manual_discount    : fixedDiscount,
-            discount_applied   : fixedDiscount,
-            final_price        : finalPrice.toFixed(2),
-            tax_id             : 2,
-            taxes              : taxes.toFixed(2),
-            cost               : 0,
-            supplier_id        : json[productId].supplier_id,
-            total_cost         : totalCost,
-            total              : total.toFixed(2),
-            subtotal           : subtotal.toFixed(2)
-          };
+      let productId     = entries.fields[0].name.replace(/\D/g,''),
+        discountReason  = productsJson[productId].discountReason,
+        sellQuantity    = productsJson[productId].sellQuantity,
+        inventory       = productsJson[productId].quantity,
+        totalCost       = 0,
+        processQuantity = sellQuantity,
+        discountType    = $('.discounts-form-wrapper button.selected')
+        .attr('id'),
+        discountPercent = parseFloat(productsJson[productId].discount) / 100,
+        unitPrice       = productsJson[productId].price,
+        subtotal        = (unitPrice * sellQuantity),
+        finalPrice      = (unitPrice * (1 - discountPercent)),
+        discount        = (subtotal * discountPercent),
+        taxes           = ((subtotal - discount) * 0.16),
+        total           = (subtotal - discount + taxes),
+        fixedDiscount   = parseFloat(discount.toFixed(2)),
+        data = {
+          product_id         : productId,
+          quantity           : sellQuantity,
+          movement_type      : 'venta',
+          ticket_id          : ticketId,
+          initial_price      : productsJson[productId].price.toFixed(2),
+          automatic_discount : 0,
+          manual_discount    : fixedDiscount,
+          discount_applied   : fixedDiscount,
+          final_price        : finalPrice.toFixed(2),
+          tax_id             : 2,
+          taxes              : taxes.toFixed(2),
+          cost               : 0,
+          supplier_id        : productsJson[productId].supplier_id,
+          total_cost         : totalCost,
+          total              : total.toFixed(2),
+          subtotal           : subtotal.toFixed(2)
+        };
 
       if (discountReason){
         data.discount_reason = discountReason;
       }
 
       if (entries.rowCount === 0) {
-        createStoreMovement(data, productId, call);
+        createStoreMovement(data, call);
       } else {
         let BreakException = {};
         try {
@@ -251,7 +345,7 @@ function assignCost(ticketId, call) {
 
             if (processQuantity >= quantity) {
               totalCost += (quantity * cost);
-              deleteBy('stores_warehouse_entries', entryId);
+              deleteBy('stores_warehouse_entries', `id = ${entryId}`);
               updateStoreInventories(
                 productId, quantity
               );
@@ -281,12 +375,13 @@ function assignCost(ticketId, call) {
         if (discountType !== 'none'){
           data[`${discountType}_discount`] = fixedDiscount;
         }
-        createStoreMovement(data, productId, call);
+        createStoreMovement(data, call);
       }
 
     });
 
   }
+
 }
 
 function clearDate(date){
@@ -297,6 +392,10 @@ function clearDate(date){
 function insertsPayments(ticketId, userId, store, call) {
   limit = $('tr[id^=paymentMethod_]').length;
   count = 0;
+
+  if (limit === 0){
+    return call();
+  }
 
   $.each($('tr[id^=paymentMethod_]'), function(index){
 

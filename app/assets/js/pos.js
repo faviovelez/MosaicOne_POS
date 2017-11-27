@@ -47,7 +47,7 @@ $(document).ready(function() {
         }, err => {
           $('#addProductQuantity tr').remove();
         });
-      })
+      });
     });
   });
 
@@ -96,9 +96,12 @@ $(document).ready(function() {
               value: `${service.unique_code} ${service.description}`,
               id:    service.id,
               table:  'services',
+              company: service.delivery_company ? service.delivery_company 
+                                                : '',
               description: service.description
             }
           );
+
         });
       });
       setTimeout(function(){
@@ -138,7 +141,7 @@ $(document).ready(function() {
       ).replace(',', '');
       sum += parseFloat(currency);
     });
-    let total = $('table.subtotal td.total').html().replace(
+    let total = $('table.subtotal td.total strong').html().replace(
       '$ ', ''
     ).replace(',',''),
        rest = (parseFloat(total) - sum).toFixed(2);
@@ -235,13 +238,17 @@ $(document).ready(function() {
 
             assignCost(ticketId, function(){
 
-              insertsPayments(ticketId, user, storeObject, function(){
+              insertsServiceOffereds(ticketId, function(){
 
-                store.set('lastTicket', parseInt(
-                  $('#ticketNum').html()
-                ));
+                insertsPayments(ticketId, user, storeObject, function(){
 
-                window.location.reload(true);
+                  store.set('lastTicket', parseInt(
+                    $('#ticketNum').html()
+                  ));
+
+                  window.location.reload(true);
+
+                });
 
               });
 
@@ -256,10 +263,19 @@ $(document).ready(function() {
 
   });
 
+  function translateInfo(info){
+    if (info === " NaN"){
+      return 0;
+    }
+    return info;
+  }
+
   function createRealSubtotal(){
     let discount = 0;
     $.each($(`td[id^=priceTo]`), function(){
-      let price       = parseFloat($(this).html()),
+      let price       = parseFloat($(this).html()).toString() === 'NaN' ?
+                        $(this).find('input').val() :
+                        parseFloat($(this).html()),
           tr          = $(this).parent(),
           cuantity    = parseInt($(tr).find(
             'input[id^=cuantityTo]'
@@ -269,6 +285,10 @@ $(document).ready(function() {
             'a[id^=discount]'
           ))
           .html().replace(' %',''));
+      if (total.toString() === 'NaN'){
+        total = 0;
+      }
+
       discount += (parseFloat(discountval) / 100 * total);
     });
     $('#discountSum').html(
@@ -280,8 +300,16 @@ $(document).ready(function() {
     );
 
     $('#savedSubtotal').html(
-      ` $ ${(parseFloat($('#SubtotalSum').html().replace("$ ", "").replace(/,/g,'')) + parseFloat(
-          $('#discountSum').html().replace('$ ', '').replace(/,/g,'')
+      ` $ ${(
+        parseFloat($('#SubtotalSum').html().replace(
+          "$ ", ""
+        ).replace(/,/g,'')
+        ) + parseFloat(
+          translateInfo(
+            $('#discountSum').html().replace(
+              '$ ', ''
+            ).replace(/,/g,'')
+          )
         )).toFixed(
           2
         ).replace(
@@ -295,9 +323,10 @@ $(document).ready(function() {
     let subTotalInput = $('table.subtotal #SubtotalSum'),
         subtotal      = 0;
     $.each($(`td[id^=totalTo_]`), function(){
-      subtotal += parseFloat(
+      let productTotal = parseFloat(
         $(this).html().replace('$ ', '').replace(/,/g,'')
       );
+      subtotal += productTotal.toString() === 'NaN' ? 0 : productTotal;
     });
     $(subTotalInput).html(`$ ${subtotal.toFixed(
       2
@@ -310,9 +339,9 @@ $(document).ready(function() {
       )}`
     );
     $('table.subtotal td.total, #paymentRest').html(
-      `$ ${(subtotal + parseFloat(iva)).toFixed(
+      `<strong>$ ${(subtotal + parseFloat(iva)).toFixed(
         2
-      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
+      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}</strong>`
     );
 
     createRealSubtotal();
@@ -439,7 +468,11 @@ $(document).ready(function() {
     $('#discountMotive, #discountCount').val('');
   });
 
-  function carIcon(id){
+  function carIcon(id, company){
+    if (company === '') {
+      return '';
+    }
+
     return '<a href="#" data-toggle="modal"' +
       'data-target="#deliveryService"' +
       `id="service_1" data-id=${id}>` +
@@ -447,16 +480,36 @@ $(document).ready(function() {
       '</a>';
   }
 
+  function translatePrice(price){
+    let convertPrice =  parseFloat(
+            price.replace(' $ ','')
+          ).toFixed(2);
+
+    if (convertPrice === "NaN") {
+      return price;
+    }
+    return convertPrice;
+  }
+
   function addTr(product){
-    let color = product.table === 'services' ? carIcon(product.id) :
+    let color = product.table === 'services' ? carIcon(product.id, product.company) :
       product.color,
-      productInList = $(`#product_${product.id}`),
-      price = product.table === 'products' ? ` $ ${product.price}` :
+      productInList = $(`#product_${product.id}`);
+
+    if (productInList.length === 1) {
+      if (product.table === 'products'){
+        return '';
+      } else {
+        product.id = `${product.id}_${product.id}`;
+      }
+    }
+
+    product.id = `${product.id}_${product.table}`;
+
+    let price = product.table === 'products' ? ` $ ${product.price}` :
       '<input type="text" class="form-control ' +
       `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
-    if (productInList.length === 1) {
-      return '';
-    }
+
     return `<tr id="product_${product.id}"><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +
@@ -472,10 +525,8 @@ $(document).ready(function() {
       '</a>' +
       '</td>' +
       `<td> ${color} </td>` +
-      `<td id="priceTo_${product.id}">${parseFloat(
-        price.replace(' $ ','')
-      ).toFixed(2)}</td>` +
-      '<td>' +
+      `<td id="priceTo_${product.id}"> ${translatePrice(price)}` +
+      '</td><td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}"></td>` +
       '<td> <a href="#" data-toggle="modal"' +
