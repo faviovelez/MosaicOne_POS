@@ -173,6 +173,9 @@ $(document).ready(function() {
   }
 
   $('#addPayment').click(function(){
+    if ($('#ticketList tr').length === 0){
+      return false;
+    }
     let count = $('#paymentMethodList tr').length - 2,
         type  = $('.payment-form-wrapper .selected')
       .html().replace(/\s/g,'').replace(/.*<\/i>/,''),

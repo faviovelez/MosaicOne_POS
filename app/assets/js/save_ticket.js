@@ -70,12 +70,18 @@ function createTicketProductJson(call){
         return call();
       });
     });
+  } else {
+    return call();
   }
 
 }
 
 function quantityMessage(call){
   createTicketProductJson(function(){
+    if ($.isEmptyObject(productsJson)){
+      call();
+    }
+
     let needed = false,
         message = '<h1>Faltante de producto en relacion</h1>';
 
@@ -288,8 +294,11 @@ function insertsServiceOffereds(ticketId, call){
 }
 
 function assignCost(ticketId, call) {
-  count = 0;
+  if ($.isEmptyObject(productsJson)){
+    call();
+  }
 
+  count = 0;
   for (var productId in productsJson){
     let localQuery = specialQuery(productId);
 
