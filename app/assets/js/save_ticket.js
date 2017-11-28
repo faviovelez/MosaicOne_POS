@@ -170,7 +170,7 @@ function setPayedLogic(data){
   if ($(creditPaymentSelector).length > 0){
     let creditPaymentQuantity = $(creditPaymentSelector).find('td.cuantity').html().replace(/\s|\$|,/g,''),
         realPayment           =  data.payments_amount - creditPaymentQuantity;
-    if (realPayment <= data.total) {
+    if (realPayment <= parseFloat(data.total)) {
       data.payed = false;
       data.payments_amount = realPayment;
     }

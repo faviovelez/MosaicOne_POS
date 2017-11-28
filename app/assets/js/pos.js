@@ -243,6 +243,12 @@ $(document).ready(function() {
   }
 
   $('#completeSale').click(function() {
+    let ticketId = window.location.href.replace(/.*ticket_id=/,'');
+
+    if (!isNaN(parseInt(ticketId))){
+      deleteTicket(ticketId);
+    }
+
     if (validateAllServiceOfferedFill()){
 
       validateQuantity(function(hasInventory){
@@ -370,16 +376,17 @@ $(document).ready(function() {
     createRealSubtotal();
   }
 
-  function createTotal(id, manualDiscount = false){
-    let cuantity = $(`#cuantityTo_${id}`).val(),
+  function createTotal(id){
+    let cuantity = $(`input[id^=cuantityTo_${id}]`).val(),
+      manualDiscount = !$('#manual-discount').hasClass('hidden'),
       price    = parseFloat(
-        $(`#priceTo_${id}`).html().replace(' $ ','')
+        $(`td[id^=priceTo_${id}]`).html().replace(' $ ','')
       );
     if (!price){
-      price = $(`#priceTo_${id} input`).val();
+      price = $(`td[id^=priceTo_${id}] input`).val();
     }
     let total =  price * cuantity,
-        discount = $(`#discount_${id}`)
+        discount = $(`a[id^=discount_${id}]`)
       .html().replace(' %',''),
       discountVal = parseFloat(discount) / 100 * total,
       productTotal    = total - discountVal;
@@ -388,6 +395,11 @@ $(document).ready(function() {
       let globalManual = parseFloat(
         $('#manualDiscountQuantity').html().replace(' $ ','')
       );
+
+      if (globalManual.toString() === 'NaN'){
+        globalManual = 0;
+      }
+
       $('#manualDiscountQuantity').html(
         ` $ ${(globalManual += discountVal).toFixed(
           2
