@@ -242,6 +242,15 @@ $(document).ready(function() {
     return true;
   }
 
+  function deleteTicket(ticketId){
+    deleteBy('store_movements', `ticket_id = ${ticketId}`).then(() => {});
+    deleteBy('payments', `ticket_id = ${ticketId}`).then(() => {});
+    deleteBy('service_offereds', `ticket_id = ${ticketId}`).then(() => {});
+    deleteBy('tickets', `id = ${ticketId}`).then(() => {});
+    $(`#ticket${ticketId}`).remove();
+    $('#cancelTicket').modal('hide');
+  }
+
   $('#completeSale').click(function() {
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
 
