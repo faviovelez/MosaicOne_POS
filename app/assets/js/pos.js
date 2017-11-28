@@ -500,7 +500,7 @@ $(document).ready(function() {
       neighborhood      : $('#delivery_service_neighborhood').val(),
       city              : $('#delivery_service_city').val(),
       state             : $('#delivery_service_state').val(),
-      country           : $('#delivery_service_country').val(''),
+      country           : $('#delivery_service_country').val(),
       phone             : $('#delivery_service_phone').val(),
       cellphone         : $('#delivery_service_cellphone').val(),
       email             : $('#delivery_service_email').val(),
