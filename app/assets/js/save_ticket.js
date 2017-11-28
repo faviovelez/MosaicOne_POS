@@ -79,7 +79,7 @@ function createTicketProductJson(call){
 function quantityMessage(call){
   createTicketProductJson(function(){
     if ($.isEmptyObject(productsJson)){
-      call();
+      return call('', false);
     }
 
     let needed = false,
@@ -160,7 +160,7 @@ function createStoreMovement(data, call){
   ).then(storeMovement => {
     count++;
     if (count === Object.keys(productsJson).length){
-      call();
+      return call();
     }
   });
 }
@@ -231,7 +231,7 @@ function specialQuery(productId){
 
 function insertsServiceOffereds(ticketId, call){
   if ($.isEmptyObject(servicesJson)){
-    call();
+    return call();
   }
 
   count = 0;
@@ -283,11 +283,36 @@ function insertsServiceOffereds(ticketId, call){
       Object.keys(data),
       Object.values(data),
       'service_offereds'
-    ).then(storeMovement => {
-      count++;
-      if (count === Object.keys(servicesJson).length){
-        call();
-      }
+    ).then(serviceOffered => {
+      findBy('id', serviceOffered.lastId, 'service_offereds' ).then(
+        serviceOffered => {
+          let deliveryServiceId = $(
+            `#deliveryServiceId${serviceOffered.rows[0].service_id}`
+          ).html();
+
+          if (typeof deliveryServiceId === 'undefined'){
+            count++;
+            if (count === Object.keys(servicesJson).length){
+              return call();
+            }
+          } else {
+            let data = {
+              service_offered_id: serviceOffered.rows[0].id
+            };
+
+            updateBy(
+              data,
+              'delivery_services',
+              `id = ${deliveryServiceId}`).then(() => {
+
+                count++;
+                if (count === Object.keys(servicesJson).length){
+                  return call();
+                }
+
+              });
+          }
+        });
     });
 
   }
@@ -295,7 +320,7 @@ function insertsServiceOffereds(ticketId, call){
 
 function assignCost(ticketId, call) {
   if ($.isEmptyObject(productsJson)){
-    call();
+    return call();
   }
 
   count = 0;
