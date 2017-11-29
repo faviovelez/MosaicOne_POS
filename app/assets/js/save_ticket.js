@@ -420,7 +420,7 @@ function assignCost(ticketId, call) {
 
 function clearDate(date){
   let strDate = date.toString();
-  return strDate.replace(' GMT-0600 (CST)','');
+  return strDate.replace(/GMT.*/,'');
 }
 
 function insertsPayments(ticketId, userId, store, call) {

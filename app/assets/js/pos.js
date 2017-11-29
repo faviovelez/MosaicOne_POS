@@ -103,10 +103,8 @@ $(document).ready(function() {
           );
 
         });
-      });
-      setTimeout(function(){
         return call(options);
-      }, 300);
+      });
     });
   }
 
@@ -729,6 +727,14 @@ $(document).ready(function() {
           );
         });
       });
+
+      setTimeout(function(){
+        if ($('#mainProductSearch').attr('autocomplete') === 'undefined'){
+          $('#pos').click();
+        } else {
+          alert('Listado cargado');
+        }
+      }, 500);
 
       getProductsAndServices(list => {
         $('#mainProductSearch').autocomplete({
