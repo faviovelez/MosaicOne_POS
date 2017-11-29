@@ -281,7 +281,7 @@ $(document).ready(function() {
                       $('#ticketNum').html()
                     ));
 
-                    window.location.reload(true);
+                    window.location.href = 'pos_sale.html';
 
                   });
 

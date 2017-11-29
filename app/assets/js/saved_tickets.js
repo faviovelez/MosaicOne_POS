@@ -535,6 +535,24 @@ $(function(){
     }
   }
 
+  function setUserData(userId, ticketId, call){
+    if (userId){
+
+      findBy(
+        'id',
+        userId,
+        'users'
+      ).then(user => {
+        json[
+          ticketId
+        ].user = createFullName(user.rows[0]);
+        call();
+      });
+    } else {
+      return call();
+    }
+  }
+
   if ($('#savedTicketsList').length === 1) {
 
     (function loadTickets(call){
@@ -553,17 +571,18 @@ $(function(){
               total    : ticket.total,
               comments : ticket.comments,
               prospect : '',
-              user     : createFullName(
-                store.get('current_user')
-              )
             };
 
             setStoreMovementsData(ticketId, function(){
               setProspectData(ticket.prospect_id, ticketId, function(){
-                count++;
-                if (limit === count){
-                  call();
-                }
+                setUserData(ticket.user_id, ticketId, function(){
+
+                  count++;
+                  if (limit === count){
+                    call();
+                  }
+
+                });
               });
             });
 
