@@ -70,12 +70,18 @@ function createTicketProductJson(call){
         return call();
       });
     });
+  } else {
+    return call();
   }
 
 }
 
 function quantityMessage(call){
   createTicketProductJson(function(){
+    if ($.isEmptyObject(productsJson)){
+      return call('', false);
+    }
+
     let needed = false,
         message = '<h1>Faltante de producto en relacion</h1>';
 
@@ -154,7 +160,7 @@ function createStoreMovement(data, call){
   ).then(storeMovement => {
     count++;
     if (count === Object.keys(productsJson).length){
-      call();
+      return call();
     }
   });
 }
@@ -164,7 +170,7 @@ function setPayedLogic(data){
   if ($(creditPaymentSelector).length > 0){
     let creditPaymentQuantity = $(creditPaymentSelector).find('td.cuantity').html().replace(/\s|\$|,/g,''),
         realPayment           =  data.payments_amount - creditPaymentQuantity;
-    if (realPayment <= data.total) {
+    if (realPayment <= parseFloat(data.total)) {
       data.payed = false;
       data.payments_amount = realPayment;
     }
@@ -225,7 +231,7 @@ function specialQuery(productId){
 
 function insertsServiceOffereds(ticketId, call){
   if ($.isEmptyObject(servicesJson)){
-    call();
+    return call();
   }
 
   count = 0;
@@ -277,19 +283,47 @@ function insertsServiceOffereds(ticketId, call){
       Object.keys(data),
       Object.values(data),
       'service_offereds'
-    ).then(storeMovement => {
-      count++;
-      if (count === Object.keys(servicesJson).length){
-        call();
-      }
+    ).then(serviceOffered => {
+      findBy('id', serviceOffered.lastId, 'service_offereds' ).then(
+        serviceOffered => {
+          let deliveryServiceId = $(
+            `#deliveryServiceId${serviceOffered.rows[0].service_id}`
+          ).html();
+
+          if (typeof deliveryServiceId === 'undefined'){
+            count++;
+            if (count === Object.keys(servicesJson).length){
+              return call();
+            }
+          } else {
+            let data = {
+              service_offered_id: serviceOffered.rows[0].id
+            };
+
+            updateBy(
+              data,
+              'delivery_services',
+              `id = ${deliveryServiceId}`).then(() => {
+
+                count++;
+                if (count === Object.keys(servicesJson).length){
+                  return call();
+                }
+
+              });
+          }
+        });
     });
 
   }
 }
 
 function assignCost(ticketId, call) {
-  count = 0;
+  if ($.isEmptyObject(productsJson)){
+    return call();
+  }
 
+  count = 0;
   for (var productId in productsJson){
     let localQuery = specialQuery(productId);
 

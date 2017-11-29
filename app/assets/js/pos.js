@@ -173,6 +173,9 @@ $(document).ready(function() {
   }
 
   $('#addPayment').click(function(){
+    if ($('#ticketList tr').length === 0){
+      return false;
+    }
     let count = $('#paymentMethodList tr').length - 2,
         type  = $('.payment-form-wrapper .selected')
       .html().replace(/\s/g,'').replace(/.*<\/i>/,''),
@@ -224,42 +227,77 @@ $(document).ready(function() {
     $('#ticketDiscountChange').modal('toggle');
   });
 
+  function validateAllServiceOfferedFill(){
+    if ($('tr[id$=services').length > 0){
+      let error = false;
+      $.each($('tr[id$=services]'), function(){
+        if ($(this).find('a[data-target="#deliveryService"]').length === 1){
+          if ($(this).find('td[id^=deliveryServiceId]').length === 0){
+            error = true;
+          }
+        }
+      });
+      return !error;
+    }
+    return true;
+  }
+
+  function deleteTicket(ticketId){
+    deleteBy('store_movements', `ticket_id = ${ticketId}`).then(() => {});
+    deleteBy('payments', `ticket_id = ${ticketId}`).then(() => {});
+    deleteBy('service_offereds', `ticket_id = ${ticketId}`).then(() => {});
+    deleteBy('tickets', `id = ${ticketId}`).then(() => {});
+    $(`#ticket${ticketId}`).remove();
+    $('#cancelTicket').modal('hide');
+  }
+
   $('#completeSale').click(function() {
-    validateQuantity(function(hasInventory){
+    let ticketId = window.location.href.replace(/.*ticket_id=/,'');
 
-      if (hasInventory){
+    if (!isNaN(parseInt(ticketId))){
+      deleteTicket(ticketId);
+    }
 
-        initStore().then(store => {
-          let user        = store.get('current_user').id,
+    if (validateAllServiceOfferedFill()){
+
+      validateQuantity(function(hasInventory){
+
+        if (hasInventory){
+
+          initStore().then(store => {
+            let user        = store.get('current_user').id,
               storeObject = store.get('store'),
               storeId     = store.id;
 
-          insertTicket(user, function(ticketId){
+            insertTicket(user, function(ticketId){
 
-            assignCost(ticketId, function(){
+              assignCost(ticketId, function(){
 
-              insertsServiceOffereds(ticketId, function(){
+                insertsServiceOffereds(ticketId, function(){
 
-                insertsPayments(ticketId, user, storeObject, function(){
+                  insertsPayments(ticketId, user, storeObject, function(){
 
-                  store.set('lastTicket', parseInt(
-                    $('#ticketNum').html()
-                  ));
+                    store.set('lastTicket', parseInt(
+                      $('#ticketNum').html()
+                    ));
 
-                  window.location.reload(true);
+                    window.location.href = 'pos_sale.html';
+
+                  });
 
                 });
 
               });
 
-            });
+            }, 'venta');
 
-          }, 'venta');
+          });
 
-        });
-
-      }
-    });
+        }
+      });
+    } else {
+      alert('Favor de llenar toda la informacion de envios');
+    }
 
   });
 
@@ -347,16 +385,17 @@ $(document).ready(function() {
     createRealSubtotal();
   }
 
-  function createTotal(id, manualDiscount = false){
-    let cuantity = $(`#cuantityTo_${id}`).val(),
+  function createTotal(id){
+    let cuantity = $(`input[id^=cuantityTo_${id}]`).val(),
+      manualDiscount = !$('#manual-discount').hasClass('hidden'),
       price    = parseFloat(
-        $(`#priceTo_${id}`).html().replace(' $ ','')
+        $(`td[id^=priceTo_${id}]`).html().replace(' $ ','')
       );
     if (!price){
-      price = $(`#priceTo_${id} input`).val();
+      price = $(`td[id^=priceTo_${id}] input`).val();
     }
     let total =  price * cuantity,
-        discount = $(`#discount_${id}`)
+        discount = $(`a[id^=discount_${id}]`)
       .html().replace(' %',''),
       discountVal = parseFloat(discount) / 100 * total,
       productTotal    = total - discountVal;
@@ -365,6 +404,11 @@ $(document).ready(function() {
       let globalManual = parseFloat(
         $('#manualDiscountQuantity').html().replace(' $ ','')
       );
+
+      if (globalManual.toString() === 'NaN'){
+        globalManual = 0;
+      }
+
       $('#manualDiscountQuantity').html(
         ` $ ${(globalManual += discountVal).toFixed(
           2
@@ -399,6 +443,119 @@ $(document).ready(function() {
       bigTotal();
     });
   }
+
+  $('#deliveryService').on('shown.bs.modal', function(e) {
+    let serviceId = e.relatedTarget.dataset.id;
+
+    $('#delivery_service_sender_name').val('');
+    $('#delivery_service_sender_zipcode').val('');
+    $('#delivery_service_tracking_number').val('');
+    $('#delivery_service_receivers_name').val('');
+    $('#delivery_service_contact_name').val('');
+    $('#delivery_service_street').val('');
+    $('#delivery_service_exterior_number').val('');
+    $('#delivery_service_interior_number').val('');
+    $('#delivery_service_neighborhood').val('');
+    $('#delivery_service_city').val('');
+    $('#delivery_service_state').val('');
+    $('#delivery_service_country').val('');
+    $('#delivery_service_phone').val('');
+    $('#delivery_service_cellphone').val('');
+    $('#delivery_service_email').val('');
+    $('#delivery_service_company').val('');
+    $('#delivery_service_receivers_zipcode').val('');
+    $('#secretServiceId').val(serviceId);
+
+  });
+
+  async function checkFillAll(objects){
+    let error = false;
+    for (var key in objects) {
+      let validation = notNull(objects[key], key);
+      if (!validation.result){
+        error = true;
+        showAlert(validation.type, validation.message, cloneAlert());
+      }
+    }
+    return error;
+  }
+
+  function validateDeliveryService(call){
+    let params = {
+      sender_name       : $('#delivery_service_sender_name').val(),
+      sender_zipcode    : $('#delivery_service_sender_zipcode').val(),
+      tracking_number   : $('#delivery_service_tracking_number').val(),
+      receivers_name    : $('#delivery_service_receivers_name').val(),
+      contact_name      : $('#delivery_service_contact_name').val(),
+      receivers_zipcode : $('#delivery_service_receivers_zipcode').val()
+    };
+
+    checkFillAll(params).then(error => {
+
+      if (!error) {
+        let thisOrThatFill = thisOrThat(
+          '#delivery_service_phone',
+          '#delivery_service_cellphone'
+        );
+
+        if (!thisOrThatFill.result) {
+          showAlert(thisOrThatFill.type, thisOrThatFill.message, cloneAlert());
+          return call(false);
+        }
+        return call(true);
+      }
+      return call(false);
+    });
+  }
+
+  $('#deliveryServiceSave').click(function(){
+    data = {
+      sender_name       : $('#delivery_service_sender_name').val(),
+      sender_zipcode    : $('#delivery_service_sender_zipcode').val(),
+      tracking_number   : $('#delivery_service_tracking_number').val(),
+      receivers_name    : $('#delivery_service_receivers_name').val(),
+      contact_name      : $('#delivery_service_contact_name').val(),
+      street            : $('#delivery_service_street').val(),
+      exterior_number   : $('#delivery_service_exterior_number').val(),
+      interior_number   : $('#delivery_service_interior_number').val(),
+      neighborhood      : $('#delivery_service_neighborhood').val(),
+      city              : $('#delivery_service_city').val(),
+      state             : $('#delivery_service_state').val(),
+      country           : $('#delivery_service_country').val(),
+      phone             : $('#delivery_service_phone').val(),
+      cellphone         : $('#delivery_service_cellphone').val(),
+      email             : $('#delivery_service_email').val(),
+      receivers_zipcode : $('#delivery_service_receivers_zipcode').val()
+    };
+
+    validateDeliveryService(function(validate){
+      if (validate){
+
+        findBy('id', $('#secretServiceId').val(), 'services').then(service => {
+
+          data.company = service.rows[0].delivery_company;
+
+          insert(
+            Object.keys(data),
+            Object.values(data),
+            'delivery_services'
+          ).then(deliveryServices => {
+
+            let secretId = $('#secretServiceId').val();
+            $(`#product_${secretId}_services`).append(
+              `<td id="deliveryServiceId${secretId}" class="hidden">` +
+              `${deliveryServices.lastId}</td>`
+            );
+            $('#deliveryService').modal('hide');
+
+          });
+
+        });
+      }
+    });
+
+    return false;
+  });
 
   $('#productShow').on('shown.bs.modal', function(e) {
     let relatedObject = e.relatedTarget.dataset,
@@ -494,6 +651,9 @@ $(document).ready(function() {
   function addTr(product){
     let color = product.table === 'services' ? carIcon(product.id, product.company) :
       product.color,
+      description = product.table === 'products' ? '<a href="#" data-toggle="modal" ' +
+      ` data-target="#productShow" data-id="${product.id}" data-table="${product.table}" >` +
+      ` ${product.description} </a>` : product.description,
       productInList = $(`#product_${product.id}`);
 
     if (productInList.length === 1) {
@@ -519,10 +679,7 @@ $(document).ready(function() {
       '</div>' +
       '</td>' +
       '<td class="left">' +
-      '<a href="#" data-toggle="modal" data-target="#productShow"' +
-      `data-id="${product.id}" data-table="${product.table}" >` +
-      product.description +
-      '</a>' +
+      description +
       '</td>' +
       `<td> ${color} </td>` +
       `<td id="priceTo_${product.id}"> ${translatePrice(price)}` +

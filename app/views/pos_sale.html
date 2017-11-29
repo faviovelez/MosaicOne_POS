@@ -1032,7 +1032,7 @@
 
            <form class="new_delivery_service" id="new_delivery_service" action="#" accept-charset="UTF-8" method="post">
              <input name="utf8" type="hidden" value="&#x2713;" />
-             <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
+             <input type="hidden" id="secretServiceId" />
 
              <h4> Datos de guía y remitente </h4>
              <table class="delivery-services-table">
@@ -1191,7 +1191,7 @@
                </table>
 
              <div class="actions">
-               <input type="submit" name="commit" value="Guardar datos" class="main-button" />
+               <input type="submit" name="commit" value="Guardar datos" id="deliveryServiceSave" class="main-button" />
              </div>
            </form>
          </div>

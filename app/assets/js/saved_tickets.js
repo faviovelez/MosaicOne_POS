@@ -268,11 +268,24 @@ $(function(){
       ` ticket_id = ${ticketId}`;
     query(localQuery).then(serviceOffereds => {
       serviceOffereds.rows.forEach(service => {
+        findBy('service_offered_id', service.id, 'delivery_services').then(
+          deliveryService => {
+            let deliveryServiceObject = deliveryService.rows[0];
+
+            $(`#product_${serviceId}_services`).append(
+              `<td id="deliveryServiceId${serviceId}" class="hidden">` +
+              `${deliveryServiceObject.id}</td>`
+            );
+          }
+        );
+
         service.table = 'services';
         service.id    = service.service_id;
+        serviceId     = service.id;
 
         $('#ticketList').append(addTr(service));
         addEvents(service.id);
+
       });
     });
 
@@ -522,6 +535,24 @@ $(function(){
     }
   }
 
+  function setUserData(userId, ticketId, call){
+    if (userId){
+
+      findBy(
+        'id',
+        userId,
+        'users'
+      ).then(user => {
+        json[
+          ticketId
+        ].user = createFullName(user.rows[0]);
+        call();
+      });
+    } else {
+      return call();
+    }
+  }
+
   if ($('#savedTicketsList').length === 1) {
 
     (function loadTickets(call){
@@ -540,17 +571,18 @@ $(function(){
               total    : ticket.total,
               comments : ticket.comments,
               prospect : '',
-              user     : createFullName(
-                store.get('current_user')
-              )
             };
 
             setStoreMovementsData(ticketId, function(){
               setProspectData(ticket.prospect_id, ticketId, function(){
-                count++;
-                if (limit === count){
-                  call();
-                }
+                setUserData(ticket.user_id, ticketId, function(){
+
+                  count++;
+                  if (limit === count){
+                    call();
+                  }
+
+                });
               });
             });
 
