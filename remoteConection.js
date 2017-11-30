@@ -2,18 +2,18 @@ const {Pool} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-  user: 'faviovelez',
+  user: 'oscar',
   host: 'localhost',
-  database: 'mosaiconepos',
-  password: 'bafio44741',
+  database: 'mosaicone',
+  password: '12345678"',
   port: 5432,
 });
 
 const localPool = new Pool({
-  user: 'faviovelez',
+  user: 'oscar',
   host: 'localhost',
-  database: 'mosaiconepos',
-  password: 'bafio44741',
+  database: 'local_db',
+  password: '12345678"',
   port: 5432,
 });
 
@@ -41,41 +41,29 @@ async function query (q, remote = true, table = '') {
   return res;
 }
 
-async function toWebDatabase(){
-  let rows,
-    tablesListQuery = "SELECT table_name" +
-    " FROM information_schema.tables" +
-    " WHERE table_schema='public'" +
-    " AND table_type='BASE TABLE'";
-      tablesList = await query(tablesListQuery, false);
-  tablesList.rows.forEach(async table => {
+async function getLastTime(table){
+  let localQuery = `SELECT updated_at as time FROM ${table}` +
+               ' ORDER BY updated_at DESC LIMIT 1';
 
-    try {
+  let row = await query(localQuery);
 
-      let rows = await toDayRows(table.table_name);
-      rows.rows.forEach(async register => {
+  return row.rows[0];
+}
 
-        delete register.id;
-        let insertQuery = await createInsert(
-          Object.keys(register),
-          Object.values(register),
-          table.table_name
-        );
+async function getToTransfer(table){
+  let localQuery = `SELECT * FROM ${table}` +
+                   ' WHERE updated_at > ',
+      lastTimeObject = { time: '' };
 
-        try {
-          await query(insertQuery);
-        } catch (err) {
-          console.log(table);
-        }
+      lastTimeObject = await getLastTime(table);
+  try {
+    timeString = lastTimeObject.time.toString().replace(/GMT.*/,'');
+    localQuery += `'${timeString}'`;
+  } catch (err) {
+    localQuery = `SELECT * FROM ${table}`;
+  }
 
-      });
-
-    } catch(err) {
-      console.log(table);
-    }
-
-
-  });
+  return await query(localQuery, false, table);
 }
 
 async function toDayRows(table){
@@ -89,13 +77,16 @@ async function toDayRows(table){
   return await query(localQuery, false);
 }
 
-async function createInsert (columns, data, table){
-  let localQuery = `INSERT INTO public.${table}(`;
+async function createInsert (columns, data, table, storeId = 0){
+  let localQuery = `INSERT INTO public.${table}(id, `;
   localQuery += columns.shift();
   columns.forEach(fieldName => {
     localQuery += `, "${fieldName}"`;
   });
-  localQuery += `) VALUES ( '${data.shift()}'`;
+  let lastId = await query(`SELECT MAX(id) as id FROM ${table}`);
+  recordId = (lastId.rows[0].id + 1);
+  localQuery += ` VALUES ('${recordId}', '${data.shift()}'`;
+
   data.forEach(data => {
     switch(data){
       case null:
@@ -106,13 +97,21 @@ async function createInsert (columns, data, table){
         break;
       default:
         if (typeof data === 'object'){
-          localQuery += `, '${data.toUTCString()}'`;
+          localQuery += `, '${data.toUTCString().replace(
+          /GMT.*|/g,''
+          )}'`;
         } else {
           localQuery += `, '${data}'`;
         }
     }
   });
-  return `${localQuery})`;
+
+  return {
+    query   : `${localQuery})`,
+    lastId  : recordId,
+    table   : table,
+    storeId : storeId
+  };
 }
 
 async function findBy(column, data, table){
