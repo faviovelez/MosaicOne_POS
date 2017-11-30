@@ -70,11 +70,13 @@ $(function(){
   });
 
   $('#openCash').click(function(){
+
     initStore().then(store => {
       store.set('cash', $('#register_open_cash_register').val());
-      window.location.href = 'open_sale.html';
+      $('#pos').click();
       return false;
     });
+
   });
 
   $('#closeDay').click(function(){

@@ -115,8 +115,8 @@ async function insert (columns, data, table){
   let createDate = new Date(),
     updateDate = new Date();
 
-  localQuery += `, '${createDate.toString().replace(' GMT-0600 (CST)','')}',`;
-  localQuery += `'${updateDate.toString().replace(' GMT-0600 (CST)','')}'`;
+  localQuery += `, '${createDate.toString().replace(/GMT.*/,'')}',`;
+  localQuery += `'${updateDate.toString().replace(/GMT.*/,'')}'`;
   if ($.inArray(table, storeIdsTables) > -1) {
     let storeId = store.get('store').id;
     localQuery += `, '${storeId}'`;
