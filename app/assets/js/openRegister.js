@@ -48,54 +48,70 @@ $(function(){
     ];
   }
 
+  function getTranslateRelations(){
+    return {
+      'billing_addresses_id' : 'billing_address_id',
+      'users_id'             : 'user_id',
+      'prospects_id'         : 'prospect_id',
+      'cash_registers_id'    : 'cash_register_id',
+      'parents_id'           : 'parent_id',
+      'tickets_id'           : 'ticket_id',
+      'childrens_id'         : 'children_id',
+      'banks_id'             : 'bank_id',
+      'terminals_id'         : 'terminal_id',
+      'store_movements_id'   : 'store_movement_id',
+      'service_offereds_id'  : 'service_offered_id'
+    };
+  }
+
   function getRelationObjectDetails(){
     return {
 
       'prospects' : {
-        'billing_address_id' : {},
+        'billing_addresses_id' : {},
       },
 
       'tickets' : {
-        'user_id': {},
-        'prospect_id' : {},
-        'cash_register_id' : {},
-        'parent_id' : {},
+        'users_id': {},
+        'prospects_id' : {},
+        'cash_registers_id' : {},
+        'parents_id' : {},
       },
 
       'tickets_children' : {
-        'ticket_id' : {},
-        'children_id' : {}
+        'tickets_id' : {},
+        'childrens_id' : {}
       },
 
       'terminals' : {
-        'bank_id' : {},
+        'banks_id' : {},
       },
 
       'payments' : {
-        'user_id' : {},
-        'terminal_id' : {},
-        'ticket_id' : {},
-        'bank_id' : {},
+        'users_id' : {},
+        'terminals_id' : {},
+        'tickets_id' : {},
+        'banks_id' : {},
       },
 
       'store_movements': {
-        'ticket_id' : {}
+        'tickets_id' : {}
       },
 
       'stores_warehouse_entries' : {
-        'store_movement_id' : {}
+        'store_movements_id' : {}
       },
 
       service_offereds : {
-        'ticket_id' : {}
+        'tickets_id' : {}
       },
 
       'delivery_services' : {
-        'service_offered_id' : {}
+        'service_offereds_id' : {}
       },
 
       'expenses' : {
-        'user_id' : {}
+        'users_id' : {}
       }
     };
   }
@@ -173,47 +189,6 @@ $(function(){
     });
   }
 
-  function createInsertsQueries(call){
-    count = 0;
-    limit = limitRows;
-
-    getLotTables().forEach(table => {
-      delete sendObjects[table].processRow;
-      delete sendObjects[table].rowsLimit;
-
-      for (var key in sendObjects[table]){
-        let row = sendObjects[table][key].object;
-
-        delete row.id;
-
-        createInsert(
-          Object.keys(row),
-          Object.values(row),
-          table,
-          key
-        ).then(remoteQueryObject => {
-
-          tablesData[remoteQueryObject.table][
-            remoteQueryObject.storeId
-          ].inWeb = remoteQueryObject.lastId;
-          tablesData[remoteQueryObject.table][
-            remoteQueryObject.storeId
-          ].query = remoteQueryObject.query;
-
-          remoteObject = remoteQueryObject;
-
-          count++;
-          if (count === limit){
-            return call();
-          }
-
-        });
-
-      }
-
-    });
-  }
-
   function createFullName(user){
     return `${user.first_name} ${user.middle_name} ${user.last_name}`;
   }
@@ -280,182 +255,123 @@ $(function(){
 
   });
 
+  function updatedRelationIds(table, mainKey, key, translateRelations){
+    let billingsAddressId = sendObjects[
+                              table
+                            ][
+                              mainKey
+                            ].object[
+                              translateRelations[
+                                key
+                              ]
+                            ];
+
+    if (billingsAddressId !== null) {
+      try{
+        sendObjects[
+          table
+        ][
+          mainKey
+        ].object[
+          translateRelations[
+            key
+          ]
+        ] = tablesData[key.replace('_id','')][billingsAddressId].inWeb;
+      } catch (err) {
+        debugger
+      }
+    }
+  }
+
   function processTableToWeb(table, call){
+
     if (sendObjects[table].rowsLimit === 0){
       return call();
     }
 
-    for (var key in tablesData[table]){
-      insertInWeb(
-        tablesData[table][key].query,
-        table,
-        key
-      ).then(resultInsert => {
-        tablesData[
-          resultInsert.table
-        ][
-          resultInsert.storeId
-        ].inWeb = resultInsert.lastId;
+    sendObjects[table].processRow = 0;
+    let translateRelations = getTranslateRelations();
 
-        sendObjects[resultInsert.table].processRow++;
+    for (var mainKey in tablesData[table]){
 
-        if (
-        sendObjects[
-          resultInsert.table
-        ].processRow === sendObjects[
-          resultInsert.table
-        ].rowsLimit
-        ) {
-          return call();
+      if (relationObjectDetails[table]) {
+        for (var key in relationObjectDetails[
+          table
+        ]) {
+          updatedRelationIds(table, mainKey, key, translateRelations);
         }
+      }
+
+      let row = sendObjects[table][mainKey].object;
+
+      delete row.id;
+
+      createInsert(
+        Object.keys(row),
+        Object.values(row),
+        table,
+        mainKey
+      ).then(remoteQueryObject => {
+        insertInWeb(
+          remoteQueryObject.query,
+          table,
+          remoteQueryObject.storeId
+        ).then(resultInsert => {
+
+          tablesData[
+            resultInsert.table
+          ][
+            resultInsert.storeId
+          ].inWeb = resultInsert.lastId;
+
+          sendObjects[resultInsert.table].processRow++;
+
+          if (
+            sendObjects[
+              resultInsert.table
+            ].processRow === sendObjects[
+              resultInsert.table
+            ].rowsLimit
+          ) {
+            return call();
+          }
+        });
+
       });
     }
   }
 
   $('#closeDay').click(function(event){
     createStoreObjectsLot(function(){
-      createInsertsQueries(function(){
 
-        sendObjects.users = {
-          rowsLimit  : Object.keys(tablesData.users).length,
-          processRow : 0
-        };
+      processTableToWeb('users', function(){
 
-        processTableToWeb('users', function(){
+        processTableToWeb('billing_addresses', function(){
 
-          try {
-            sendObjects.billing_addresses = {
-              rowsLimit  : Object.keys(
-                tablesData.billing_addresses
-              ).length,
-              processRow : 0
-            };
-          } catch (err) {
-            sendObjects.billing_addresses = {
-              rowsLimit  : 0,
-              processRow : 0
-            };
-          }
+          processTableToWeb('prospects', function(){
 
-          processTableToWeb('billing_addresses', function(){
+            processTableToWeb('cash_registers', function(){
 
-            sendObjects.prospects = {
-              rowsLimit  : Object.keys(
-                tablesData.prospects
-              ).length,
-              processRow : 0
-            };
+              processTableToWeb('tickets', function(){
 
-            processTableToWeb('prospects', function(){
+                processTableToWeb('tickets_children', function(){
 
-              try {
-                sendObjects.cash_registers = {
-                  rowsLimit  : Object.keys(
-                    tablesData.cash_registers
-                  ).length,
-                  processRow : 0
-                };
-              } catch (err) {
-                sendObjects.cash_registers = {
-                  rowsLimit  : 0,
-                  processRow : 0
-                };
-              }
+                  processTableToWeb('terminals', function(){
 
-              processTableToWeb('cash_registers', function(){
+                    processTableToWeb('payments', function(){
 
-                sendObjects.tickets = {
-                  rowsLimit  : Object.keys(
-                    tablesData.tickets
-                  ).length,
-                  processRow : 0
-                };
+                      processTableToWeb('store_movements', function(){
 
-                processTableToWeb('tickets', function(){
+                        processTableToWeb('stores_warehouse_entries', function(){
 
-                  sendObjects.tickets_children = {
-                    rowsLimit  : Object.keys(
-                      tablesData.tickets_children
-                    ).length,
-                    processRow : 0
-                  };
+                          processTableToWeb('stores_inventories', function(){
 
-                  processTableToWeb('tickets_children', function(){
+                            processTableToWeb('service_offereds', function(){
 
-                    sendObjects.terminals = {
-                      rowsLimit  : Object.keys(
-                        tablesData.terminals
-                      ).length,
-                      processRow : 0
-                    };
+                              processTableToWeb('delivery_services', function(){
 
-                    processTableToWeb('terminals', function(){
-
-                      sendObjects.payments = {
-                        rowsLimit  : Object.keys(
-                          tablesData.payments
-                        ).length,
-                        processRow : 0
-                      };
-
-                      processTableToWeb('payments', function(){
-
-                        sendObjects.store_movements = {
-                          rowsLimit  : Object.keys(
-                            tablesData.store_movements
-                          ).length,
-                          processRow : 0
-                        };
-
-                        processTableToWeb('store_movements', function(){
-
-                          sendObjects.stores_warehouse_entries = {
-                            rowsLimit  : Object.keys(
-                              tablesData.stores_warehouse_entries
-                            ).length,
-                            processRow : 0
-                          };
-
-                          processTableToWeb('stores_warehouse_entries', function(){
-
-                            sendObjects.stores_inventories = {
-                              rowsLimit  : Object.keys(
-                                tablesData.stores_inventories
-                              ).length,
-                              processRow : 0
-                            };
-
-                            processTableToWeb('stores_inventories', function(){
-
-                              sendObjects.service_offereds = {
-                                rowsLimit  : Object.keys(
-                                  tablesData.service_offereds
-                                ).length,
-                                processRow : 0
-                              };
-
-                              processTableToWeb('service_offereds', function(){
-
-                                sendObjects.delivery_services = {
-                                  rowsLimit  : Object.keys(
-                                    tablesData.delivery_services
-                                  ).length,
-                                  processRow : 0
-                                };
-
-                                processTableToWeb('delivery_services', function(){
-
-                                  sendObjects.expenses = {
-                                    rowsLimit  : Object.keys(
-                                      tablesData.expenses
-                                    ).length,
-                                    processRow : 0
-                                  };
-
-                                  processTableToWeb('expenses', function(){
-                                    debugger
-                                  });
-
+                                processTableToWeb('expenses', function(){
+                                  debugger
                                 });
 
                               });
