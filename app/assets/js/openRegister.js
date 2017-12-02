@@ -298,6 +298,7 @@ $(function(){
             key
           ]
         ] = tablesData[objectTable][objectId].inWeb;
+        return call();
       } catch (err) {
 
         findBy(
@@ -345,6 +346,11 @@ $(function(){
   }
 
   function processInsertInWeb(row, table, mainKey, call){
+    row.web = true;
+
+    if (table === 'users') {
+      row.email = `user_pos${row.email}`;
+    }
 
     createInsert(
       Object.keys(row),
@@ -366,12 +372,12 @@ $(function(){
 
         sendObjects[resultInsert.table].processRow++;
 
+        return call();
+
       });
 
-      return call();
-
     });
-  
+
   }
 
   function processTableToWeb(table, call){
@@ -456,7 +462,7 @@ $(function(){
                               processTableToWeb('delivery_services', function(){
 
                                 processTableToWeb('expenses', function(){
-                                  debugger
+                                  alert('Proceso terminado correctamente');
                                 });
 
                               });

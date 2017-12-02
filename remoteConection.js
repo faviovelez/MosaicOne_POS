@@ -50,6 +50,13 @@ async function query (q, remote = true, table = '', lastId = 0) {
   return res;
 }
 
+async function updatePosData(table, lastId, newId){
+  let localQuery = `UPDATE ${table} SET id = ${newId},` +
+                   ` web = true WHERE id = ${lastId}`;
+
+  return query(localQuery, false);
+}
+
 async function insertInWeb(localQuery, table, storeId){
   let lastId   = await query(`SELECT MAX(id) as id FROM ${table}`);
   recordId = (lastId.rows[0].id + 1);
@@ -75,31 +82,14 @@ async function insertInWeb(localQuery, table, storeId){
     );
   }
 
+  await updatePosData(table, storeId, queryResult.lastId);
   queryResult.storeId = storeId;
   return queryResult;
 }
 
-async function getLastTime(table){
-  let localQuery = `SELECT updated_at as time FROM ${table}` +
-               ' ORDER BY updated_at DESC LIMIT 1';
-
-  let row = await query(localQuery);
-
-  return row.rows[0];
-}
-
 async function getToTransfer(table){
   let localQuery = `SELECT * FROM ${table}` +
-                   ' WHERE updated_at > ',
-      lastTimeObject = { time: '' };
-
-      lastTimeObject = await getLastTime(table);
-  try {
-    timeString = lastTimeObject.time.toString().replace(/GMT.*/,'');
-    localQuery += `'${timeString}'`;
-  } catch (err) {
-    localQuery = `SELECT * FROM ${table}`;
-  }
+                   ' WHERE web = false';
 
   return await query(localQuery, false, table);
 }

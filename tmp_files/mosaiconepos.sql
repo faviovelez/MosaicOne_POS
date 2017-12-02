@@ -79,7 +79,10 @@ CREATE TABLE banks (
     name character varying,
     rfc character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -213,7 +216,10 @@ CREATE TABLE billing_addresses (
     country character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    tax_regime_id integer
+    tax_regime_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -258,7 +264,6 @@ CREATE TABLE bills (
     store_id integer,
     sequence character varying,
     folio character varying,
-    payment_condition_id integer,
     payment_method_id integer,
     payment_form_id integer,
     tax_regime_id integer,
@@ -281,7 +286,6 @@ CREATE TABLE bills (
     certificate_number character varying,
     qr_string character varying,
     original_chain text,
-    sat_stampl text,
     digital_stamp text,
     subtotal double precision,
     total double precision,
@@ -291,7 +295,12 @@ CREATE TABLE bills (
     uuid character varying,
     taxes double precision,
     payed boolean DEFAULT false,
-    parent_id integer
+    parent_id integer,
+    sat_stamp character varying,
+    payment_conditions character varying,
+    "from" character varying,
+    cancel_receipt character varying,
+    rows text[] DEFAULT '{}'::text[]
 );
 
 
@@ -363,12 +372,14 @@ CREATE TABLE business_group_sales (
     business_group_id integer,
     month integer,
     year integer,
-    sales_amount double precision,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    sales_quantity integer,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer
 );
 
 
@@ -474,14 +485,16 @@ ALTER SEQUENCE business_groups_suppliers_id_seq OWNED BY business_groups_supplie
 CREATE TABLE business_unit_sales (
     id integer NOT NULL,
     business_unit_id integer,
-    sales_amount double precision,
-    sales_quantity integer,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     month integer,
     year integer,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer
 );
 
 
@@ -631,7 +644,10 @@ CREATE TABLE cash_registers (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     balance double precision,
-    cash_number integer
+    cash_number integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
@@ -1024,7 +1040,10 @@ CREATE TABLE delivery_services (
     service_offered_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    receivers_zipcode character varying
+    receivers_zipcode character varying,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -1496,7 +1515,10 @@ CREATE TABLE expenses (
     updated_at timestamp without time zone NOT NULL,
     expense_type character varying,
     taxes double precision,
-    payment_id integer
+    payment_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -1603,7 +1625,10 @@ CREATE TABLE images (
     image character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    product_id integer
+    product_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
@@ -2010,7 +2035,7 @@ CREATE TABLE payment_forms (
     description character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    payment_id character varying
+    payment_key character varying
 );
 
 
@@ -2097,7 +2122,10 @@ CREATE TABLE payments (
     bank_id integer,
     credit_days integer,
     total double precision,
-    order_id integer
+    order_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -2157,7 +2185,8 @@ CREATE TABLE pending_movements (
     ticket_id integer,
     total_cost double precision,
     total double precision,
-    subtotal double precision
+    subtotal double precision,
+    taxes double precision DEFAULT 0.0
 );
 
 
@@ -2270,8 +2299,6 @@ ALTER SEQUENCE product_requests_id_seq OWNED BY product_requests.id;
 
 CREATE TABLE product_sales (
     id integer NOT NULL,
-    sales_amount double precision,
-    sales_quantity integer,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2280,7 +2307,11 @@ CREATE TABLE product_sales (
     year integer,
     store_id integer,
     business_unit_id integer,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer
 );
 
 
@@ -2467,7 +2498,15 @@ CREATE TABLE products (
     store_id integer,
     supplier_id integer,
     unit_id integer,
-    "group" boolean DEFAULT false
+    "group" boolean DEFAULT false,
+    child_id integer,
+    parent_id integer,
+    unit character varying,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date,
+    discount_for_stores double precision DEFAULT 0.0,
+    discount_for_franchises double precision DEFAULT 0.0
 );
 
 
@@ -2501,8 +2540,6 @@ ALTER SEQUENCE products_id_seq OWNED BY products.id;
 CREATE TABLE prospect_sales (
     id integer NOT NULL,
     prospect_id integer,
-    sales_amount double precision,
-    sales_quantity integer,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2510,7 +2547,11 @@ CREATE TABLE prospect_sales (
     year integer,
     store_id integer,
     business_unit_id integer,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer
 );
 
 
@@ -2566,7 +2607,10 @@ CREATE TABLE prospects (
     store_code character varying,
     store_type_id integer,
     store_prospect_id integer,
-    credit_days integer
+    credit_days integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -3106,7 +3150,10 @@ CREATE TABLE service_offereds (
     quantity integer,
     discount_reason character varying,
     total double precision,
-    subtotal double precision
+    subtotal double precision,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -3134,6 +3181,50 @@ ALTER SEQUENCE service_offereds_id_seq OWNED BY service_offereds.id;
 
 
 --
+-- Name: service_sales; Type: TABLE; Schema: public; Owner: oscar
+--
+
+CREATE TABLE service_sales (
+    id integer NOT NULL,
+    store_id integer,
+    year integer,
+    month integer,
+    cost double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    discount double precision,
+    quantity integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    service_id integer
+);
+
+
+ALTER TABLE service_sales OWNER TO oscar;
+
+--
+-- Name: service_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+--
+
+CREATE SEQUENCE service_sales_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE service_sales_id_seq OWNER TO oscar;
+
+--
+-- Name: service_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+--
+
+ALTER SEQUENCE service_sales_id_seq OWNED BY service_sales.id;
+
+
+--
 -- Name: services; Type: TABLE; Schema: public; Owner: oscar
 --
 
@@ -3150,7 +3241,8 @@ CREATE TABLE services (
     business_unit_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    delivery_company character varying
+    delivery_company character varying,
+    current boolean
 );
 
 
@@ -3205,7 +3297,11 @@ CREATE TABLE store_movements (
     total_cost double precision,
     discount_reason character varying,
     total double precision,
-    subtotal double precision
+    subtotal double precision,
+    bill_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -3241,12 +3337,16 @@ CREATE TABLE store_sales (
     store_id integer,
     month character varying,
     year character varying,
-    sales_amount double precision,
-    sales_quantity integer,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer,
+    payments double precision,
+    expenses double precision
 );
 
 
@@ -3394,7 +3494,7 @@ CREATE TABLE stores (
     advance_i_last_folio integer DEFAULT 0,
     initial_inventory character varying,
     current_inventory character varying,
-    prospects character varying
+    propects_file character varying
 );
 
 
@@ -3436,7 +3536,10 @@ CREATE TABLE stores_inventories (
     updated_at timestamp without time zone NOT NULL,
     rack character varying,
     level character varying,
-    manual_price_update boolean DEFAULT false
+    manual_price_update boolean DEFAULT false,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -3513,7 +3616,10 @@ CREATE TABLE stores_warehouse_entries (
     updated_at timestamp without time zone NOT NULL,
     retail_units_per_unit integer,
     units_used integer,
-    store_movement_id integer
+    store_movement_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
@@ -3719,7 +3825,10 @@ CREATE TABLE terminals (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     debit_comission double precision,
-    credit_comission double precision
+    credit_comission double precision,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
@@ -3772,7 +3881,11 @@ CREATE TABLE tickets (
     cash_return double precision,
     payed boolean DEFAULT false,
     parent_id integer,
-    cost double precision
+    cost double precision,
+    saved boolean,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
@@ -3787,7 +3900,10 @@ CREATE TABLE tickets_children (
     ticket_id integer,
     children_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
@@ -4004,7 +4120,10 @@ CREATE TABLE users (
     middle_name character varying,
     last_name character varying,
     store_id integer,
-    role_id integer
+    role_id integer,
+    pos boolean,
+    web boolean,
+    date date
 );
 
 
@@ -4673,6 +4792,13 @@ ALTER TABLE ONLY service_offereds ALTER COLUMN id SET DEFAULT nextval('service_o
 -- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
 --
 
+ALTER TABLE ONLY service_sales ALTER COLUMN id SET DEFAULT nextval('service_sales_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+--
+
 ALTER TABLE ONLY services ALTER COLUMN id SET DEFAULT nextval('services_id_seq'::regclass);
 
 
@@ -4856,7 +4982,7 @@ SELECT pg_catalog.setval('bank_balances_id_seq', 1, false);
 -- Data for Name: banks; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY banks (id, name, rfc, created_at, updated_at) FROM stdin;
+COPY banks (id, name, rfc, created_at, updated_at, pos, web, date) FROM stdin;
 \.
 
 
@@ -4901,7 +5027,7 @@ SELECT pg_catalog.setval('bill_sales_id_seq', 1, false);
 -- Data for Name: billing_addresses; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY billing_addresses (id, type_of_person, business_name, rfc, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, created_at, updated_at, tax_regime_id) FROM stdin;
+COPY billing_addresses (id, type_of_person, business_name, rfc, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, created_at, updated_at, tax_regime_id, pos, web, date) FROM stdin;
 \.
 
 
@@ -4916,7 +5042,7 @@ SELECT pg_catalog.setval('billing_addresses_id_seq', 1, false);
 -- Data for Name: bills; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY bills (id, status, discount_applied, created_at, updated_at, prospect_id, pdf, xml, issuing_company_id, receiving_company_id, store_id, sequence, folio, payment_condition_id, payment_method_id, payment_form_id, tax_regime_id, cfdi_use_id, tax_id, pac_id, relation_type_id, references_field, type_of_bill_id, currency_id, id_trib_reg_num, confirmation_key, exchange_rate, country_id, automatic_discount_applied, manual_discount_applied, taxes_transferred, taxes_witheld, sat_certificate_number, certificate_number, qr_string, original_chain, sat_stampl, digital_stamp, subtotal, total, sat_zipcode_id, date_signed, leyend, uuid, taxes, payed, parent_id) FROM stdin;
+COPY bills (id, status, discount_applied, created_at, updated_at, prospect_id, pdf, xml, issuing_company_id, receiving_company_id, store_id, sequence, folio, payment_method_id, payment_form_id, tax_regime_id, cfdi_use_id, tax_id, pac_id, relation_type_id, references_field, type_of_bill_id, currency_id, id_trib_reg_num, confirmation_key, exchange_rate, country_id, automatic_discount_applied, manual_discount_applied, taxes_transferred, taxes_witheld, sat_certificate_number, certificate_number, qr_string, original_chain, digital_stamp, subtotal, total, sat_zipcode_id, date_signed, leyend, uuid, taxes, payed, parent_id, sat_stamp, payment_conditions, "from", cancel_receipt, rows) FROM stdin;
 \.
 
 
@@ -4946,7 +5072,7 @@ SELECT pg_catalog.setval('bills_id_seq', 1, false);
 -- Data for Name: business_group_sales; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY business_group_sales (id, business_group_id, month, year, sales_amount, cost, created_at, updated_at, sales_quantity, discount) FROM stdin;
+COPY business_group_sales (id, business_group_id, month, year, cost, created_at, updated_at, discount, total, subtotal, taxes, quantity) FROM stdin;
 \.
 
 
@@ -4991,7 +5117,7 @@ SELECT pg_catalog.setval('business_groups_suppliers_id_seq', 1, false);
 -- Data for Name: business_unit_sales; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY business_unit_sales (id, business_unit_id, sales_amount, sales_quantity, cost, created_at, updated_at, month, year, discount) FROM stdin;
+COPY business_unit_sales (id, business_unit_id, cost, created_at, updated_at, month, year, discount, total, subtotal, taxes, quantity) FROM stdin;
 \.
 
 
@@ -5051,7 +5177,7 @@ SELECT pg_catalog.setval('carriers_id_seq', 1, false);
 -- Data for Name: cash_registers; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY cash_registers (id, name, store_id, created_at, updated_at, balance, cash_number) FROM stdin;
+COPY cash_registers (id, name, store_id, created_at, updated_at, balance, cash_number, pos, web, date) FROM stdin;
 \.
 
 
@@ -5201,7 +5327,7 @@ SELECT pg_catalog.setval('delivery_packages_id_seq', 1, false);
 -- Data for Name: delivery_services; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY delivery_services (id, sender_name, sender_zipcode, tracking_number, receivers_name, contact_name, street, exterior_number, interior_number, neighborhood, city, state, country, phone, cellphone, email, company, service_offered_id, created_at, updated_at, receivers_zipcode) FROM stdin;
+COPY delivery_services (id, sender_name, sender_zipcode, tracking_number, receivers_name, contact_name, street, exterior_number, interior_number, neighborhood, city, state, country, phone, cellphone, email, company, service_offered_id, created_at, updated_at, receivers_zipcode, pos, web, date) FROM stdin;
 \.
 
 
@@ -5381,7 +5507,7 @@ SELECT pg_catalog.setval('expedition_zips_id_seq', 1, false);
 -- Data for Name: expenses; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY expenses (id, subtotal, taxes_rate, total, store_id, business_unit_id, user_id, bill_received_id, month, year, expense_date, created_at, updated_at, expense_type, taxes, payment_id) FROM stdin;
+COPY expenses (id, subtotal, taxes_rate, total, store_id, business_unit_id, user_id, bill_received_id, month, year, expense_date, created_at, updated_at, expense_type, taxes, payment_id, pos, web, date) FROM stdin;
 \.
 
 
@@ -5426,7 +5552,7 @@ SELECT pg_catalog.setval('finishings_id_seq', 1, false);
 -- Data for Name: images; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY images (id, image, created_at, updated_at, product_id) FROM stdin;
+COPY images (id, image, created_at, updated_at, product_id, pos, web, date) FROM stdin;
 \.
 
 
@@ -5576,7 +5702,7 @@ SELECT pg_catalog.setval('payment_conditions_id_seq', 1, false);
 -- Data for Name: payment_forms; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY payment_forms (id, description, created_at, updated_at, payment_id) FROM stdin;
+COPY payment_forms (id, description, created_at, updated_at, payment_key) FROM stdin;
 \.
 
 
@@ -5606,7 +5732,7 @@ SELECT pg_catalog.setval('payment_methods_id_seq', 1, false);
 -- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY payments (id, payment_date, bill_received_id, supplier_id, created_at, updated_at, user_id, store_id, business_unit_id, payment_form_id, payment_type, bill_id, terminal_id, ticket_id, operation_number, payment_number, bank_id, credit_days, total, order_id) FROM stdin;
+COPY payments (id, payment_date, bill_received_id, supplier_id, created_at, updated_at, user_id, store_id, business_unit_id, payment_form_id, payment_type, bill_id, terminal_id, ticket_id, operation_number, payment_number, bank_id, credit_days, total, order_id, pos, web, date) FROM stdin;
 \.
 
 
@@ -5621,7 +5747,7 @@ SELECT pg_catalog.setval('payments_id_seq', 1, false);
 -- Data for Name: pending_movements; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY pending_movements (id, product_id, quantity, created_at, updated_at, order_id, cost, unique_code, store_id, initial_price, supplier_id, movement_type, user_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, ticket_id, total_cost, total, subtotal) FROM stdin;
+COPY pending_movements (id, product_id, quantity, created_at, updated_at, order_id, cost, unique_code, store_id, initial_price, supplier_id, movement_type, user_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, ticket_id, total_cost, total, subtotal, taxes) FROM stdin;
 \.
 
 
@@ -5666,7 +5792,7 @@ SELECT pg_catalog.setval('product_requests_id_seq', 1, false);
 -- Data for Name: product_sales; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY product_sales (id, sales_amount, sales_quantity, cost, created_at, updated_at, product_id, month, year, store_id, business_unit_id, discount) FROM stdin;
+COPY product_sales (id, cost, created_at, updated_at, product_id, month, year, store_id, business_unit_id, discount, total, subtotal, taxes, quantity) FROM stdin;
 \.
 
 
@@ -5726,7 +5852,9 @@ SELECT pg_catalog.setval('production_requests_id_seq', 1, false);
 -- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY products (id, former_code, unique_code, description, product_type, exterior_material_color, interior_material_color, impression, exterior_color_or_design, main_material, resistance_main_material, inner_length, inner_width, inner_height, outer_length, outer_width, outer_height, design_type, number_of_pieces, accesories_kit, created_at, updated_at, price, bag_length, bag_width, bag_height, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, classification, line, image, pieces_per_package, business_unit_id, warehouse_id, cost, rack, level, sat_key_id, sat_unit_key_id, current, store_id, supplier_id, unit_id, "group") FROM stdin;
+COPY products (id, former_code, unique_code, description, product_type, exterior_material_color, interior_material_color, impression, exterior_color_or_design, main_material, resistance_main_material, inner_length, inner_width, inner_height, outer_length, outer_width, outer_height, design_type, number_of_pieces, accesories_kit, created_at, updated_at, price, bag_length, bag_width, bag_height, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, classification, line, image, pieces_per_package, business_unit_id, warehouse_id, cost, rack, level, sat_key_id, sat_unit_key_id, current, store_id, supplier_id, unit_id, "group", child_id, parent_id, unit, pos, web, date, discount_for_stores, discount_for_franchises) FROM stdin;
+1	\N	1002	ecoburo combo zapatera 12 espacios 38x33x63	caja	\N	\N	\N	kraft	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	ninguno	2017-10-20 05:24:25	2017-10-20 23:01:35	107.248959999999997	\N	\N	\N	\N	\N	\N	\N	\N	de línea	hogar	\N	20	2	2	\N	\N	\N	\N	1070	t	\N	2	\N	f	\N	\N	\N	f	f	\N	0	0
+2	\N	1005	ecoburo combo zapatera 8 espacios 38x33x63	caja	\N	\N	\N	kraft	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	ninguno	2017-10-20 05:24:25	2017-10-20 23:01:35	96.527079999999998	\N	\N	\N	\N	\N	\N	\N	\N	de línea	hogar	\N	15	2	2	\N	\N	\N	\N	1070	t	\N	2	\N	f	\N	\N	\N	f	f	\N	0	0
 \.
 
 
@@ -5741,7 +5869,7 @@ SELECT pg_catalog.setval('products_id_seq', 1, false);
 -- Data for Name: prospect_sales; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY prospect_sales (id, prospect_id, sales_amount, sales_quantity, cost, created_at, updated_at, month, year, store_id, business_unit_id, discount) FROM stdin;
+COPY prospect_sales (id, prospect_id, cost, created_at, updated_at, month, year, store_id, business_unit_id, discount, total, subtotal, taxes, quantity) FROM stdin;
 \.
 
 
@@ -5756,7 +5884,7 @@ SELECT pg_catalog.setval('prospect_sales_id_seq', 1, false);
 -- Data for Name: prospects; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY prospects (id, store_id, created_at, updated_at, prospect_type, contact_first_name, contact_middle_name, contact_last_name, contact_position, direct_phone, extension, cell_phone, business_type, prospect_status, legal_or_business_name, billing_address_id, delivery_address_id, second_last_name, business_unit_id, email, business_group_id, store_code, store_type_id, store_prospect_id, credit_days) FROM stdin;
+COPY prospects (id, store_id, created_at, updated_at, prospect_type, contact_first_name, contact_middle_name, contact_last_name, contact_position, direct_phone, extension, cell_phone, business_type, prospect_status, legal_or_business_name, billing_address_id, delivery_address_id, second_last_name, business_unit_id, email, business_group_id, store_code, store_type_id, store_prospect_id, credit_days, pos, web, date) FROM stdin;
 \.
 
 
@@ -5944,7 +6072,7 @@ COPY schema_migrations (version) FROM stdin;
 -- Data for Name: service_offereds; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY service_offereds (id, service_id, store_id, created_at, updated_at, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, service_type, tax_id, taxes, cost, ticket_id, total_cost, quantity, discount_reason, total, subtotal) FROM stdin;
+COPY service_offereds (id, service_id, store_id, created_at, updated_at, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, service_type, tax_id, taxes, cost, ticket_id, total_cost, quantity, discount_reason, total, subtotal, pos, web, date) FROM stdin;
 \.
 
 
@@ -5956,10 +6084,25 @@ SELECT pg_catalog.setval('service_offereds_id_seq', 1, false);
 
 
 --
+-- Data for Name: service_sales; Type: TABLE DATA; Schema: public; Owner: oscar
+--
+
+COPY service_sales (id, store_id, year, month, cost, total, subtotal, taxes, discount, quantity, created_at, updated_at, service_id) FROM stdin;
+\.
+
+
+--
+-- Name: service_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+--
+
+SELECT pg_catalog.setval('service_sales_id_seq', 1, false);
+
+
+--
 -- Data for Name: services; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY services (id, unique_code, description, price, sat_key_id, unit, sat_unit_key_id, shared, store_id, business_unit_id, created_at, updated_at, delivery_company) FROM stdin;
+COPY services (id, unique_code, description, price, sat_key_id, unit, sat_unit_key_id, shared, store_id, business_unit_id, created_at, updated_at, delivery_company, current) FROM stdin;
 \.
 
 
@@ -5974,7 +6117,7 @@ SELECT pg_catalog.setval('services_id_seq', 1, false);
 -- Data for Name: store_movements; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY store_movements (id, product_id, quantity, movement_type, order_id, ticket_id, store_id, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, tax_id, taxes, cost, supplier_id, product_request_id, created_at, updated_at, total_cost, discount_reason, total, subtotal) FROM stdin;
+COPY store_movements (id, product_id, quantity, movement_type, order_id, ticket_id, store_id, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, tax_id, taxes, cost, supplier_id, product_request_id, created_at, updated_at, total_cost, discount_reason, total, subtotal, bill_id, pos, web, date) FROM stdin;
 \.
 
 
@@ -5989,7 +6132,7 @@ SELECT pg_catalog.setval('store_movements_id_seq', 1, false);
 -- Data for Name: store_sales; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY store_sales (id, store_id, month, year, sales_amount, sales_quantity, cost, created_at, updated_at, discount) FROM stdin;
+COPY store_sales (id, store_id, month, year, cost, created_at, updated_at, discount, total, subtotal, taxes, quantity, payments, expenses) FROM stdin;
 \.
 
 
@@ -6034,7 +6177,7 @@ SELECT pg_catalog.setval('store_use_inventories_id_seq', 1, false);
 -- Data for Name: stores; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY stores (id, created_at, updated_at, store_code, store_name, delivery_address_id, business_unit_id, store_type_id, email, cost_type_id, cost_type_selected_since, months_in_inventory, reorder_point, critical_point, contact_first_name, contact_middle_name, contact_last_name, direct_phone, extension, type_of_person, second_last_name, business_group_id, cell_phone, zip_code, period_sales_achievement, inspection_approved, overprice, series, last_bill, install_code, certificate, key, certificate_password, certificate_number, certificate_content, bill_last_folio, credit_note_last_folio, debit_note_last_folio, return_last_folio, pay_bill_last_folio, advance_e_last_folio, advance_i_last_folio, initial_inventory, current_inventory, prospects) FROM stdin;
+COPY stores (id, created_at, updated_at, store_code, store_name, delivery_address_id, business_unit_id, store_type_id, email, cost_type_id, cost_type_selected_since, months_in_inventory, reorder_point, critical_point, contact_first_name, contact_middle_name, contact_last_name, direct_phone, extension, type_of_person, second_last_name, business_group_id, cell_phone, zip_code, period_sales_achievement, inspection_approved, overprice, series, last_bill, install_code, certificate, key, certificate_password, certificate_number, certificate_content, bill_last_folio, credit_note_last_folio, debit_note_last_folio, return_last_folio, pay_bill_last_folio, advance_e_last_folio, advance_i_last_folio, initial_inventory, current_inventory, propects_file) FROM stdin;
 \.
 
 
@@ -6049,7 +6192,7 @@ SELECT pg_catalog.setval('stores_id_seq', 1, false);
 -- Data for Name: stores_inventories; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY stores_inventories (id, product_id, store_id, quantity, alert, alert_type, created_at, updated_at, rack, level, manual_price_update) FROM stdin;
+COPY stores_inventories (id, product_id, store_id, quantity, alert, alert_type, created_at, updated_at, rack, level, manual_price_update, pos, web, date) FROM stdin;
 \.
 
 
@@ -6079,7 +6222,7 @@ SELECT pg_catalog.setval('stores_suppliers_id_seq', 1, false);
 -- Data for Name: stores_warehouse_entries; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY stores_warehouse_entries (id, product_id, store_id, quantity, movement_id, created_at, updated_at, retail_units_per_unit, units_used, store_movement_id) FROM stdin;
+COPY stores_warehouse_entries (id, product_id, store_id, quantity, movement_id, created_at, updated_at, retail_units_per_unit, units_used, store_movement_id, pos, web, date) FROM stdin;
 \.
 
 
@@ -6154,7 +6297,7 @@ SELECT pg_catalog.setval('temporal_numbers_id_seq', 1, false);
 -- Data for Name: terminals; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY terminals (id, name, bank_id, number, store_id, created_at, updated_at, debit_comission, credit_comission) FROM stdin;
+COPY terminals (id, name, bank_id, number, store_id, created_at, updated_at, debit_comission, credit_comission, pos, web, date) FROM stdin;
 \.
 
 
@@ -6169,7 +6312,7 @@ SELECT pg_catalog.setval('terminals_id_seq', 1, false);
 -- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id, bill_id, ticket_type, created_at, updated_at, cash_register_id, ticket_number, cfdi_use_id, comments, payments_amount, discount_applied, cash_return, payed, parent_id, cost) FROM stdin;
+COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id, bill_id, ticket_type, created_at, updated_at, cash_register_id, ticket_number, cfdi_use_id, comments, payments_amount, discount_applied, cash_return, payed, parent_id, cost, saved, pos, web, date) FROM stdin;
 \.
 
 
@@ -6177,7 +6320,7 @@ COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id
 -- Data for Name: tickets_children; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY tickets_children (id, ticket_id, children_id, created_at, updated_at) FROM stdin;
+COPY tickets_children (id, ticket_id, children_id, created_at, updated_at, pos, web, date) FROM stdin;
 \.
 
 
@@ -6259,7 +6402,7 @@ SELECT pg_catalog.setval('user_sales_id_seq', 1, false);
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: oscar
 --
 
-COPY users (id, email, encrypted_password, reset_password_token, reset_password_sent_at, remember_created_at, sign_in_count, current_sign_in_at, last_sign_in_at, current_sign_in_ip, last_sign_in_ip, created_at, updated_at, first_name, middle_name, last_name, store_id, role_id) FROM stdin;
+COPY users (id, email, encrypted_password, reset_password_token, reset_password_sent_at, remember_created_at, sign_in_count, current_sign_in_at, last_sign_in_at, current_sign_in_ip, last_sign_in_ip, created_at, updated_at, first_name, middle_name, last_name, store_id, role_id, pos, web, date) FROM stdin;
 \.
 
 
@@ -6908,6 +7051,14 @@ ALTER TABLE ONLY service_offereds
 
 
 --
+-- Name: service_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+--
+
+ALTER TABLE ONLY service_sales
+    ADD CONSTRAINT service_sales_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: services_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
 --
 
@@ -7216,13 +7367,6 @@ CREATE INDEX index_bills_on_pac_id ON bills USING btree (pac_id);
 --
 
 CREATE INDEX index_bills_on_parent_id ON bills USING btree (parent_id);
-
-
---
--- Name: index_bills_on_payment_condition_id; Type: INDEX; Schema: public; Owner: oscar
---
-
-CREATE INDEX index_bills_on_payment_condition_id ON bills USING btree (payment_condition_id);
 
 
 --
@@ -8059,6 +8203,20 @@ CREATE INDEX index_products_on_business_unit_id ON products USING btree (busines
 
 
 --
+-- Name: index_products_on_child_id; Type: INDEX; Schema: public; Owner: oscar
+--
+
+CREATE INDEX index_products_on_child_id ON products USING btree (child_id);
+
+
+--
+-- Name: index_products_on_parent_id; Type: INDEX; Schema: public; Owner: oscar
+--
+
+CREATE INDEX index_products_on_parent_id ON products USING btree (parent_id);
+
+
+--
 -- Name: index_products_on_sat_key_id; Type: INDEX; Schema: public; Owner: oscar
 --
 
@@ -8283,6 +8441,20 @@ CREATE INDEX index_service_offereds_on_ticket_id ON service_offereds USING btree
 
 
 --
+-- Name: index_service_sales_on_service_id; Type: INDEX; Schema: public; Owner: oscar
+--
+
+CREATE INDEX index_service_sales_on_service_id ON service_sales USING btree (service_id);
+
+
+--
+-- Name: index_service_sales_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+--
+
+CREATE INDEX index_service_sales_on_store_id ON service_sales USING btree (store_id);
+
+
+--
 -- Name: index_services_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
 --
 
@@ -8308,6 +8480,13 @@ CREATE INDEX index_services_on_sat_unit_key_id ON services USING btree (sat_unit
 --
 
 CREATE INDEX index_services_on_store_id ON services USING btree (store_id);
+
+
+--
+-- Name: index_store_movements_on_bill_id; Type: INDEX; Schema: public; Owner: oscar
+--
+
+CREATE INDEX index_store_movements_on_bill_id ON store_movements USING btree (bill_id);
 
 
 --

@@ -96,9 +96,9 @@ async function insert (columns, data, table){
   });
 
   if ($.inArray(table, storeIdsTables) > -1) {
-    localQuery += ', created_at, updated_at, store_id)';
+    localQuery += ', created_at, updated_at, store_id, pos, web)';
   } else {
-    localQuery += ', created_at, updated_at)';
+    localQuery += ', created_at, updated_at, pos, web)';
   }
 
   if ($.inArray(columns, 'id') === -1) {
@@ -121,12 +121,12 @@ async function insert (columns, data, table){
     let storeId = store.get('store').id;
     localQuery += `, '${storeId}'`;
   }
-  let queryResult = await query(`${localQuery})`, recordId);
+  let queryResult = await query(`${localQuery}, true, false)`, recordId);
 
   while (queryResult.err) {
     let newId = queryResult.lastId + 1;
     localQuery = localQuery.replace(queryResult.lastId, newId);
-    queryResult = await query(`${localQuery})`, newId);
+    queryResult = await query(`${localQuery}, true, false)`, newId);
   }
 
   return queryResult;

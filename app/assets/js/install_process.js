@@ -115,6 +115,10 @@ function lotQueries(store, call){
 
           tablesResult.rows.forEach(row => {
 
+            if (typeof row.pos !== 'undefined'){
+              row.pos = true;
+            }
+
             createInsert(
               Object.keys(row),
               Object.values(row),
@@ -133,6 +137,7 @@ function lotQueries(store, call){
                   .text(current_progress + "%");
               }, err => {
               });
+
             });
           });
         });
