@@ -245,6 +245,26 @@ $(function(){
     locale: 'es'
   });
 
+  function findRelations(){
+    return {
+      'billing_addresses'        : ['business_name', 'rfc'],
+      'users'                    : ['email'],
+      'prospects'                : ['legal_or_business_name', 'created_at', 'store_id'],
+      'cash_registers'           : ['name', 'created_at', 'store_id'],
+      'tickets'                  : ['ticket_number', 'created_at', 'cash_register_id', 'store_id'],
+      'tickets_children'         : ['ticket_id', 'children_id', 'created_at'],
+      'banks'                    : ['name', 'rfc', 'created_at'],
+      'store_movements'          : ['product_id', 'created_at', 'ticket_id', 'quantity', 'store_id'],
+      'service_offereds'         : ['service_id', 'created_at', 'ticket_id', 'quantity', 'store_id'],
+      'delivery_services'        : ['service_offered_id', 'created_at', 'sender_name', 'sender_zipcode'],
+      'stores_inventories'       : ['product_id', 'store_id', 'created_at'],
+      'stores_warehouse_entries' : ['product_id', 'store_id', 'created_at', 'store_movement_id'],
+      'terminals'                : ['name', 'store_id', 'created_at'],
+      'payments'                 : ['business_unit_id', 'payment_form_id', 'terminal_id', 'ticket_id', 'created_at'],
+      'expenses'                 : ['total', 'store_id', 'business_unit_id', 'created_at']
+    };
+  }
+
   $('#openCash').click(function(){
 
     initStore().then(store => {
@@ -256,7 +276,7 @@ $(function(){
   });
 
   function updatedRelationIds(table, mainKey, key, translateRelations){
-    let billingsAddressId = sendObjects[
+    const objectId    = sendObjects[
                               table
                             ][
                               mainKey
@@ -264,9 +284,10 @@ $(function(){
                               translateRelations[
                                 key
                               ]
-                            ];
+                            ],
+          objectTable = key.replace('_id', '');
 
-    if (billingsAddressId !== null) {
+    if (objectId !== null) {
       try{
         sendObjects[
           table
@@ -276,9 +297,37 @@ $(function(){
           translateRelations[
             key
           ]
-        ] = tablesData[key.replace('_id','')][billingsAddressId].inWeb;
+        ] = tablesData[objectTable][objectId].inWeb;
       } catch (err) {
-        debugger
+
+        findBy(
+          'id',
+          objectId,
+          objectTable,
+          false,
+          objectId,
+          mainKey
+        ).then(objectCollection => {
+          let object = objectCollection.objectResult;
+          parameters = {};
+          row = object.rows[0];
+          localTable = object.table;
+
+          findRelations()[object.table].forEach(field => {
+            parameters[field] = row[field];
+          });
+
+          findByParameters(
+            object.table,
+            parameters,
+            object.lastId,
+            objectCollection.referenceId
+          ).then(
+            result => {
+              debugger
+            });
+
+        });
       }
     }
   }

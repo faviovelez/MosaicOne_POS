@@ -148,8 +148,58 @@ async function createInsert (columns, data, table, storeId = 0){
   };
 }
 
-async function findBy(column, data, table){
+async function findByParameters(table, parameters, usedId, referenceId){
+  let localQuery = `SELECT id FROM ${table} WHERE`,
+      columns    = Object.keys(parameters),
+      data       = Object.values(parameters);
+
+  for (var column in parameters){
+    let data = parameters[column];
+    localQuery += ` ${column} = `;
+    switch(data){
+      case true:
+      case false:
+        localQuery += data;
+        break;
+      case null:
+        localQuery = localQuery.replace(
+          RegExp(` ${column} =`), ''
+        );
+        localQuery += ` ${column} IS NULL`;
+        break;
+      default:
+        if (typeof data === 'object'){
+          localQuery += `'${data.toUTCString().replace(
+          /GMT.*|/g,''
+          )}'`;
+        } else {
+          localQuery += `'${data}'`;
+        }
+    }
+    localQuery += ' AND';
+  }
+
+  let result = await query(
+    localQuery.replace(/AND$/, ''),
+    true,
+    table,
+    usedId
+  );
+
+  return {
+    objectResult : result,
+    referenceId  : referenceId
+  };
+}
+
+async function findBy(column, data, table, remote = true, usedId = 0, referenceId = 0){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
-  return await query(`${localQuery}`);
+  let result = await query(`${localQuery}`, remote, table, usedId);
+
+  return {
+    objectResult : result,
+    referenceId  : referenceId
+  };
+
 }

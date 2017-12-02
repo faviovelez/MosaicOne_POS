@@ -121,7 +121,7 @@ function lotQueries(store, call){
               tablesResult.table
             ).then(localQuery => {
 
-              query(localQuery, false).then(result => {
+              query(localQuery.query, false).then(result => {
                 if (count++ === limit - 1){
                   call();
                 }
@@ -170,11 +170,11 @@ function lotQueries(store, call){
 
         findBy('install_code', installCode, 'stores').then(result => {
           initStore().then(storage => {
-            let store = result.rows[0];
+            let store = result.objectResult.rows[0];
 
             if (store) {
               storage.set('store', store);
-              lotQueries(result.rows[0], function(queries){
+              lotQueries(store, function(queries){
 
                 $("#dynamic")
                   .css("width", 5 + "%")
