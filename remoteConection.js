@@ -133,7 +133,7 @@ async function createInsert (columns, data, table, storeId = 0){
         break;
       default:
         if (typeof data === 'object'){
-          localQuery += `, '${data.toUTCString().replace(
+          localQuery += `, '${data.toString().replace(
           /GMT.*|/g,''
           )}'`;
         } else {
@@ -148,7 +148,7 @@ async function createInsert (columns, data, table, storeId = 0){
   };
 }
 
-async function findByParameters(table, parameters, usedId, referenceId){
+async function findByParameters(table, parameters, usedId, referenceId, referenceTable = ''){
   let localQuery = `SELECT id FROM ${table} WHERE`,
       columns    = Object.keys(parameters),
       data       = Object.values(parameters);
@@ -169,7 +169,16 @@ async function findByParameters(table, parameters, usedId, referenceId){
         break;
       default:
         if (typeof data === 'object'){
-          localQuery += `'${data.toUTCString().replace(
+          localQuery = localQuery.replace(
+            RegExp(` ${column} =`), ''
+          );
+          localQuery += ` ${column} > '${data.toString().replace(
+          /GMT.*|/g,''
+          )}'`;
+          let oneMinuteAddition = new Date (data.setMinutes(
+            data.getMinutes() + 1)
+          );
+          localQuery += ` AND ${column} < '${oneMinuteAddition.toString().replace(
           /GMT.*|/g,''
           )}'`;
         } else {
@@ -187,19 +196,21 @@ async function findByParameters(table, parameters, usedId, referenceId){
   );
 
   return {
-    objectResult : result,
-    referenceId  : referenceId
+    objectResult   : result,
+    referenceId    : referenceId,
+    referenceTable : referenceTable
   };
 }
 
-async function findBy(column, data, table, remote = true, usedId = 0, referenceId = 0){
+async function findBy(column, data, table, remote = true, usedId = 0, referenceId = 0, referenceTable = ''){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
   let result = await query(`${localQuery}`, remote, table, usedId);
 
   return {
-    objectResult : result,
-    referenceId  : referenceId
+    objectResult   : result,
+    referenceId    : referenceId,
+    referenceTable : referenceTable
   };
 
 }

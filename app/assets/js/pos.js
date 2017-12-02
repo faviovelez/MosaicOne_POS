@@ -218,7 +218,7 @@ $(document).ready(function() {
         $('#globalDiscount input:first').val() + ' %'
       );
       let id = $(this).attr('id').replace(/\D/g,'');
-      $(`#totalTo_${id}`).html(
+      $(`td[id^=totalTo_${id}`).html(
         `$ ${createTotal(id, true)}`
       );
     });
@@ -731,8 +731,6 @@ $(document).ready(function() {
       setTimeout(function(){
         if ($('#mainProductSearch').attr('autocomplete') === 'undefined'){
           $('#pos').click();
-        } else {
-          alert('Listado cargado');
         }
       }, 500);
 
