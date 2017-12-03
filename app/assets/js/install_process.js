@@ -57,9 +57,10 @@ function lotQueries(store, call){
       `id = ${store.business_group_id}`,
       'prospects': 'SELECT * FROM prospects WHERE ' +
       `store_id = ${store.id}`,
-      'products' : 'SELECT * FROM products WHERE supplier_id IN (1,2)',
+      'products' : "SELECT * FROM products WHERE classification = 'de línea'" +
+      " AND current = true AND parent_id IS NULL",
       'services' : 'SELECT * FROM services WHERE ' +
-      'store_id IS NULL AND shared = true',
+      'store_id IS NULL AND shared = true AND current = true',
       'stores_inventories': 'SELECT * FROM stores_inventories ' +
       `WHERE store_id = ${store.id}`,
       'stores_warehouse_entries': 'SELECT * FROM stores_warehouse_entries ' +
@@ -176,6 +177,7 @@ function lotQueries(store, call){
         findBy('install_code', installCode, 'stores').then(result => {
           initStore().then(storage => {
             let store = result.objectResult.rows[0];
+            store.set('lastTicket', 0);
 
             if (store) {
               storage.set('store', store);

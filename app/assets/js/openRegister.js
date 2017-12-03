@@ -342,6 +342,8 @@ $(function(){
 
         });
       }
+    } else {
+      return call();
     }
   }
 

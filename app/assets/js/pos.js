@@ -721,11 +721,16 @@ $(document).ready(function() {
       $('#store').html(store.get('store').store_name);
 
       getAll('terminals').then(terminals => {
-        terminals.rows.forEach(terminal => {
-          $('#select_terminal').append(
-            `<option value="${terminal.id}">${terminal.name}</option>`
-          );
-        });
+        if (terminals.rows.length === 0) {
+          $('#credit, #debit, #select_terminal').addClass('hidden');
+        } else {
+          $('#credit, #debit, #select_terminal').removeClass('hidden');
+          terminals.rows.forEach(terminal => {
+            $('#select_terminal').append(
+              `<option value="${terminal.id}">${terminal.name}</option>`
+            );
+          });
+        }
       });
 
       setTimeout(function(){
