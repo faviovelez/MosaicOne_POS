@@ -292,18 +292,36 @@ $(function(){
           mainKey,
           table
         ).then(objectCollection => {
-          let object = objectCollection.objectResult;
+          object   = objectCollection.objectResult;
           parameters = {};
           row = object.rows[0];
           localTable = object.table;
+          referenceId    = objectCollection.referenceId;
+          referenceTable = objectCollection.referenceTable;
 
-          findRelations()[object.table].forEach(field => {
-            try {
+          try {
+            findRelations()[object.table].forEach(field => {
               parameters[field] = row[field];
-            } catch (err) {
-              debugger
-            }
-          });
+            });
+          } catch (err) {
+
+            initStore().then(store => {
+              let restoreTablesData = store.get('tablesData'),
+                  translateRelations = getTranslateRelations(),
+                  objectId = sendObjects[
+                    referenceTable
+                  ][
+                    referenceId
+                  ].object[translateRelations[`${localTable}_id`]];
+                  objectId = sendObjects[
+                    referenceTable
+                  ][
+                    referenceId
+                  ].object[translateRelations[`${localTable}_id`]] = restoreTablesData[localTable][objectId].inWeb;
+              return call();
+            });
+
+          }
 
           findByParameters(
             object.table,
@@ -370,54 +388,71 @@ $(function(){
 
   function processTableToWeb(table, call){
 
-    if (sendObjects[table].rowsLimit === 0){
-      return call();
-    }
-
-    sendObjects[table].processRow = 0;
-    let translateRelations = getTranslateRelations();
-
-    for (var mainKey in tablesData[table]){
-      if (relationObjectDetails[table]) {
-        for (var key in relationObjectDetails[
-          table
-        ]) {
-          updatedRelationIds(table, mainKey, key, translateRelations, function(){
-            let row = sendObjects[table][mainKey].object;
-            delete row.id;
-
-            processInsertInWeb(row, table, mainKey, function(){
-              if (
-                sendObjects[
-                  table
-                ].processRow === sendObjects[
-                  table
-                ].rowsLimit
-              ) {
-                return call();
-              }
-            });
-
-          });
-        }
-      } else {
-        let row = sendObjects[table][mainKey].object;
-        delete row.id;
-
-        processInsertInWeb(row, table, mainKey, function(){
-          if (
-            sendObjects[
-              table
-            ].processRow === sendObjects[
-              table
-            ].rowsLimit
-          ) {
-            return call();
-          }
-        });
+    try {
+      if (sendObjects[table].rowsLimit === 0){
+        return call();
       }
 
+      sendObjects[table].processRow = 0;
+      let translateRelations = getTranslateRelations();
+
+      for (var mainKey in tablesData[table]){
+        if (relationObjectDetails[table]) {
+          relationLimit = Object.keys(relationObjectDetails[table]).length;
+          relationCount = 0;
+          for (var key in relationObjectDetails[
+            table
+          ]) {
+            updatedRelationIds(table, mainKey, key, translateRelations, function(){
+              relationCount++;
+              if (relationCount === relationLimit){
+
+                let row = sendObjects[table][mainKey].object;
+                delete row.id;
+
+                processInsertInWeb(row, table, mainKey, function(){
+                  if (
+                    sendObjects[
+                      table
+                    ].processRow === sendObjects[
+                      table
+                    ].rowsLimit
+                  ) {
+                    return call();
+                  }
+
+                });
+
+              }
+            });
+          }
+        } else {
+          let row = sendObjects[table][mainKey].object;
+          delete row.id;
+
+          processInsertInWeb(row, table, mainKey, function(){
+            if (
+              sendObjects[
+                table
+              ].processRow === sendObjects[
+                table
+              ].rowsLimit
+            ) {
+              return call();
+            }
+          });
+        }
+
+      }
+    } catch(err) {
+      createTmpDataRestore();
     }
+  }
+
+  function createTmpDataRestore(call){
+    initStore().then(store => {
+      store.set('tablesData', tablesData);
+    });
   }
 
   $('#closeDay').click(function(event){

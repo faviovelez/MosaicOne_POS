@@ -111,29 +111,28 @@ async function createInsert (columns, data, table, storeId = 0){
   columns.forEach(fieldName => {
     localQuery += `, "${fieldName}"`;
   });
-  localQuery += `) VALUES ('${data.shift()}'`;
+  localQuery += `) VALUES (`;
 
   data.forEach(data => {
     switch(data){
       case null:
       case true:
       case false:
-        localQuery += ', ';
         localQuery += data;
+        localQuery += ', ';
         break;
       default:
         if (typeof data === 'object'){
-          localQuery += `, '${data.toString().replace(
+          localQuery += `'${data.toString().replace(
           /GMT.*|/g,''
-          )}'`;
+          )}', `;
         } else {
-          localQuery += `, '${data}'`;
+          localQuery += `'${data}', `;
         }
     }
   });
-
   return {
-    query   : `${localQuery})`,
+    query   : `${localQuery.replace(/, $/,'')})`,
     storeId : storeId
   };
 }

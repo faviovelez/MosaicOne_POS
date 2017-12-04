@@ -81,9 +81,10 @@ async function query (q, lastId = 0) {
   return res;
 }
 
-async function insert (columns, data, table){
+async function insert (columns, data, table, extras = true){
   let localQuery = `INSERT INTO public.${table}(`,
       store,
+      extrasData = extras ? ', pos, web)' : ')',
       recordId;
 
   if ($.inArray(columns, 'id') === -1) {
@@ -96,9 +97,9 @@ async function insert (columns, data, table){
   });
 
   if ($.inArray(table, storeIdsTables) > -1) {
-    localQuery += ', created_at, updated_at, store_id, pos, web)';
+    localQuery += `, created_at, updated_at, store_id${extrasData}`;
   } else {
-    localQuery += ', created_at, updated_at, pos, web)';
+    localQuery += `, created_at, updated_at${extrasData}`;
   }
 
   if ($.inArray(columns, 'id') === -1) {
@@ -121,12 +122,13 @@ async function insert (columns, data, table){
     let storeId = store.get('store').id;
     localQuery += `, '${storeId}'`;
   }
-  let queryResult = await query(`${localQuery}, true, false)`, recordId);
+  extrasData = extras ? ', true, false)' : ')';
+  let queryResult = await query(`${localQuery}${extrasData}`, recordId);
 
   while (queryResult.err) {
     let newId = queryResult.lastId + 1;
     localQuery = localQuery.replace(queryResult.lastId, newId);
-    queryResult = await query(`${localQuery}, true, false)`, newId);
+    queryResult = await query(`${localQuery}${extrasData}`, newId);
   }
 
   return queryResult;

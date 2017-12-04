@@ -35,11 +35,12 @@ $(document).ready(function() {
         )
       };
     findBy('product_id', id, 'stores_inventories').then(inventory => {
-      findBy('product_id', id, 'warehouse_entries').then(warehouse_entry_table => {
+      findBy('product_id', id, 'stores_warehouse_entries').then(warehouse_entry_table => {
         insert(
           ['product_id', 'quantity', 'entry_number'],
           [inventory.rows[0].product_id, $('#addProductInput').val().replace(/_/g,''), warehouse_entry_table.rowCount],
-          'warehouse_entries'
+          'stores_warehouse_entries',
+          false
         );
         data.quantity += inventory.rows[0].quantity;
         updateBy(data, table, condition).then(product => {
