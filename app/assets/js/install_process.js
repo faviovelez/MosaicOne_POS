@@ -85,8 +85,8 @@ function lotQueries(store, call){
       ` SELECT COUNT (*) as rows FROM cost_types WHERE id = ${store.cost_type_id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM business_groups WHERE id = ${store.business_group_id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM prospects WHERE store_id = ${store.id} UNION ALL` +
-      ' SELECT COUNT (*) as rows FROM products WHERE supplier_id IN (1,2) UNION ALL' +
-      ' SELECT COUNT (*) as rows FROM services WHERE store_id IS NULL AND shared = true UNION ALL' +
+      " SELECT COUNT (*) as rows FROM products WHERE classification = 'de línea' AND current = true AND parent_id IS NULL UNION ALL" +
+      ' SELECT COUNT (*) as rows FROM services WHERE store_id IS NULL AND shared = true AND current = true UNION ALL' +
       ` SELECT COUNT (*) as rows FROM stores_inventories WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores_warehouse_entries WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM store_movements WHERE store_id = ${store.id} UNION ALL` +
@@ -177,7 +177,7 @@ function lotQueries(store, call){
         findBy('install_code', installCode, 'stores').then(result => {
           initStore().then(storage => {
             let store = result.objectResult.rows[0];
-            store.set('lastTicket', 0);
+            storage.set('lastTicket', 0);
 
             if (store) {
               storage.set('store', store);

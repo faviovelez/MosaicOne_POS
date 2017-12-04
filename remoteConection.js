@@ -192,6 +192,14 @@ async function findByParameters(table, parameters, usedId, referenceId, referenc
   };
 }
 
+async function getAll(table, remote){
+  let localQuery = `SELECT * FROM ${table}`;
+
+  let result = await query(localQuery, remote);
+
+  return result.rows;
+}
+
 async function findBy(column, data, table, remote = true, usedId = 0, referenceId = 0, referenceTable = ''){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
