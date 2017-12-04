@@ -177,8 +177,12 @@ async function findByParameters(table, parameters, usedId, referenceId, referenc
     localQuery += ' AND';
   }
 
+  localQuery = table === 'users' ?
+   localQuery.replace(/AND$/, '').replace(/email = \'/,'email = \'user_pos') 
+    : localQuery.replace(/AND$/, '');
+
   let result = await query(
-    localQuery.replace(/AND$/, ''),
+    localQuery,
     true,
     table,
     usedId
