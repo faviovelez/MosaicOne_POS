@@ -559,6 +559,10 @@ $(document).ready(function() {
     let relatedObject = e.relatedTarget.dataset,
         productId     = relatedObject.id;
 
+    if (isNaN(parseInt(productId))){
+      console.log(e.relatedTarget);
+    }
+
     findBy('id', productId, relatedObject.table).then(product => {
       let productData = product.rows[0];
       $('.product_description').html(
