@@ -112,7 +112,7 @@ $(document).ready(function() {
   function createWarehouseEntry(productId, storeMovementId){
     warehouseEntryData = {
       product_id : productId,
-      quantity   : -1 * storeMovementData.quantity,
+      quantity   : storeMovementData.quantity,
       store_movement_id : storeMovementId
     };
 
