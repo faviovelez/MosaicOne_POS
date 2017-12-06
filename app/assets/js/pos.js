@@ -23,6 +23,51 @@ $(document).ready(function() {
       '</td></tr>';
   }
 
+  function createStoreMovementData(productId, quantity, call){
+    findBy('id', productId, 'products').then(product => {
+      productDetails = product.rows[0];
+      let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100));
+
+      if (productDetails.discount_for_stores === 0){
+        final_price = productDetails.price * 0.65;
+      }
+
+      storeMovementData = {
+        product_id    : productDetails.id,
+        quantity      : quantity,
+        movement_type : 'alta',
+        initial_price : productDetails.price,
+        final_price   : final_price,
+        supplier_id   : productDetails.supplier_id,
+      };
+
+      initStore().then(storage => {
+
+        let store = storage.get('store');
+        if (store.store_type_id === 4) {
+          let final_price = productDetails.price * ( 1 - (productDetails.discount_for_franchises / 100));
+          if (productDetails.discount_for_franchises === 0){
+            final_price = productDetails.price * 0.65;
+          }
+          storeMovementData.final_price = final_price;
+        }
+
+        storeMovementData.cost       = storeMovementData.final_price;
+        storeMovementData.total_cost = storeMovementData.cost * storeMovementData.quantity;
+
+        insert(
+          Object.keys(storeMovementData),
+          Object.values(storeMovementData),
+          'store_movements'
+        ).then(storeMovementObject => {
+          return call(storeMovementObject.lastId);
+        });
+
+      });
+
+    });
+  }
+
   $('#confirmAddProduct').click(function(){
     let id = $('tr[id^=addProduct]').attr(
       'id'
@@ -34,20 +79,34 @@ $(document).ready(function() {
           $('#addProductInput').val().replace(/_/g,'')
         )
       };
-    findBy('product_id', id, 'stores_inventories').then(inventory => {
-      findBy('product_id', id, 'stores_warehouse_entries').then(warehouse_entry_table => {
-        insert(
-          ['product_id', 'quantity'],
-          [inventory.rows[0].product_id, $('#addProductInput').val().replace(/_/g,'')],
-          'stores_warehouse_entries'
-        );
-        data.quantity += inventory.rows[0].quantity;
-        updateBy(data, table, condition).then(product => {
-          $('#addProductQuantity tr').remove();
-        }, err => {
-          $('#addProductQuantity tr').remove();
+    findBy('product_id', id, table).then(inventory => {
+      inventoryObject = inventory.rows[0];
+      createStoreMovementData(id, data.quantity, function(storeMovementId){
+
+        warehouseEntryData = {
+          product_id : id,
+          quantity   : storeMovementData.quantity,
+          store_movement_id : storeMovementId
+        };
+
+        findBy('id', id, 'products').then(product => {
+          warehouseEntryData.retails_unit_per_unit = product.rows[0].average;
+          insert(
+            Object.keys(warehouseEntryData),
+            Object.values(warehouseEntryData),
+            'stores_warehouse_entries'
+          ).then(() => {});
         });
+
       });
+
+      data.quantity += inventory.rows[0].quantity;
+      updateBy(data, table, condition).then(() => {
+        $('#addProductQuantity tr').remove();
+      }, err => {
+        $('#addProductQuantity tr').remove();
+      });
+
     });
   });
 
