@@ -400,7 +400,7 @@ function assignCost(ticketId, call) {
             }
           });
         } catch (err){
-          if (err !== BreakException) throw e;
+          if (err !== BreakException) throw err;
         }
 
         data.total_cost = totalCost.toFixed(2);

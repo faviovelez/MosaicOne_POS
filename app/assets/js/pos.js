@@ -24,10 +24,11 @@ $(document).ready(function() {
       '</td></tr>';
   }
 
-  function createStoreMovementData(productId, quantity, call){
+  function createStoreMovementData(productId, quantity, action, call){
     findBy('id', productId, 'products').then(product => {
       productDetails = product.rows[0];
-      let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100));
+      let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100)),
+        multipler = action === 'alta' ? 1 : -1;
 
       if (productDetails.discount_for_stores === 0){
         final_price = productDetails.price * 0.65;
@@ -35,8 +36,8 @@ $(document).ready(function() {
 
       storeMovementData = {
         product_id    : productDetails.id,
-        quantity      : quantity,
-        movement_type : 'alta',
+        quantity      : (multipler * quantity),
+        movement_type : action,
         initial_price : productDetails.price.toFixed(2),
         final_price   : final_price.toFixed(2),
         supplier_id   : productDetails.supplier_id,
@@ -69,10 +70,72 @@ $(document).ready(function() {
     });
   }
 
+  function destroyProcess(productId){
+    let localQuery      =  specialQuery(productId),
+        processQuantity =  -1 * storeMovementData.quantity;
+    query(localQuery).then(entries => {
+      let BreakException = {},
+          totalCost      = 0;
+      try {
+        entries.rows.forEach(entry => {
+          let quantity  = entry.quantity,
+            cost        = entry.cost,
+            entryId     = entry.id;
+
+          if (processQuantity >= quantity) {
+            totalCost += (quantity * cost);
+            deleteBy('stores_warehouse_entries', `id = ${entryId}`);
+            updateStoreInventories(
+              productId, quantity
+            );
+            processQuantity -= quantity;
+          } else {
+            totalCost += (processQuantity * cost);
+            updateStoreInventories(
+              productId, processQuantity
+            );
+            updateBy(
+              {
+                quantity: (quantity - processQuantity)
+              },
+              'stores_warehouse_entries',
+              `id = ${entryId}`
+            );
+            throw BreakException;
+          }
+        });
+      } catch (err){
+        if (err !== BreakException) throw err;
+      }
+    });
+  }
+
+  function createWarehouseEntry(productId, storeMovementId){
+    warehouseEntryData = {
+      product_id : productId,
+      quantity   : storeMovementData.quantity,
+      store_movement_id : storeMovementId
+    };
+
+    findBy('id', productId, 'products').then(product => {
+      let average = product.rows[0].average;
+      if (average) {
+        warehouseEntryData.retail_units_per_unit = average;
+      }
+
+      insert(
+        Object.keys(warehouseEntryData),
+        Object.values(warehouseEntryData),
+        'stores_warehouse_entries'
+      ).then(() => {});
+    });
+  }
+
   $('#confirmAddProduct').click(function(){
-    let id = $('tr[id^=addProduct]').attr(
+    let id = $('tr[id^=addProduct_]').attr(
       'id'
     ).replace(/\D/g,''),
+      action = $('#addProductDetails').hasClass('head-blue') ? 'alta' : 'baja',
       table = 'stores_inventories',
       condition = `product_id = ${id}`,
       data = {
@@ -82,26 +145,17 @@ $(document).ready(function() {
       };
     findBy('product_id', id, table).then(inventory => {
       inventoryObject = inventory.rows[0];
-      createStoreMovementData(id, data.quantity, function(storeMovementId){
+      createStoreMovementData(id, data.quantity, action, function(storeMovementId){
 
-        warehouseEntryData = {
-          product_id : id,
-          quantity   : storeMovementData.quantity,
-          store_movement_id : storeMovementId
-        };
+        if ( action === 'alta') {
+          createWarehouseEntry(id, storeMovementId);
+        } else {
+          destroyProcess(id);
+        }
 
-        findBy('id', id, 'products').then(product => {
-          let average = product.rows[0].average;
-          if (average) {
-            warehouseEntryData.retail_units_per_unit = average;
-          }
-
-          insert(
-            Object.keys(warehouseEntryData),
-            Object.values(warehouseEntryData),
-            'stores_warehouse_entries'
-          ).then(() => {});
-        });
+        $('#addProductDetails')
+          .removeClass('head-red')
+          .addClass('head-blue');
 
       });
 
@@ -115,6 +169,18 @@ $(document).ready(function() {
     });
   });
 
+  function radioToggleClass(){
+    if ($('#addProductDetails').hasClass('head-blue')) {
+      $('#addProductDetails')
+        .removeClass('head-blue')
+        .addClass('head-red');
+    } else {
+      $('#addProductDetails')
+        .removeClass('head-red')
+        .addClass('head-blue');
+    }
+  }
+
   $('#addProductSearch').click(function(){
 
       getProductsAndServices(list => {
@@ -127,10 +193,7 @@ $(document).ready(function() {
             );
 
             $('#removeProducts').change(function(){
-              debugger
-              $('#addProductDetails')
-              .removeClass('head-blue')
-              .addClass('head-red');
+              radioToggleClass();
             });
 
             let selector = document.getElementById("addProductInput");
