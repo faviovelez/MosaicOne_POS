@@ -2,18 +2,18 @@ const {Pool} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-  user: 'faviovelez',
+  user: 'oscar',
   host: 'localhost',
-  database: 'mosaiconepos',
-  password: 'bafio44741',
+  database: 'mosaicone',
+  password: '12345678"',
   port: 5432,
 });
 
 const localPool = new Pool({
-  user: 'faviovelez',
+  user: 'oscar',
   host: 'localhost',
-  database: 'mosaiconepos',
-  password: 'bafio44741',
+  database: 'local_db',
+  password: '12345678"',
   port: 5432,
 });
 
@@ -41,41 +41,11 @@ async function query (q, remote = true, table = '') {
   return res;
 }
 
-async function toWebDatabase(){
-  let rows,
-    tablesListQuery = "SELECT table_name" +
-    " FROM information_schema.tables" +
-    " WHERE table_schema='public'" +
-    " AND table_type='BASE TABLE'";
-      tablesList = await query(tablesListQuery, false);
-  tablesList.rows.forEach(async table => {
+async function getToTransfer(table){
+  let localQuery = `SELECT * FROM ${table}` +
+    ' WHERE web = false';
 
-    try {
-
-      let rows = await toDayRows(table.table_name);
-      rows.rows.forEach(async register => {
-
-        delete register.id;
-        let insertQuery = await createInsert(
-          Object.keys(register),
-          Object.values(register),
-          table.table_name
-        );
-
-        try {
-          await query(insertQuery);
-        } catch (err) {
-          console.log(table);
-        }
-
-      });
-
-    } catch(err) {
-      console.log(table);
-    }
-
-
-  });
+  return await query(localQuery, false, table);
 }
 
 async function toDayRows(table){
@@ -119,4 +89,11 @@ async function findBy(column, data, table){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
   return await query(`${localQuery}`);
+}
+
+async function updatePosData(table, id){
+  let localQuery = `UPDATE ${table} SET ` +
+    ` web = true WHERE id = ${id}`;
+
+  return query(localQuery, false);
 }

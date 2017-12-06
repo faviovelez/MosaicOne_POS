@@ -34,7 +34,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: bank_balances; Type: TABLE; Schema: public; Owner: oscar
+-- Name: bank_balances; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE bank_balances (
@@ -47,10 +47,10 @@ CREATE TABLE bank_balances (
 );
 
 
-ALTER TABLE bank_balances OWNER TO oscar;
+ALTER TABLE bank_balances OWNER TO faviovelez;
 
 --
--- Name: bank_balances_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: bank_balances_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE bank_balances_id_seq
@@ -61,17 +61,17 @@ CREATE SEQUENCE bank_balances_id_seq
     CACHE 1;
 
 
-ALTER TABLE bank_balances_id_seq OWNER TO oscar;
+ALTER TABLE bank_balances_id_seq OWNER TO faviovelez;
 
 --
--- Name: bank_balances_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: bank_balances_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE bank_balances_id_seq OWNED BY bank_balances.id;
 
 
 --
--- Name: banks; Type: TABLE; Schema: public; Owner: oscar
+-- Name: banks; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE banks (
@@ -79,14 +79,17 @@ CREATE TABLE banks (
     name character varying,
     rfc character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE banks OWNER TO oscar;
+ALTER TABLE banks OWNER TO faviovelez;
 
 --
--- Name: banks_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: banks_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE banks_id_seq
@@ -97,17 +100,17 @@ CREATE SEQUENCE banks_id_seq
     CACHE 1;
 
 
-ALTER TABLE banks_id_seq OWNER TO oscar;
+ALTER TABLE banks_id_seq OWNER TO faviovelez;
 
 --
--- Name: banks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: banks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE banks_id_seq OWNED BY banks.id;
 
 
 --
--- Name: bill_receiveds; Type: TABLE; Schema: public; Owner: oscar
+-- Name: bill_receiveds; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE bill_receiveds (
@@ -130,10 +133,10 @@ CREATE TABLE bill_receiveds (
 );
 
 
-ALTER TABLE bill_receiveds OWNER TO oscar;
+ALTER TABLE bill_receiveds OWNER TO faviovelez;
 
 --
--- Name: bill_receiveds_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: bill_receiveds_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE bill_receiveds_id_seq
@@ -144,17 +147,17 @@ CREATE SEQUENCE bill_receiveds_id_seq
     CACHE 1;
 
 
-ALTER TABLE bill_receiveds_id_seq OWNER TO oscar;
+ALTER TABLE bill_receiveds_id_seq OWNER TO faviovelez;
 
 --
--- Name: bill_receiveds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: bill_receiveds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE bill_receiveds_id_seq OWNED BY bill_receiveds.id;
 
 
 --
--- Name: bill_sales; Type: TABLE; Schema: public; Owner: oscar
+-- Name: bill_sales; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE bill_sales (
@@ -171,10 +174,10 @@ CREATE TABLE bill_sales (
 );
 
 
-ALTER TABLE bill_sales OWNER TO oscar;
+ALTER TABLE bill_sales OWNER TO faviovelez;
 
 --
--- Name: bill_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: bill_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE bill_sales_id_seq
@@ -185,17 +188,17 @@ CREATE SEQUENCE bill_sales_id_seq
     CACHE 1;
 
 
-ALTER TABLE bill_sales_id_seq OWNER TO oscar;
+ALTER TABLE bill_sales_id_seq OWNER TO faviovelez;
 
 --
--- Name: bill_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: bill_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE bill_sales_id_seq OWNED BY bill_sales.id;
 
 
 --
--- Name: billing_addresses; Type: TABLE; Schema: public; Owner: oscar
+-- Name: billing_addresses; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE billing_addresses (
@@ -213,14 +216,17 @@ CREATE TABLE billing_addresses (
     country character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    tax_regime_id integer
+    tax_regime_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE billing_addresses OWNER TO oscar;
+ALTER TABLE billing_addresses OWNER TO faviovelez;
 
 --
--- Name: billing_addresses_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: billing_addresses_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE billing_addresses_id_seq
@@ -231,17 +237,17 @@ CREATE SEQUENCE billing_addresses_id_seq
     CACHE 1;
 
 
-ALTER TABLE billing_addresses_id_seq OWNER TO oscar;
+ALTER TABLE billing_addresses_id_seq OWNER TO faviovelez;
 
 --
--- Name: billing_addresses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: billing_addresses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE billing_addresses_id_seq OWNED BY billing_addresses.id;
 
 
 --
--- Name: bills; Type: TABLE; Schema: public; Owner: oscar
+-- Name: bills; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE bills (
@@ -258,7 +264,6 @@ CREATE TABLE bills (
     store_id integer,
     sequence character varying,
     folio character varying,
-    payment_condition_id integer,
     payment_method_id integer,
     payment_form_id integer,
     tax_regime_id integer,
@@ -281,7 +286,6 @@ CREATE TABLE bills (
     certificate_number character varying,
     qr_string character varying,
     original_chain text,
-    sat_stampl text,
     digital_stamp text,
     subtotal double precision,
     total double precision,
@@ -291,14 +295,19 @@ CREATE TABLE bills (
     uuid character varying,
     taxes double precision,
     payed boolean DEFAULT false,
-    parent_id integer
+    parent_id integer,
+    sat_stamp character varying,
+    payment_conditions character varying,
+    "from" character varying,
+    cancel_receipt character varying,
+    bill_type character varying
 );
 
 
-ALTER TABLE bills OWNER TO oscar;
+ALTER TABLE bills OWNER TO faviovelez;
 
 --
--- Name: bills_children; Type: TABLE; Schema: public; Owner: oscar
+-- Name: bills_children; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE bills_children (
@@ -310,10 +319,10 @@ CREATE TABLE bills_children (
 );
 
 
-ALTER TABLE bills_children OWNER TO oscar;
+ALTER TABLE bills_children OWNER TO faviovelez;
 
 --
--- Name: bills_children_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: bills_children_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE bills_children_id_seq
@@ -324,17 +333,17 @@ CREATE SEQUENCE bills_children_id_seq
     CACHE 1;
 
 
-ALTER TABLE bills_children_id_seq OWNER TO oscar;
+ALTER TABLE bills_children_id_seq OWNER TO faviovelez;
 
 --
--- Name: bills_children_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: bills_children_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE bills_children_id_seq OWNED BY bills_children.id;
 
 
 --
--- Name: bills_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: bills_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE bills_id_seq
@@ -345,17 +354,17 @@ CREATE SEQUENCE bills_id_seq
     CACHE 1;
 
 
-ALTER TABLE bills_id_seq OWNER TO oscar;
+ALTER TABLE bills_id_seq OWNER TO faviovelez;
 
 --
--- Name: bills_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: bills_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE bills_id_seq OWNED BY bills.id;
 
 
 --
--- Name: business_group_sales; Type: TABLE; Schema: public; Owner: oscar
+-- Name: business_group_sales; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE business_group_sales (
@@ -363,19 +372,21 @@ CREATE TABLE business_group_sales (
     business_group_id integer,
     month integer,
     year integer,
-    sales_amount double precision,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    sales_quantity integer,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer
 );
 
 
-ALTER TABLE business_group_sales OWNER TO oscar;
+ALTER TABLE business_group_sales OWNER TO faviovelez;
 
 --
--- Name: business_group_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: business_group_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE business_group_sales_id_seq
@@ -386,17 +397,17 @@ CREATE SEQUENCE business_group_sales_id_seq
     CACHE 1;
 
 
-ALTER TABLE business_group_sales_id_seq OWNER TO oscar;
+ALTER TABLE business_group_sales_id_seq OWNER TO faviovelez;
 
 --
--- Name: business_group_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: business_group_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE business_group_sales_id_seq OWNED BY business_group_sales.id;
 
 
 --
--- Name: business_groups; Type: TABLE; Schema: public; Owner: oscar
+-- Name: business_groups; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE business_groups (
@@ -408,10 +419,10 @@ CREATE TABLE business_groups (
 );
 
 
-ALTER TABLE business_groups OWNER TO oscar;
+ALTER TABLE business_groups OWNER TO faviovelez;
 
 --
--- Name: business_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: business_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE business_groups_id_seq
@@ -422,17 +433,17 @@ CREATE SEQUENCE business_groups_id_seq
     CACHE 1;
 
 
-ALTER TABLE business_groups_id_seq OWNER TO oscar;
+ALTER TABLE business_groups_id_seq OWNER TO faviovelez;
 
 --
--- Name: business_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: business_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE business_groups_id_seq OWNED BY business_groups.id;
 
 
 --
--- Name: business_groups_suppliers; Type: TABLE; Schema: public; Owner: oscar
+-- Name: business_groups_suppliers; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE business_groups_suppliers (
@@ -444,10 +455,10 @@ CREATE TABLE business_groups_suppliers (
 );
 
 
-ALTER TABLE business_groups_suppliers OWNER TO oscar;
+ALTER TABLE business_groups_suppliers OWNER TO faviovelez;
 
 --
--- Name: business_groups_suppliers_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: business_groups_suppliers_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE business_groups_suppliers_id_seq
@@ -458,37 +469,39 @@ CREATE SEQUENCE business_groups_suppliers_id_seq
     CACHE 1;
 
 
-ALTER TABLE business_groups_suppliers_id_seq OWNER TO oscar;
+ALTER TABLE business_groups_suppliers_id_seq OWNER TO faviovelez;
 
 --
--- Name: business_groups_suppliers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: business_groups_suppliers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE business_groups_suppliers_id_seq OWNED BY business_groups_suppliers.id;
 
 
 --
--- Name: business_unit_sales; Type: TABLE; Schema: public; Owner: oscar
+-- Name: business_unit_sales; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE business_unit_sales (
     id integer NOT NULL,
     business_unit_id integer,
-    sales_amount double precision,
-    sales_quantity integer,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     month integer,
     year integer,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer
 );
 
 
-ALTER TABLE business_unit_sales OWNER TO oscar;
+ALTER TABLE business_unit_sales OWNER TO faviovelez;
 
 --
--- Name: business_unit_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: business_unit_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE business_unit_sales_id_seq
@@ -499,17 +512,17 @@ CREATE SEQUENCE business_unit_sales_id_seq
     CACHE 1;
 
 
-ALTER TABLE business_unit_sales_id_seq OWNER TO oscar;
+ALTER TABLE business_unit_sales_id_seq OWNER TO faviovelez;
 
 --
--- Name: business_unit_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: business_unit_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE business_unit_sales_id_seq OWNED BY business_unit_sales.id;
 
 
 --
--- Name: business_units; Type: TABLE; Schema: public; Owner: oscar
+-- Name: business_units; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE business_units (
@@ -525,10 +538,10 @@ CREATE TABLE business_units (
 );
 
 
-ALTER TABLE business_units OWNER TO oscar;
+ALTER TABLE business_units OWNER TO faviovelez;
 
 --
--- Name: business_units_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: business_units_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE business_units_id_seq
@@ -539,17 +552,17 @@ CREATE SEQUENCE business_units_id_seq
     CACHE 1;
 
 
-ALTER TABLE business_units_id_seq OWNER TO oscar;
+ALTER TABLE business_units_id_seq OWNER TO faviovelez;
 
 --
--- Name: business_units_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: business_units_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE business_units_id_seq OWNED BY business_units.id;
 
 
 --
--- Name: business_units_suppliers; Type: TABLE; Schema: public; Owner: oscar
+-- Name: business_units_suppliers; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE business_units_suppliers (
@@ -561,10 +574,10 @@ CREATE TABLE business_units_suppliers (
 );
 
 
-ALTER TABLE business_units_suppliers OWNER TO oscar;
+ALTER TABLE business_units_suppliers OWNER TO faviovelez;
 
 --
--- Name: business_units_suppliers_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: business_units_suppliers_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE business_units_suppliers_id_seq
@@ -575,17 +588,17 @@ CREATE SEQUENCE business_units_suppliers_id_seq
     CACHE 1;
 
 
-ALTER TABLE business_units_suppliers_id_seq OWNER TO oscar;
+ALTER TABLE business_units_suppliers_id_seq OWNER TO faviovelez;
 
 --
--- Name: business_units_suppliers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: business_units_suppliers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE business_units_suppliers_id_seq OWNED BY business_units_suppliers.id;
 
 
 --
--- Name: carriers; Type: TABLE; Schema: public; Owner: oscar
+-- Name: carriers; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE carriers (
@@ -597,10 +610,10 @@ CREATE TABLE carriers (
 );
 
 
-ALTER TABLE carriers OWNER TO oscar;
+ALTER TABLE carriers OWNER TO faviovelez;
 
 --
--- Name: carriers_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: carriers_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE carriers_id_seq
@@ -611,17 +624,17 @@ CREATE SEQUENCE carriers_id_seq
     CACHE 1;
 
 
-ALTER TABLE carriers_id_seq OWNER TO oscar;
+ALTER TABLE carriers_id_seq OWNER TO faviovelez;
 
 --
--- Name: carriers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: carriers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE carriers_id_seq OWNED BY carriers.id;
 
 
 --
--- Name: cash_registers; Type: TABLE; Schema: public; Owner: oscar
+-- Name: cash_registers; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE cash_registers (
@@ -631,14 +644,17 @@ CREATE TABLE cash_registers (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     balance double precision,
-    cash_number integer
+    cash_number integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
-ALTER TABLE cash_registers OWNER TO oscar;
+ALTER TABLE cash_registers OWNER TO faviovelez;
 
 --
--- Name: cash_registers_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: cash_registers_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE cash_registers_id_seq
@@ -649,17 +665,17 @@ CREATE SEQUENCE cash_registers_id_seq
     CACHE 1;
 
 
-ALTER TABLE cash_registers_id_seq OWNER TO oscar;
+ALTER TABLE cash_registers_id_seq OWNER TO faviovelez;
 
 --
--- Name: cash_registers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: cash_registers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE cash_registers_id_seq OWNED BY cash_registers.id;
 
 
 --
--- Name: cfdi_uses; Type: TABLE; Schema: public; Owner: oscar
+-- Name: cfdi_uses; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE cfdi_uses (
@@ -671,10 +687,10 @@ CREATE TABLE cfdi_uses (
 );
 
 
-ALTER TABLE cfdi_uses OWNER TO oscar;
+ALTER TABLE cfdi_uses OWNER TO faviovelez;
 
 --
--- Name: cfdi_uses_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: cfdi_uses_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE cfdi_uses_id_seq
@@ -685,17 +701,17 @@ CREATE SEQUENCE cfdi_uses_id_seq
     CACHE 1;
 
 
-ALTER TABLE cfdi_uses_id_seq OWNER TO oscar;
+ALTER TABLE cfdi_uses_id_seq OWNER TO faviovelez;
 
 --
--- Name: cfdi_uses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: cfdi_uses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE cfdi_uses_id_seq OWNED BY cfdi_uses.id;
 
 
 --
--- Name: change_tickets; Type: TABLE; Schema: public; Owner: oscar
+-- Name: change_tickets; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE change_tickets (
@@ -709,10 +725,10 @@ CREATE TABLE change_tickets (
 );
 
 
-ALTER TABLE change_tickets OWNER TO oscar;
+ALTER TABLE change_tickets OWNER TO faviovelez;
 
 --
--- Name: change_tickets_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: change_tickets_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE change_tickets_id_seq
@@ -723,17 +739,17 @@ CREATE SEQUENCE change_tickets_id_seq
     CACHE 1;
 
 
-ALTER TABLE change_tickets_id_seq OWNER TO oscar;
+ALTER TABLE change_tickets_id_seq OWNER TO faviovelez;
 
 --
--- Name: change_tickets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: change_tickets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE change_tickets_id_seq OWNED BY change_tickets.id;
 
 
 --
--- Name: classifications; Type: TABLE; Schema: public; Owner: oscar
+-- Name: classifications; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE classifications (
@@ -744,10 +760,10 @@ CREATE TABLE classifications (
 );
 
 
-ALTER TABLE classifications OWNER TO oscar;
+ALTER TABLE classifications OWNER TO faviovelez;
 
 --
--- Name: classifications_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: classifications_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE classifications_id_seq
@@ -758,17 +774,17 @@ CREATE SEQUENCE classifications_id_seq
     CACHE 1;
 
 
-ALTER TABLE classifications_id_seq OWNER TO oscar;
+ALTER TABLE classifications_id_seq OWNER TO faviovelez;
 
 --
--- Name: classifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: classifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE classifications_id_seq OWNED BY classifications.id;
 
 
 --
--- Name: cost_types; Type: TABLE; Schema: public; Owner: oscar
+-- Name: cost_types; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE cost_types (
@@ -780,10 +796,10 @@ CREATE TABLE cost_types (
 );
 
 
-ALTER TABLE cost_types OWNER TO oscar;
+ALTER TABLE cost_types OWNER TO faviovelez;
 
 --
--- Name: cost_types_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: cost_types_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE cost_types_id_seq
@@ -794,17 +810,17 @@ CREATE SEQUENCE cost_types_id_seq
     CACHE 1;
 
 
-ALTER TABLE cost_types_id_seq OWNER TO oscar;
+ALTER TABLE cost_types_id_seq OWNER TO faviovelez;
 
 --
--- Name: cost_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: cost_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE cost_types_id_seq OWNED BY cost_types.id;
 
 
 --
--- Name: countries; Type: TABLE; Schema: public; Owner: oscar
+-- Name: countries; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE countries (
@@ -816,10 +832,10 @@ CREATE TABLE countries (
 );
 
 
-ALTER TABLE countries OWNER TO oscar;
+ALTER TABLE countries OWNER TO faviovelez;
 
 --
--- Name: countries_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: countries_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE countries_id_seq
@@ -830,17 +846,17 @@ CREATE SEQUENCE countries_id_seq
     CACHE 1;
 
 
-ALTER TABLE countries_id_seq OWNER TO oscar;
+ALTER TABLE countries_id_seq OWNER TO faviovelez;
 
 --
--- Name: countries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: countries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE countries_id_seq OWNED BY countries.id;
 
 
 --
--- Name: currencies; Type: TABLE; Schema: public; Owner: oscar
+-- Name: currencies; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE currencies (
@@ -853,10 +869,10 @@ CREATE TABLE currencies (
 );
 
 
-ALTER TABLE currencies OWNER TO oscar;
+ALTER TABLE currencies OWNER TO faviovelez;
 
 --
--- Name: currencies_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: currencies_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE currencies_id_seq
@@ -867,17 +883,17 @@ CREATE SEQUENCE currencies_id_seq
     CACHE 1;
 
 
-ALTER TABLE currencies_id_seq OWNER TO oscar;
+ALTER TABLE currencies_id_seq OWNER TO faviovelez;
 
 --
--- Name: currencies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: currencies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE currencies_id_seq OWNED BY currencies.id;
 
 
 --
--- Name: delivery_addresses; Type: TABLE; Schema: public; Owner: oscar
+-- Name: delivery_addresses; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE delivery_addresses (
@@ -898,10 +914,10 @@ CREATE TABLE delivery_addresses (
 );
 
 
-ALTER TABLE delivery_addresses OWNER TO oscar;
+ALTER TABLE delivery_addresses OWNER TO faviovelez;
 
 --
--- Name: delivery_addresses_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: delivery_addresses_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE delivery_addresses_id_seq
@@ -912,17 +928,17 @@ CREATE SEQUENCE delivery_addresses_id_seq
     CACHE 1;
 
 
-ALTER TABLE delivery_addresses_id_seq OWNER TO oscar;
+ALTER TABLE delivery_addresses_id_seq OWNER TO faviovelez;
 
 --
--- Name: delivery_addresses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: delivery_addresses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE delivery_addresses_id_seq OWNED BY delivery_addresses.id;
 
 
 --
--- Name: delivery_attempts; Type: TABLE; Schema: public; Owner: oscar
+-- Name: delivery_attempts; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE delivery_attempts (
@@ -936,10 +952,10 @@ CREATE TABLE delivery_attempts (
 );
 
 
-ALTER TABLE delivery_attempts OWNER TO oscar;
+ALTER TABLE delivery_attempts OWNER TO faviovelez;
 
 --
--- Name: delivery_attempts_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: delivery_attempts_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE delivery_attempts_id_seq
@@ -950,17 +966,17 @@ CREATE SEQUENCE delivery_attempts_id_seq
     CACHE 1;
 
 
-ALTER TABLE delivery_attempts_id_seq OWNER TO oscar;
+ALTER TABLE delivery_attempts_id_seq OWNER TO faviovelez;
 
 --
--- Name: delivery_attempts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: delivery_attempts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE delivery_attempts_id_seq OWNED BY delivery_attempts.id;
 
 
 --
--- Name: delivery_packages; Type: TABLE; Schema: public; Owner: oscar
+-- Name: delivery_packages; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE delivery_packages (
@@ -976,10 +992,10 @@ CREATE TABLE delivery_packages (
 );
 
 
-ALTER TABLE delivery_packages OWNER TO oscar;
+ALTER TABLE delivery_packages OWNER TO faviovelez;
 
 --
--- Name: delivery_packages_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: delivery_packages_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE delivery_packages_id_seq
@@ -990,17 +1006,17 @@ CREATE SEQUENCE delivery_packages_id_seq
     CACHE 1;
 
 
-ALTER TABLE delivery_packages_id_seq OWNER TO oscar;
+ALTER TABLE delivery_packages_id_seq OWNER TO faviovelez;
 
 --
--- Name: delivery_packages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: delivery_packages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE delivery_packages_id_seq OWNED BY delivery_packages.id;
 
 
 --
--- Name: delivery_services; Type: TABLE; Schema: public; Owner: oscar
+-- Name: delivery_services; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE delivery_services (
@@ -1024,14 +1040,17 @@ CREATE TABLE delivery_services (
     service_offered_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    receivers_zipcode character varying
+    receivers_zipcode character varying,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE delivery_services OWNER TO oscar;
+ALTER TABLE delivery_services OWNER TO faviovelez;
 
 --
--- Name: delivery_services_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: delivery_services_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE delivery_services_id_seq
@@ -1042,17 +1061,17 @@ CREATE SEQUENCE delivery_services_id_seq
     CACHE 1;
 
 
-ALTER TABLE delivery_services_id_seq OWNER TO oscar;
+ALTER TABLE delivery_services_id_seq OWNER TO faviovelez;
 
 --
--- Name: delivery_services_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: delivery_services_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE delivery_services_id_seq OWNED BY delivery_services.id;
 
 
 --
--- Name: deposits; Type: TABLE; Schema: public; Owner: oscar
+-- Name: deposits; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE deposits (
@@ -1067,10 +1086,10 @@ CREATE TABLE deposits (
 );
 
 
-ALTER TABLE deposits OWNER TO oscar;
+ALTER TABLE deposits OWNER TO faviovelez;
 
 --
--- Name: deposits_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: deposits_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE deposits_id_seq
@@ -1081,17 +1100,17 @@ CREATE SEQUENCE deposits_id_seq
     CACHE 1;
 
 
-ALTER TABLE deposits_id_seq OWNER TO oscar;
+ALTER TABLE deposits_id_seq OWNER TO faviovelez;
 
 --
--- Name: deposits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: deposits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE deposits_id_seq OWNED BY deposits.id;
 
 
 --
--- Name: design_costs; Type: TABLE; Schema: public; Owner: oscar
+-- Name: design_costs; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE design_costs (
@@ -1103,10 +1122,10 @@ CREATE TABLE design_costs (
 );
 
 
-ALTER TABLE design_costs OWNER TO oscar;
+ALTER TABLE design_costs OWNER TO faviovelez;
 
 --
--- Name: design_costs_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: design_costs_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE design_costs_id_seq
@@ -1117,17 +1136,17 @@ CREATE SEQUENCE design_costs_id_seq
     CACHE 1;
 
 
-ALTER TABLE design_costs_id_seq OWNER TO oscar;
+ALTER TABLE design_costs_id_seq OWNER TO faviovelez;
 
 --
--- Name: design_costs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: design_costs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE design_costs_id_seq OWNED BY design_costs.id;
 
 
 --
--- Name: design_likes; Type: TABLE; Schema: public; Owner: oscar
+-- Name: design_likes; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE design_likes (
@@ -1138,10 +1157,10 @@ CREATE TABLE design_likes (
 );
 
 
-ALTER TABLE design_likes OWNER TO oscar;
+ALTER TABLE design_likes OWNER TO faviovelez;
 
 --
--- Name: design_likes_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: design_likes_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE design_likes_id_seq
@@ -1152,17 +1171,17 @@ CREATE SEQUENCE design_likes_id_seq
     CACHE 1;
 
 
-ALTER TABLE design_likes_id_seq OWNER TO oscar;
+ALTER TABLE design_likes_id_seq OWNER TO faviovelez;
 
 --
--- Name: design_likes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: design_likes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE design_likes_id_seq OWNED BY design_likes.id;
 
 
 --
--- Name: design_request_users; Type: TABLE; Schema: public; Owner: oscar
+-- Name: design_request_users; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE design_request_users (
@@ -1172,10 +1191,10 @@ CREATE TABLE design_request_users (
 );
 
 
-ALTER TABLE design_request_users OWNER TO oscar;
+ALTER TABLE design_request_users OWNER TO faviovelez;
 
 --
--- Name: design_request_users_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: design_request_users_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE design_request_users_id_seq
@@ -1186,17 +1205,17 @@ CREATE SEQUENCE design_request_users_id_seq
     CACHE 1;
 
 
-ALTER TABLE design_request_users_id_seq OWNER TO oscar;
+ALTER TABLE design_request_users_id_seq OWNER TO faviovelez;
 
 --
--- Name: design_request_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: design_request_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE design_request_users_id_seq OWNED BY design_request_users.id;
 
 
 --
--- Name: design_requests; Type: TABLE; Schema: public; Owner: oscar
+-- Name: design_requests; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE design_requests (
@@ -1214,10 +1233,10 @@ CREATE TABLE design_requests (
 );
 
 
-ALTER TABLE design_requests OWNER TO oscar;
+ALTER TABLE design_requests OWNER TO faviovelez;
 
 --
--- Name: design_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: design_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE design_requests_id_seq
@@ -1228,17 +1247,17 @@ CREATE SEQUENCE design_requests_id_seq
     CACHE 1;
 
 
-ALTER TABLE design_requests_id_seq OWNER TO oscar;
+ALTER TABLE design_requests_id_seq OWNER TO faviovelez;
 
 --
--- Name: design_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: design_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE design_requests_id_seq OWNED BY design_requests.id;
 
 
 --
--- Name: discount_rules; Type: TABLE; Schema: public; Owner: oscar
+-- Name: discount_rules; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE discount_rules (
@@ -1268,10 +1287,10 @@ CREATE TABLE discount_rules (
 );
 
 
-ALTER TABLE discount_rules OWNER TO oscar;
+ALTER TABLE discount_rules OWNER TO faviovelez;
 
 --
--- Name: discount_rules_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: discount_rules_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE discount_rules_id_seq
@@ -1282,17 +1301,17 @@ CREATE SEQUENCE discount_rules_id_seq
     CACHE 1;
 
 
-ALTER TABLE discount_rules_id_seq OWNER TO oscar;
+ALTER TABLE discount_rules_id_seq OWNER TO faviovelez;
 
 --
--- Name: discount_rules_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: discount_rules_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE discount_rules_id_seq OWNED BY discount_rules.id;
 
 
 --
--- Name: documents; Type: TABLE; Schema: public; Owner: oscar
+-- Name: documents; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE documents (
@@ -1306,10 +1325,10 @@ CREATE TABLE documents (
 );
 
 
-ALTER TABLE documents OWNER TO oscar;
+ALTER TABLE documents OWNER TO faviovelez;
 
 --
--- Name: documents_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: documents_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE documents_id_seq
@@ -1320,17 +1339,17 @@ CREATE SEQUENCE documents_id_seq
     CACHE 1;
 
 
-ALTER TABLE documents_id_seq OWNER TO oscar;
+ALTER TABLE documents_id_seq OWNER TO faviovelez;
 
 --
--- Name: documents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: documents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE documents_id_seq OWNED BY documents.id;
 
 
 --
--- Name: estimate_docs; Type: TABLE; Schema: public; Owner: oscar
+-- Name: estimate_docs; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE estimate_docs (
@@ -1343,10 +1362,10 @@ CREATE TABLE estimate_docs (
 );
 
 
-ALTER TABLE estimate_docs OWNER TO oscar;
+ALTER TABLE estimate_docs OWNER TO faviovelez;
 
 --
--- Name: estimate_docs_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: estimate_docs_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE estimate_docs_id_seq
@@ -1357,17 +1376,17 @@ CREATE SEQUENCE estimate_docs_id_seq
     CACHE 1;
 
 
-ALTER TABLE estimate_docs_id_seq OWNER TO oscar;
+ALTER TABLE estimate_docs_id_seq OWNER TO faviovelez;
 
 --
--- Name: estimate_docs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: estimate_docs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE estimate_docs_id_seq OWNED BY estimate_docs.id;
 
 
 --
--- Name: estimates; Type: TABLE; Schema: public; Owner: oscar
+-- Name: estimates; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE estimates (
@@ -1381,10 +1400,10 @@ CREATE TABLE estimates (
 );
 
 
-ALTER TABLE estimates OWNER TO oscar;
+ALTER TABLE estimates OWNER TO faviovelez;
 
 --
--- Name: estimates_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: estimates_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE estimates_id_seq
@@ -1395,17 +1414,17 @@ CREATE SEQUENCE estimates_id_seq
     CACHE 1;
 
 
-ALTER TABLE estimates_id_seq OWNER TO oscar;
+ALTER TABLE estimates_id_seq OWNER TO faviovelez;
 
 --
--- Name: estimates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: estimates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE estimates_id_seq OWNED BY estimates.id;
 
 
 --
--- Name: exhibition_inventories; Type: TABLE; Schema: public; Owner: oscar
+-- Name: exhibition_inventories; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE exhibition_inventories (
@@ -1418,10 +1437,10 @@ CREATE TABLE exhibition_inventories (
 );
 
 
-ALTER TABLE exhibition_inventories OWNER TO oscar;
+ALTER TABLE exhibition_inventories OWNER TO faviovelez;
 
 --
--- Name: exhibition_inventories_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: exhibition_inventories_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE exhibition_inventories_id_seq
@@ -1432,17 +1451,17 @@ CREATE SEQUENCE exhibition_inventories_id_seq
     CACHE 1;
 
 
-ALTER TABLE exhibition_inventories_id_seq OWNER TO oscar;
+ALTER TABLE exhibition_inventories_id_seq OWNER TO faviovelez;
 
 --
--- Name: exhibition_inventories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: exhibition_inventories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE exhibition_inventories_id_seq OWNED BY exhibition_inventories.id;
 
 
 --
--- Name: expedition_zips; Type: TABLE; Schema: public; Owner: oscar
+-- Name: expedition_zips; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE expedition_zips (
@@ -1453,10 +1472,10 @@ CREATE TABLE expedition_zips (
 );
 
 
-ALTER TABLE expedition_zips OWNER TO oscar;
+ALTER TABLE expedition_zips OWNER TO faviovelez;
 
 --
--- Name: expedition_zips_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: expedition_zips_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE expedition_zips_id_seq
@@ -1467,17 +1486,17 @@ CREATE SEQUENCE expedition_zips_id_seq
     CACHE 1;
 
 
-ALTER TABLE expedition_zips_id_seq OWNER TO oscar;
+ALTER TABLE expedition_zips_id_seq OWNER TO faviovelez;
 
 --
--- Name: expedition_zips_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: expedition_zips_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE expedition_zips_id_seq OWNED BY expedition_zips.id;
 
 
 --
--- Name: expenses; Type: TABLE; Schema: public; Owner: oscar
+-- Name: expenses; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE expenses (
@@ -1496,14 +1515,17 @@ CREATE TABLE expenses (
     updated_at timestamp without time zone NOT NULL,
     expense_type character varying,
     taxes double precision,
-    payment_id integer
+    payment_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE expenses OWNER TO oscar;
+ALTER TABLE expenses OWNER TO faviovelez;
 
 --
--- Name: expenses_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: expenses_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE expenses_id_seq
@@ -1514,17 +1536,17 @@ CREATE SEQUENCE expenses_id_seq
     CACHE 1;
 
 
-ALTER TABLE expenses_id_seq OWNER TO oscar;
+ALTER TABLE expenses_id_seq OWNER TO faviovelez;
 
 --
--- Name: expenses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: expenses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE expenses_id_seq OWNED BY expenses.id;
 
 
 --
--- Name: exterior_colors; Type: TABLE; Schema: public; Owner: oscar
+-- Name: exterior_colors; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE exterior_colors (
@@ -1536,10 +1558,10 @@ CREATE TABLE exterior_colors (
 );
 
 
-ALTER TABLE exterior_colors OWNER TO oscar;
+ALTER TABLE exterior_colors OWNER TO faviovelez;
 
 --
--- Name: exterior_colors_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: exterior_colors_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE exterior_colors_id_seq
@@ -1550,17 +1572,17 @@ CREATE SEQUENCE exterior_colors_id_seq
     CACHE 1;
 
 
-ALTER TABLE exterior_colors_id_seq OWNER TO oscar;
+ALTER TABLE exterior_colors_id_seq OWNER TO faviovelez;
 
 --
--- Name: exterior_colors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: exterior_colors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE exterior_colors_id_seq OWNED BY exterior_colors.id;
 
 
 --
--- Name: finishings; Type: TABLE; Schema: public; Owner: oscar
+-- Name: finishings; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE finishings (
@@ -1571,10 +1593,10 @@ CREATE TABLE finishings (
 );
 
 
-ALTER TABLE finishings OWNER TO oscar;
+ALTER TABLE finishings OWNER TO faviovelez;
 
 --
--- Name: finishings_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: finishings_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE finishings_id_seq
@@ -1585,17 +1607,17 @@ CREATE SEQUENCE finishings_id_seq
     CACHE 1;
 
 
-ALTER TABLE finishings_id_seq OWNER TO oscar;
+ALTER TABLE finishings_id_seq OWNER TO faviovelez;
 
 --
--- Name: finishings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: finishings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE finishings_id_seq OWNED BY finishings.id;
 
 
 --
--- Name: images; Type: TABLE; Schema: public; Owner: oscar
+-- Name: images; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE images (
@@ -1603,14 +1625,17 @@ CREATE TABLE images (
     image character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    product_id integer
+    product_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
-ALTER TABLE images OWNER TO oscar;
+ALTER TABLE images OWNER TO faviovelez;
 
 --
--- Name: images_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: images_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE images_id_seq
@@ -1621,17 +1646,17 @@ CREATE SEQUENCE images_id_seq
     CACHE 1;
 
 
-ALTER TABLE images_id_seq OWNER TO oscar;
+ALTER TABLE images_id_seq OWNER TO faviovelez;
 
 --
--- Name: images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE images_id_seq OWNED BY images.id;
 
 
 --
--- Name: interior_colors; Type: TABLE; Schema: public; Owner: oscar
+-- Name: interior_colors; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE interior_colors (
@@ -1643,10 +1668,10 @@ CREATE TABLE interior_colors (
 );
 
 
-ALTER TABLE interior_colors OWNER TO oscar;
+ALTER TABLE interior_colors OWNER TO faviovelez;
 
 --
--- Name: interior_colors_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: interior_colors_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE interior_colors_id_seq
@@ -1657,17 +1682,17 @@ CREATE SEQUENCE interior_colors_id_seq
     CACHE 1;
 
 
-ALTER TABLE interior_colors_id_seq OWNER TO oscar;
+ALTER TABLE interior_colors_id_seq OWNER TO faviovelez;
 
 --
--- Name: interior_colors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: interior_colors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE interior_colors_id_seq OWNED BY interior_colors.id;
 
 
 --
--- Name: inventories; Type: TABLE; Schema: public; Owner: oscar
+-- Name: inventories; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE inventories (
@@ -1682,10 +1707,10 @@ CREATE TABLE inventories (
 );
 
 
-ALTER TABLE inventories OWNER TO oscar;
+ALTER TABLE inventories OWNER TO faviovelez;
 
 --
--- Name: inventories_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: inventories_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE inventories_id_seq
@@ -1696,17 +1721,17 @@ CREATE SEQUENCE inventories_id_seq
     CACHE 1;
 
 
-ALTER TABLE inventories_id_seq OWNER TO oscar;
+ALTER TABLE inventories_id_seq OWNER TO faviovelez;
 
 --
--- Name: inventories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: inventories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE inventories_id_seq OWNED BY inventories.id;
 
 
 --
--- Name: materials; Type: TABLE; Schema: public; Owner: oscar
+-- Name: materials; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE materials (
@@ -1717,10 +1742,10 @@ CREATE TABLE materials (
 );
 
 
-ALTER TABLE materials OWNER TO oscar;
+ALTER TABLE materials OWNER TO faviovelez;
 
 --
--- Name: materials_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: materials_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE materials_id_seq
@@ -1731,17 +1756,17 @@ CREATE SEQUENCE materials_id_seq
     CACHE 1;
 
 
-ALTER TABLE materials_id_seq OWNER TO oscar;
+ALTER TABLE materials_id_seq OWNER TO faviovelez;
 
 --
--- Name: materials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: materials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE materials_id_seq OWNED BY materials.id;
 
 
 --
--- Name: materials_resistances; Type: TABLE; Schema: public; Owner: oscar
+-- Name: materials_resistances; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE materials_resistances (
@@ -1753,10 +1778,10 @@ CREATE TABLE materials_resistances (
 );
 
 
-ALTER TABLE materials_resistances OWNER TO oscar;
+ALTER TABLE materials_resistances OWNER TO faviovelez;
 
 --
--- Name: materials_resistances_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: materials_resistances_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE materials_resistances_id_seq
@@ -1767,17 +1792,17 @@ CREATE SEQUENCE materials_resistances_id_seq
     CACHE 1;
 
 
-ALTER TABLE materials_resistances_id_seq OWNER TO oscar;
+ALTER TABLE materials_resistances_id_seq OWNER TO faviovelez;
 
 --
--- Name: materials_resistances_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: materials_resistances_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE materials_resistances_id_seq OWNED BY materials_resistances.id;
 
 
 --
--- Name: movements; Type: TABLE; Schema: public; Owner: oscar
+-- Name: movements; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE movements (
@@ -1818,10 +1843,10 @@ CREATE TABLE movements (
 );
 
 
-ALTER TABLE movements OWNER TO oscar;
+ALTER TABLE movements OWNER TO faviovelez;
 
 --
--- Name: movements_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: movements_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE movements_id_seq
@@ -1832,17 +1857,17 @@ CREATE SEQUENCE movements_id_seq
     CACHE 1;
 
 
-ALTER TABLE movements_id_seq OWNER TO oscar;
+ALTER TABLE movements_id_seq OWNER TO faviovelez;
 
 --
--- Name: movements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: movements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE movements_id_seq OWNED BY movements.id;
 
 
 --
--- Name: orders; Type: TABLE; Schema: public; Owner: oscar
+-- Name: orders; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE orders (
@@ -1869,10 +1894,10 @@ CREATE TABLE orders (
 );
 
 
-ALTER TABLE orders OWNER TO oscar;
+ALTER TABLE orders OWNER TO faviovelez;
 
 --
--- Name: orders_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: orders_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE orders_id_seq
@@ -1883,17 +1908,17 @@ CREATE SEQUENCE orders_id_seq
     CACHE 1;
 
 
-ALTER TABLE orders_id_seq OWNER TO oscar;
+ALTER TABLE orders_id_seq OWNER TO faviovelez;
 
 --
--- Name: orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE orders_id_seq OWNED BY orders.id;
 
 
 --
--- Name: orders_users; Type: TABLE; Schema: public; Owner: oscar
+-- Name: orders_users; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE orders_users (
@@ -1905,10 +1930,10 @@ CREATE TABLE orders_users (
 );
 
 
-ALTER TABLE orders_users OWNER TO oscar;
+ALTER TABLE orders_users OWNER TO faviovelez;
 
 --
--- Name: orders_users_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: orders_users_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE orders_users_id_seq
@@ -1919,17 +1944,17 @@ CREATE SEQUENCE orders_users_id_seq
     CACHE 1;
 
 
-ALTER TABLE orders_users_id_seq OWNER TO oscar;
+ALTER TABLE orders_users_id_seq OWNER TO faviovelez;
 
 --
--- Name: orders_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: orders_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE orders_users_id_seq OWNED BY orders_users.id;
 
 
 --
--- Name: pacs; Type: TABLE; Schema: public; Owner: oscar
+-- Name: pacs; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE pacs (
@@ -1943,10 +1968,10 @@ CREATE TABLE pacs (
 );
 
 
-ALTER TABLE pacs OWNER TO oscar;
+ALTER TABLE pacs OWNER TO faviovelez;
 
 --
--- Name: pacs_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: pacs_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE pacs_id_seq
@@ -1957,17 +1982,17 @@ CREATE SEQUENCE pacs_id_seq
     CACHE 1;
 
 
-ALTER TABLE pacs_id_seq OWNER TO oscar;
+ALTER TABLE pacs_id_seq OWNER TO faviovelez;
 
 --
--- Name: pacs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: pacs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE pacs_id_seq OWNED BY pacs.id;
 
 
 --
--- Name: payment_conditions; Type: TABLE; Schema: public; Owner: oscar
+-- Name: payment_conditions; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE payment_conditions (
@@ -1978,10 +2003,10 @@ CREATE TABLE payment_conditions (
 );
 
 
-ALTER TABLE payment_conditions OWNER TO oscar;
+ALTER TABLE payment_conditions OWNER TO faviovelez;
 
 --
--- Name: payment_conditions_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: payment_conditions_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE payment_conditions_id_seq
@@ -1992,17 +2017,17 @@ CREATE SEQUENCE payment_conditions_id_seq
     CACHE 1;
 
 
-ALTER TABLE payment_conditions_id_seq OWNER TO oscar;
+ALTER TABLE payment_conditions_id_seq OWNER TO faviovelez;
 
 --
--- Name: payment_conditions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: payment_conditions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE payment_conditions_id_seq OWNED BY payment_conditions.id;
 
 
 --
--- Name: payment_forms; Type: TABLE; Schema: public; Owner: oscar
+-- Name: payment_forms; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE payment_forms (
@@ -2010,14 +2035,14 @@ CREATE TABLE payment_forms (
     description character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    payment_id character varying
+    payment_key character varying
 );
 
 
-ALTER TABLE payment_forms OWNER TO oscar;
+ALTER TABLE payment_forms OWNER TO faviovelez;
 
 --
--- Name: payment_forms_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: payment_forms_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE payment_forms_id_seq
@@ -2028,17 +2053,17 @@ CREATE SEQUENCE payment_forms_id_seq
     CACHE 1;
 
 
-ALTER TABLE payment_forms_id_seq OWNER TO oscar;
+ALTER TABLE payment_forms_id_seq OWNER TO faviovelez;
 
 --
--- Name: payment_forms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: payment_forms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE payment_forms_id_seq OWNED BY payment_forms.id;
 
 
 --
--- Name: payment_methods; Type: TABLE; Schema: public; Owner: oscar
+-- Name: payment_methods; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE payment_methods (
@@ -2050,10 +2075,10 @@ CREATE TABLE payment_methods (
 );
 
 
-ALTER TABLE payment_methods OWNER TO oscar;
+ALTER TABLE payment_methods OWNER TO faviovelez;
 
 --
--- Name: payment_methods_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: payment_methods_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE payment_methods_id_seq
@@ -2064,17 +2089,17 @@ CREATE SEQUENCE payment_methods_id_seq
     CACHE 1;
 
 
-ALTER TABLE payment_methods_id_seq OWNER TO oscar;
+ALTER TABLE payment_methods_id_seq OWNER TO faviovelez;
 
 --
--- Name: payment_methods_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: payment_methods_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE payment_methods_id_seq OWNED BY payment_methods.id;
 
 
 --
--- Name: payments; Type: TABLE; Schema: public; Owner: oscar
+-- Name: payments; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE payments (
@@ -2097,14 +2122,17 @@ CREATE TABLE payments (
     bank_id integer,
     credit_days integer,
     total double precision,
-    order_id integer
+    order_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE payments OWNER TO oscar;
+ALTER TABLE payments OWNER TO faviovelez;
 
 --
--- Name: payments_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: payments_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE payments_id_seq
@@ -2115,17 +2143,17 @@ CREATE SEQUENCE payments_id_seq
     CACHE 1;
 
 
-ALTER TABLE payments_id_seq OWNER TO oscar;
+ALTER TABLE payments_id_seq OWNER TO faviovelez;
 
 --
--- Name: payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE payments_id_seq OWNED BY payments.id;
 
 
 --
--- Name: pending_movements; Type: TABLE; Schema: public; Owner: oscar
+-- Name: pending_movements; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE pending_movements (
@@ -2157,14 +2185,15 @@ CREATE TABLE pending_movements (
     ticket_id integer,
     total_cost double precision,
     total double precision,
-    subtotal double precision
+    subtotal double precision,
+    taxes double precision DEFAULT 0.0
 );
 
 
-ALTER TABLE pending_movements OWNER TO oscar;
+ALTER TABLE pending_movements OWNER TO faviovelez;
 
 --
--- Name: pending_movements_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: pending_movements_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE pending_movements_id_seq
@@ -2175,17 +2204,17 @@ CREATE SEQUENCE pending_movements_id_seq
     CACHE 1;
 
 
-ALTER TABLE pending_movements_id_seq OWNER TO oscar;
+ALTER TABLE pending_movements_id_seq OWNER TO faviovelez;
 
 --
--- Name: pending_movements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: pending_movements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE pending_movements_id_seq OWNED BY pending_movements.id;
 
 
 --
--- Name: pos_entries; Type: TABLE; Schema: public; Owner: oscar
+-- Name: pos_entries; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE pos_entries (
@@ -2198,10 +2227,10 @@ CREATE TABLE pos_entries (
 );
 
 
-ALTER TABLE pos_entries OWNER TO oscar;
+ALTER TABLE pos_entries OWNER TO faviovelez;
 
 --
--- Name: pos_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: pos_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE pos_entries_id_seq
@@ -2212,17 +2241,17 @@ CREATE SEQUENCE pos_entries_id_seq
     CACHE 1;
 
 
-ALTER TABLE pos_entries_id_seq OWNER TO oscar;
+ALTER TABLE pos_entries_id_seq OWNER TO faviovelez;
 
 --
--- Name: pos_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: pos_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE pos_entries_id_seq OWNED BY pos_entries.id;
 
 
 --
--- Name: product_requests; Type: TABLE; Schema: public; Owner: oscar
+-- Name: product_requests; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE product_requests (
@@ -2241,10 +2270,10 @@ CREATE TABLE product_requests (
 );
 
 
-ALTER TABLE product_requests OWNER TO oscar;
+ALTER TABLE product_requests OWNER TO faviovelez;
 
 --
--- Name: product_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: product_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE product_requests_id_seq
@@ -2255,23 +2284,21 @@ CREATE SEQUENCE product_requests_id_seq
     CACHE 1;
 
 
-ALTER TABLE product_requests_id_seq OWNER TO oscar;
+ALTER TABLE product_requests_id_seq OWNER TO faviovelez;
 
 --
--- Name: product_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: product_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE product_requests_id_seq OWNED BY product_requests.id;
 
 
 --
--- Name: product_sales; Type: TABLE; Schema: public; Owner: oscar
+-- Name: product_sales; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE product_sales (
     id integer NOT NULL,
-    sales_amount double precision,
-    sales_quantity integer,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2280,14 +2307,18 @@ CREATE TABLE product_sales (
     year integer,
     store_id integer,
     business_unit_id integer,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer
 );
 
 
-ALTER TABLE product_sales OWNER TO oscar;
+ALTER TABLE product_sales OWNER TO faviovelez;
 
 --
--- Name: product_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: product_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE product_sales_id_seq
@@ -2298,17 +2329,17 @@ CREATE SEQUENCE product_sales_id_seq
     CACHE 1;
 
 
-ALTER TABLE product_sales_id_seq OWNER TO oscar;
+ALTER TABLE product_sales_id_seq OWNER TO faviovelez;
 
 --
--- Name: product_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: product_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE product_sales_id_seq OWNED BY product_sales.id;
 
 
 --
--- Name: product_types; Type: TABLE; Schema: public; Owner: oscar
+-- Name: product_types; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE product_types (
@@ -2319,10 +2350,10 @@ CREATE TABLE product_types (
 );
 
 
-ALTER TABLE product_types OWNER TO oscar;
+ALTER TABLE product_types OWNER TO faviovelez;
 
 --
--- Name: product_types_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: product_types_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE product_types_id_seq
@@ -2333,17 +2364,17 @@ CREATE SEQUENCE product_types_id_seq
     CACHE 1;
 
 
-ALTER TABLE product_types_id_seq OWNER TO oscar;
+ALTER TABLE product_types_id_seq OWNER TO faviovelez;
 
 --
--- Name: product_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: product_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE product_types_id_seq OWNED BY product_types.id;
 
 
 --
--- Name: production_orders; Type: TABLE; Schema: public; Owner: oscar
+-- Name: production_orders; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE production_orders (
@@ -2355,10 +2386,10 @@ CREATE TABLE production_orders (
 );
 
 
-ALTER TABLE production_orders OWNER TO oscar;
+ALTER TABLE production_orders OWNER TO faviovelez;
 
 --
--- Name: production_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: production_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE production_orders_id_seq
@@ -2369,17 +2400,17 @@ CREATE SEQUENCE production_orders_id_seq
     CACHE 1;
 
 
-ALTER TABLE production_orders_id_seq OWNER TO oscar;
+ALTER TABLE production_orders_id_seq OWNER TO faviovelez;
 
 --
--- Name: production_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: production_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE production_orders_id_seq OWNED BY production_orders.id;
 
 
 --
--- Name: production_requests; Type: TABLE; Schema: public; Owner: oscar
+-- Name: production_requests; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE production_requests (
@@ -2393,10 +2424,10 @@ CREATE TABLE production_requests (
 );
 
 
-ALTER TABLE production_requests OWNER TO oscar;
+ALTER TABLE production_requests OWNER TO faviovelez;
 
 --
--- Name: production_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: production_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE production_requests_id_seq
@@ -2407,17 +2438,17 @@ CREATE SEQUENCE production_requests_id_seq
     CACHE 1;
 
 
-ALTER TABLE production_requests_id_seq OWNER TO oscar;
+ALTER TABLE production_requests_id_seq OWNER TO faviovelez;
 
 --
--- Name: production_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: production_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE production_requests_id_seq OWNED BY production_requests.id;
 
 
 --
--- Name: products; Type: TABLE; Schema: public; Owner: oscar
+-- Name: products; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE products (
@@ -2467,14 +2498,27 @@ CREATE TABLE products (
     store_id integer,
     supplier_id integer,
     unit_id integer,
-    "group" boolean DEFAULT false
+    "group" boolean DEFAULT false,
+    child_id integer,
+    parent_id integer,
+    unit character varying,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date,
+    discount_for_stores double precision DEFAULT 0.0,
+    discount_for_franchises double precision DEFAULT 0.0,
+    factor double precision,
+    average double precision,
+    stores_discount double precision,
+    franchises_discount double precision,
+    shared boolean
 );
 
 
-ALTER TABLE products OWNER TO oscar;
+ALTER TABLE products OWNER TO faviovelez;
 
 --
--- Name: products_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: products_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE products_id_seq
@@ -2485,24 +2529,22 @@ CREATE SEQUENCE products_id_seq
     CACHE 1;
 
 
-ALTER TABLE products_id_seq OWNER TO oscar;
+ALTER TABLE products_id_seq OWNER TO faviovelez;
 
 --
--- Name: products_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: products_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE products_id_seq OWNED BY products.id;
 
 
 --
--- Name: prospect_sales; Type: TABLE; Schema: public; Owner: oscar
+-- Name: prospect_sales; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE prospect_sales (
     id integer NOT NULL,
     prospect_id integer,
-    sales_amount double precision,
-    sales_quantity integer,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2510,14 +2552,18 @@ CREATE TABLE prospect_sales (
     year integer,
     store_id integer,
     business_unit_id integer,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer
 );
 
 
-ALTER TABLE prospect_sales OWNER TO oscar;
+ALTER TABLE prospect_sales OWNER TO faviovelez;
 
 --
--- Name: prospect_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: prospect_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE prospect_sales_id_seq
@@ -2528,17 +2574,17 @@ CREATE SEQUENCE prospect_sales_id_seq
     CACHE 1;
 
 
-ALTER TABLE prospect_sales_id_seq OWNER TO oscar;
+ALTER TABLE prospect_sales_id_seq OWNER TO faviovelez;
 
 --
--- Name: prospect_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: prospect_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE prospect_sales_id_seq OWNED BY prospect_sales.id;
 
 
 --
--- Name: prospects; Type: TABLE; Schema: public; Owner: oscar
+-- Name: prospects; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE prospects (
@@ -2566,14 +2612,17 @@ CREATE TABLE prospects (
     store_code character varying,
     store_type_id integer,
     store_prospect_id integer,
-    credit_days integer
+    credit_days integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE prospects OWNER TO oscar;
+ALTER TABLE prospects OWNER TO faviovelez;
 
 --
--- Name: prospects_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: prospects_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE prospects_id_seq
@@ -2584,17 +2633,17 @@ CREATE SEQUENCE prospects_id_seq
     CACHE 1;
 
 
-ALTER TABLE prospects_id_seq OWNER TO oscar;
+ALTER TABLE prospects_id_seq OWNER TO faviovelez;
 
 --
--- Name: prospects_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: prospects_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE prospects_id_seq OWNED BY prospects.id;
 
 
 --
--- Name: relation_types; Type: TABLE; Schema: public; Owner: oscar
+-- Name: relation_types; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE relation_types (
@@ -2606,10 +2655,10 @@ CREATE TABLE relation_types (
 );
 
 
-ALTER TABLE relation_types OWNER TO oscar;
+ALTER TABLE relation_types OWNER TO faviovelez;
 
 --
--- Name: relation_types_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: relation_types_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE relation_types_id_seq
@@ -2620,17 +2669,17 @@ CREATE SEQUENCE relation_types_id_seq
     CACHE 1;
 
 
-ALTER TABLE relation_types_id_seq OWNER TO oscar;
+ALTER TABLE relation_types_id_seq OWNER TO faviovelez;
 
 --
--- Name: relation_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: relation_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE relation_types_id_seq OWNED BY relation_types.id;
 
 
 --
--- Name: request_users; Type: TABLE; Schema: public; Owner: oscar
+-- Name: request_users; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE request_users (
@@ -2642,10 +2691,10 @@ CREATE TABLE request_users (
 );
 
 
-ALTER TABLE request_users OWNER TO oscar;
+ALTER TABLE request_users OWNER TO faviovelez;
 
 --
--- Name: request_users_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: request_users_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE request_users_id_seq
@@ -2656,17 +2705,17 @@ CREATE SEQUENCE request_users_id_seq
     CACHE 1;
 
 
-ALTER TABLE request_users_id_seq OWNER TO oscar;
+ALTER TABLE request_users_id_seq OWNER TO faviovelez;
 
 --
--- Name: request_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: request_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE request_users_id_seq OWNED BY request_users.id;
 
 
 --
--- Name: requests; Type: TABLE; Schema: public; Owner: oscar
+-- Name: requests; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE requests (
@@ -2754,10 +2803,10 @@ CREATE TABLE requests (
 );
 
 
-ALTER TABLE requests OWNER TO oscar;
+ALTER TABLE requests OWNER TO faviovelez;
 
 --
--- Name: requests_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: requests_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE requests_id_seq
@@ -2768,17 +2817,17 @@ CREATE SEQUENCE requests_id_seq
     CACHE 1;
 
 
-ALTER TABLE requests_id_seq OWNER TO oscar;
+ALTER TABLE requests_id_seq OWNER TO faviovelez;
 
 --
--- Name: requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE requests_id_seq OWNED BY requests.id;
 
 
 --
--- Name: resistances; Type: TABLE; Schema: public; Owner: oscar
+-- Name: resistances; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE resistances (
@@ -2789,10 +2838,10 @@ CREATE TABLE resistances (
 );
 
 
-ALTER TABLE resistances OWNER TO oscar;
+ALTER TABLE resistances OWNER TO faviovelez;
 
 --
--- Name: resistances_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: resistances_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE resistances_id_seq
@@ -2803,17 +2852,17 @@ CREATE SEQUENCE resistances_id_seq
     CACHE 1;
 
 
-ALTER TABLE resistances_id_seq OWNER TO oscar;
+ALTER TABLE resistances_id_seq OWNER TO faviovelez;
 
 --
--- Name: resistances_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: resistances_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE resistances_id_seq OWNED BY resistances.id;
 
 
 --
--- Name: return_tickets; Type: TABLE; Schema: public; Owner: oscar
+-- Name: return_tickets; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE return_tickets (
@@ -2827,10 +2876,10 @@ CREATE TABLE return_tickets (
 );
 
 
-ALTER TABLE return_tickets OWNER TO oscar;
+ALTER TABLE return_tickets OWNER TO faviovelez;
 
 --
--- Name: return_tickets_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: return_tickets_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE return_tickets_id_seq
@@ -2841,17 +2890,17 @@ CREATE SEQUENCE return_tickets_id_seq
     CACHE 1;
 
 
-ALTER TABLE return_tickets_id_seq OWNER TO oscar;
+ALTER TABLE return_tickets_id_seq OWNER TO faviovelez;
 
 --
--- Name: return_tickets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: return_tickets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE return_tickets_id_seq OWNED BY return_tickets.id;
 
 
 --
--- Name: roles; Type: TABLE; Schema: public; Owner: oscar
+-- Name: roles; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE roles (
@@ -2864,10 +2913,10 @@ CREATE TABLE roles (
 );
 
 
-ALTER TABLE roles OWNER TO oscar;
+ALTER TABLE roles OWNER TO faviovelez;
 
 --
--- Name: roles_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: roles_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE roles_id_seq
@@ -2878,17 +2927,66 @@ CREATE SEQUENCE roles_id_seq
     CACHE 1;
 
 
-ALTER TABLE roles_id_seq OWNER TO oscar;
+ALTER TABLE roles_id_seq OWNER TO faviovelez;
 
 --
--- Name: roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE roles_id_seq OWNED BY roles.id;
 
 
 --
--- Name: sales_movements; Type: TABLE; Schema: public; Owner: oscar
+-- Name: rows; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE rows (
+    id integer NOT NULL,
+    bill_id integer,
+    product integer,
+    service integer,
+    unique_code character varying,
+    quantity integer,
+    unit_value double precision,
+    ticket integer,
+    sat_key character varying,
+    sat_unit_key character varying,
+    description text,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    discount double precision,
+    sat_unit_description character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE rows OWNER TO faviovelez;
+
+--
+-- Name: rows_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE rows_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE rows_id_seq OWNER TO faviovelez;
+
+--
+-- Name: rows_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE rows_id_seq OWNED BY rows.id;
+
+
+--
+-- Name: sales_movements; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE sales_movements (
@@ -2900,10 +2998,10 @@ CREATE TABLE sales_movements (
 );
 
 
-ALTER TABLE sales_movements OWNER TO oscar;
+ALTER TABLE sales_movements OWNER TO faviovelez;
 
 --
--- Name: sales_movements_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: sales_movements_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE sales_movements_id_seq
@@ -2914,17 +3012,17 @@ CREATE SEQUENCE sales_movements_id_seq
     CACHE 1;
 
 
-ALTER TABLE sales_movements_id_seq OWNER TO oscar;
+ALTER TABLE sales_movements_id_seq OWNER TO faviovelez;
 
 --
--- Name: sales_movements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: sales_movements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE sales_movements_id_seq OWNED BY sales_movements.id;
 
 
 --
--- Name: sales_targets; Type: TABLE; Schema: public; Owner: oscar
+-- Name: sales_targets; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE sales_targets (
@@ -2940,10 +3038,10 @@ CREATE TABLE sales_targets (
 );
 
 
-ALTER TABLE sales_targets OWNER TO oscar;
+ALTER TABLE sales_targets OWNER TO faviovelez;
 
 --
--- Name: sales_targets_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: sales_targets_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE sales_targets_id_seq
@@ -2954,17 +3052,17 @@ CREATE SEQUENCE sales_targets_id_seq
     CACHE 1;
 
 
-ALTER TABLE sales_targets_id_seq OWNER TO oscar;
+ALTER TABLE sales_targets_id_seq OWNER TO faviovelez;
 
 --
--- Name: sales_targets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: sales_targets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE sales_targets_id_seq OWNED BY sales_targets.id;
 
 
 --
--- Name: sat_keys; Type: TABLE; Schema: public; Owner: oscar
+-- Name: sat_keys; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE sat_keys (
@@ -2976,10 +3074,10 @@ CREATE TABLE sat_keys (
 );
 
 
-ALTER TABLE sat_keys OWNER TO oscar;
+ALTER TABLE sat_keys OWNER TO faviovelez;
 
 --
--- Name: sat_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: sat_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE sat_keys_id_seq
@@ -2990,17 +3088,17 @@ CREATE SEQUENCE sat_keys_id_seq
     CACHE 1;
 
 
-ALTER TABLE sat_keys_id_seq OWNER TO oscar;
+ALTER TABLE sat_keys_id_seq OWNER TO faviovelez;
 
 --
--- Name: sat_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: sat_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE sat_keys_id_seq OWNED BY sat_keys.id;
 
 
 --
--- Name: sat_unit_keys; Type: TABLE; Schema: public; Owner: oscar
+-- Name: sat_unit_keys; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE sat_unit_keys (
@@ -3012,10 +3110,10 @@ CREATE TABLE sat_unit_keys (
 );
 
 
-ALTER TABLE sat_unit_keys OWNER TO oscar;
+ALTER TABLE sat_unit_keys OWNER TO faviovelez;
 
 --
--- Name: sat_unit_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: sat_unit_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE sat_unit_keys_id_seq
@@ -3026,17 +3124,17 @@ CREATE SEQUENCE sat_unit_keys_id_seq
     CACHE 1;
 
 
-ALTER TABLE sat_unit_keys_id_seq OWNER TO oscar;
+ALTER TABLE sat_unit_keys_id_seq OWNER TO faviovelez;
 
 --
--- Name: sat_unit_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: sat_unit_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE sat_unit_keys_id_seq OWNED BY sat_unit_keys.id;
 
 
 --
--- Name: sat_zipcodes; Type: TABLE; Schema: public; Owner: oscar
+-- Name: sat_zipcodes; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE sat_zipcodes (
@@ -3047,10 +3145,10 @@ CREATE TABLE sat_zipcodes (
 );
 
 
-ALTER TABLE sat_zipcodes OWNER TO oscar;
+ALTER TABLE sat_zipcodes OWNER TO faviovelez;
 
 --
--- Name: sat_zipcodes_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: sat_zipcodes_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE sat_zipcodes_id_seq
@@ -3061,17 +3159,17 @@ CREATE SEQUENCE sat_zipcodes_id_seq
     CACHE 1;
 
 
-ALTER TABLE sat_zipcodes_id_seq OWNER TO oscar;
+ALTER TABLE sat_zipcodes_id_seq OWNER TO faviovelez;
 
 --
--- Name: sat_zipcodes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: sat_zipcodes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE sat_zipcodes_id_seq OWNED BY sat_zipcodes.id;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: oscar
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE schema_migrations (
@@ -3079,10 +3177,10 @@ CREATE TABLE schema_migrations (
 );
 
 
-ALTER TABLE schema_migrations OWNER TO oscar;
+ALTER TABLE schema_migrations OWNER TO faviovelez;
 
 --
--- Name: service_offereds; Type: TABLE; Schema: public; Owner: oscar
+-- Name: service_offereds; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE service_offereds (
@@ -3106,14 +3204,17 @@ CREATE TABLE service_offereds (
     quantity integer,
     discount_reason character varying,
     total double precision,
-    subtotal double precision
+    subtotal double precision,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE service_offereds OWNER TO oscar;
+ALTER TABLE service_offereds OWNER TO faviovelez;
 
 --
--- Name: service_offereds_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: service_offereds_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE service_offereds_id_seq
@@ -3124,17 +3225,61 @@ CREATE SEQUENCE service_offereds_id_seq
     CACHE 1;
 
 
-ALTER TABLE service_offereds_id_seq OWNER TO oscar;
+ALTER TABLE service_offereds_id_seq OWNER TO faviovelez;
 
 --
--- Name: service_offereds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: service_offereds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE service_offereds_id_seq OWNED BY service_offereds.id;
 
 
 --
--- Name: services; Type: TABLE; Schema: public; Owner: oscar
+-- Name: service_sales; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE service_sales (
+    id integer NOT NULL,
+    store_id integer,
+    year integer,
+    month integer,
+    cost double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    discount double precision,
+    quantity integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    service_id integer
+);
+
+
+ALTER TABLE service_sales OWNER TO faviovelez;
+
+--
+-- Name: service_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE service_sales_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE service_sales_id_seq OWNER TO faviovelez;
+
+--
+-- Name: service_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE service_sales_id_seq OWNED BY service_sales.id;
+
+
+--
+-- Name: services; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE services (
@@ -3150,14 +3295,15 @@ CREATE TABLE services (
     business_unit_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    delivery_company character varying
+    delivery_company character varying,
+    current boolean
 );
 
 
-ALTER TABLE services OWNER TO oscar;
+ALTER TABLE services OWNER TO faviovelez;
 
 --
--- Name: services_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: services_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE services_id_seq
@@ -3168,17 +3314,17 @@ CREATE SEQUENCE services_id_seq
     CACHE 1;
 
 
-ALTER TABLE services_id_seq OWNER TO oscar;
+ALTER TABLE services_id_seq OWNER TO faviovelez;
 
 --
--- Name: services_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: services_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE services_id_seq OWNED BY services.id;
 
 
 --
--- Name: store_movements; Type: TABLE; Schema: public; Owner: oscar
+-- Name: store_movements; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE store_movements (
@@ -3205,14 +3351,18 @@ CREATE TABLE store_movements (
     total_cost double precision,
     discount_reason character varying,
     total double precision,
-    subtotal double precision
+    subtotal double precision,
+    bill_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE store_movements OWNER TO oscar;
+ALTER TABLE store_movements OWNER TO faviovelez;
 
 --
--- Name: store_movements_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: store_movements_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE store_movements_id_seq
@@ -3223,17 +3373,17 @@ CREATE SEQUENCE store_movements_id_seq
     CACHE 1;
 
 
-ALTER TABLE store_movements_id_seq OWNER TO oscar;
+ALTER TABLE store_movements_id_seq OWNER TO faviovelez;
 
 --
--- Name: store_movements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: store_movements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE store_movements_id_seq OWNED BY store_movements.id;
 
 
 --
--- Name: store_sales; Type: TABLE; Schema: public; Owner: oscar
+-- Name: store_sales; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE store_sales (
@@ -3241,19 +3391,23 @@ CREATE TABLE store_sales (
     store_id integer,
     month character varying,
     year character varying,
-    sales_amount double precision,
-    sales_quantity integer,
     cost double precision,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    discount double precision
+    discount double precision,
+    total double precision,
+    subtotal double precision,
+    taxes double precision,
+    quantity integer,
+    payments double precision,
+    expenses double precision
 );
 
 
-ALTER TABLE store_sales OWNER TO oscar;
+ALTER TABLE store_sales OWNER TO faviovelez;
 
 --
--- Name: store_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: store_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE store_sales_id_seq
@@ -3264,17 +3418,17 @@ CREATE SEQUENCE store_sales_id_seq
     CACHE 1;
 
 
-ALTER TABLE store_sales_id_seq OWNER TO oscar;
+ALTER TABLE store_sales_id_seq OWNER TO faviovelez;
 
 --
--- Name: store_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: store_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE store_sales_id_seq OWNED BY store_sales.id;
 
 
 --
--- Name: store_types; Type: TABLE; Schema: public; Owner: oscar
+-- Name: store_types; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE store_types (
@@ -3285,10 +3439,10 @@ CREATE TABLE store_types (
 );
 
 
-ALTER TABLE store_types OWNER TO oscar;
+ALTER TABLE store_types OWNER TO faviovelez;
 
 --
--- Name: store_types_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: store_types_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE store_types_id_seq
@@ -3299,17 +3453,17 @@ CREATE SEQUENCE store_types_id_seq
     CACHE 1;
 
 
-ALTER TABLE store_types_id_seq OWNER TO oscar;
+ALTER TABLE store_types_id_seq OWNER TO faviovelez;
 
 --
--- Name: store_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: store_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE store_types_id_seq OWNED BY store_types.id;
 
 
 --
--- Name: store_use_inventories; Type: TABLE; Schema: public; Owner: oscar
+-- Name: store_use_inventories; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE store_use_inventories (
@@ -3322,10 +3476,10 @@ CREATE TABLE store_use_inventories (
 );
 
 
-ALTER TABLE store_use_inventories OWNER TO oscar;
+ALTER TABLE store_use_inventories OWNER TO faviovelez;
 
 --
--- Name: store_use_inventories_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: store_use_inventories_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE store_use_inventories_id_seq
@@ -3336,17 +3490,17 @@ CREATE SEQUENCE store_use_inventories_id_seq
     CACHE 1;
 
 
-ALTER TABLE store_use_inventories_id_seq OWNER TO oscar;
+ALTER TABLE store_use_inventories_id_seq OWNER TO faviovelez;
 
 --
--- Name: store_use_inventories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: store_use_inventories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE store_use_inventories_id_seq OWNED BY store_use_inventories.id;
 
 
 --
--- Name: stores; Type: TABLE; Schema: public; Owner: oscar
+-- Name: stores; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE stores (
@@ -3394,14 +3548,14 @@ CREATE TABLE stores (
     advance_i_last_folio integer DEFAULT 0,
     initial_inventory character varying,
     current_inventory character varying,
-    prospects character varying
+    prospects_file character varying
 );
 
 
-ALTER TABLE stores OWNER TO oscar;
+ALTER TABLE stores OWNER TO faviovelez;
 
 --
--- Name: stores_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: stores_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE stores_id_seq
@@ -3412,17 +3566,17 @@ CREATE SEQUENCE stores_id_seq
     CACHE 1;
 
 
-ALTER TABLE stores_id_seq OWNER TO oscar;
+ALTER TABLE stores_id_seq OWNER TO faviovelez;
 
 --
--- Name: stores_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: stores_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE stores_id_seq OWNED BY stores.id;
 
 
 --
--- Name: stores_inventories; Type: TABLE; Schema: public; Owner: oscar
+-- Name: stores_inventories; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE stores_inventories (
@@ -3436,14 +3590,17 @@ CREATE TABLE stores_inventories (
     updated_at timestamp without time zone NOT NULL,
     rack character varying,
     level character varying,
-    manual_price_update boolean DEFAULT false
+    manual_price_update boolean DEFAULT false,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE stores_inventories OWNER TO oscar;
+ALTER TABLE stores_inventories OWNER TO faviovelez;
 
 --
--- Name: stores_inventories_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: stores_inventories_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE stores_inventories_id_seq
@@ -3454,17 +3611,17 @@ CREATE SEQUENCE stores_inventories_id_seq
     CACHE 1;
 
 
-ALTER TABLE stores_inventories_id_seq OWNER TO oscar;
+ALTER TABLE stores_inventories_id_seq OWNER TO faviovelez;
 
 --
--- Name: stores_inventories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: stores_inventories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE stores_inventories_id_seq OWNED BY stores_inventories.id;
 
 
 --
--- Name: stores_suppliers; Type: TABLE; Schema: public; Owner: oscar
+-- Name: stores_suppliers; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE stores_suppliers (
@@ -3476,10 +3633,10 @@ CREATE TABLE stores_suppliers (
 );
 
 
-ALTER TABLE stores_suppliers OWNER TO oscar;
+ALTER TABLE stores_suppliers OWNER TO faviovelez;
 
 --
--- Name: stores_suppliers_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: stores_suppliers_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE stores_suppliers_id_seq
@@ -3490,17 +3647,17 @@ CREATE SEQUENCE stores_suppliers_id_seq
     CACHE 1;
 
 
-ALTER TABLE stores_suppliers_id_seq OWNER TO oscar;
+ALTER TABLE stores_suppliers_id_seq OWNER TO faviovelez;
 
 --
--- Name: stores_suppliers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: stores_suppliers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE stores_suppliers_id_seq OWNED BY stores_suppliers.id;
 
 
 --
--- Name: stores_warehouse_entries; Type: TABLE; Schema: public; Owner: oscar
+-- Name: stores_warehouse_entries; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE stores_warehouse_entries (
@@ -3513,14 +3670,17 @@ CREATE TABLE stores_warehouse_entries (
     updated_at timestamp without time zone NOT NULL,
     retail_units_per_unit integer,
     units_used integer,
-    store_movement_id integer
+    store_movement_id integer,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT true,
+    date date
 );
 
 
-ALTER TABLE stores_warehouse_entries OWNER TO oscar;
+ALTER TABLE stores_warehouse_entries OWNER TO faviovelez;
 
 --
--- Name: stores_warehouse_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: stores_warehouse_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE stores_warehouse_entries_id_seq
@@ -3531,17 +3691,17 @@ CREATE SEQUENCE stores_warehouse_entries_id_seq
     CACHE 1;
 
 
-ALTER TABLE stores_warehouse_entries_id_seq OWNER TO oscar;
+ALTER TABLE stores_warehouse_entries_id_seq OWNER TO faviovelez;
 
 --
--- Name: stores_warehouse_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: stores_warehouse_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE stores_warehouse_entries_id_seq OWNED BY stores_warehouse_entries.id;
 
 
 --
--- Name: suppliers; Type: TABLE; Schema: public; Owner: oscar
+-- Name: suppliers; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE suppliers (
@@ -3567,10 +3727,10 @@ CREATE TABLE suppliers (
 );
 
 
-ALTER TABLE suppliers OWNER TO oscar;
+ALTER TABLE suppliers OWNER TO faviovelez;
 
 --
--- Name: suppliers_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: suppliers_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE suppliers_id_seq
@@ -3581,17 +3741,17 @@ CREATE SEQUENCE suppliers_id_seq
     CACHE 1;
 
 
-ALTER TABLE suppliers_id_seq OWNER TO oscar;
+ALTER TABLE suppliers_id_seq OWNER TO faviovelez;
 
 --
--- Name: suppliers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: suppliers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE suppliers_id_seq OWNED BY suppliers.id;
 
 
 --
--- Name: tax_regimes; Type: TABLE; Schema: public; Owner: oscar
+-- Name: tax_regimes; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE tax_regimes (
@@ -3606,10 +3766,10 @@ CREATE TABLE tax_regimes (
 );
 
 
-ALTER TABLE tax_regimes OWNER TO oscar;
+ALTER TABLE tax_regimes OWNER TO faviovelez;
 
 --
--- Name: tax_regimes_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: tax_regimes_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE tax_regimes_id_seq
@@ -3620,17 +3780,17 @@ CREATE SEQUENCE tax_regimes_id_seq
     CACHE 1;
 
 
-ALTER TABLE tax_regimes_id_seq OWNER TO oscar;
+ALTER TABLE tax_regimes_id_seq OWNER TO faviovelez;
 
 --
--- Name: tax_regimes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: tax_regimes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE tax_regimes_id_seq OWNED BY tax_regimes.id;
 
 
 --
--- Name: taxes; Type: TABLE; Schema: public; Owner: oscar
+-- Name: taxes; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE taxes (
@@ -3645,10 +3805,10 @@ CREATE TABLE taxes (
 );
 
 
-ALTER TABLE taxes OWNER TO oscar;
+ALTER TABLE taxes OWNER TO faviovelez;
 
 --
--- Name: taxes_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: taxes_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE taxes_id_seq
@@ -3659,17 +3819,17 @@ CREATE SEQUENCE taxes_id_seq
     CACHE 1;
 
 
-ALTER TABLE taxes_id_seq OWNER TO oscar;
+ALTER TABLE taxes_id_seq OWNER TO faviovelez;
 
 --
--- Name: taxes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: taxes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE taxes_id_seq OWNED BY taxes.id;
 
 
 --
--- Name: temporal_numbers; Type: TABLE; Schema: public; Owner: oscar
+-- Name: temporal_numbers; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE temporal_numbers (
@@ -3683,10 +3843,10 @@ CREATE TABLE temporal_numbers (
 );
 
 
-ALTER TABLE temporal_numbers OWNER TO oscar;
+ALTER TABLE temporal_numbers OWNER TO faviovelez;
 
 --
--- Name: temporal_numbers_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: temporal_numbers_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE temporal_numbers_id_seq
@@ -3697,17 +3857,17 @@ CREATE SEQUENCE temporal_numbers_id_seq
     CACHE 1;
 
 
-ALTER TABLE temporal_numbers_id_seq OWNER TO oscar;
+ALTER TABLE temporal_numbers_id_seq OWNER TO faviovelez;
 
 --
--- Name: temporal_numbers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: temporal_numbers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE temporal_numbers_id_seq OWNED BY temporal_numbers.id;
 
 
 --
--- Name: terminals; Type: TABLE; Schema: public; Owner: oscar
+-- Name: terminals; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE terminals (
@@ -3719,14 +3879,17 @@ CREATE TABLE terminals (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     debit_comission double precision,
-    credit_comission double precision
+    credit_comission double precision,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
-ALTER TABLE terminals OWNER TO oscar;
+ALTER TABLE terminals OWNER TO faviovelez;
 
 --
--- Name: terminals_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: terminals_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE terminals_id_seq
@@ -3737,17 +3900,17 @@ CREATE SEQUENCE terminals_id_seq
     CACHE 1;
 
 
-ALTER TABLE terminals_id_seq OWNER TO oscar;
+ALTER TABLE terminals_id_seq OWNER TO faviovelez;
 
 --
--- Name: terminals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: terminals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE terminals_id_seq OWNED BY terminals.id;
 
 
 --
--- Name: tickets; Type: TABLE; Schema: public; Owner: oscar
+-- Name: tickets; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE tickets (
@@ -3772,14 +3935,18 @@ CREATE TABLE tickets (
     cash_return double precision,
     payed boolean DEFAULT false,
     parent_id integer,
-    cost double precision
+    cost double precision,
+    saved boolean,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
-ALTER TABLE tickets OWNER TO oscar;
+ALTER TABLE tickets OWNER TO faviovelez;
 
 --
--- Name: tickets_children; Type: TABLE; Schema: public; Owner: oscar
+-- Name: tickets_children; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE tickets_children (
@@ -3787,14 +3954,17 @@ CREATE TABLE tickets_children (
     ticket_id integer,
     children_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    pos boolean DEFAULT false,
+    web boolean DEFAULT false,
+    date date
 );
 
 
-ALTER TABLE tickets_children OWNER TO oscar;
+ALTER TABLE tickets_children OWNER TO faviovelez;
 
 --
--- Name: tickets_children_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: tickets_children_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE tickets_children_id_seq
@@ -3805,17 +3975,17 @@ CREATE SEQUENCE tickets_children_id_seq
     CACHE 1;
 
 
-ALTER TABLE tickets_children_id_seq OWNER TO oscar;
+ALTER TABLE tickets_children_id_seq OWNER TO faviovelez;
 
 --
--- Name: tickets_children_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: tickets_children_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE tickets_children_id_seq OWNED BY tickets_children.id;
 
 
 --
--- Name: tickets_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: tickets_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE tickets_id_seq
@@ -3826,17 +3996,17 @@ CREATE SEQUENCE tickets_id_seq
     CACHE 1;
 
 
-ALTER TABLE tickets_id_seq OWNER TO oscar;
+ALTER TABLE tickets_id_seq OWNER TO faviovelez;
 
 --
--- Name: tickets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: tickets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE tickets_id_seq OWNED BY tickets.id;
 
 
 --
--- Name: type_of_bills; Type: TABLE; Schema: public; Owner: oscar
+-- Name: type_of_bills; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE type_of_bills (
@@ -3848,10 +4018,10 @@ CREATE TABLE type_of_bills (
 );
 
 
-ALTER TABLE type_of_bills OWNER TO oscar;
+ALTER TABLE type_of_bills OWNER TO faviovelez;
 
 --
--- Name: type_of_bills_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: type_of_bills_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE type_of_bills_id_seq
@@ -3862,17 +4032,17 @@ CREATE SEQUENCE type_of_bills_id_seq
     CACHE 1;
 
 
-ALTER TABLE type_of_bills_id_seq OWNER TO oscar;
+ALTER TABLE type_of_bills_id_seq OWNER TO faviovelez;
 
 --
--- Name: type_of_bills_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: type_of_bills_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE type_of_bills_id_seq OWNED BY type_of_bills.id;
 
 
 --
--- Name: units; Type: TABLE; Schema: public; Owner: oscar
+-- Name: units; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE units (
@@ -3885,10 +4055,10 @@ CREATE TABLE units (
 );
 
 
-ALTER TABLE units OWNER TO oscar;
+ALTER TABLE units OWNER TO faviovelez;
 
 --
--- Name: units_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: units_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE units_id_seq
@@ -3899,17 +4069,17 @@ CREATE SEQUENCE units_id_seq
     CACHE 1;
 
 
-ALTER TABLE units_id_seq OWNER TO oscar;
+ALTER TABLE units_id_seq OWNER TO faviovelez;
 
 --
--- Name: units_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: units_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE units_id_seq OWNED BY units.id;
 
 
 --
--- Name: user_requests; Type: TABLE; Schema: public; Owner: oscar
+-- Name: user_requests; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE user_requests (
@@ -3919,10 +4089,10 @@ CREATE TABLE user_requests (
 );
 
 
-ALTER TABLE user_requests OWNER TO oscar;
+ALTER TABLE user_requests OWNER TO faviovelez;
 
 --
--- Name: user_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: user_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE user_requests_id_seq
@@ -3933,17 +4103,17 @@ CREATE SEQUENCE user_requests_id_seq
     CACHE 1;
 
 
-ALTER TABLE user_requests_id_seq OWNER TO oscar;
+ALTER TABLE user_requests_id_seq OWNER TO faviovelez;
 
 --
--- Name: user_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: user_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE user_requests_id_seq OWNED BY user_requests.id;
 
 
 --
--- Name: user_sales; Type: TABLE; Schema: public; Owner: oscar
+-- Name: user_sales; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE user_sales (
@@ -3959,10 +4129,10 @@ CREATE TABLE user_sales (
 );
 
 
-ALTER TABLE user_sales OWNER TO oscar;
+ALTER TABLE user_sales OWNER TO faviovelez;
 
 --
--- Name: user_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: user_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE user_sales_id_seq
@@ -3973,17 +4143,17 @@ CREATE SEQUENCE user_sales_id_seq
     CACHE 1;
 
 
-ALTER TABLE user_sales_id_seq OWNER TO oscar;
+ALTER TABLE user_sales_id_seq OWNER TO faviovelez;
 
 --
--- Name: user_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: user_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE user_sales_id_seq OWNED BY user_sales.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: oscar
+-- Name: users; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE users (
@@ -4004,14 +4174,17 @@ CREATE TABLE users (
     middle_name character varying,
     last_name character varying,
     store_id integer,
-    role_id integer
+    role_id integer,
+    web boolean,
+    pos boolean,
+    date date
 );
 
 
-ALTER TABLE users OWNER TO oscar;
+ALTER TABLE users OWNER TO faviovelez;
 
 --
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE users_id_seq
@@ -4022,17 +4195,17 @@ CREATE SEQUENCE users_id_seq
     CACHE 1;
 
 
-ALTER TABLE users_id_seq OWNER TO oscar;
+ALTER TABLE users_id_seq OWNER TO faviovelez;
 
 --
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
--- Name: warehouse_entries; Type: TABLE; Schema: public; Owner: oscar
+-- Name: warehouse_entries; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE warehouse_entries (
@@ -4049,10 +4222,10 @@ CREATE TABLE warehouse_entries (
 );
 
 
-ALTER TABLE warehouse_entries OWNER TO oscar;
+ALTER TABLE warehouse_entries OWNER TO faviovelez;
 
 --
--- Name: warehouse_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: warehouse_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE warehouse_entries_id_seq
@@ -4063,17 +4236,17 @@ CREATE SEQUENCE warehouse_entries_id_seq
     CACHE 1;
 
 
-ALTER TABLE warehouse_entries_id_seq OWNER TO oscar;
+ALTER TABLE warehouse_entries_id_seq OWNER TO faviovelez;
 
 --
--- Name: warehouse_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: warehouse_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE warehouse_entries_id_seq OWNED BY warehouse_entries.id;
 
 
 --
--- Name: warehouses; Type: TABLE; Schema: public; Owner: oscar
+-- Name: warehouses; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE warehouses (
@@ -4089,10 +4262,10 @@ CREATE TABLE warehouses (
 );
 
 
-ALTER TABLE warehouses OWNER TO oscar;
+ALTER TABLE warehouses OWNER TO faviovelez;
 
 --
--- Name: warehouses_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: warehouses_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE warehouses_id_seq
@@ -4103,17 +4276,17 @@ CREATE SEQUENCE warehouses_id_seq
     CACHE 1;
 
 
-ALTER TABLE warehouses_id_seq OWNER TO oscar;
+ALTER TABLE warehouses_id_seq OWNER TO faviovelez;
 
 --
--- Name: warehouses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: warehouses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE warehouses_id_seq OWNED BY warehouses.id;
 
 
 --
--- Name: withdrawals; Type: TABLE; Schema: public; Owner: oscar
+-- Name: withdrawals; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE withdrawals (
@@ -4128,10 +4301,10 @@ CREATE TABLE withdrawals (
 );
 
 
-ALTER TABLE withdrawals OWNER TO oscar;
+ALTER TABLE withdrawals OWNER TO faviovelez;
 
 --
--- Name: withdrawals_id_seq; Type: SEQUENCE; Schema: public; Owner: oscar
+-- Name: withdrawals_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
 --
 
 CREATE SEQUENCE withdrawals_id_seq
@@ -4142,703 +4315,717 @@ CREATE SEQUENCE withdrawals_id_seq
     CACHE 1;
 
 
-ALTER TABLE withdrawals_id_seq OWNER TO oscar;
+ALTER TABLE withdrawals_id_seq OWNER TO faviovelez;
 
 --
--- Name: withdrawals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: oscar
+-- Name: withdrawals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
 --
 
 ALTER SEQUENCE withdrawals_id_seq OWNED BY withdrawals.id;
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bank_balances ALTER COLUMN id SET DEFAULT nextval('bank_balances_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY banks ALTER COLUMN id SET DEFAULT nextval('banks_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bill_receiveds ALTER COLUMN id SET DEFAULT nextval('bill_receiveds_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bill_sales ALTER COLUMN id SET DEFAULT nextval('bill_sales_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY billing_addresses ALTER COLUMN id SET DEFAULT nextval('billing_addresses_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bills ALTER COLUMN id SET DEFAULT nextval('bills_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bills_children ALTER COLUMN id SET DEFAULT nextval('bills_children_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_group_sales ALTER COLUMN id SET DEFAULT nextval('business_group_sales_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_groups ALTER COLUMN id SET DEFAULT nextval('business_groups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_groups_suppliers ALTER COLUMN id SET DEFAULT nextval('business_groups_suppliers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_unit_sales ALTER COLUMN id SET DEFAULT nextval('business_unit_sales_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_units ALTER COLUMN id SET DEFAULT nextval('business_units_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_units_suppliers ALTER COLUMN id SET DEFAULT nextval('business_units_suppliers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY carriers ALTER COLUMN id SET DEFAULT nextval('carriers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY cash_registers ALTER COLUMN id SET DEFAULT nextval('cash_registers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY cfdi_uses ALTER COLUMN id SET DEFAULT nextval('cfdi_uses_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY change_tickets ALTER COLUMN id SET DEFAULT nextval('change_tickets_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY classifications ALTER COLUMN id SET DEFAULT nextval('classifications_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY cost_types ALTER COLUMN id SET DEFAULT nextval('cost_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY countries ALTER COLUMN id SET DEFAULT nextval('countries_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY currencies ALTER COLUMN id SET DEFAULT nextval('currencies_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY delivery_addresses ALTER COLUMN id SET DEFAULT nextval('delivery_addresses_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY delivery_attempts ALTER COLUMN id SET DEFAULT nextval('delivery_attempts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY delivery_packages ALTER COLUMN id SET DEFAULT nextval('delivery_packages_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY delivery_services ALTER COLUMN id SET DEFAULT nextval('delivery_services_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY deposits ALTER COLUMN id SET DEFAULT nextval('deposits_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY design_costs ALTER COLUMN id SET DEFAULT nextval('design_costs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY design_likes ALTER COLUMN id SET DEFAULT nextval('design_likes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY design_request_users ALTER COLUMN id SET DEFAULT nextval('design_request_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY design_requests ALTER COLUMN id SET DEFAULT nextval('design_requests_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY discount_rules ALTER COLUMN id SET DEFAULT nextval('discount_rules_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY documents ALTER COLUMN id SET DEFAULT nextval('documents_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY estimate_docs ALTER COLUMN id SET DEFAULT nextval('estimate_docs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY estimates ALTER COLUMN id SET DEFAULT nextval('estimates_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY exhibition_inventories ALTER COLUMN id SET DEFAULT nextval('exhibition_inventories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY expedition_zips ALTER COLUMN id SET DEFAULT nextval('expedition_zips_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY expenses ALTER COLUMN id SET DEFAULT nextval('expenses_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY exterior_colors ALTER COLUMN id SET DEFAULT nextval('exterior_colors_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY finishings ALTER COLUMN id SET DEFAULT nextval('finishings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY images ALTER COLUMN id SET DEFAULT nextval('images_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY interior_colors ALTER COLUMN id SET DEFAULT nextval('interior_colors_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY inventories ALTER COLUMN id SET DEFAULT nextval('inventories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY materials ALTER COLUMN id SET DEFAULT nextval('materials_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY materials_resistances ALTER COLUMN id SET DEFAULT nextval('materials_resistances_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY movements ALTER COLUMN id SET DEFAULT nextval('movements_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY orders ALTER COLUMN id SET DEFAULT nextval('orders_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY orders_users ALTER COLUMN id SET DEFAULT nextval('orders_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY pacs ALTER COLUMN id SET DEFAULT nextval('pacs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY payment_conditions ALTER COLUMN id SET DEFAULT nextval('payment_conditions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY payment_forms ALTER COLUMN id SET DEFAULT nextval('payment_forms_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY payment_methods ALTER COLUMN id SET DEFAULT nextval('payment_methods_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY payments ALTER COLUMN id SET DEFAULT nextval('payments_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY pending_movements ALTER COLUMN id SET DEFAULT nextval('pending_movements_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY pos_entries ALTER COLUMN id SET DEFAULT nextval('pos_entries_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY product_requests ALTER COLUMN id SET DEFAULT nextval('product_requests_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY product_sales ALTER COLUMN id SET DEFAULT nextval('product_sales_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY product_types ALTER COLUMN id SET DEFAULT nextval('product_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY production_orders ALTER COLUMN id SET DEFAULT nextval('production_orders_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY production_requests ALTER COLUMN id SET DEFAULT nextval('production_requests_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY products ALTER COLUMN id SET DEFAULT nextval('products_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY prospect_sales ALTER COLUMN id SET DEFAULT nextval('prospect_sales_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY prospects ALTER COLUMN id SET DEFAULT nextval('prospects_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY relation_types ALTER COLUMN id SET DEFAULT nextval('relation_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY request_users ALTER COLUMN id SET DEFAULT nextval('request_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY requests ALTER COLUMN id SET DEFAULT nextval('requests_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY resistances ALTER COLUMN id SET DEFAULT nextval('resistances_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY return_tickets ALTER COLUMN id SET DEFAULT nextval('return_tickets_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('roles_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY rows ALTER COLUMN id SET DEFAULT nextval('rows_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sales_movements ALTER COLUMN id SET DEFAULT nextval('sales_movements_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sales_targets ALTER COLUMN id SET DEFAULT nextval('sales_targets_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sat_keys ALTER COLUMN id SET DEFAULT nextval('sat_keys_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sat_unit_keys ALTER COLUMN id SET DEFAULT nextval('sat_unit_keys_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sat_zipcodes ALTER COLUMN id SET DEFAULT nextval('sat_zipcodes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY service_offereds ALTER COLUMN id SET DEFAULT nextval('service_offereds_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY service_sales ALTER COLUMN id SET DEFAULT nextval('service_sales_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY services ALTER COLUMN id SET DEFAULT nextval('services_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY store_movements ALTER COLUMN id SET DEFAULT nextval('store_movements_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY store_sales ALTER COLUMN id SET DEFAULT nextval('store_sales_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY store_types ALTER COLUMN id SET DEFAULT nextval('store_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY store_use_inventories ALTER COLUMN id SET DEFAULT nextval('store_use_inventories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY stores ALTER COLUMN id SET DEFAULT nextval('stores_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY stores_inventories ALTER COLUMN id SET DEFAULT nextval('stores_inventories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY stores_suppliers ALTER COLUMN id SET DEFAULT nextval('stores_suppliers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY stores_warehouse_entries ALTER COLUMN id SET DEFAULT nextval('stores_warehouse_entries_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY suppliers ALTER COLUMN id SET DEFAULT nextval('suppliers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY tax_regimes ALTER COLUMN id SET DEFAULT nextval('tax_regimes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY taxes ALTER COLUMN id SET DEFAULT nextval('taxes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY temporal_numbers ALTER COLUMN id SET DEFAULT nextval('temporal_numbers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY terminals ALTER COLUMN id SET DEFAULT nextval('terminals_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY tickets ALTER COLUMN id SET DEFAULT nextval('tickets_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY tickets_children ALTER COLUMN id SET DEFAULT nextval('tickets_children_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY type_of_bills ALTER COLUMN id SET DEFAULT nextval('type_of_bills_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY units ALTER COLUMN id SET DEFAULT nextval('units_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY user_requests ALTER COLUMN id SET DEFAULT nextval('user_requests_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY user_sales ALTER COLUMN id SET DEFAULT nextval('user_sales_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY warehouse_entries ALTER COLUMN id SET DEFAULT nextval('warehouse_entries_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY warehouses ALTER COLUMN id SET DEFAULT nextval('warehouses_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: oscar
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY withdrawals ALTER COLUMN id SET DEFAULT nextval('withdrawals_id_seq'::regclass);
 
 
 --
--- Data for Name: bank_balances; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: bank_balances; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY bank_balances (id, balance, store_id, business_unit_id, created_at, updated_at) FROM stdin;
@@ -4846,29 +5033,29 @@ COPY bank_balances (id, balance, store_id, business_unit_id, created_at, updated
 
 
 --
--- Name: bank_balances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: bank_balances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('bank_balances_id_seq', 1, false);
 
 
 --
--- Data for Name: banks; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: banks; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY banks (id, name, rfc, created_at, updated_at) FROM stdin;
+COPY banks (id, name, rfc, created_at, updated_at, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: banks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: banks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('banks_id_seq', 1, false);
 
 
 --
--- Data for Name: bill_receiveds; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: bill_receiveds; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY bill_receiveds (id, folio, date_of_bill, subtotal, taxes_rate, taxes, total_amount, supplier_id, product_id, payment_day, payment_complete, payment_on_time, created_at, updated_at, business_unit_id, store_id) FROM stdin;
@@ -4876,14 +5063,14 @@ COPY bill_receiveds (id, folio, date_of_bill, subtotal, taxes_rate, taxes, total
 
 
 --
--- Name: bill_receiveds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: bill_receiveds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('bill_receiveds_id_seq', 1, false);
 
 
 --
--- Data for Name: bill_sales; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: bill_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY bill_sales (id, business_unit_id, store_id, sales_quantity, amount, month, year, created_at, updated_at, discount) FROM stdin;
@@ -4891,37 +5078,37 @@ COPY bill_sales (id, business_unit_id, store_id, sales_quantity, amount, month, 
 
 
 --
--- Name: bill_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: bill_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('bill_sales_id_seq', 1, false);
 
 
 --
--- Data for Name: billing_addresses; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: billing_addresses; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY billing_addresses (id, type_of_person, business_name, rfc, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, created_at, updated_at, tax_regime_id) FROM stdin;
+COPY billing_addresses (id, type_of_person, business_name, rfc, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, created_at, updated_at, tax_regime_id, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: billing_addresses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: billing_addresses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('billing_addresses_id_seq', 1, false);
 
 
 --
--- Data for Name: bills; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: bills; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY bills (id, status, discount_applied, created_at, updated_at, prospect_id, pdf, xml, issuing_company_id, receiving_company_id, store_id, sequence, folio, payment_condition_id, payment_method_id, payment_form_id, tax_regime_id, cfdi_use_id, tax_id, pac_id, relation_type_id, references_field, type_of_bill_id, currency_id, id_trib_reg_num, confirmation_key, exchange_rate, country_id, automatic_discount_applied, manual_discount_applied, taxes_transferred, taxes_witheld, sat_certificate_number, certificate_number, qr_string, original_chain, sat_stampl, digital_stamp, subtotal, total, sat_zipcode_id, date_signed, leyend, uuid, taxes, payed, parent_id) FROM stdin;
+COPY bills (id, status, discount_applied, created_at, updated_at, prospect_id, pdf, xml, issuing_company_id, receiving_company_id, store_id, sequence, folio, payment_method_id, payment_form_id, tax_regime_id, cfdi_use_id, tax_id, pac_id, relation_type_id, references_field, type_of_bill_id, currency_id, id_trib_reg_num, confirmation_key, exchange_rate, country_id, automatic_discount_applied, manual_discount_applied, taxes_transferred, taxes_witheld, sat_certificate_number, certificate_number, qr_string, original_chain, digital_stamp, subtotal, total, sat_zipcode_id, date_signed, leyend, uuid, taxes, payed, parent_id, sat_stamp, payment_conditions, "from", cancel_receipt, bill_type) FROM stdin;
 \.
 
 
 --
--- Data for Name: bills_children; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: bills_children; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY bills_children (id, bill_id, children_id, created_at, updated_at) FROM stdin;
@@ -4929,36 +5116,36 @@ COPY bills_children (id, bill_id, children_id, created_at, updated_at) FROM stdi
 
 
 --
--- Name: bills_children_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: bills_children_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('bills_children_id_seq', 1, false);
 
 
 --
--- Name: bills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: bills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('bills_id_seq', 1, false);
 
 
 --
--- Data for Name: business_group_sales; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: business_group_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY business_group_sales (id, business_group_id, month, year, sales_amount, cost, created_at, updated_at, sales_quantity, discount) FROM stdin;
+COPY business_group_sales (id, business_group_id, month, year, cost, created_at, updated_at, discount, total, subtotal, taxes, quantity) FROM stdin;
 \.
 
 
 --
--- Name: business_group_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: business_group_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('business_group_sales_id_seq', 1, false);
 
 
 --
--- Data for Name: business_groups; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: business_groups; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY business_groups (id, name, created_at, updated_at, business_group_type) FROM stdin;
@@ -4966,14 +5153,14 @@ COPY business_groups (id, name, created_at, updated_at, business_group_type) FRO
 
 
 --
--- Name: business_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: business_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('business_groups_id_seq', 1, false);
 
 
 --
--- Data for Name: business_groups_suppliers; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: business_groups_suppliers; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY business_groups_suppliers (id, business_group_id, supplier_id, created_at, updated_at) FROM stdin;
@@ -4981,29 +5168,29 @@ COPY business_groups_suppliers (id, business_group_id, supplier_id, created_at, 
 
 
 --
--- Name: business_groups_suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: business_groups_suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('business_groups_suppliers_id_seq', 1, false);
 
 
 --
--- Data for Name: business_unit_sales; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: business_unit_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY business_unit_sales (id, business_unit_id, sales_amount, sales_quantity, cost, created_at, updated_at, month, year, discount) FROM stdin;
+COPY business_unit_sales (id, business_unit_id, cost, created_at, updated_at, month, year, discount, total, subtotal, taxes, quantity) FROM stdin;
 \.
 
 
 --
--- Name: business_unit_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: business_unit_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('business_unit_sales_id_seq', 1, false);
 
 
 --
--- Data for Name: business_units; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: business_units; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY business_units (id, name, created_at, updated_at, business_group_id, billing_address_id, current, pending_balance, main) FROM stdin;
@@ -5011,14 +5198,14 @@ COPY business_units (id, name, created_at, updated_at, business_group_id, billin
 
 
 --
--- Name: business_units_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: business_units_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('business_units_id_seq', 1, false);
 
 
 --
--- Data for Name: business_units_suppliers; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: business_units_suppliers; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY business_units_suppliers (id, business_unit_id, supplier_id, created_at, updated_at) FROM stdin;
@@ -5026,14 +5213,14 @@ COPY business_units_suppliers (id, business_unit_id, supplier_id, created_at, up
 
 
 --
--- Name: business_units_suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: business_units_suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('business_units_suppliers_id_seq', 1, false);
 
 
 --
--- Data for Name: carriers; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: carriers; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY carriers (id, name, created_at, updated_at, delivery_address_id) FROM stdin;
@@ -5041,29 +5228,29 @@ COPY carriers (id, name, created_at, updated_at, delivery_address_id) FROM stdin
 
 
 --
--- Name: carriers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: carriers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('carriers_id_seq', 1, false);
 
 
 --
--- Data for Name: cash_registers; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: cash_registers; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY cash_registers (id, name, store_id, created_at, updated_at, balance, cash_number) FROM stdin;
+COPY cash_registers (id, name, store_id, created_at, updated_at, balance, cash_number, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: cash_registers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: cash_registers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('cash_registers_id_seq', 1, false);
 
 
 --
--- Data for Name: cfdi_uses; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: cfdi_uses; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY cfdi_uses (id, description, created_at, updated_at, key) FROM stdin;
@@ -5071,14 +5258,14 @@ COPY cfdi_uses (id, description, created_at, updated_at, key) FROM stdin;
 
 
 --
--- Name: cfdi_uses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: cfdi_uses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('cfdi_uses_id_seq', 1, false);
 
 
 --
--- Data for Name: change_tickets; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: change_tickets; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY change_tickets (id, ticket_id, ticket_number, created_at, updated_at, store_id, bill_id) FROM stdin;
@@ -5086,14 +5273,14 @@ COPY change_tickets (id, ticket_id, ticket_number, created_at, updated_at, store
 
 
 --
--- Name: change_tickets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: change_tickets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('change_tickets_id_seq', 1, false);
 
 
 --
--- Data for Name: classifications; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: classifications; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY classifications (id, name, created_at, updated_at) FROM stdin;
@@ -5101,14 +5288,14 @@ COPY classifications (id, name, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: classifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: classifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('classifications_id_seq', 1, false);
 
 
 --
--- Data for Name: cost_types; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: cost_types; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY cost_types (id, warehouse_cost_type, created_at, updated_at, description) FROM stdin;
@@ -5116,14 +5303,14 @@ COPY cost_types (id, warehouse_cost_type, created_at, updated_at, description) F
 
 
 --
--- Name: cost_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: cost_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('cost_types_id_seq', 1, false);
 
 
 --
--- Data for Name: countries; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: countries; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY countries (id, key, name, created_at, updated_at) FROM stdin;
@@ -5131,14 +5318,14 @@ COPY countries (id, key, name, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: countries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: countries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('countries_id_seq', 1, false);
 
 
 --
--- Data for Name: currencies; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: currencies; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY currencies (id, name, created_at, updated_at, description, decimals) FROM stdin;
@@ -5146,14 +5333,14 @@ COPY currencies (id, name, created_at, updated_at, description, decimals) FROM s
 
 
 --
--- Name: currencies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: currencies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('currencies_id_seq', 1, false);
 
 
 --
--- Data for Name: delivery_addresses; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: delivery_addresses; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY delivery_addresses (id, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, type_of_address, created_at, updated_at, additional_references, name) FROM stdin;
@@ -5161,14 +5348,14 @@ COPY delivery_addresses (id, street, exterior_number, interior_number, zipcode, 
 
 
 --
--- Name: delivery_addresses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: delivery_addresses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('delivery_addresses_id_seq', 1, false);
 
 
 --
--- Data for Name: delivery_attempts; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: delivery_attempts; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY delivery_attempts (id, product_request_id, created_at, updated_at, movement_id, driver_id, receiver_id) FROM stdin;
@@ -5176,14 +5363,14 @@ COPY delivery_attempts (id, product_request_id, created_at, updated_at, movement
 
 
 --
--- Name: delivery_attempts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: delivery_attempts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('delivery_attempts_id_seq', 1, false);
 
 
 --
--- Data for Name: delivery_packages; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: delivery_packages; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY delivery_packages (id, length, width, height, weight, order_id, created_at, updated_at, delivery_attempt_id) FROM stdin;
@@ -5191,29 +5378,29 @@ COPY delivery_packages (id, length, width, height, weight, order_id, created_at,
 
 
 --
--- Name: delivery_packages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: delivery_packages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('delivery_packages_id_seq', 1, false);
 
 
 --
--- Data for Name: delivery_services; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: delivery_services; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY delivery_services (id, sender_name, sender_zipcode, tracking_number, receivers_name, contact_name, street, exterior_number, interior_number, neighborhood, city, state, country, phone, cellphone, email, company, service_offered_id, created_at, updated_at, receivers_zipcode) FROM stdin;
+COPY delivery_services (id, sender_name, sender_zipcode, tracking_number, receivers_name, contact_name, street, exterior_number, interior_number, neighborhood, city, state, country, phone, cellphone, email, company, service_offered_id, created_at, updated_at, receivers_zipcode, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: delivery_services_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: delivery_services_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('delivery_services_id_seq', 1, false);
 
 
 --
--- Data for Name: deposits; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: deposits; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY deposits (id, user_id, store_id, amount, created_at, updated_at, cash_register_id, name) FROM stdin;
@@ -5221,14 +5408,14 @@ COPY deposits (id, user_id, store_id, amount, created_at, updated_at, cash_regis
 
 
 --
--- Name: deposits_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: deposits_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('deposits_id_seq', 1, false);
 
 
 --
--- Data for Name: design_costs; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: design_costs; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY design_costs (id, complexity, cost, created_at, updated_at) FROM stdin;
@@ -5236,14 +5423,14 @@ COPY design_costs (id, complexity, cost, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: design_costs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: design_costs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('design_costs_id_seq', 1, false);
 
 
 --
--- Data for Name: design_likes; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: design_likes; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY design_likes (id, name, created_at, updated_at) FROM stdin;
@@ -5251,14 +5438,14 @@ COPY design_likes (id, name, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: design_likes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: design_likes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('design_likes_id_seq', 1, false);
 
 
 --
--- Data for Name: design_request_users; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: design_request_users; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY design_request_users (id, design_request_id, user_id) FROM stdin;
@@ -5266,14 +5453,14 @@ COPY design_request_users (id, design_request_id, user_id) FROM stdin;
 
 
 --
--- Name: design_request_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: design_request_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('design_request_users_id_seq', 1, false);
 
 
 --
--- Data for Name: design_requests; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: design_requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY design_requests (id, design_type, cost, status, authorisation, created_at, updated_at, request_id, description, attachment, notes) FROM stdin;
@@ -5281,14 +5468,14 @@ COPY design_requests (id, design_type, cost, status, authorisation, created_at, 
 
 
 --
--- Name: design_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: design_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('design_requests_id_seq', 1, false);
 
 
 --
--- Data for Name: discount_rules; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: discount_rules; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY discount_rules (id, percentage, product_list, prospect_list, initial_date, final_date, user_id, rule, minimum_amount, minimum_quantity, exclusions, active, created_at, updated_at, business_unit_id, store_id, prospect_filter, product_filter, product_all, prospect_all, product_gift, line_filter, material_filter) FROM stdin;
@@ -5296,14 +5483,14 @@ COPY discount_rules (id, percentage, product_list, prospect_list, initial_date, 
 
 
 --
--- Name: discount_rules_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: discount_rules_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('discount_rules_id_seq', 1, false);
 
 
 --
--- Data for Name: documents; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: documents; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY documents (id, request_id, created_at, updated_at, document_type, design_request_id, document) FROM stdin;
@@ -5311,14 +5498,14 @@ COPY documents (id, request_id, created_at, updated_at, document_type, design_re
 
 
 --
--- Name: documents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: documents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('documents_id_seq', 1, false);
 
 
 --
--- Data for Name: estimate_docs; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: estimate_docs; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY estimate_docs (id, prospect_id, user_id, created_at, updated_at, store_id) FROM stdin;
@@ -5326,14 +5513,14 @@ COPY estimate_docs (id, prospect_id, user_id, created_at, updated_at, store_id) 
 
 
 --
--- Name: estimate_docs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: estimate_docs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('estimate_docs_id_seq', 1, false);
 
 
 --
--- Data for Name: estimates; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: estimates; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY estimates (id, product_id, quantity, discount, estimate_doc_id, created_at, updated_at) FROM stdin;
@@ -5341,14 +5528,14 @@ COPY estimates (id, product_id, quantity, discount, estimate_doc_id, created_at,
 
 
 --
--- Name: estimates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: estimates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('estimates_id_seq', 1, false);
 
 
 --
--- Data for Name: exhibition_inventories; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: exhibition_inventories; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY exhibition_inventories (id, store_id, product_id, quantity, created_at, updated_at) FROM stdin;
@@ -5356,14 +5543,14 @@ COPY exhibition_inventories (id, store_id, product_id, quantity, created_at, upd
 
 
 --
--- Name: exhibition_inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: exhibition_inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('exhibition_inventories_id_seq', 1, false);
 
 
 --
--- Data for Name: expedition_zips; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: expedition_zips; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY expedition_zips (id, zip, created_at, updated_at) FROM stdin;
@@ -5371,29 +5558,29 @@ COPY expedition_zips (id, zip, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: expedition_zips_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: expedition_zips_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('expedition_zips_id_seq', 1, false);
 
 
 --
--- Data for Name: expenses; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: expenses; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY expenses (id, subtotal, taxes_rate, total, store_id, business_unit_id, user_id, bill_received_id, month, year, expense_date, created_at, updated_at, expense_type, taxes, payment_id) FROM stdin;
+COPY expenses (id, subtotal, taxes_rate, total, store_id, business_unit_id, user_id, bill_received_id, month, year, expense_date, created_at, updated_at, expense_type, taxes, payment_id, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: expenses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: expenses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('expenses_id_seq', 1, false);
 
 
 --
--- Data for Name: exterior_colors; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: exterior_colors; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY exterior_colors (id, name, material_id, created_at, updated_at) FROM stdin;
@@ -5401,14 +5588,14 @@ COPY exterior_colors (id, name, material_id, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: exterior_colors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: exterior_colors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('exterior_colors_id_seq', 1, false);
 
 
 --
--- Data for Name: finishings; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: finishings; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY finishings (id, name, created_at, updated_at) FROM stdin;
@@ -5416,29 +5603,29 @@ COPY finishings (id, name, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: finishings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: finishings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('finishings_id_seq', 1, false);
 
 
 --
--- Data for Name: images; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: images; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY images (id, image, created_at, updated_at, product_id) FROM stdin;
+COPY images (id, image, created_at, updated_at, product_id, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: images_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: images_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('images_id_seq', 1, false);
 
 
 --
--- Data for Name: interior_colors; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: interior_colors; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY interior_colors (id, name, material_id, created_at, updated_at) FROM stdin;
@@ -5446,14 +5633,14 @@ COPY interior_colors (id, name, material_id, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: interior_colors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: interior_colors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('interior_colors_id_seq', 1, false);
 
 
 --
--- Data for Name: inventories; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: inventories; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY inventories (id, product_id, created_at, updated_at, quantity, unique_code, alert, alert_type) FROM stdin;
@@ -5461,14 +5648,14 @@ COPY inventories (id, product_id, created_at, updated_at, quantity, unique_code,
 
 
 --
--- Name: inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('inventories_id_seq', 1, false);
 
 
 --
--- Data for Name: materials; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: materials; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY materials (id, name, created_at, updated_at) FROM stdin;
@@ -5476,14 +5663,14 @@ COPY materials (id, name, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: materials_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: materials_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('materials_id_seq', 1, false);
 
 
 --
--- Data for Name: materials_resistances; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: materials_resistances; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY materials_resistances (id, material_id, resistance_id, created_at, updated_at) FROM stdin;
@@ -5491,14 +5678,14 @@ COPY materials_resistances (id, material_id, resistance_id, created_at, updated_
 
 
 --
--- Name: materials_resistances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: materials_resistances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('materials_resistances_id_seq', 1, false);
 
 
 --
--- Data for Name: movements; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY movements (id, product_id, quantity, movement_type, created_at, updated_at, order_id, user_id, cost, unique_code, store_id, initial_price, supplier_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, confirm, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, rule_could_be, ticket_id, tax_id, taxes, total_cost, total, subtotal, entry_movement_id) FROM stdin;
@@ -5506,14 +5693,14 @@ COPY movements (id, product_id, quantity, movement_type, created_at, updated_at,
 
 
 --
--- Name: movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('movements_id_seq', 1, false);
 
 
 --
--- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY orders (id, status, delivery_address_id, created_at, updated_at, category, prospect_id, request_id, billing_address_id, carrier_id, store_id, confirm, delivery_notes, bill_id, delivery_attempt_id, total, subtotal, taxes, discount_applied, cost) FROM stdin;
@@ -5521,14 +5708,14 @@ COPY orders (id, status, delivery_address_id, created_at, updated_at, category, 
 
 
 --
--- Name: orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('orders_id_seq', 1, false);
 
 
 --
--- Data for Name: orders_users; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: orders_users; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY orders_users (id, order_id, user_id, created_at, updated_at) FROM stdin;
@@ -5536,14 +5723,14 @@ COPY orders_users (id, order_id, user_id, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: orders_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: orders_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('orders_users_id_seq', 1, false);
 
 
 --
--- Data for Name: pacs; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: pacs; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY pacs (id, name, certificate, created_at, updated_at, active, rfc) FROM stdin;
@@ -5551,14 +5738,14 @@ COPY pacs (id, name, certificate, created_at, updated_at, active, rfc) FROM stdi
 
 
 --
--- Name: pacs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: pacs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('pacs_id_seq', 1, false);
 
 
 --
--- Data for Name: payment_conditions; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: payment_conditions; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY payment_conditions (id, description, created_at, updated_at) FROM stdin;
@@ -5566,29 +5753,29 @@ COPY payment_conditions (id, description, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: payment_conditions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: payment_conditions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('payment_conditions_id_seq', 1, false);
 
 
 --
--- Data for Name: payment_forms; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: payment_forms; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY payment_forms (id, description, created_at, updated_at, payment_id) FROM stdin;
+COPY payment_forms (id, description, created_at, updated_at, payment_key) FROM stdin;
 \.
 
 
 --
--- Name: payment_forms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: payment_forms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('payment_forms_id_seq', 1, false);
 
 
 --
--- Data for Name: payment_methods; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: payment_methods; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY payment_methods (id, description, created_at, updated_at, method) FROM stdin;
@@ -5596,44 +5783,44 @@ COPY payment_methods (id, description, created_at, updated_at, method) FROM stdi
 
 
 --
--- Name: payment_methods_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: payment_methods_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('payment_methods_id_seq', 1, false);
 
 
 --
--- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY payments (id, payment_date, bill_received_id, supplier_id, created_at, updated_at, user_id, store_id, business_unit_id, payment_form_id, payment_type, bill_id, terminal_id, ticket_id, operation_number, payment_number, bank_id, credit_days, total, order_id) FROM stdin;
+COPY payments (id, payment_date, bill_received_id, supplier_id, created_at, updated_at, user_id, store_id, business_unit_id, payment_form_id, payment_type, bill_id, terminal_id, ticket_id, operation_number, payment_number, bank_id, credit_days, total, order_id, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('payments_id_seq', 1, false);
 
 
 --
--- Data for Name: pending_movements; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: pending_movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY pending_movements (id, product_id, quantity, created_at, updated_at, order_id, cost, unique_code, store_id, initial_price, supplier_id, movement_type, user_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, ticket_id, total_cost, total, subtotal) FROM stdin;
+COPY pending_movements (id, product_id, quantity, created_at, updated_at, order_id, cost, unique_code, store_id, initial_price, supplier_id, movement_type, user_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, ticket_id, total_cost, total, subtotal, taxes) FROM stdin;
 \.
 
 
 --
--- Name: pending_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: pending_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('pending_movements_id_seq', 1, false);
 
 
 --
--- Data for Name: pos_entries; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: pos_entries; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY pos_entries (id, store_id, product_id, quantity, created_at, updated_at) FROM stdin;
@@ -5641,14 +5828,14 @@ COPY pos_entries (id, store_id, product_id, quantity, created_at, updated_at) FR
 
 
 --
--- Name: pos_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: pos_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('pos_entries_id_seq', 1, false);
 
 
 --
--- Data for Name: product_requests; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: product_requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY product_requests (id, product_id, quantity, status, order_id, urgency_level, maximum_date, created_at, updated_at, armed, surplus, excess) FROM stdin;
@@ -5656,29 +5843,29 @@ COPY product_requests (id, product_id, quantity, status, order_id, urgency_level
 
 
 --
--- Name: product_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: product_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('product_requests_id_seq', 1, false);
 
 
 --
--- Data for Name: product_sales; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: product_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY product_sales (id, sales_amount, sales_quantity, cost, created_at, updated_at, product_id, month, year, store_id, business_unit_id, discount) FROM stdin;
+COPY product_sales (id, cost, created_at, updated_at, product_id, month, year, store_id, business_unit_id, discount, total, subtotal, taxes, quantity) FROM stdin;
 \.
 
 
 --
--- Name: product_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: product_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('product_sales_id_seq', 1, false);
 
 
 --
--- Data for Name: product_types; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: product_types; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY product_types (id, product_type, created_at, updated_at) FROM stdin;
@@ -5686,14 +5873,14 @@ COPY product_types (id, product_type, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: product_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: product_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('product_types_id_seq', 1, false);
 
 
 --
--- Data for Name: production_orders; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: production_orders; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY production_orders (id, user_id, created_at, updated_at, status) FROM stdin;
@@ -5701,14 +5888,14 @@ COPY production_orders (id, user_id, created_at, updated_at, status) FROM stdin;
 
 
 --
--- Name: production_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: production_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('production_orders_id_seq', 1, false);
 
 
 --
--- Data for Name: production_requests; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: production_requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY production_requests (id, product_id, quantity, status, production_order_id, created_at, updated_at) FROM stdin;
@@ -5716,59 +5903,59 @@ COPY production_requests (id, product_id, quantity, status, production_order_id,
 
 
 --
--- Name: production_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: production_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('production_requests_id_seq', 1, false);
 
 
 --
--- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY products (id, former_code, unique_code, description, product_type, exterior_material_color, interior_material_color, impression, exterior_color_or_design, main_material, resistance_main_material, inner_length, inner_width, inner_height, outer_length, outer_width, outer_height, design_type, number_of_pieces, accesories_kit, created_at, updated_at, price, bag_length, bag_width, bag_height, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, classification, line, image, pieces_per_package, business_unit_id, warehouse_id, cost, rack, level, sat_key_id, sat_unit_key_id, current, store_id, supplier_id, unit_id, "group") FROM stdin;
+COPY products (id, former_code, unique_code, description, product_type, exterior_material_color, interior_material_color, impression, exterior_color_or_design, main_material, resistance_main_material, inner_length, inner_width, inner_height, outer_length, outer_width, outer_height, design_type, number_of_pieces, accesories_kit, created_at, updated_at, price, bag_length, bag_width, bag_height, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, classification, line, image, pieces_per_package, business_unit_id, warehouse_id, cost, rack, level, sat_key_id, sat_unit_key_id, current, store_id, supplier_id, unit_id, "group", child_id, parent_id, unit, pos, web, date, discount_for_stores, discount_for_franchises, factor, average, stores_discount, franchises_discount, shared) FROM stdin;
 \.
 
 
 --
--- Name: products_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: products_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('products_id_seq', 1, false);
 
 
 --
--- Data for Name: prospect_sales; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: prospect_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY prospect_sales (id, prospect_id, sales_amount, sales_quantity, cost, created_at, updated_at, month, year, store_id, business_unit_id, discount) FROM stdin;
+COPY prospect_sales (id, prospect_id, cost, created_at, updated_at, month, year, store_id, business_unit_id, discount, total, subtotal, taxes, quantity) FROM stdin;
 \.
 
 
 --
--- Name: prospect_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: prospect_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('prospect_sales_id_seq', 1, false);
 
 
 --
--- Data for Name: prospects; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: prospects; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY prospects (id, store_id, created_at, updated_at, prospect_type, contact_first_name, contact_middle_name, contact_last_name, contact_position, direct_phone, extension, cell_phone, business_type, prospect_status, legal_or_business_name, billing_address_id, delivery_address_id, second_last_name, business_unit_id, email, business_group_id, store_code, store_type_id, store_prospect_id, credit_days) FROM stdin;
+COPY prospects (id, store_id, created_at, updated_at, prospect_type, contact_first_name, contact_middle_name, contact_last_name, contact_position, direct_phone, extension, cell_phone, business_type, prospect_status, legal_or_business_name, billing_address_id, delivery_address_id, second_last_name, business_unit_id, email, business_group_id, store_code, store_type_id, store_prospect_id, credit_days, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: prospects_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: prospects_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('prospects_id_seq', 1, false);
 
 
 --
--- Data for Name: relation_types; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: relation_types; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY relation_types (id, description, created_at, updated_at, key) FROM stdin;
@@ -5776,14 +5963,14 @@ COPY relation_types (id, description, created_at, updated_at, key) FROM stdin;
 
 
 --
--- Name: relation_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: relation_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('relation_types_id_seq', 1, false);
 
 
 --
--- Data for Name: request_users; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: request_users; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY request_users (id, request_id, user_id, created_at, updated_at) FROM stdin;
@@ -5791,14 +5978,14 @@ COPY request_users (id, request_id, user_id, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: request_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: request_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('request_users_id_seq', 1, false);
 
 
 --
--- Data for Name: requests; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY requests (id, product_type, product_what, product_length, product_width, product_height, product_weight, for_what, quantity, inner_length, inner_width, outer_length, outer_width, outer_height, bag_length, bag_width, bag_height, main_material, resistance_main_material, secondary_material, resistance_secondary_material, third_material, resistance_third_material, impression, inks, impression_finishing, delivery_date, maximum_sales_price, observations, notes, prospect_id, created_at, updated_at, final_quantity, payment_uploaded, authorisation_signed, date_finished, internal_cost, internal_price, sales_price, impression_where, design_like, resistance_like, rigid_color, paper_type_rigid, store_id, require_design, exterior_material_color, interior_material_color, status, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, name_type, contraencolado, authorised_without_doc, how_many, authorised_without_pay, boxes_stow, specification, what_measures, specification_document, sensitive_fields_changed, payment, authorisation, authorised, last_status, product_id, estimate_doc_id, second_quantity, third_quantity, second_internal_cost, third_internal_cost, second_internal_price, third_internal_price, second_sales_price, third_sales_price, price_selected, inner_height) FROM stdin;
@@ -5806,14 +5993,14 @@ COPY requests (id, product_type, product_what, product_length, product_width, pr
 
 
 --
--- Name: requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('requests_id_seq', 1, false);
 
 
 --
--- Data for Name: resistances; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: resistances; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY resistances (id, name, created_at, updated_at) FROM stdin;
@@ -5821,14 +6008,14 @@ COPY resistances (id, name, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: resistances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: resistances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('resistances_id_seq', 1, false);
 
 
 --
--- Data for Name: return_tickets; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: return_tickets; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY return_tickets (id, ticket_id, ticket_number, created_at, updated_at, store_id, bill_id) FROM stdin;
@@ -5836,14 +6023,14 @@ COPY return_tickets (id, ticket_id, ticket_number, created_at, updated_at, store
 
 
 --
--- Name: return_tickets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: return_tickets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('return_tickets_id_seq', 1, false);
 
 
 --
--- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY roles (id, name, description, created_at, updated_at, translation) FROM stdin;
@@ -5851,14 +6038,29 @@ COPY roles (id, name, description, created_at, updated_at, translation) FROM std
 
 
 --
--- Name: roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('roles_id_seq', 1, false);
 
 
 --
--- Data for Name: sales_movements; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: rows; Type: TABLE DATA; Schema: public; Owner: faviovelez
+--
+
+COPY rows (id, bill_id, product, service, unique_code, quantity, unit_value, ticket, sat_key, sat_unit_key, description, total, subtotal, taxes, discount, sat_unit_description, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: rows_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
+--
+
+SELECT pg_catalog.setval('rows_id_seq', 1, false);
+
+
+--
+-- Data for Name: sales_movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY sales_movements (id, sales_id, movement_id, created_at, updated_at) FROM stdin;
@@ -5866,14 +6068,14 @@ COPY sales_movements (id, sales_id, movement_id, created_at, updated_at) FROM st
 
 
 --
--- Name: sales_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: sales_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('sales_movements_id_seq', 1, false);
 
 
 --
--- Data for Name: sales_targets; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: sales_targets; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY sales_targets (id, store_id, month, year, target, actual_sales, achieved, created_at, updated_at) FROM stdin;
@@ -5881,14 +6083,14 @@ COPY sales_targets (id, store_id, month, year, target, actual_sales, achieved, c
 
 
 --
--- Name: sales_targets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: sales_targets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('sales_targets_id_seq', 1, false);
 
 
 --
--- Data for Name: sat_keys; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: sat_keys; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY sat_keys (id, sat_key, description, created_at, updated_at) FROM stdin;
@@ -5896,14 +6098,14 @@ COPY sat_keys (id, sat_key, description, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: sat_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: sat_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('sat_keys_id_seq', 1, false);
 
 
 --
--- Data for Name: sat_unit_keys; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: sat_unit_keys; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY sat_unit_keys (id, unit, description, created_at, updated_at) FROM stdin;
@@ -5911,14 +6113,14 @@ COPY sat_unit_keys (id, unit, description, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: sat_unit_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: sat_unit_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('sat_unit_keys_id_seq', 1, false);
 
 
 --
--- Data for Name: sat_zipcodes; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: sat_zipcodes; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY sat_zipcodes (id, zipcode, created_at, updated_at) FROM stdin;
@@ -5926,14 +6128,14 @@ COPY sat_zipcodes (id, zipcode, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: sat_zipcodes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: sat_zipcodes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('sat_zipcodes_id_seq', 1, false);
 
 
 --
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: schema_migrations; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY schema_migrations (version) FROM stdin;
@@ -5941,67 +6143,82 @@ COPY schema_migrations (version) FROM stdin;
 
 
 --
--- Data for Name: service_offereds; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: service_offereds; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY service_offereds (id, service_id, store_id, created_at, updated_at, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, service_type, tax_id, taxes, cost, ticket_id, total_cost, quantity, discount_reason, total, subtotal) FROM stdin;
+COPY service_offereds (id, service_id, store_id, created_at, updated_at, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, service_type, tax_id, taxes, cost, ticket_id, total_cost, quantity, discount_reason, total, subtotal, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: service_offereds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: service_offereds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('service_offereds_id_seq', 1, false);
 
 
 --
--- Data for Name: services; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: service_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY services (id, unique_code, description, price, sat_key_id, unit, sat_unit_key_id, shared, store_id, business_unit_id, created_at, updated_at, delivery_company) FROM stdin;
+COPY service_sales (id, store_id, year, month, cost, total, subtotal, taxes, discount, quantity, created_at, updated_at, service_id) FROM stdin;
 \.
 
 
 --
--- Name: services_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: service_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
+--
+
+SELECT pg_catalog.setval('service_sales_id_seq', 1, false);
+
+
+--
+-- Data for Name: services; Type: TABLE DATA; Schema: public; Owner: faviovelez
+--
+
+COPY services (id, unique_code, description, price, sat_key_id, unit, sat_unit_key_id, shared, store_id, business_unit_id, created_at, updated_at, delivery_company, current) FROM stdin;
+\.
+
+
+--
+-- Name: services_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('services_id_seq', 1, false);
 
 
 --
--- Data for Name: store_movements; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: store_movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY store_movements (id, product_id, quantity, movement_type, order_id, ticket_id, store_id, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, tax_id, taxes, cost, supplier_id, product_request_id, created_at, updated_at, total_cost, discount_reason, total, subtotal) FROM stdin;
+COPY store_movements (id, product_id, quantity, movement_type, order_id, ticket_id, store_id, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, tax_id, taxes, cost, supplier_id, product_request_id, created_at, updated_at, total_cost, discount_reason, total, subtotal, bill_id, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: store_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: store_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('store_movements_id_seq', 1, false);
 
 
 --
--- Data for Name: store_sales; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: store_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY store_sales (id, store_id, month, year, sales_amount, sales_quantity, cost, created_at, updated_at, discount) FROM stdin;
+COPY store_sales (id, store_id, month, year, cost, created_at, updated_at, discount, total, subtotal, taxes, quantity, payments, expenses) FROM stdin;
 \.
 
 
 --
--- Name: store_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: store_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('store_sales_id_seq', 1, false);
 
 
 --
--- Data for Name: store_types; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: store_types; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY store_types (id, store_type, created_at, updated_at) FROM stdin;
@@ -6009,14 +6226,14 @@ COPY store_types (id, store_type, created_at, updated_at) FROM stdin;
 
 
 --
--- Name: store_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: store_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('store_types_id_seq', 1, false);
 
 
 --
--- Data for Name: store_use_inventories; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: store_use_inventories; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY store_use_inventories (id, store_id, product_id, quantity, created_at, updated_at) FROM stdin;
@@ -6024,44 +6241,44 @@ COPY store_use_inventories (id, store_id, product_id, quantity, created_at, upda
 
 
 --
--- Name: store_use_inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: store_use_inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('store_use_inventories_id_seq', 1, false);
 
 
 --
--- Data for Name: stores; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: stores; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY stores (id, created_at, updated_at, store_code, store_name, delivery_address_id, business_unit_id, store_type_id, email, cost_type_id, cost_type_selected_since, months_in_inventory, reorder_point, critical_point, contact_first_name, contact_middle_name, contact_last_name, direct_phone, extension, type_of_person, second_last_name, business_group_id, cell_phone, zip_code, period_sales_achievement, inspection_approved, overprice, series, last_bill, install_code, certificate, key, certificate_password, certificate_number, certificate_content, bill_last_folio, credit_note_last_folio, debit_note_last_folio, return_last_folio, pay_bill_last_folio, advance_e_last_folio, advance_i_last_folio, initial_inventory, current_inventory, prospects) FROM stdin;
+COPY stores (id, created_at, updated_at, store_code, store_name, delivery_address_id, business_unit_id, store_type_id, email, cost_type_id, cost_type_selected_since, months_in_inventory, reorder_point, critical_point, contact_first_name, contact_middle_name, contact_last_name, direct_phone, extension, type_of_person, second_last_name, business_group_id, cell_phone, zip_code, period_sales_achievement, inspection_approved, overprice, series, last_bill, install_code, certificate, key, certificate_password, certificate_number, certificate_content, bill_last_folio, credit_note_last_folio, debit_note_last_folio, return_last_folio, pay_bill_last_folio, advance_e_last_folio, advance_i_last_folio, initial_inventory, current_inventory, prospects_file) FROM stdin;
 \.
 
 
 --
--- Name: stores_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: stores_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('stores_id_seq', 1, false);
 
 
 --
--- Data for Name: stores_inventories; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: stores_inventories; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY stores_inventories (id, product_id, store_id, quantity, alert, alert_type, created_at, updated_at, rack, level, manual_price_update) FROM stdin;
+COPY stores_inventories (id, product_id, store_id, quantity, alert, alert_type, created_at, updated_at, rack, level, manual_price_update, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: stores_inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: stores_inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('stores_inventories_id_seq', 1, false);
 
 
 --
--- Data for Name: stores_suppliers; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: stores_suppliers; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY stores_suppliers (id, store_id, supplier_id, created_at, updated_at) FROM stdin;
@@ -6069,29 +6286,29 @@ COPY stores_suppliers (id, store_id, supplier_id, created_at, updated_at) FROM s
 
 
 --
--- Name: stores_suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: stores_suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('stores_suppliers_id_seq', 1, false);
 
 
 --
--- Data for Name: stores_warehouse_entries; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: stores_warehouse_entries; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY stores_warehouse_entries (id, product_id, store_id, quantity, movement_id, created_at, updated_at, retail_units_per_unit, units_used, store_movement_id) FROM stdin;
+COPY stores_warehouse_entries (id, product_id, store_id, quantity, movement_id, created_at, updated_at, retail_units_per_unit, units_used, store_movement_id, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: stores_warehouse_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: stores_warehouse_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('stores_warehouse_entries_id_seq', 1, false);
 
 
 --
--- Data for Name: suppliers; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: suppliers; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY suppliers (id, name, business_type, created_at, updated_at, type_of_person, contact_first_name, contact_middle_name, contact_last_name, contact_position, direct_phone, extension, cell_phone, email, supplier_status, delivery_address_id, last_purchase_bill_date, store_id, last_purchase_folio) FROM stdin;
@@ -6099,14 +6316,14 @@ COPY suppliers (id, name, business_type, created_at, updated_at, type_of_person,
 
 
 --
--- Name: suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('suppliers_id_seq', 1, false);
 
 
 --
--- Data for Name: tax_regimes; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: tax_regimes; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY tax_regimes (id, description, created_at, updated_at, tax_id, corporate, particular, date_since) FROM stdin;
@@ -6114,14 +6331,14 @@ COPY tax_regimes (id, description, created_at, updated_at, tax_id, corporate, pa
 
 
 --
--- Name: tax_regimes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: tax_regimes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('tax_regimes_id_seq', 1, false);
 
 
 --
--- Data for Name: taxes; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: taxes; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY taxes (id, description, value, created_at, updated_at, key, transfer, retention) FROM stdin;
@@ -6129,14 +6346,14 @@ COPY taxes (id, description, value, created_at, updated_at, key, transfer, reten
 
 
 --
--- Name: taxes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: taxes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('taxes_id_seq', 1, false);
 
 
 --
--- Data for Name: temporal_numbers; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: temporal_numbers; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY temporal_numbers (id, store_id, business_group_id, past_sales, future_sales, created_at, updated_at) FROM stdin;
@@ -6144,59 +6361,59 @@ COPY temporal_numbers (id, store_id, business_group_id, past_sales, future_sales
 
 
 --
--- Name: temporal_numbers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: temporal_numbers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('temporal_numbers_id_seq', 1, false);
 
 
 --
--- Data for Name: terminals; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: terminals; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY terminals (id, name, bank_id, number, store_id, created_at, updated_at, debit_comission, credit_comission) FROM stdin;
+COPY terminals (id, name, bank_id, number, store_id, created_at, updated_at, debit_comission, credit_comission, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: terminals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: terminals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('terminals_id_seq', 1, false);
 
 
 --
--- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id, bill_id, ticket_type, created_at, updated_at, cash_register_id, ticket_number, cfdi_use_id, comments, payments_amount, discount_applied, cash_return, payed, parent_id, cost) FROM stdin;
+COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id, bill_id, ticket_type, created_at, updated_at, cash_register_id, ticket_number, cfdi_use_id, comments, payments_amount, discount_applied, cash_return, payed, parent_id, cost, saved, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Data for Name: tickets_children; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: tickets_children; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY tickets_children (id, ticket_id, children_id, created_at, updated_at) FROM stdin;
+COPY tickets_children (id, ticket_id, children_id, created_at, updated_at, pos, web, date) FROM stdin;
 \.
 
 
 --
--- Name: tickets_children_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: tickets_children_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('tickets_children_id_seq', 1, false);
 
 
 --
--- Name: tickets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: tickets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('tickets_id_seq', 1, false);
 
 
 --
--- Data for Name: type_of_bills; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: type_of_bills; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY type_of_bills (id, description, created_at, updated_at, key) FROM stdin;
@@ -6204,14 +6421,14 @@ COPY type_of_bills (id, description, created_at, updated_at, key) FROM stdin;
 
 
 --
--- Name: type_of_bills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: type_of_bills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('type_of_bills_id_seq', 1, false);
 
 
 --
--- Data for Name: units; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: units; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY units (id, name, plural_name, abbreviation, created_at, updated_at) FROM stdin;
@@ -6219,14 +6436,14 @@ COPY units (id, name, plural_name, abbreviation, created_at, updated_at) FROM st
 
 
 --
--- Name: units_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: units_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('units_id_seq', 1, false);
 
 
 --
--- Data for Name: user_requests; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: user_requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY user_requests (id, user_id, request_id) FROM stdin;
@@ -6234,14 +6451,14 @@ COPY user_requests (id, user_id, request_id) FROM stdin;
 
 
 --
--- Name: user_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: user_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('user_requests_id_seq', 1, false);
 
 
 --
--- Data for Name: user_sales; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: user_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY user_sales (id, user_id, month, year, sales_amount, sales_quantity, cost, created_at, updated_at) FROM stdin;
@@ -6249,29 +6466,29 @@ COPY user_sales (id, user_id, month, year, sales_amount, sales_quantity, cost, c
 
 
 --
--- Name: user_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: user_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('user_sales_id_seq', 1, false);
 
 
 --
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
-COPY users (id, email, encrypted_password, reset_password_token, reset_password_sent_at, remember_created_at, sign_in_count, current_sign_in_at, last_sign_in_at, current_sign_in_ip, last_sign_in_ip, created_at, updated_at, first_name, middle_name, last_name, store_id, role_id) FROM stdin;
+COPY users (id, email, encrypted_password, reset_password_token, reset_password_sent_at, remember_created_at, sign_in_count, current_sign_in_at, last_sign_in_at, current_sign_in_ip, last_sign_in_ip, created_at, updated_at, first_name, middle_name, last_name, store_id, role_id, web, pos, date) FROM stdin;
 \.
 
 
 --
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('users_id_seq', 1, false);
 
 
 --
--- Data for Name: warehouse_entries; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: warehouse_entries; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY warehouse_entries (id, product_id, quantity, entry_number, created_at, updated_at, movement_id, store_id, retail_units_per_unit, units_used) FROM stdin;
@@ -6279,14 +6496,14 @@ COPY warehouse_entries (id, product_id, quantity, entry_number, created_at, upda
 
 
 --
--- Name: warehouse_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: warehouse_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('warehouse_entries_id_seq', 1, false);
 
 
 --
--- Data for Name: warehouses; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: warehouses; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY warehouses (id, name, delivery_address_id, created_at, updated_at, business_unit_id, store_id, warehouse_code, business_group_id) FROM stdin;
@@ -6294,14 +6511,14 @@ COPY warehouses (id, name, delivery_address_id, created_at, updated_at, business
 
 
 --
--- Name: warehouses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: warehouses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('warehouses_id_seq', 1, false);
 
 
 --
--- Data for Name: withdrawals; Type: TABLE DATA; Schema: public; Owner: oscar
+-- Data for Name: withdrawals; Type: TABLE DATA; Schema: public; Owner: faviovelez
 --
 
 COPY withdrawals (id, user_id, store_id, amount, created_at, updated_at, cash_register_id, name) FROM stdin;
@@ -6309,14 +6526,14 @@ COPY withdrawals (id, user_id, store_id, amount, created_at, updated_at, cash_re
 
 
 --
--- Name: withdrawals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: oscar
+-- Name: withdrawals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
 --
 
 SELECT pg_catalog.setval('withdrawals_id_seq', 1, false);
 
 
 --
--- Name: bank_balances_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: bank_balances_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bank_balances
@@ -6324,7 +6541,7 @@ ALTER TABLE ONLY bank_balances
 
 
 --
--- Name: banks_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: banks_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY banks
@@ -6332,7 +6549,7 @@ ALTER TABLE ONLY banks
 
 
 --
--- Name: bill_receiveds_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: bill_receiveds_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bill_receiveds
@@ -6340,7 +6557,7 @@ ALTER TABLE ONLY bill_receiveds
 
 
 --
--- Name: bill_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: bill_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bill_sales
@@ -6348,7 +6565,7 @@ ALTER TABLE ONLY bill_sales
 
 
 --
--- Name: billing_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: billing_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY billing_addresses
@@ -6356,7 +6573,7 @@ ALTER TABLE ONLY billing_addresses
 
 
 --
--- Name: bills_children_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: bills_children_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bills_children
@@ -6364,7 +6581,7 @@ ALTER TABLE ONLY bills_children
 
 
 --
--- Name: bills_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: bills_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY bills
@@ -6372,7 +6589,7 @@ ALTER TABLE ONLY bills
 
 
 --
--- Name: business_group_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: business_group_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_group_sales
@@ -6380,7 +6597,7 @@ ALTER TABLE ONLY business_group_sales
 
 
 --
--- Name: business_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: business_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_groups
@@ -6388,7 +6605,7 @@ ALTER TABLE ONLY business_groups
 
 
 --
--- Name: business_groups_suppliers_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: business_groups_suppliers_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_groups_suppliers
@@ -6396,7 +6613,7 @@ ALTER TABLE ONLY business_groups_suppliers
 
 
 --
--- Name: business_unit_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: business_unit_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_unit_sales
@@ -6404,7 +6621,7 @@ ALTER TABLE ONLY business_unit_sales
 
 
 --
--- Name: business_units_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: business_units_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_units
@@ -6412,7 +6629,7 @@ ALTER TABLE ONLY business_units
 
 
 --
--- Name: business_units_suppliers_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: business_units_suppliers_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY business_units_suppliers
@@ -6420,7 +6637,7 @@ ALTER TABLE ONLY business_units_suppliers
 
 
 --
--- Name: carriers_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: carriers_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY carriers
@@ -6428,7 +6645,7 @@ ALTER TABLE ONLY carriers
 
 
 --
--- Name: cash_registers_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: cash_registers_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY cash_registers
@@ -6436,7 +6653,7 @@ ALTER TABLE ONLY cash_registers
 
 
 --
--- Name: cfdi_uses_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: cfdi_uses_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY cfdi_uses
@@ -6444,7 +6661,7 @@ ALTER TABLE ONLY cfdi_uses
 
 
 --
--- Name: change_tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: change_tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY change_tickets
@@ -6452,7 +6669,7 @@ ALTER TABLE ONLY change_tickets
 
 
 --
--- Name: classifications_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: classifications_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY classifications
@@ -6460,7 +6677,7 @@ ALTER TABLE ONLY classifications
 
 
 --
--- Name: cost_types_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: cost_types_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY cost_types
@@ -6468,7 +6685,7 @@ ALTER TABLE ONLY cost_types
 
 
 --
--- Name: countries_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: countries_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY countries
@@ -6476,7 +6693,7 @@ ALTER TABLE ONLY countries
 
 
 --
--- Name: currencies_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: currencies_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY currencies
@@ -6484,7 +6701,7 @@ ALTER TABLE ONLY currencies
 
 
 --
--- Name: delivery_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: delivery_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY delivery_addresses
@@ -6492,7 +6709,7 @@ ALTER TABLE ONLY delivery_addresses
 
 
 --
--- Name: delivery_attempts_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: delivery_attempts_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY delivery_attempts
@@ -6500,7 +6717,7 @@ ALTER TABLE ONLY delivery_attempts
 
 
 --
--- Name: delivery_packages_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: delivery_packages_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY delivery_packages
@@ -6508,7 +6725,7 @@ ALTER TABLE ONLY delivery_packages
 
 
 --
--- Name: delivery_services_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: delivery_services_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY delivery_services
@@ -6516,7 +6733,7 @@ ALTER TABLE ONLY delivery_services
 
 
 --
--- Name: deposits_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: deposits_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY deposits
@@ -6524,7 +6741,7 @@ ALTER TABLE ONLY deposits
 
 
 --
--- Name: design_costs_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: design_costs_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY design_costs
@@ -6532,7 +6749,7 @@ ALTER TABLE ONLY design_costs
 
 
 --
--- Name: design_likes_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: design_likes_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY design_likes
@@ -6540,7 +6757,7 @@ ALTER TABLE ONLY design_likes
 
 
 --
--- Name: design_request_users_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: design_request_users_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY design_request_users
@@ -6548,7 +6765,7 @@ ALTER TABLE ONLY design_request_users
 
 
 --
--- Name: design_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: design_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY design_requests
@@ -6556,7 +6773,7 @@ ALTER TABLE ONLY design_requests
 
 
 --
--- Name: discount_rules_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: discount_rules_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY discount_rules
@@ -6564,7 +6781,7 @@ ALTER TABLE ONLY discount_rules
 
 
 --
--- Name: documents_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: documents_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY documents
@@ -6572,7 +6789,7 @@ ALTER TABLE ONLY documents
 
 
 --
--- Name: estimate_docs_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: estimate_docs_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY estimate_docs
@@ -6580,7 +6797,7 @@ ALTER TABLE ONLY estimate_docs
 
 
 --
--- Name: estimates_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: estimates_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY estimates
@@ -6588,7 +6805,7 @@ ALTER TABLE ONLY estimates
 
 
 --
--- Name: exhibition_inventories_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: exhibition_inventories_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY exhibition_inventories
@@ -6596,7 +6813,7 @@ ALTER TABLE ONLY exhibition_inventories
 
 
 --
--- Name: expedition_zips_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: expedition_zips_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY expedition_zips
@@ -6604,7 +6821,7 @@ ALTER TABLE ONLY expedition_zips
 
 
 --
--- Name: expenses_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: expenses_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY expenses
@@ -6612,7 +6829,7 @@ ALTER TABLE ONLY expenses
 
 
 --
--- Name: exterior_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: exterior_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY exterior_colors
@@ -6620,7 +6837,7 @@ ALTER TABLE ONLY exterior_colors
 
 
 --
--- Name: finishings_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: finishings_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY finishings
@@ -6628,7 +6845,7 @@ ALTER TABLE ONLY finishings
 
 
 --
--- Name: images_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: images_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY images
@@ -6636,7 +6853,7 @@ ALTER TABLE ONLY images
 
 
 --
--- Name: interior_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: interior_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY interior_colors
@@ -6644,7 +6861,7 @@ ALTER TABLE ONLY interior_colors
 
 
 --
--- Name: inventories_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: inventories_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY inventories
@@ -6652,7 +6869,7 @@ ALTER TABLE ONLY inventories
 
 
 --
--- Name: materials_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: materials_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY materials
@@ -6660,7 +6877,7 @@ ALTER TABLE ONLY materials
 
 
 --
--- Name: materials_resistances_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: materials_resistances_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY materials_resistances
@@ -6668,7 +6885,7 @@ ALTER TABLE ONLY materials_resistances
 
 
 --
--- Name: movements_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: movements_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY movements
@@ -6676,7 +6893,7 @@ ALTER TABLE ONLY movements
 
 
 --
--- Name: orders_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: orders_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY orders
@@ -6684,7 +6901,7 @@ ALTER TABLE ONLY orders
 
 
 --
--- Name: orders_users_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: orders_users_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY orders_users
@@ -6692,7 +6909,7 @@ ALTER TABLE ONLY orders_users
 
 
 --
--- Name: pacs_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: pacs_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY pacs
@@ -6700,7 +6917,7 @@ ALTER TABLE ONLY pacs
 
 
 --
--- Name: payment_conditions_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: payment_conditions_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY payment_conditions
@@ -6708,7 +6925,7 @@ ALTER TABLE ONLY payment_conditions
 
 
 --
--- Name: payment_forms_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: payment_forms_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY payment_forms
@@ -6716,7 +6933,7 @@ ALTER TABLE ONLY payment_forms
 
 
 --
--- Name: payment_methods_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: payment_methods_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY payment_methods
@@ -6724,7 +6941,7 @@ ALTER TABLE ONLY payment_methods
 
 
 --
--- Name: payments_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: payments_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY payments
@@ -6732,7 +6949,7 @@ ALTER TABLE ONLY payments
 
 
 --
--- Name: pending_movements_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: pending_movements_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY pending_movements
@@ -6740,7 +6957,7 @@ ALTER TABLE ONLY pending_movements
 
 
 --
--- Name: pos_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: pos_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY pos_entries
@@ -6748,7 +6965,7 @@ ALTER TABLE ONLY pos_entries
 
 
 --
--- Name: product_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: product_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY product_requests
@@ -6756,7 +6973,7 @@ ALTER TABLE ONLY product_requests
 
 
 --
--- Name: product_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: product_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY product_sales
@@ -6764,7 +6981,7 @@ ALTER TABLE ONLY product_sales
 
 
 --
--- Name: product_types_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: product_types_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY product_types
@@ -6772,7 +6989,7 @@ ALTER TABLE ONLY product_types
 
 
 --
--- Name: production_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: production_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY production_orders
@@ -6780,7 +6997,7 @@ ALTER TABLE ONLY production_orders
 
 
 --
--- Name: production_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: production_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY production_requests
@@ -6788,7 +7005,7 @@ ALTER TABLE ONLY production_requests
 
 
 --
--- Name: products_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: products_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY products
@@ -6796,7 +7013,7 @@ ALTER TABLE ONLY products
 
 
 --
--- Name: prospect_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: prospect_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY prospect_sales
@@ -6804,7 +7021,7 @@ ALTER TABLE ONLY prospect_sales
 
 
 --
--- Name: prospects_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: prospects_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY prospects
@@ -6812,7 +7029,7 @@ ALTER TABLE ONLY prospects
 
 
 --
--- Name: relation_types_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: relation_types_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY relation_types
@@ -6820,7 +7037,7 @@ ALTER TABLE ONLY relation_types
 
 
 --
--- Name: request_users_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: request_users_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY request_users
@@ -6828,7 +7045,7 @@ ALTER TABLE ONLY request_users
 
 
 --
--- Name: requests_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: requests_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY requests
@@ -6836,7 +7053,7 @@ ALTER TABLE ONLY requests
 
 
 --
--- Name: resistances_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: resistances_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY resistances
@@ -6844,7 +7061,7 @@ ALTER TABLE ONLY resistances
 
 
 --
--- Name: return_tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: return_tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY return_tickets
@@ -6852,7 +7069,7 @@ ALTER TABLE ONLY return_tickets
 
 
 --
--- Name: roles_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: roles_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY roles
@@ -6860,7 +7077,15 @@ ALTER TABLE ONLY roles
 
 
 --
--- Name: sales_movements_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: rows_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY rows
+    ADD CONSTRAINT rows_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sales_movements_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sales_movements
@@ -6868,7 +7093,7 @@ ALTER TABLE ONLY sales_movements
 
 
 --
--- Name: sales_targets_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: sales_targets_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sales_targets
@@ -6876,7 +7101,7 @@ ALTER TABLE ONLY sales_targets
 
 
 --
--- Name: sat_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: sat_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sat_keys
@@ -6884,7 +7109,7 @@ ALTER TABLE ONLY sat_keys
 
 
 --
--- Name: sat_unit_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: sat_unit_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sat_unit_keys
@@ -6892,7 +7117,7 @@ ALTER TABLE ONLY sat_unit_keys
 
 
 --
--- Name: sat_zipcodes_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: sat_zipcodes_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY sat_zipcodes
@@ -6900,7 +7125,7 @@ ALTER TABLE ONLY sat_zipcodes
 
 
 --
--- Name: service_offereds_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: service_offereds_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY service_offereds
@@ -6908,7 +7133,15 @@ ALTER TABLE ONLY service_offereds
 
 
 --
--- Name: services_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: service_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY service_sales
+    ADD CONSTRAINT service_sales_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: services_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY services
@@ -6916,7 +7149,7 @@ ALTER TABLE ONLY services
 
 
 --
--- Name: store_movements_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: store_movements_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY store_movements
@@ -6924,7 +7157,7 @@ ALTER TABLE ONLY store_movements
 
 
 --
--- Name: store_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: store_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY store_sales
@@ -6932,7 +7165,7 @@ ALTER TABLE ONLY store_sales
 
 
 --
--- Name: store_types_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: store_types_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY store_types
@@ -6940,7 +7173,7 @@ ALTER TABLE ONLY store_types
 
 
 --
--- Name: store_use_inventories_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: store_use_inventories_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY store_use_inventories
@@ -6948,7 +7181,7 @@ ALTER TABLE ONLY store_use_inventories
 
 
 --
--- Name: stores_inventories_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: stores_inventories_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY stores_inventories
@@ -6956,7 +7189,7 @@ ALTER TABLE ONLY stores_inventories
 
 
 --
--- Name: stores_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: stores_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY stores
@@ -6964,7 +7197,7 @@ ALTER TABLE ONLY stores
 
 
 --
--- Name: stores_suppliers_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: stores_suppliers_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY stores_suppliers
@@ -6972,7 +7205,7 @@ ALTER TABLE ONLY stores_suppliers
 
 
 --
--- Name: stores_warehouse_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: stores_warehouse_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY stores_warehouse_entries
@@ -6980,7 +7213,7 @@ ALTER TABLE ONLY stores_warehouse_entries
 
 
 --
--- Name: suppliers_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: suppliers_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY suppliers
@@ -6988,7 +7221,7 @@ ALTER TABLE ONLY suppliers
 
 
 --
--- Name: tax_regimes_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: tax_regimes_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY tax_regimes
@@ -6996,7 +7229,7 @@ ALTER TABLE ONLY tax_regimes
 
 
 --
--- Name: taxes_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: taxes_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY taxes
@@ -7004,7 +7237,7 @@ ALTER TABLE ONLY taxes
 
 
 --
--- Name: temporal_numbers_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: temporal_numbers_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY temporal_numbers
@@ -7012,7 +7245,7 @@ ALTER TABLE ONLY temporal_numbers
 
 
 --
--- Name: terminals_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: terminals_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY terminals
@@ -7020,7 +7253,7 @@ ALTER TABLE ONLY terminals
 
 
 --
--- Name: tickets_children_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: tickets_children_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY tickets_children
@@ -7028,7 +7261,7 @@ ALTER TABLE ONLY tickets_children
 
 
 --
--- Name: tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY tickets
@@ -7036,7 +7269,7 @@ ALTER TABLE ONLY tickets
 
 
 --
--- Name: type_of_bills_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: type_of_bills_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY type_of_bills
@@ -7044,7 +7277,7 @@ ALTER TABLE ONLY type_of_bills
 
 
 --
--- Name: units_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: units_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY units
@@ -7052,7 +7285,7 @@ ALTER TABLE ONLY units
 
 
 --
--- Name: user_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: user_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY user_requests
@@ -7060,7 +7293,7 @@ ALTER TABLE ONLY user_requests
 
 
 --
--- Name: user_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: user_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY user_sales
@@ -7068,7 +7301,7 @@ ALTER TABLE ONLY user_sales
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY users
@@ -7076,7 +7309,7 @@ ALTER TABLE ONLY users
 
 
 --
--- Name: warehouse_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: warehouse_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY warehouse_entries
@@ -7084,7 +7317,7 @@ ALTER TABLE ONLY warehouse_entries
 
 
 --
--- Name: warehouses_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: warehouses_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY warehouses
@@ -7092,7 +7325,7 @@ ALTER TABLE ONLY warehouses
 
 
 --
--- Name: withdrawals_pkey; Type: CONSTRAINT; Schema: public; Owner: oscar
+-- Name: withdrawals_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
 ALTER TABLE ONLY withdrawals
@@ -7100,1610 +7333,1645 @@ ALTER TABLE ONLY withdrawals
 
 
 --
--- Name: index_bank_balances_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bank_balances_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bank_balances_on_business_unit_id ON bank_balances USING btree (business_unit_id);
 
 
 --
--- Name: index_bank_balances_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bank_balances_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bank_balances_on_store_id ON bank_balances USING btree (store_id);
 
 
 --
--- Name: index_bill_receiveds_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bill_receiveds_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bill_receiveds_on_business_unit_id ON bill_receiveds USING btree (business_unit_id);
 
 
 --
--- Name: index_bill_receiveds_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bill_receiveds_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bill_receiveds_on_product_id ON bill_receiveds USING btree (product_id);
 
 
 --
--- Name: index_bill_receiveds_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bill_receiveds_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bill_receiveds_on_store_id ON bill_receiveds USING btree (store_id);
 
 
 --
--- Name: index_bill_receiveds_on_supplier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bill_receiveds_on_supplier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bill_receiveds_on_supplier_id ON bill_receiveds USING btree (supplier_id);
 
 
 --
--- Name: index_bill_sales_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bill_sales_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bill_sales_on_business_unit_id ON bill_sales USING btree (business_unit_id);
 
 
 --
--- Name: index_bill_sales_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bill_sales_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bill_sales_on_store_id ON bill_sales USING btree (store_id);
 
 
 --
--- Name: index_billing_addresses_on_tax_regime_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_billing_addresses_on_tax_regime_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_billing_addresses_on_tax_regime_id ON billing_addresses USING btree (tax_regime_id);
 
 
 --
--- Name: index_bills_children_on_bill_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_children_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_children_on_bill_id ON bills_children USING btree (bill_id);
 
 
 --
--- Name: index_bills_children_on_children_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_children_on_children_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_children_on_children_id ON bills_children USING btree (children_id);
 
 
 --
--- Name: index_bills_on_cfdi_use_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_cfdi_use_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_cfdi_use_id ON bills USING btree (cfdi_use_id);
 
 
 --
--- Name: index_bills_on_country_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_country_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_country_id ON bills USING btree (country_id);
 
 
 --
--- Name: index_bills_on_currency_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_currency_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_currency_id ON bills USING btree (currency_id);
 
 
 --
--- Name: index_bills_on_issuing_company_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_issuing_company_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_issuing_company_id ON bills USING btree (issuing_company_id);
 
 
 --
--- Name: index_bills_on_pac_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_pac_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_pac_id ON bills USING btree (pac_id);
 
 
 --
--- Name: index_bills_on_parent_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_parent_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_parent_id ON bills USING btree (parent_id);
 
 
 --
--- Name: index_bills_on_payment_condition_id; Type: INDEX; Schema: public; Owner: oscar
---
-
-CREATE INDEX index_bills_on_payment_condition_id ON bills USING btree (payment_condition_id);
-
-
---
--- Name: index_bills_on_payment_form_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_payment_form_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_payment_form_id ON bills USING btree (payment_form_id);
 
 
 --
--- Name: index_bills_on_payment_method_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_payment_method_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_payment_method_id ON bills USING btree (payment_method_id);
 
 
 --
--- Name: index_bills_on_prospect_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_prospect_id ON bills USING btree (prospect_id);
 
 
 --
--- Name: index_bills_on_receiving_company_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_receiving_company_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_receiving_company_id ON bills USING btree (receiving_company_id);
 
 
 --
--- Name: index_bills_on_relation_type_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_relation_type_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_relation_type_id ON bills USING btree (relation_type_id);
 
 
 --
--- Name: index_bills_on_sat_zipcode_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_sat_zipcode_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_sat_zipcode_id ON bills USING btree (sat_zipcode_id);
 
 
 --
--- Name: index_bills_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_store_id ON bills USING btree (store_id);
 
 
 --
--- Name: index_bills_on_tax_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_tax_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_tax_id ON bills USING btree (tax_id);
 
 
 --
--- Name: index_bills_on_tax_regime_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_tax_regime_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_tax_regime_id ON bills USING btree (tax_regime_id);
 
 
 --
--- Name: index_bills_on_type_of_bill_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_bills_on_type_of_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_bills_on_type_of_bill_id ON bills USING btree (type_of_bill_id);
 
 
 --
--- Name: index_business_group_sales_on_business_group_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_business_group_sales_on_business_group_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_business_group_sales_on_business_group_id ON business_group_sales USING btree (business_group_id);
 
 
 --
--- Name: index_business_groups_suppliers_on_business_group_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_business_groups_suppliers_on_business_group_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_business_groups_suppliers_on_business_group_id ON business_groups_suppliers USING btree (business_group_id);
 
 
 --
--- Name: index_business_groups_suppliers_on_supplier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_business_groups_suppliers_on_supplier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_business_groups_suppliers_on_supplier_id ON business_groups_suppliers USING btree (supplier_id);
 
 
 --
--- Name: index_business_unit_sales_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_business_unit_sales_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_business_unit_sales_on_business_unit_id ON business_unit_sales USING btree (business_unit_id);
 
 
 --
--- Name: index_business_units_on_billing_address_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_business_units_on_billing_address_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_business_units_on_billing_address_id ON business_units USING btree (billing_address_id);
 
 
 --
--- Name: index_business_units_on_business_group_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_business_units_on_business_group_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_business_units_on_business_group_id ON business_units USING btree (business_group_id);
 
 
 --
--- Name: index_business_units_suppliers_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_business_units_suppliers_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_business_units_suppliers_on_business_unit_id ON business_units_suppliers USING btree (business_unit_id);
 
 
 --
--- Name: index_business_units_suppliers_on_supplier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_business_units_suppliers_on_supplier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_business_units_suppliers_on_supplier_id ON business_units_suppliers USING btree (supplier_id);
 
 
 --
--- Name: index_carriers_on_delivery_address_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_carriers_on_delivery_address_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_carriers_on_delivery_address_id ON carriers USING btree (delivery_address_id);
 
 
 --
--- Name: index_cash_registers_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_cash_registers_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_cash_registers_on_store_id ON cash_registers USING btree (store_id);
 
 
 --
--- Name: index_change_tickets_on_bill_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_change_tickets_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_change_tickets_on_bill_id ON change_tickets USING btree (bill_id);
 
 
 --
--- Name: index_change_tickets_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_change_tickets_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_change_tickets_on_store_id ON change_tickets USING btree (store_id);
 
 
 --
--- Name: index_change_tickets_on_ticket_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_change_tickets_on_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_change_tickets_on_ticket_id ON change_tickets USING btree (ticket_id);
 
 
 --
--- Name: index_delivery_attempts_on_driver_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_delivery_attempts_on_driver_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_delivery_attempts_on_driver_id ON delivery_attempts USING btree (driver_id);
 
 
 --
--- Name: index_delivery_attempts_on_movement_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_delivery_attempts_on_movement_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_delivery_attempts_on_movement_id ON delivery_attempts USING btree (movement_id);
 
 
 --
--- Name: index_delivery_attempts_on_product_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_delivery_attempts_on_product_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_delivery_attempts_on_product_request_id ON delivery_attempts USING btree (product_request_id);
 
 
 --
--- Name: index_delivery_attempts_on_receiver_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_delivery_attempts_on_receiver_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_delivery_attempts_on_receiver_id ON delivery_attempts USING btree (receiver_id);
 
 
 --
--- Name: index_delivery_packages_on_delivery_attempt_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_delivery_packages_on_delivery_attempt_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_delivery_packages_on_delivery_attempt_id ON delivery_packages USING btree (delivery_attempt_id);
 
 
 --
--- Name: index_delivery_packages_on_order_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_delivery_packages_on_order_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_delivery_packages_on_order_id ON delivery_packages USING btree (order_id);
 
 
 --
--- Name: index_delivery_services_on_service_offered_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_delivery_services_on_service_offered_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_delivery_services_on_service_offered_id ON delivery_services USING btree (service_offered_id);
 
 
 --
--- Name: index_deposits_on_cash_register_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_deposits_on_cash_register_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_deposits_on_cash_register_id ON deposits USING btree (cash_register_id);
 
 
 --
--- Name: index_deposits_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_deposits_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_deposits_on_store_id ON deposits USING btree (store_id);
 
 
 --
--- Name: index_deposits_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_deposits_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_deposits_on_user_id ON deposits USING btree (user_id);
 
 
 --
--- Name: index_design_request_users_on_design_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_design_request_users_on_design_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_design_request_users_on_design_request_id ON design_request_users USING btree (design_request_id);
 
 
 --
--- Name: index_design_request_users_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_design_request_users_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_design_request_users_on_user_id ON design_request_users USING btree (user_id);
 
 
 --
--- Name: index_design_requests_on_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_design_requests_on_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_design_requests_on_request_id ON design_requests USING btree (request_id);
 
 
 --
--- Name: index_discount_rules_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_discount_rules_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_discount_rules_on_business_unit_id ON discount_rules USING btree (business_unit_id);
 
 
 --
--- Name: index_discount_rules_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_discount_rules_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_discount_rules_on_store_id ON discount_rules USING btree (store_id);
 
 
 --
--- Name: index_discount_rules_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_discount_rules_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_discount_rules_on_user_id ON discount_rules USING btree (user_id);
 
 
 --
--- Name: index_documents_on_design_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_documents_on_design_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_documents_on_design_request_id ON documents USING btree (design_request_id);
 
 
 --
--- Name: index_documents_on_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_documents_on_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_documents_on_request_id ON documents USING btree (request_id);
 
 
 --
--- Name: index_estimate_docs_on_prospect_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_estimate_docs_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_estimate_docs_on_prospect_id ON estimate_docs USING btree (prospect_id);
 
 
 --
--- Name: index_estimate_docs_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_estimate_docs_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_estimate_docs_on_store_id ON estimate_docs USING btree (store_id);
 
 
 --
--- Name: index_estimate_docs_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_estimate_docs_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_estimate_docs_on_user_id ON estimate_docs USING btree (user_id);
 
 
 --
--- Name: index_estimates_on_estimate_doc_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_estimates_on_estimate_doc_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_estimates_on_estimate_doc_id ON estimates USING btree (estimate_doc_id);
 
 
 --
--- Name: index_estimates_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_estimates_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_estimates_on_product_id ON estimates USING btree (product_id);
 
 
 --
--- Name: index_exhibition_inventories_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_exhibition_inventories_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_exhibition_inventories_on_product_id ON exhibition_inventories USING btree (product_id);
 
 
 --
--- Name: index_exhibition_inventories_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_exhibition_inventories_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_exhibition_inventories_on_store_id ON exhibition_inventories USING btree (store_id);
 
 
 --
--- Name: index_expenses_on_bill_received_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_expenses_on_bill_received_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_expenses_on_bill_received_id ON expenses USING btree (bill_received_id);
 
 
 --
--- Name: index_expenses_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_expenses_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_expenses_on_business_unit_id ON expenses USING btree (business_unit_id);
 
 
 --
--- Name: index_expenses_on_payment_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_expenses_on_payment_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_expenses_on_payment_id ON expenses USING btree (payment_id);
 
 
 --
--- Name: index_expenses_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_expenses_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_expenses_on_store_id ON expenses USING btree (store_id);
 
 
 --
--- Name: index_expenses_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_expenses_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_expenses_on_user_id ON expenses USING btree (user_id);
 
 
 --
--- Name: index_exterior_colors_on_material_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_exterior_colors_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_exterior_colors_on_material_id ON exterior_colors USING btree (material_id);
 
 
 --
--- Name: index_images_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_images_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_images_on_product_id ON images USING btree (product_id);
 
 
 --
--- Name: index_interior_colors_on_material_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_interior_colors_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_interior_colors_on_material_id ON interior_colors USING btree (material_id);
 
 
 --
--- Name: index_inventories_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_inventories_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_inventories_on_product_id ON inventories USING btree (product_id);
 
 
 --
--- Name: index_materials_resistances_on_material_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_materials_resistances_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_materials_resistances_on_material_id ON materials_resistances USING btree (material_id);
 
 
 --
--- Name: index_materials_resistances_on_resistance_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_materials_resistances_on_resistance_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_materials_resistances_on_resistance_id ON materials_resistances USING btree (resistance_id);
 
 
 --
--- Name: index_movements_on_bill_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_bill_id ON movements USING btree (bill_id);
 
 
 --
--- Name: index_movements_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_business_unit_id ON movements USING btree (business_unit_id);
 
 
 --
--- Name: index_movements_on_buyer_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_buyer_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_buyer_user_id ON movements USING btree (buyer_user_id);
 
 
 --
--- Name: index_movements_on_discount_rule_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_discount_rule_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_discount_rule_id ON movements USING btree (discount_rule_id);
 
 
 --
--- Name: index_movements_on_entry_movement_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_entry_movement_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_entry_movement_id ON movements USING btree (entry_movement_id);
 
 
 --
--- Name: index_movements_on_order_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_order_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_order_id ON movements USING btree (order_id);
 
 
 --
--- Name: index_movements_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_product_id ON movements USING btree (product_id);
 
 
 --
--- Name: index_movements_on_product_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_product_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_product_request_id ON movements USING btree (product_request_id);
 
 
 --
--- Name: index_movements_on_prospect_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_prospect_id ON movements USING btree (prospect_id);
 
 
 --
--- Name: index_movements_on_seller_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_seller_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_seller_user_id ON movements USING btree (seller_user_id);
 
 
 --
--- Name: index_movements_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_store_id ON movements USING btree (store_id);
 
 
 --
--- Name: index_movements_on_supplier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_supplier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_supplier_id ON movements USING btree (supplier_id);
 
 
 --
--- Name: index_movements_on_tax_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_tax_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_tax_id ON movements USING btree (tax_id);
 
 
 --
--- Name: index_movements_on_ticket_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_ticket_id ON movements USING btree (ticket_id);
 
 
 --
--- Name: index_movements_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_movements_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_movements_on_user_id ON movements USING btree (user_id);
 
 
 --
--- Name: index_orders_on_bill_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_on_bill_id ON orders USING btree (bill_id);
 
 
 --
--- Name: index_orders_on_billing_address_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_on_billing_address_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_on_billing_address_id ON orders USING btree (billing_address_id);
 
 
 --
--- Name: index_orders_on_carrier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_on_carrier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_on_carrier_id ON orders USING btree (carrier_id);
 
 
 --
--- Name: index_orders_on_delivery_address_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_on_delivery_address_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_on_delivery_address_id ON orders USING btree (delivery_address_id);
 
 
 --
--- Name: index_orders_on_delivery_attempt_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_on_delivery_attempt_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_on_delivery_attempt_id ON orders USING btree (delivery_attempt_id);
 
 
 --
--- Name: index_orders_on_prospect_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_on_prospect_id ON orders USING btree (prospect_id);
 
 
 --
--- Name: index_orders_on_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_on_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_on_request_id ON orders USING btree (request_id);
 
 
 --
--- Name: index_orders_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_on_store_id ON orders USING btree (store_id);
 
 
 --
--- Name: index_orders_users_on_order_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_users_on_order_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_users_on_order_id ON orders_users USING btree (order_id);
 
 
 --
--- Name: index_orders_users_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_orders_users_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_orders_users_on_user_id ON orders_users USING btree (user_id);
 
 
 --
--- Name: index_payments_on_bank_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_bank_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_bank_id ON payments USING btree (bank_id);
 
 
 --
--- Name: index_payments_on_bill_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_bill_id ON payments USING btree (bill_id);
 
 
 --
--- Name: index_payments_on_bill_received_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_bill_received_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_bill_received_id ON payments USING btree (bill_received_id);
 
 
 --
--- Name: index_payments_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_business_unit_id ON payments USING btree (business_unit_id);
 
 
 --
--- Name: index_payments_on_order_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_order_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_order_id ON payments USING btree (order_id);
 
 
 --
--- Name: index_payments_on_payment_form_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_payment_form_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_payment_form_id ON payments USING btree (payment_form_id);
 
 
 --
--- Name: index_payments_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_store_id ON payments USING btree (store_id);
 
 
 --
--- Name: index_payments_on_supplier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_supplier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_supplier_id ON payments USING btree (supplier_id);
 
 
 --
--- Name: index_payments_on_terminal_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_terminal_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_terminal_id ON payments USING btree (terminal_id);
 
 
 --
--- Name: index_payments_on_ticket_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_ticket_id ON payments USING btree (ticket_id);
 
 
 --
--- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_payments_on_user_id ON payments USING btree (user_id);
 
 
 --
--- Name: index_pending_movements_on_bill_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_bill_id ON pending_movements USING btree (bill_id);
 
 
 --
--- Name: index_pending_movements_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_business_unit_id ON pending_movements USING btree (business_unit_id);
 
 
 --
--- Name: index_pending_movements_on_buyer_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_buyer_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_buyer_user_id ON pending_movements USING btree (buyer_user_id);
 
 
 --
--- Name: index_pending_movements_on_discount_rule_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_discount_rule_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_discount_rule_id ON pending_movements USING btree (discount_rule_id);
 
 
 --
--- Name: index_pending_movements_on_order_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_order_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_order_id ON pending_movements USING btree (order_id);
 
 
 --
--- Name: index_pending_movements_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_product_id ON pending_movements USING btree (product_id);
 
 
 --
--- Name: index_pending_movements_on_product_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_product_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_product_request_id ON pending_movements USING btree (product_request_id);
 
 
 --
--- Name: index_pending_movements_on_prospect_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_prospect_id ON pending_movements USING btree (prospect_id);
 
 
 --
--- Name: index_pending_movements_on_seller_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_seller_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_seller_user_id ON pending_movements USING btree (seller_user_id);
 
 
 --
--- Name: index_pending_movements_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_store_id ON pending_movements USING btree (store_id);
 
 
 --
--- Name: index_pending_movements_on_supplier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_supplier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_supplier_id ON pending_movements USING btree (supplier_id);
 
 
 --
--- Name: index_pending_movements_on_ticket_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_ticket_id ON pending_movements USING btree (ticket_id);
 
 
 --
--- Name: index_pending_movements_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pending_movements_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pending_movements_on_user_id ON pending_movements USING btree (user_id);
 
 
 --
--- Name: index_pos_entries_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pos_entries_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pos_entries_on_product_id ON pos_entries USING btree (product_id);
 
 
 --
--- Name: index_pos_entries_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_pos_entries_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_pos_entries_on_store_id ON pos_entries USING btree (store_id);
 
 
 --
--- Name: index_product_requests_on_order_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_product_requests_on_order_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_product_requests_on_order_id ON product_requests USING btree (order_id);
 
 
 --
--- Name: index_product_requests_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_product_requests_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_product_requests_on_product_id ON product_requests USING btree (product_id);
 
 
 --
--- Name: index_product_sales_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_product_sales_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_product_sales_on_business_unit_id ON product_sales USING btree (business_unit_id);
 
 
 --
--- Name: index_product_sales_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_product_sales_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_product_sales_on_product_id ON product_sales USING btree (product_id);
 
 
 --
--- Name: index_product_sales_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_product_sales_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_product_sales_on_store_id ON product_sales USING btree (store_id);
 
 
 --
--- Name: index_production_orders_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_production_orders_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_production_orders_on_user_id ON production_orders USING btree (user_id);
 
 
 --
--- Name: index_production_requests_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_production_requests_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_production_requests_on_product_id ON production_requests USING btree (product_id);
 
 
 --
--- Name: index_production_requests_on_production_order_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_production_requests_on_production_order_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_production_requests_on_production_order_id ON production_requests USING btree (production_order_id);
 
 
 --
--- Name: index_products_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_products_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_products_on_business_unit_id ON products USING btree (business_unit_id);
 
 
 --
--- Name: index_products_on_sat_key_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_products_on_child_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_products_on_child_id ON products USING btree (child_id);
+
+
+--
+-- Name: index_products_on_parent_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_products_on_parent_id ON products USING btree (parent_id);
+
+
+--
+-- Name: index_products_on_sat_key_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_products_on_sat_key_id ON products USING btree (sat_key_id);
 
 
 --
--- Name: index_products_on_sat_unit_key_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_products_on_sat_unit_key_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_products_on_sat_unit_key_id ON products USING btree (sat_unit_key_id);
 
 
 --
--- Name: index_products_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_products_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_products_on_store_id ON products USING btree (store_id);
 
 
 --
--- Name: index_products_on_supplier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_products_on_supplier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_products_on_supplier_id ON products USING btree (supplier_id);
 
 
 --
--- Name: index_products_on_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_products_on_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_products_on_unit_id ON products USING btree (unit_id);
 
 
 --
--- Name: index_products_on_warehouse_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_products_on_warehouse_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_products_on_warehouse_id ON products USING btree (warehouse_id);
 
 
 --
--- Name: index_prospect_sales_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospect_sales_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospect_sales_on_business_unit_id ON prospect_sales USING btree (business_unit_id);
 
 
 --
--- Name: index_prospect_sales_on_prospect_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospect_sales_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospect_sales_on_prospect_id ON prospect_sales USING btree (prospect_id);
 
 
 --
--- Name: index_prospect_sales_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospect_sales_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospect_sales_on_store_id ON prospect_sales USING btree (store_id);
 
 
 --
--- Name: index_prospects_on_billing_address_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospects_on_billing_address_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospects_on_billing_address_id ON prospects USING btree (billing_address_id);
 
 
 --
--- Name: index_prospects_on_business_group_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospects_on_business_group_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospects_on_business_group_id ON prospects USING btree (business_group_id);
 
 
 --
--- Name: index_prospects_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospects_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospects_on_business_unit_id ON prospects USING btree (business_unit_id);
 
 
 --
--- Name: index_prospects_on_delivery_address_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospects_on_delivery_address_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospects_on_delivery_address_id ON prospects USING btree (delivery_address_id);
 
 
 --
--- Name: index_prospects_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospects_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospects_on_store_id ON prospects USING btree (store_id);
 
 
 --
--- Name: index_prospects_on_store_prospect_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospects_on_store_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospects_on_store_prospect_id ON prospects USING btree (store_prospect_id);
 
 
 --
--- Name: index_prospects_on_store_type_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_prospects_on_store_type_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_prospects_on_store_type_id ON prospects USING btree (store_type_id);
 
 
 --
--- Name: index_request_users_on_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_request_users_on_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_request_users_on_request_id ON request_users USING btree (request_id);
 
 
 --
--- Name: index_request_users_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_request_users_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_request_users_on_user_id ON request_users USING btree (user_id);
 
 
 --
--- Name: index_requests_on_estimate_doc_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_requests_on_estimate_doc_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_requests_on_estimate_doc_id ON requests USING btree (estimate_doc_id);
 
 
 --
--- Name: index_requests_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_requests_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_requests_on_product_id ON requests USING btree (product_id);
 
 
 --
--- Name: index_requests_on_prospect_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_requests_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_requests_on_prospect_id ON requests USING btree (prospect_id);
 
 
 --
--- Name: index_requests_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_requests_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_requests_on_store_id ON requests USING btree (store_id);
 
 
 --
--- Name: index_return_tickets_on_bill_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_return_tickets_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_return_tickets_on_bill_id ON return_tickets USING btree (bill_id);
 
 
 --
--- Name: index_return_tickets_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_return_tickets_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_return_tickets_on_store_id ON return_tickets USING btree (store_id);
 
 
 --
--- Name: index_return_tickets_on_ticket_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_return_tickets_on_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_return_tickets_on_ticket_id ON return_tickets USING btree (ticket_id);
 
 
 --
--- Name: index_sales_movements_on_movement_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_rows_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_rows_on_bill_id ON rows USING btree (bill_id);
+
+
+--
+-- Name: index_sales_movements_on_movement_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_sales_movements_on_movement_id ON sales_movements USING btree (movement_id);
 
 
 --
--- Name: index_sales_movements_on_sales_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_sales_movements_on_sales_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_sales_movements_on_sales_id ON sales_movements USING btree (sales_id);
 
 
 --
--- Name: index_sales_targets_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_sales_targets_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_sales_targets_on_store_id ON sales_targets USING btree (store_id);
 
 
 --
--- Name: index_service_offereds_on_service_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_service_offereds_on_service_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_service_offereds_on_service_id ON service_offereds USING btree (service_id);
 
 
 --
--- Name: index_service_offereds_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_service_offereds_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_service_offereds_on_store_id ON service_offereds USING btree (store_id);
 
 
 --
--- Name: index_service_offereds_on_tax_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_service_offereds_on_tax_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_service_offereds_on_tax_id ON service_offereds USING btree (tax_id);
 
 
 --
--- Name: index_service_offereds_on_ticket_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_service_offereds_on_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_service_offereds_on_ticket_id ON service_offereds USING btree (ticket_id);
 
 
 --
--- Name: index_services_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_service_sales_on_service_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_service_sales_on_service_id ON service_sales USING btree (service_id);
+
+
+--
+-- Name: index_service_sales_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_service_sales_on_store_id ON service_sales USING btree (store_id);
+
+
+--
+-- Name: index_services_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_services_on_business_unit_id ON services USING btree (business_unit_id);
 
 
 --
--- Name: index_services_on_sat_key_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_services_on_sat_key_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_services_on_sat_key_id ON services USING btree (sat_key_id);
 
 
 --
--- Name: index_services_on_sat_unit_key_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_services_on_sat_unit_key_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_services_on_sat_unit_key_id ON services USING btree (sat_unit_key_id);
 
 
 --
--- Name: index_services_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_services_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_services_on_store_id ON services USING btree (store_id);
 
 
 --
--- Name: index_store_movements_on_order_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_movements_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_store_movements_on_bill_id ON store_movements USING btree (bill_id);
+
+
+--
+-- Name: index_store_movements_on_order_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_movements_on_order_id ON store_movements USING btree (order_id);
 
 
 --
--- Name: index_store_movements_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_movements_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_movements_on_product_id ON store_movements USING btree (product_id);
 
 
 --
--- Name: index_store_movements_on_product_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_movements_on_product_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_movements_on_product_request_id ON store_movements USING btree (product_request_id);
 
 
 --
--- Name: index_store_movements_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_movements_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_movements_on_store_id ON store_movements USING btree (store_id);
 
 
 --
--- Name: index_store_movements_on_supplier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_movements_on_supplier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_movements_on_supplier_id ON store_movements USING btree (supplier_id);
 
 
 --
--- Name: index_store_movements_on_tax_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_movements_on_tax_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_movements_on_tax_id ON store_movements USING btree (tax_id);
 
 
 --
--- Name: index_store_movements_on_ticket_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_movements_on_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_movements_on_ticket_id ON store_movements USING btree (ticket_id);
 
 
 --
--- Name: index_store_sales_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_sales_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_sales_on_store_id ON store_sales USING btree (store_id);
 
 
 --
--- Name: index_store_use_inventories_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_use_inventories_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_use_inventories_on_product_id ON store_use_inventories USING btree (product_id);
 
 
 --
--- Name: index_store_use_inventories_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_store_use_inventories_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_store_use_inventories_on_store_id ON store_use_inventories USING btree (store_id);
 
 
 --
--- Name: index_stores_inventories_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_inventories_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_inventories_on_product_id ON stores_inventories USING btree (product_id);
 
 
 --
--- Name: index_stores_inventories_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_inventories_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_inventories_on_store_id ON stores_inventories USING btree (store_id);
 
 
 --
--- Name: index_stores_on_business_group_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_on_business_group_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_on_business_group_id ON stores USING btree (business_group_id);
 
 
 --
--- Name: index_stores_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_on_business_unit_id ON stores USING btree (business_unit_id);
 
 
 --
--- Name: index_stores_on_cost_type_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_on_cost_type_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_on_cost_type_id ON stores USING btree (cost_type_id);
 
 
 --
--- Name: index_stores_on_delivery_address_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_on_delivery_address_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_on_delivery_address_id ON stores USING btree (delivery_address_id);
 
 
 --
--- Name: index_stores_on_store_type_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_on_store_type_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_on_store_type_id ON stores USING btree (store_type_id);
 
 
 --
--- Name: index_stores_suppliers_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_suppliers_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_suppliers_on_store_id ON stores_suppliers USING btree (store_id);
 
 
 --
--- Name: index_stores_suppliers_on_supplier_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_suppliers_on_supplier_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_suppliers_on_supplier_id ON stores_suppliers USING btree (supplier_id);
 
 
 --
--- Name: index_stores_warehouse_entries_on_movement_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_warehouse_entries_on_movement_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_warehouse_entries_on_movement_id ON stores_warehouse_entries USING btree (movement_id);
 
 
 --
--- Name: index_stores_warehouse_entries_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_warehouse_entries_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_warehouse_entries_on_product_id ON stores_warehouse_entries USING btree (product_id);
 
 
 --
--- Name: index_stores_warehouse_entries_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_warehouse_entries_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_warehouse_entries_on_store_id ON stores_warehouse_entries USING btree (store_id);
 
 
 --
--- Name: index_stores_warehouse_entries_on_store_movement_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_stores_warehouse_entries_on_store_movement_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_stores_warehouse_entries_on_store_movement_id ON stores_warehouse_entries USING btree (store_movement_id);
 
 
 --
--- Name: index_suppliers_on_delivery_address_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_suppliers_on_delivery_address_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_suppliers_on_delivery_address_id ON suppliers USING btree (delivery_address_id);
 
 
 --
--- Name: index_suppliers_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_suppliers_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_suppliers_on_store_id ON suppliers USING btree (store_id);
 
 
 --
--- Name: index_temporal_numbers_on_business_group_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_temporal_numbers_on_business_group_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_temporal_numbers_on_business_group_id ON temporal_numbers USING btree (business_group_id);
 
 
 --
--- Name: index_temporal_numbers_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_temporal_numbers_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_temporal_numbers_on_store_id ON temporal_numbers USING btree (store_id);
 
 
 --
--- Name: index_terminals_on_bank_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_terminals_on_bank_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_terminals_on_bank_id ON terminals USING btree (bank_id);
 
 
 --
--- Name: index_terminals_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_terminals_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_terminals_on_store_id ON terminals USING btree (store_id);
 
 
 --
--- Name: index_tickets_children_on_children_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_children_on_children_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_children_on_children_id ON tickets_children USING btree (children_id);
 
 
 --
--- Name: index_tickets_children_on_ticket_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_children_on_ticket_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_children_on_ticket_id ON tickets_children USING btree (ticket_id);
 
 
 --
--- Name: index_tickets_on_bill_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_on_bill_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_on_bill_id ON tickets USING btree (bill_id);
 
 
 --
--- Name: index_tickets_on_cash_register_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_on_cash_register_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_on_cash_register_id ON tickets USING btree (cash_register_id);
 
 
 --
--- Name: index_tickets_on_cfdi_use_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_on_cfdi_use_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_on_cfdi_use_id ON tickets USING btree (cfdi_use_id);
 
 
 --
--- Name: index_tickets_on_parent_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_on_parent_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_on_parent_id ON tickets USING btree (parent_id);
 
 
 --
--- Name: index_tickets_on_prospect_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_on_prospect_id ON tickets USING btree (prospect_id);
 
 
 --
--- Name: index_tickets_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_on_store_id ON tickets USING btree (store_id);
 
 
 --
--- Name: index_tickets_on_tax_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_on_tax_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_on_tax_id ON tickets USING btree (tax_id);
 
 
 --
--- Name: index_tickets_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_tickets_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_tickets_on_user_id ON tickets USING btree (user_id);
 
 
 --
--- Name: index_user_requests_on_request_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_user_requests_on_request_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_user_requests_on_request_id ON user_requests USING btree (request_id);
 
 
 --
--- Name: index_user_requests_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_user_requests_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_user_requests_on_user_id ON user_requests USING btree (user_id);
 
 
 --
--- Name: index_user_sales_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_user_sales_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_user_sales_on_user_id ON user_sales USING btree (user_id);
 
 
 --
--- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE UNIQUE INDEX index_users_on_email ON users USING btree (email);
 
 
 --
--- Name: index_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE UNIQUE INDEX index_users_on_reset_password_token ON users USING btree (reset_password_token);
 
 
 --
--- Name: index_users_on_role_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_users_on_role_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_users_on_role_id ON users USING btree (role_id);
 
 
 --
--- Name: index_users_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_users_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_users_on_store_id ON users USING btree (store_id);
 
 
 --
--- Name: index_warehouse_entries_on_movement_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_warehouse_entries_on_movement_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_warehouse_entries_on_movement_id ON warehouse_entries USING btree (movement_id);
 
 
 --
--- Name: index_warehouse_entries_on_product_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_warehouse_entries_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_warehouse_entries_on_product_id ON warehouse_entries USING btree (product_id);
 
 
 --
--- Name: index_warehouse_entries_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_warehouse_entries_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_warehouse_entries_on_store_id ON warehouse_entries USING btree (store_id);
 
 
 --
--- Name: index_warehouses_on_business_group_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_warehouses_on_business_group_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_warehouses_on_business_group_id ON warehouses USING btree (business_group_id);
 
 
 --
--- Name: index_warehouses_on_business_unit_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_warehouses_on_business_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_warehouses_on_business_unit_id ON warehouses USING btree (business_unit_id);
 
 
 --
--- Name: index_warehouses_on_delivery_address_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_warehouses_on_delivery_address_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_warehouses_on_delivery_address_id ON warehouses USING btree (delivery_address_id);
 
 
 --
--- Name: index_warehouses_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_warehouses_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_warehouses_on_store_id ON warehouses USING btree (store_id);
 
 
 --
--- Name: index_withdrawals_on_cash_register_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_withdrawals_on_cash_register_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_withdrawals_on_cash_register_id ON withdrawals USING btree (cash_register_id);
 
 
 --
--- Name: index_withdrawals_on_store_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_withdrawals_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_withdrawals_on_store_id ON withdrawals USING btree (store_id);
 
 
 --
--- Name: index_withdrawals_on_user_id; Type: INDEX; Schema: public; Owner: oscar
+-- Name: index_withdrawals_on_user_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_withdrawals_on_user_id ON withdrawals USING btree (user_id);
 
 
 --
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: oscar
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);

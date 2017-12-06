@@ -174,6 +174,8 @@ function lotQueries(store, call){
 
             if (store) {
               storage.set('store', store);
+              storage.set('lastTicket', 0);
+
               lotQueries(result.rows[0], function(queries){
 
                 $("#dynamic")
