@@ -156,6 +156,15 @@ $(document).ready(function() {
           .removeClass('head-red')
           .addClass('head-blue');
 
+        $('#modalTitleAltaBaja').html('Entrada de mercancías');
+        $('#confirmAddProduct')
+          .addClass('main-button')
+          .val('Confirmar alta')
+          .removeClass('third-button');
+
+        $('input[type=radio][name=processProduct]').prop('checked', false);
+        $('#addProductSearch').addClass('hidden');
+
       });
 
       data.quantity += inventory.rows[0].quantity;
