@@ -15,7 +15,6 @@ $(document).ready(function() {
 
   function productAddChange(product){
     return `<tr id="addProduct_${product.id}">` +
-      '<td class="left" id="removeProducts"><input type="checkbox" class="form-check-input"></td>' +
       '<td class="left">' +
       product.description +
       '</td>' +
@@ -161,25 +160,45 @@ $(document).ready(function() {
 
       data.quantity += inventory.rows[0].quantity;
       updateBy(data, table, condition).then(() => {
-        $('#addProductQuantity tr').remove();
+        $('#addProductQuantity tr[id^=addProduct_]').remove();
       }, err => {
-        $('#addProductQuantity tr').remove();
+        $('#addProductQuantity tr[id^=addProduct_]').remove();
       });
 
     });
   });
 
-  function radioToggleClass(){
-    if ($('#addProductDetails').hasClass('head-blue')) {
+  function toggleProductAction(type){
+    if (type === 'Baja'){
+
       $('#addProductDetails')
         .removeClass('head-blue')
         .addClass('head-red');
+      $('#modalTitleAltaBaja').html('Baja de mercancías');
+      $('#confirmAddProduct')
+      .removeClass('main-button')
+      .val('Confirmar baja')
+      .addClass('third-button');
+
     } else {
+
       $('#addProductDetails')
         .removeClass('head-red')
         .addClass('head-blue');
+
+      $('#modalTitleAltaBaja').html('Entrada de mercancías');
+      $('#confirmAddProduct')
+      .addClass('main-button')
+      .val('Confirmar alta')
+      .removeClass('third-button');
     }
   }
+
+  $('input[type=radio][name=processProduct]').change(function(){
+    $('#addProductSearch').removeClass('hidden');
+    toggleProductAction($(this).val());
+  });
+
 
   $('#addProductSearch').click(function(){
 
@@ -192,10 +211,6 @@ $(document).ready(function() {
               productAddChange(suggestion)
             );
 
-            $('#removeProducts').change(function(){
-              radioToggleClass();
-            });
-
             let selector = document.getElementById("addProductInput");
             var im = new Inputmask("99999999");
             im.mask(selector);
@@ -203,7 +218,8 @@ $(document).ready(function() {
           }
         });
       });
-  });
+  })
+  .addClass('hidden');
 
   function createFullName(user){
     return `${user.first_name} ${user.middle_name} ${user.last_name}`;
@@ -413,6 +429,10 @@ $(document).ready(function() {
                     store.set('lastTicket', parseInt(
                       $('#ticketNum').html()
                     ));
+
+                    let ticketInfo = {
+                    
+                    };
 
                     window.location.href = 'pos_sale.html';
 

@@ -632,3 +632,7 @@ i.fa.fa-chevron-down.show-payments:hover,
 i.fa.fa-chevron-up.hide-payments:hover {
   color: #009CB7;
 }
+
+.center {
+  text-align: center;
+}
