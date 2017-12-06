@@ -15,6 +15,7 @@ $(document).ready(function() {
 
   function productAddChange(product){
     return `<tr id="addProduct_${product.id}">` +
+      '<td class="left" id="removeProducts"><input type="checkbox" class="form-check-input"></td>' +
       '<td class="left">' +
       product.description +
       '</td>' +
@@ -36,8 +37,8 @@ $(document).ready(function() {
         product_id    : productDetails.id,
         quantity      : quantity,
         movement_type : 'alta',
-        initial_price : productDetails.price,
-        final_price   : final_price,
+        initial_price : productDetails.price.toFixed(2),
+        final_price   : final_price.toFixed(2),
         supplier_id   : productDetails.supplier_id,
       };
 
@@ -49,11 +50,11 @@ $(document).ready(function() {
           if (productDetails.discount_for_franchises === 0){
             final_price = productDetails.price * 0.65;
           }
-          storeMovementData.final_price = final_price;
+          storeMovementData.final_price = final_price.toFixed(2);
         }
 
         storeMovementData.cost       = storeMovementData.final_price;
-        storeMovementData.total_cost = storeMovementData.cost * storeMovementData.quantity;
+        storeMovementData.total_cost = (storeMovementData.cost * storeMovementData.quantity).toFixed(2);
 
         insert(
           Object.keys(storeMovementData),
@@ -90,7 +91,11 @@ $(document).ready(function() {
         };
 
         findBy('id', id, 'products').then(product => {
-          warehouseEntryData.retails_unit_per_unit = product.rows[0].average;
+          let average = product.rows[0].average;
+          if (average) {
+            warehouseEntryData.retail_units_per_unit = average;
+          }
+
           insert(
             Object.keys(warehouseEntryData),
             Object.values(warehouseEntryData),
@@ -120,6 +125,14 @@ $(document).ready(function() {
             $('#addProductQuantity').append(
               productAddChange(suggestion)
             );
+
+            $('#removeProducts').change(function(){
+              debugger
+              $('#addProductDetails')
+              .removeClass('head-blue')
+              .addClass('head-red');
+            });
+
             let selector = document.getElementById("addProductInput");
             var im = new Inputmask("99999999");
             im.mask(selector);
