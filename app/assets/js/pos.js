@@ -27,7 +27,7 @@ $(document).ready(function() {
     findBy('id', productId, 'products').then(product => {
       productDetails = product.rows[0];
       let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100)),
-        multipler = action === 'alta' ? 1 : -1;
+        multipler = -1;
 
       if (productDetails.discount_for_stores === 0){
         final_price = productDetails.price * 0.65;
@@ -112,7 +112,7 @@ $(document).ready(function() {
   function createWarehouseEntry(productId, storeMovementId){
     warehouseEntryData = {
       product_id : productId,
-      quantity   : storeMovementData.quantity,
+      quantity   : -1 * storeMovementData.quantity,
       store_movement_id : storeMovementId
     };
 
@@ -167,13 +167,14 @@ $(document).ready(function() {
 
       });
 
-      data.quantity += inventory.rows[0].quantity;
-      updateBy(data, table, condition).then(() => {
-        $('#addProductQuantity tr[id^=addProduct_]').remove();
-      }, err => {
-        $('#addProductQuantity tr[id^=addProduct_]').remove();
-      });
+      if (action === 'alta'){
+        data.quantity += inventory.rows[0].quantity;
+        updateBy(data, table, condition).then(() => {
+        }, err => {
+        });
+      }
 
+      $('#addProductQuantity tr[id^=addProduct_]').remove();
     });
   });
 
