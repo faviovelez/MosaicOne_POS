@@ -628,7 +628,7 @@
             <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
             Manual
           </button>
-          <button type="button" class="btn btn-default custom-button" id="automatic">
+          <button type="button" class="btn btn-default custom-button hidden" id="automatic">
             <i class="fa fa-repeat" aria-hidden="true"></i>
             Automático
           </button>
@@ -766,26 +766,12 @@
           <i class="fa fa-exchange " aria-hidden="true"></i>
           Devolución
         </button>
-        <button type="button" class="btn btn-default custom-button" id="other" value="21">
+        <button type="button" class="btn btn-default custom-button hidden" id="other" value="21">
           <i class="fa fa-question-circle-o " aria-hidden="true"></i>
           Otra
         </button>
       </div>
       <!-- Termina la sección de formas de pago -->
-
-      <div class="input-group margin-bottom credit-days-container hidden paymentProcess">
-        <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)">
-        <span class="input-group-btn">
-          <button class="btn btn-default color-button pos-main-btn" type="button" id="creditDays">Días de crédito</button>
-        </span>
-      </div><!-- /input-group -->
-
-      <div class="input-group margin-bottom operation-number-container hidden paymentProcess">
-        <input type="text" class="form-control" placeholder="Referencia bancaria">
-        <span class="input-group-btn">
-          <button class="btn btn-default color-button pos-main-btn" type="button" id="operationNumber">Referencia</button>
-        </span>
-      </div><!-- /input-group -->
 
       <div class="actions select-register-container hidden paymentProcess">
         <select class="myfield margin-top margin-bottom" name="business_type" id="select_terminal">
@@ -802,6 +788,21 @@
           </span>
         </div><!-- /input-group -->
       </div><!-- /.row -->
+
+      <div class="input-group margin-bottom credit-days-container hidden paymentProcess">
+        <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)">
+        <span class="input-group-btn">
+          <button class="btn btn-default color-button pos-main-btn" type="button" id="creditDays">Días de crédito</button>
+        </span>
+      </div><!-- /input-group -->
+
+      <div class="input-group margin-bottom operation-number-container hidden paymentProcess">
+        <input type="text" class="form-control" placeholder="Referencia bancaria">
+        <span class="input-group-btn">
+          <button class="btn btn-default color-button pos-main-btn" type="button" id="operationNumber">Referencia</button>
+        </span>
+      </div><!-- /input-group -->
+
       <input type="text" class="form-control higher-form process-sale paymentProcess" placeholder="Comentarios"><br /><br />
 
     </div> <!-- Termina right-container  -->
