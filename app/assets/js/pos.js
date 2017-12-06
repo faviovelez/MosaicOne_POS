@@ -35,11 +35,11 @@ $(document).ready(function() {
         )
       };
     findBy('product_id', id, 'stores_inventories').then(inventory => {
-      findBy('product_id', id, 'warehouse_entries').then(warehouse_entry_table => {
+      findBy('product_id', id, 'stores_warehouse_entries').then(warehouse_entry_table => {
         insert(
-          ['product_id', 'quantity', 'entry_number'],
-          [inventory.rows[0].product_id, $('#addProductInput').val().replace(/_/g,''), warehouse_entry_table.rowCount],
-          'warehouse_entries'
+          ['product_id', 'quantity'],
+          [inventory.rows[0].product_id, $('#addProductInput').val().replace(/_/g,'')],
+          'stores_warehouse_entries'
         );
         data.quantity += inventory.rows[0].quantity;
         updateBy(data, table, condition).then(product => {
@@ -721,18 +721,21 @@ $(document).ready(function() {
       $('#store').html(store.get('store').store_name);
 
       getAll('terminals').then(terminals => {
-        terminals.rows.forEach(terminal => {
-          $('#select_terminal').append(
-            `<option value="${terminal.id}">${terminal.name}</option>`
-          );
-        });
+        if (terminals.rows.length === 0) {
+          $('#credit, #debit, #select_terminal').addClass('hidden');
+        } else {
+          $('#credit, #debit, #select_terminal').removeClass('hidden');
+          terminals.rows.forEach(terminal => {
+            $('#select_terminal').append(
+              `<option value="${terminal.id}">${terminal.name}</option>`
+            );
+          });
+        }
       });
 
       setTimeout(function(){
         if ($('#mainProductSearch').attr('autocomplete') === 'undefined'){
           $('#pos').click();
-        } else {
-          alert('Listado cargado');
         }
       }, 500);
 
