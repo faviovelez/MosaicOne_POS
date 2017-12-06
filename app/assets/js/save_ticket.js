@@ -346,7 +346,7 @@ function assignCost(ticketId, call) {
         fixedDiscount   = parseFloat(discount.toFixed(2)),
         data = {
           product_id         : productId,
-          quantity           : sellQuantity,
+          quantity           : -1 * sellQuantity,
           movement_type      : 'venta',
           ticket_id          : ticketId,
           initial_price      : productsJson[productId].price.toFixed(2),

@@ -27,7 +27,7 @@ $(document).ready(function() {
     findBy('id', productId, 'products').then(product => {
       productDetails = product.rows[0];
       let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100)),
-        multipler = -1;
+        multipler = action === 'alta' ? 1 : -1;
 
       if (productDetails.discount_for_stores === 0){
         final_price = productDetails.price * 0.65;
@@ -441,7 +441,7 @@ $(document).ready(function() {
                     ));
 
                     let ticketInfo = {
-                    
+                      sucursal : storeObject.store_name,
                     };
 
                     window.location.href = 'pos_sale.html';
