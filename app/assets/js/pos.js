@@ -23,10 +23,118 @@ $(document).ready(function() {
       '</td></tr>';
   }
 
+  function createStoreMovementData(productId, quantity, action, call){
+    findBy('id', productId, 'products').then(product => {
+      productDetails = product.rows[0];
+      let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100)),
+        multipler = action === 'alta' ? 1 : -1;
+
+      if (productDetails.discount_for_stores === 0){
+        final_price = productDetails.price * 0.65;
+      }
+
+      storeMovementData = {
+        product_id    : productDetails.id,
+        quantity      : (multipler * quantity),
+        movement_type : action,
+        initial_price : productDetails.price.toFixed(2),
+        final_price   : final_price.toFixed(2),
+        supplier_id   : productDetails.supplier_id,
+      };
+
+      initStore().then(storage => {
+
+        let store = storage.get('store');
+        if (store.store_type_id === 4) {
+          let final_price = productDetails.price * ( 1 - (productDetails.discount_for_franchises / 100));
+          if (productDetails.discount_for_franchises === 0){
+            final_price = productDetails.price * 0.65;
+          }
+          storeMovementData.final_price = final_price.toFixed(2);
+        }
+
+        storeMovementData.cost       = storeMovementData.final_price;
+        storeMovementData.total_cost = (storeMovementData.cost * storeMovementData.quantity).toFixed(2);
+
+        insert(
+          Object.keys(storeMovementData),
+          Object.values(storeMovementData),
+          'store_movements'
+        ).then(storeMovementObject => {
+          return call(storeMovementObject.lastId);
+        });
+
+      });
+
+    });
+  }
+
+  function destroyProcess(productId){
+    let localQuery      =  specialQuery(productId),
+        processQuantity =  -1 * storeMovementData.quantity;
+    query(localQuery).then(entries => {
+      let BreakException = {},
+          totalCost      = 0;
+      try {
+        entries.rows.forEach(entry => {
+          let quantity  = entry.quantity,
+            cost        = entry.cost,
+            entryId     = entry.id;
+
+          if (processQuantity >= quantity) {
+            totalCost += (quantity * cost);
+            deleteBy('stores_warehouse_entries', `id = ${entryId}`);
+            updateStoreInventories(
+              productId, quantity
+            );
+            processQuantity -= quantity;
+          } else {
+            totalCost += (processQuantity * cost);
+            updateStoreInventories(
+              productId, processQuantity
+            );
+            updateBy(
+              {
+                quantity: (quantity - processQuantity)
+              },
+              'stores_warehouse_entries',
+              `id = ${entryId}`
+            );
+            throw BreakException;
+          }
+        });
+      } catch (err){
+        if (err !== BreakException) throw err;
+      }
+    });
+  }
+
+  function createWarehouseEntry(productId, storeMovementId){
+    warehouseEntryData = {
+      product_id : productId,
+      quantity   : storeMovementData.quantity,
+      store_movement_id : storeMovementId
+    };
+
+    findBy('id', productId, 'products').then(product => {
+      let average = product.rows[0].average;
+      if (average) {
+        warehouseEntryData.retail_units_per_unit = average;
+      }
+
+      insert(
+        Object.keys(warehouseEntryData),
+        Object.values(warehouseEntryData),
+        'stores_warehouse_entries'
+      ).then(() => {});
+    });
+  }
+
   $('#confirmAddProduct').click(function(){
-    let id = $('tr[id^=addProduct]').attr(
+    let id = $('tr[id^=addProduct_]').attr(
       'id'
     ).replace(/\D/g,''),
+      action = $('#addProductDetails').hasClass('head-blue') ? 'alta' : 'baja',
       table = 'stores_inventories',
       condition = `product_id = ${id}`,
       data = {
@@ -34,22 +142,73 @@ $(document).ready(function() {
           $('#addProductInput').val().replace(/_/g,'')
         )
       };
-    findBy('product_id', id, 'stores_inventories').then(inventory => {
-      findBy('product_id', id, 'stores_warehouse_entries').then(warehouse_entry_table => {
-        insert(
-          ['product_id', 'quantity'],
-          [inventory.rows[0].product_id, $('#addProductInput').val().replace(/_/g,'')],
-          'stores_warehouse_entries'
-        );
-        data.quantity += inventory.rows[0].quantity;
-        updateBy(data, table, condition).then(product => {
-          $('#addProductQuantity tr').remove();
-        }, err => {
-          $('#addProductQuantity tr').remove();
-        });
+    findBy('product_id', id, table).then(inventory => {
+      inventoryObject = inventory.rows[0];
+      createStoreMovementData(id, data.quantity, action, function(storeMovementId){
+
+        if ( action === 'alta') {
+          createWarehouseEntry(id, storeMovementId);
+        } else {
+          destroyProcess(id);
+        }
+
+        $('#addProductDetails')
+          .removeClass('head-red')
+          .addClass('head-blue');
+
+        $('#modalTitleAltaBaja').html('Entrada de mercancías');
+        $('#confirmAddProduct')
+          .addClass('main-button')
+          .val('Confirmar alta')
+          .removeClass('third-button');
+
+        $('input[type=radio][name=processProduct]').prop('checked', false);
+        $('#addProductSearch').addClass('hidden');
+
       });
+
+      if (action === 'alta'){
+        data.quantity += inventory.rows[0].quantity;
+        updateBy(data, table, condition).then(() => {
+        }, err => {
+        });
+      }
+
+      $('#addProductQuantity tr[id^=addProduct_]').remove();
     });
   });
+
+  function toggleProductAction(type){
+    if (type === 'Baja'){
+
+      $('#addProductDetails')
+        .removeClass('head-blue')
+        .addClass('head-red');
+      $('#modalTitleAltaBaja').html('Baja de mercancías');
+      $('#confirmAddProduct')
+      .removeClass('main-button')
+      .val('Confirmar baja')
+      .addClass('third-button');
+
+    } else {
+
+      $('#addProductDetails')
+        .removeClass('head-red')
+        .addClass('head-blue');
+
+      $('#modalTitleAltaBaja').html('Entrada de mercancías');
+      $('#confirmAddProduct')
+      .addClass('main-button')
+      .val('Confirmar alta')
+      .removeClass('third-button');
+    }
+  }
+
+  $('input[type=radio][name=processProduct]').change(function(){
+    $('#addProductSearch').removeClass('hidden');
+    toggleProductAction($(this).val());
+  });
+
 
   $('#addProductSearch').click(function(){
 
@@ -61,6 +220,7 @@ $(document).ready(function() {
             $('#addProductQuantity').append(
               productAddChange(suggestion)
             );
+
             let selector = document.getElementById("addProductInput");
             var im = new Inputmask("99999999");
             im.mask(selector);
@@ -68,7 +228,8 @@ $(document).ready(function() {
           }
         });
       });
-  });
+  })
+  .addClass('hidden');
 
   function createFullName(user){
     return `${user.first_name} ${user.middle_name} ${user.last_name}`;
@@ -278,6 +439,10 @@ $(document).ready(function() {
                     store.set('lastTicket', parseInt(
                       $('#ticketNum').html()
                     ));
+
+                    let ticketInfo = {
+                      sucursal : storeObject.store_name,
+                    };
 
                     window.location.href = 'pos_sale.html';
 

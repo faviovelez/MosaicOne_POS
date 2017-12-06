@@ -1234,9 +1234,16 @@
          <div class="modal-content">
            <div class="modal-header">
              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-             <h4 class="modal-title">Entrada de mercancías</h4>
+             <h4 class="modal-title" id='modalTitleAltaBaja'>Entrada de mercancías</h4>
            </div>
            <div class="modal-body">
+
+             <div class="radio center">
+               <label><input type="radio" name="processProduct" value="Alta">Alta</label>
+             </div>
+             <div class="radio center">
+               <label><input type="radio" name="processProduct" value="Baja">Baja</label>
+             </div>
 
              <table class="items-sales center-table">
                <thead>
@@ -1248,8 +1255,8 @@
                  <tr>
                      <th> <br /></th>
                  </tr>
-                 <tr class="head-blue">
-                   <th> Producto o Servicio </th>
+                 <tr class="head-blue" id="addProductDetails">
+                   <th class="rounded-edges-left"> Producto o Servicio </th>
                    <th> Color/Diseño </th>
                    <th class="rounded-edges-right"> Cantidad </th>
                  </tr>

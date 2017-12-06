@@ -340,14 +340,8 @@ function printTicket(ticketInfo){
   )));
 
   let contents = win.webContents;
-  // if document is loaded start printing.
   win.webContents.on('did-finish-load', () => {
-    // change true for windows testing
     win.webContents.print({silent: true});
-    //    win.webContents.print({silent: true}); // haciendo default la impresora ya instalada
-    // close window after print order.
     win = null;
   });
 }
-
-// Print logic finishes
