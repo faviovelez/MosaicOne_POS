@@ -69,7 +69,8 @@ function lotQueries(store, call){
       'cash_registers': 'SELECT * FROM cash_registers ' +
       `WHERE store_id = ${store.id}`,
       'cfdi_uses': 'SELECT * FROM cfdi_uses',
-      'banks':    'SELECT * FROM banks'
+      'banks':    'SELECT * FROM banks',
+      'tax_regimes' : 'SELECT * FROM tax_regimes'
     });
   }
 
@@ -91,7 +92,8 @@ function lotQueries(store, call){
       ` SELECT COUNT (*) as rows FROM store_movements WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM cash_registers WHERE store_id = ${store.id} UNION ALL` +
       ' SELECT COUNT (*) as rows FROM cfdi_uses UNION ALL' +
-      ' SELECT COUNT (*) as rows FROM banks' +
+      ' SELECT COUNT (*) as rows FROM banks UNION ALL' +
+      ' SELECT COUNT (*) as rows FROM tax_regimes' +
     ') as u';
   }
 

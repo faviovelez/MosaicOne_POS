@@ -425,8 +425,7 @@ $(document).ready(function() {
 
           initStore().then(store => {
             let user        = store.get('current_user').id,
-              storeObject = store.get('store'),
-              storeId     = store.id;
+              storeObject = store.get('store');
 
             insertTicket(user, function(ticketId){
 
@@ -440,11 +439,44 @@ $(document).ready(function() {
                       $('#ticketNum').html()
                     ));
 
-                    let ticketInfo = {
-                      sucursal : storeObject.store_name,
+                    ticketData = {
+                      store : storeObject
                     };
 
-                    window.location.href = 'pos_sale.html';
+                    findBy(
+                      'id',
+                      storeObject.business_unit_id,
+                      'business_units'
+                    ).then(business_unit => {
+                      findBy(
+                        'id',
+                        business_unit.rows[0].billing_address_id,
+                        'billing_addresses'
+                      ).then(billing_address => {
+                        ticketData.billing_address = billing_address.rows[0];
+                        findBy(
+                          'id',
+                          ticketData.billing_address.tax_regime_id,
+                          'tax_regimes'
+                        ).then(tax_regime => {
+
+                          ticketData.tax_regime = tax_regime.rows[0];
+                          findBy('id', ticketId, 'tickets').then(ticket => {
+
+                            ticketData.ticket = ticket.rows[0];
+                            ticketData.cash_register = {
+                              name: 'TemporalName'
+                            };
+                            printTicket(ticketData);
+
+                          });
+
+                        });
+
+                      });
+                    });
+
+                    //window.location.href = 'pos_sale.html';
 
                   });
 

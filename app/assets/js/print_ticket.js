@@ -8,7 +8,8 @@ win = new remote.BrowserWindow({width: 800, height: 600, show: false });
 
 var html = '';
 
-function initTicket(ticketInfo) {
+function initTicket(ticketData) {
+  debugger
   return '<!DOCTYPE html>' +
   '<html lang="es">' +
   '<head>' +
@@ -26,26 +27,26 @@ function initTicket(ticketInfo) {
         '<tr>' +
           '<td colspan="4">' +
             '<strong style="font-size: 17px;">' +
-              'store.business_unit.billing_address.business_name <br>' +
+              `${ticketData.billing_address.business_name} <br>` +
             '</strong>' +
-            'Sucursal store.store_name <br>' +
+            `Sucursal ${ticketData.store.store_name} <br>` +
             '<br>' +
-            'store.business_unit.billing_address.street ' +
-            'store.business_unit.billing_address.exterior_number ' + 
-            'store.business_unit.billing_address.interior_number <br>' +
-            'Col. store.business_unit.billing_address.neighborhood <br>' +
-            'store.business_unit.billing_address.city, ' + 
-            'store.business_unit.billing_address.state. ' +
-            'C.P. store.business_unit.billing_address.zipcode <br>' +
-            'RFC: store.business_unit.billing_address.rfc <br>' +
+            `${ticketData.billing_address.street} ` +
+            `${ticketData.billing_address.exterior_number} ` +
+            `${ticketData.billing_address.interior_number} <br>` +
+            `Col. ${ticketData.billing_address.neighborhood} <br>` +
+            `${ticketData.billing_address.city}, ` +
+            `${ticketData.billing_address.state}. ` +
+            `C.P. ${ticketData.billing_address.zipcode} <br>` +
+            `RFC: ${ticketData.billing_address.rfc} <br>` +
             '<br>' +
             '<strong>' +
               'Régimen fiscal: <br>' +
             '</strong>' +
-            'store.business_unit.billing_address.tax_regime.description <br>' + //Esta tabla no nos la estamos trayendo pero hay que traerla
+            `${ticketData.tax_regime.description} <br>` + //Esta tabla no nos la estamos trayendo pero hay que traerla
             '<br>' +
-            'Tel. store.direct_phone <br>' + // si hay una opción como en rails (number_to_phone(1235551234, area_code: true, extension: 555)), mejor, si no, como está
-            'store.email <br>' +
+            `Tel. ${ticketData.store.direct_phone} <br>` + // si hay una opción como en rails (number_to_phone(1235551234, area_code: true, extension: 555)), mejor, si no, como está
+            `${ticketData.store.email} <br>` +
             'www.disenosdecarton.com.mx <br>' +
             '_______________________________________ <br /> <br />' +
           '</td>' +
@@ -53,19 +54,19 @@ function initTicket(ticketInfo) {
         '<tr>' +
           '<td style="text-align:left">' +
             '<strong>' +
-              'ticket.ticket_type' +
+              `${ticketData.ticket.ticket_type}` +
             '</strong>' +
           '</td>' +
           '<td>' +
             'Caja ' +
             '<span>' +
-              '<strong> ticket.cash_register.name </strong>' +
+              `<strong> ${ticketData.cash_register.name} </strong>` +
             '</span>' +
           '</td>' +
           '<td colspan="2" style="text-align:right">' +
             'Ticket: ' +
             '<span>' +
-              '<strong> ticket.ticket_number </strong>' +
+              `<strong> ${ticketData.ticket.ticket_number} </strong>` +
             '</span>' +
           '</td>' +
         '</tr>' +
@@ -352,11 +353,20 @@ function initTicket(ticketInfo) {
   '</html>';
 }
 
+function createHtmlFile(html, ticketId){
+  let fs = require('fs');
+
+  try{
+    fs.writeFileSync(`./tickets/TicketNo:_${ticketId}.html`, html);
+  }catch (e){
+    console.log("Cannot write file ", e);
+  }
+}
 
 function printTicket(ticketInfo){
-  win.loadURL("data:text/html;charset=utf-8," + encodeURI(initTicket(
-    ticketInfo
-  )));
+  let htmlContent = initTicket(ticketInfo);
+  createHtmlFile(htmlContent, ticketInfo.ticket.id);
+  win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
 
   let contents = win.webContents;
   win.webContents.on('did-finish-load', () => {
