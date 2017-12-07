@@ -26,22 +26,26 @@ function initTicket(ticketInfo) {
         '<tr>' +
           '<td colspan="4">' +
             '<strong style="font-size: 17px;">' +
-              'Diseños de Cartón S.A. de C.V. <br>' +
+              'store.business_unit.billing_address.business_name <br>' +
             '</strong>' +
-            'Sucursal Patria <br>' +
+            'Sucursal store.store_name <br>' +
             '<br>' +
-            'Av. de la Patria 124 <br>' +
-            'Col. Jardines Vallarta <br>' +
-            'Zapopan, Jalisco. C.P. 44490 <br>' +
-            'RFC: DCA8603175G2 <br>' +
+            'store.business_unit.billing_address.street ' +
+            'store.business_unit.billing_address.exterior_number ' + 
+            'store.business_unit.billing_address.interior_number <br>' +
+            'Col. store.business_unit.billing_address.neighborhood <br>' +
+            'store.business_unit.billing_address.city, ' + 
+            'store.business_unit.billing_address.state. ' +
+            'C.P. store.business_unit.billing_address.zipcode <br>' +
+            'RFC: store.business_unit.billing_address.rfc <br>' +
             '<br>' +
             '<strong>' +
               'Régimen fiscal: <br>' +
             '</strong>' +
-            'Régimen General de Ley Personas Morales <br>' +
+            'store.business_unit.billing_address.tax_regime.description <br>' + //Esta tabla no nos la estamos trayendo pero hay que traerla
             '<br>' +
-            'Tel. (33) 3162-1401 <br>' +
-            'facturacion1@disenosdecarton.com.mx <br>' +
+            'Tel. store.direct_phone <br>' + // si hay una opción como en rails (number_to_phone(1235551234, area_code: true, extension: 555)), mejor, si no, como está
+            'store.email <br>' +
             'www.disenosdecarton.com.mx <br>' +
             '_______________________________________ <br /> <br />' +
           '</td>' +
@@ -49,19 +53,19 @@ function initTicket(ticketInfo) {
         '<tr>' +
           '<td style="text-align:left">' +
             '<strong>' +
-              'Venta' +
+              'ticket.ticket_type' +
             '</strong>' +
           '</td>' +
           '<td>' +
-            'Caja' +
+            'Caja ' +
             '<span>' +
-              '<strong> 1 </strong>' +
+              '<strong> ticket.cash_register.name </strong>' +
             '</span>' +
           '</td>' +
           '<td colspan="2" style="text-align:right">' +
-            'Ticket:' +
+            'Ticket: ' +
             '<span>' +
-              '<strong> 124 </strong>' +
+              '<strong> ticket.ticket_number </strong>' +
             '</span>' +
           '</td>' +
         '</tr>' +
@@ -88,85 +92,78 @@ function initTicket(ticketInfo) {
             '</strong>' +
           '</td>' +
         '</tr>' +
+
+        // Estas líneas se iteran (1 por cada store_movement o service_offered que exista):
+        // Pueden ser tanto store_movement como service_offereds (ejemplo con store_movements)
         '<tr>' +
           '<td colspan="3" style="text-align:left">' +
             '<span>' +
-              '10' +
+              'ticket.store_movement.quantity ' +
             '</span>' +
             '<span>' +
-              '5034 ' +
+              'ticket.store_movement.product.unique_code ' +
             '</span>' +
             '<span>' +
-              'Bolsa para botella Kraft Satinada Navideña' +
+              'ticket.store_movement.product.description ' +
             '</span>' +
           '</td>' +
-          '<td colspan="1" style="width: 80px; text-align: right; vertical-align:text-top" > $ 26.50 </td>' +
+          '<td colspan="1" style="width: 80px; text-align: right; vertical-align:text-top" >' +
+            '$ ticket.store_movement.initial_price </td>' +
         '</tr>' +
+
+        // Estas líneas son condicionales (solo si hay descuento, 'ticket.discount_applied > 0' ya sea en store_movement o service_offereds)
         '<tr>' +
-          '<td colspan="3" style="text-align:left"> 5% de descuento </td>' +
-          '<td colspan="1" style="text-align:right; vertical-align:text-top"> - $ 13.25 </td>' +
+          '<td colspan="3" style="text-align:left"> ((1 - (ticket.store_movement.final_price / ticket.store_movement.initial_price)) * 100).toFixed(2) % de descuento </td>' +
+          '<td colspan="1" style="text-align:right; vertical-align:text-top"> - $ ticket.store_movement.discount_applied </td>' +
         '</tr>' +
+        // Concluyen las líneas condicionales con descuento
+
         '<tr>' +
-          '<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ 251.75 </strong> </td>' +
+          '<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ (ticket.store_movement.total - ticket.store_movement.taxes) </strong> </td>' +
         '</tr>' +
-        '<tr>' +
-          '<td colspan="3" style="text-align:left">' +
-            '<span>' +
-              '1' +
-            '</span>' +
-            '<span>' +
-              '3103' +
-            '</span>' +
-            '<span>' +
-              'Cilindro de acetato botella decorado Nav' +
-            '</span>' +
-          '</td>' +
-          '<td colspan="1" style="width: 80px; text-align: right; vertical-align:text-top"> $ 37.50 </td>' +
-        '</tr>' +
-        '<tr>' +
-          '<td colspan="3" style="text-align:left; display:none"> 0% de descuento </td>' +
-          '<td colspan="1" style="text-align:right; display:none"> - 0.0 </td>' +
-        '</tr>' +
-        '<tr>' +
-          '<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ 37.50 </strong> </td>' +
-        '</tr>' +
+        // Concluye el ejemplo con store_movement
+
+
+        // Un ejemplo con service offerds (sin descuento)
         '<tr>' +
           '<td colspan="3" style="text-align:left">' +
             '<span>' +
-              '1 ' +
+              'ticket.service_offered.quantity ' +
             '</span>' +
             '<span>' +
-              '2102 ' +
+              'ticket.service_offered.service.unique_code ' +
             '</span>' +
             '<span>' +
-              'Servicio de mensajería UPS (Nacional)' +
+              'ticket.service_offered.service.description' +
             '</span>' +
           '</td>' +
           '<td colspan="1" style="text-align:right; vertical-align:text-top">' +
-            '$ 100.00' +
+            '$ ticket.service_offered.initial_price' +
           '</td>' +
         '</tr>' +
         '<tr>' +
-          '<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ 100.00 </strong> </td>' +
+          '<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ (ticket.service_offered.total - ticket.service_offered.taxes) </strong> </td>' +
         '</tr>' +
+        // Concluye el ejemplo con service offerds sin descuento 
+
         '<tr>' +
           '<td colspan="2"></td>' +
           '<td colspan="2" style="text-align: right">_________________</td>' +
         '</tr>' +
         '<tr>' +
           '<td colspan="2" style="text-align: right"> Subtotal: </td>' +
-          '<td colspan="2" style="text-align: right"> $ 375.46 </td>' +
+          '<td colspan="2" style="text-align: right"> $ ticket.subtotal </td>' +
         '</tr>' +
         '<tr>' +
           '<td colspan="2" style="text-align: right"> IVA 16%: </td>' +
-          '<td colspan="2" style="text-align: right"> $ 13.79 </td>' +
+          '<td colspan="2" style="text-align: right"> $ ticket.taxes </td>' +
         '</tr>' +
         '<tr>' +
           '<td colspan="2" style="text-align: right">' +
             '<strong> Total: </strong>' +
           '</td>' +
           '<td colspan="2" style="text-align: right">' +
-            '<strong> $ 389.25 </strong>' +
+            '<strong> $ ticket.total </strong>' +
           '</td>' +
         '</tr>' +
         '<tr>' +
@@ -177,19 +174,22 @@ function initTicket(ticketInfo) {
         '<tr>' +
           '<td style="text-align:left"> <strong> Forma(s) de pago: </strong> </td>' +
         '</tr>' +
+
+        // Esta parte se itera, una por cada 'payment' ligado al ticket
         '<tr>' +
-          '<td colspan="2" style="text-align:left"> Efectivo </td>' +
-          '<td colspan="2" style="text-align:right"> $ 200.00 </td>' +
+          '<td colspan="2" style="text-align:left"> ticket.payment.payment_form.description </td>' + // Esta tabla actualmente no la llenamos, sería mejor traerla de web
+          '<td colspan="2" style="text-align:right"> $ ticket.payment.total </td>' +
         '</tr>' +
-        '<tr>' +
-          '<td colspan="2" style="text-align:left"> Tarjeta de crédito </td>' +
-          '<td colspan="2" style="text-align:right"> $ 189.25 </td>' +
-        '</tr>' +
+        // Aquí termina el ejemplo de un payment
+
+        // Estos espacios son para diseño (conservarlos)
         '<tr>' +
           '<td>' +
             '<br />' +
           '</td>' +
         '</tr>' +
+        // Aquí terminan los espacios para diseño (conservarlos), 
+        
         '<tr>' +
           '<td colspan="2" style="text-align:left">' +
             '<strong>' +
@@ -198,7 +198,7 @@ function initTicket(ticketInfo) {
           '</td>' +
           '<td colspan="2" style="text-align:right">' +
             '<strong>' +
-              '$ 389.25' +
+              '$ ticket.payments_amount' +
             '</strong>' +
           '</td>' +
         '</tr>' +
@@ -210,7 +210,7 @@ function initTicket(ticketInfo) {
           '</td>' +
           '<td colspan="2" style="text-align:right">' +
             '<strong>' +
-              '$ 0.00' +
+              '$ ticket.cash_return' +
             '</strong>' +
           '</td>' +
         '</tr>' +
@@ -219,6 +219,8 @@ function initTicket(ticketInfo) {
             '_______________________________________ <br /> <br />' +
           '</td>' +
         '</tr>' +
+
+        // A partir de esta línea, se llena solo si hay uno o más delivery services en el ticket (se repite desde esta línea hasta el siguente comentario)
         '<tr>' +
           '<td colspan="4"> <strong>' +
             'Detalles del envío' +
@@ -229,7 +231,7 @@ function initTicket(ticketInfo) {
           '<td colspan="1" style="text-align: left"> Empresa: </td>' +
           '<td colspan="3" style="text-align: right">' +
             '<strong>' +
-              'UPS' +
+              'ticket.service_offered.service.delivery_company' +
             '</strong>' +
           '</td>' +
         '</tr>' +
@@ -237,7 +239,7 @@ function initTicket(ticketInfo) {
           '<td colspan="1" style="text-align:left"> Guía: </td>' +
           '<td colspan="4" style="text-align:right">' +
             '<strong>' +
-              'DA1S89D1AS98F189QWF' +
+              'ticket.service_offered.delivery_service.tracking_number' +
             '</strong>' +
           '</td>' +
         '</tr>' +
@@ -245,7 +247,7 @@ function initTicket(ticketInfo) {
           '<td colspan="1" style="text-align:left"> Nombre: </td>' +
           '<td colspan="3" style="text-align:right">' +
             '<strong>' +
-              'Pedro Martínez' +
+              'ticket.service_offered.delivery_service.sender_name' +
             '</strong>' +
           '</td>' +
         '</tr>' +
@@ -253,14 +255,14 @@ function initTicket(ticketInfo) {
           '<td colspan="2" style="text-align:left"> C.P. Envío:' +
             '<span>' +
               '<strong>' +
-                '45060' +
+                'ticket.service_offered.delivery_service.sender_zipcode' +
               '</strong>' +
             '</span>' +
           '</td>' +
           '<td colspan="2" style="text-align:right"> C.P. Dest.:' +
             '<span>' +
               '<strong>' +
-                '88600' +
+                'ticket.service_offered.delivery_service.recievers_zipcode' +
               '</strong>' +
             '</span>' +
           '</td>' +
@@ -269,25 +271,42 @@ function initTicket(ticketInfo) {
           '<td colspan="1" style="text-align:left"> Destintario: </td>' +
           '<td colspan="3" style="text-align:right">' +
             '<strong>' +
-              'María Antonieta' +
+              'ticket.service_offered.delivery_service.recievers_name' +
             '</strong>' +
           '</td>' +
         '</tr>' +
         '<tr>' +
           '<td style="text-align:left; width: 50px"> Dir. destino: </td>' +
           '<td colspan="3" style="text-align:right; width: 280px">' +
-            'Av. Aguascalientes 701, Int. 2, Col. Fátima, Aguascalientes, Aguascalientes, México' +
+            'ticket.service_offered.delivery_service.street ' +
+            'ticket.service_offered.delivery_service.exterior_number ' +
+    
+            // Solo si existe ticket.service_offered.delivery_service.interior_number
+            'Int. ' +
+            'ticket.service_offered.delivery_service.interior_number ' +
+            // Si no existe, omitir estas dos líneas
+
+            // Solo si existe ticket.service_offered.delivery_service.neighborhood
+            'Col.  ' +
+            'ticket.service_offered.delivery_service.neighborhood ' +
+            // Si no existe, omitir estas dos líneas
+
+            'ticket.service_offered.delivery_service.city, ' +
+            'ticket.service_offered.delivery_service.state, ' +
+            'ticket.service_offered.delivery_service.country, ' +
           '</td>' +
         '</tr>' +
         '<tr>' +
           '<td style="text-align:left; width: 50px"> Contacto: </td>' +
           '<td colspan="3" style="text-align:right; width: 280px">' +
-            'María Antonieta <br>' +
-            'Tel. (33) 3816-28-30 <br>' +
-            'Cel. 333-745-28-90 <br>' +
-            'mariaantonieta@hotmail.com' +
+            'ticket.service_offered.delivery_service.contact_name <br>' +
+            'Tel. ticket.service_offered.delivery_service.phone <br>' +
+            'Cel. ticket.service_offered.delivery_service.cellphone <br>' + // si hay una opción como en rails (number_to_phone(1235551234, area_code: true, extension: 555)), mejor, si no, como está
+            'ticket.service_offered.delivery_service.email' +
           '</td>' +
         '</tr>' +
+        // Aquí termina la sección para delivery services del ticket
+
         '<tr>' +
           '<td colspan="5">' +
             '_______________________________________ <br /> <br />' +
@@ -298,10 +317,10 @@ function initTicket(ticketInfo) {
         '</tr>' +
         '<tr>' +
           '<td colspan="5">' +
-            '<span> Zapopan, </span>' +
-            '<span> Jalisco </span>' +
-            '<span> 10/10/2017 </span>' +
-            '<span> 14:23:17 </span>' +
+            '<span> store.delivery_address.city, </span>' +
+            '<span> store.delivery_address.state </span>' +
+            '<span> ticket.created_at </span>' + //En formato fecha dd/mm/aaaa
+            '<span> ticket.created_at </span>' + //en formato hora (ya sea 12 o 24 hrs)
           '</td>' +
         '</tr>' +
         '<tr>' +
@@ -312,7 +331,7 @@ function initTicket(ticketInfo) {
         '<tr>' +
           '<td colspan="5">' +
             'Atendió:' +
-            '<span> Favio Velez </span>' +
+            '<span> ticket.user.first_name ticket.user.last_name </span>' +
           '</td>' +
         '</tr>' +
         '<tr>' +
