@@ -427,6 +427,10 @@ $(document).ready(function() {
             let user        = store.get('current_user').id,
               storeObject = store.get('store');
 
+            ticketData = {
+              store : storeObject
+            };
+
             insertTicket(user, function(ticketId){
 
               assignCost(ticketId, function(){
@@ -438,10 +442,6 @@ $(document).ready(function() {
                     store.set('lastTicket', parseInt(
                       $('#ticketNum').html()
                     ));
-
-                    ticketData = {
-                      store : storeObject
-                    };
 
                     findBy(
                       'id',
