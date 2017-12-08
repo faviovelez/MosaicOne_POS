@@ -428,7 +428,7 @@ $(function(){
       `'<td> ${ticket.date} </td>` +
       `<td> ${ticket.time} </td>` +
       `<td> ${ticket.products} </td>` +
-      `<td> ${ticket.pieces} </td>` +
+      `<td> ${-1 * ticket.pieces} </td>` +
       `<td> ${ticket.prospect} </td>` +
       `<td class="right"> $ ${
         ticket.total.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
