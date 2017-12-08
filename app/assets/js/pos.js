@@ -410,6 +410,23 @@ $(document).ready(function() {
     $('#cancelTicket').modal('hide');
   }
 
+  function addPaymentFormData(ticketData, payments, call){
+    let limit = payments.length,
+        count = 0;
+
+    ticketData.payments = {};
+    payments.forEach(payment => {
+      ticketData.payments[payment.id] = payment;
+      findBy('id', payment.payment_form_id, 'payment_forms', payment.id).then(paymentForm => {
+        count++;
+        ticketData.payments[paymentForm.lastId].paymentForm = paymentForm.rows[0];
+        if (count === limit){
+          return call();
+        }
+      });
+    });
+  }
+
   $('#completeSale').click(function() {
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
 
@@ -424,11 +441,12 @@ $(document).ready(function() {
         if (hasInventory){
 
           initStore().then(store => {
-            let user        = store.get('current_user').id,
+            let user      = store.get('current_user').id,
               storeObject = store.get('store');
 
             ticketData = {
-              store : storeObject
+              store : storeObject,
+              user  : store.get('current_user'),
             };
 
             insertTicket(user, function(ticketId){
@@ -467,7 +485,12 @@ $(document).ready(function() {
                             ticketData.cash_register = {
                               name: 'TemporalName'
                             };
-                            printTicket(ticketData);
+
+                            findBy('ticket_id', ticketId, 'payments').then(payments => {
+                              addPaymentFormData(ticketData, payments.rows, function(){
+                                printTicket(ticketData);
+                              });
+                            });
 
                           });
 

@@ -134,10 +134,10 @@ async function insert (columns, data, table, extras = true){
   return queryResult;
 }
 
-async function findBy(column, data, table){
+async function findBy(column, data, table, lastId = 0){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
-  return await query(`${localQuery}`);
+  return await query(`${localQuery}`, lastId);
 }
 
 async function getOnly(table, ids){
