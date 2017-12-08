@@ -706,7 +706,7 @@ $(function(){
 
             insertsServiceOffereds(ticketId, function(){
 
-              insertsPayments(ticketId, user, storeObject, function(){
+              insertsPayments('pending', ticketId, user, storeObject, function(){
 
                 store.set('lastTicket', parseInt(
                   $('#ticketNum').html()

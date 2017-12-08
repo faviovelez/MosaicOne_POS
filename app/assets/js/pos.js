@@ -355,7 +355,10 @@ $(document).ready(function() {
       );
     }
     if (type === 'VentaaCrédito') {
-        creditDays         = parseInt($(creditDaysSelector).val());
+      let creditDays = parseInt($(creditDaysSelector).val());
+      if (creditDays.toString() === 'NaN') {
+        creditDays = 0;
+      }
 
       $(`tr[id=paymentMethod_${count}]`).append(
         `<td id="creditDays_${count}" class="hidden">${creditDays}</td>`
@@ -455,7 +458,7 @@ $(document).ready(function() {
 
                 insertsServiceOffereds(ticketId, function(){
 
-                  insertsPayments(ticketId, user, storeObject, function(){
+                  insertsPayments('venta', ticketId, user, storeObject, function(){
 
                     store.set('lastTicket', parseInt(
                       $('#ticketNum').html()
