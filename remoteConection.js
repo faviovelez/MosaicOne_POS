@@ -85,10 +85,10 @@ async function createInsert (columns, data, table){
   return `${localQuery})`;
 }
 
-async function findBy(column, data, table){
+async function findBy(column, data, table, remote = true){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
-  return await query(`${localQuery}`);
+  return await query(`${localQuery}`, remote);
 }
 
 async function updatePosData(table, id){
