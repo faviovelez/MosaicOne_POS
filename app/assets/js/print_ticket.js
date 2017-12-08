@@ -244,10 +244,11 @@ function initTicket(ticketData, call) {
         '<tr>' +
         '<td colspan="4">' +
         '<strong style="font-size: 17px;">' +
-        `${ticketData.billing_address.business_name} <br>` +
+        'Diseños de Cartón <br>' +
         '</strong>' +
         `Sucursal ${ticketData.store.store_name} <br>` +
         '<br>' +
+        `${ticketData.billing_address.business_name}` +
         `${ticketData.billing_address.street} ` +
         `${ticketData.billing_address.exterior_number} ` +
         `${ticketData.billing_address.interior_number} <br>` +
@@ -277,7 +278,7 @@ function initTicket(ticketData, call) {
         '<td>' +
         'Caja ' +
         '<span>' +
-        `<strong> ${ticketData.cash_register.name} </strong>` +
+        `<strong> ${ticketData.cashRegister.name} </strong>` +
         '</span>' +
         '</td>' +
         '<td colspan="2" style="text-align:right">' +

@@ -461,45 +461,46 @@ $(document).ready(function() {
                       $('#ticketNum').html()
                     ));
 
-                    findBy(
-                      'id',
-                      storeObject.business_unit_id,
-                      'business_units'
-                    ).then(business_unit => {
+                    findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
+
+                      ticketData.cashRegister = cashRegisterObject.rows[0];
                       findBy(
                         'id',
-                        business_unit.rows[0].billing_address_id,
-                        'billing_addresses'
-                      ).then(billing_address => {
-                        ticketData.billing_address = billing_address.rows[0];
+                        storeObject.business_unit_id,
+                        'business_units'
+                      ).then(business_unit => {
                         findBy(
                           'id',
-                          ticketData.billing_address.tax_regime_id,
-                          'tax_regimes'
-                        ).then(tax_regime => {
+                          business_unit.rows[0].billing_address_id,
+                          'billing_addresses'
+                        ).then(billing_address => {
+                          ticketData.billing_address = billing_address.rows[0];
+                          findBy(
+                            'id',
+                            ticketData.billing_address.tax_regime_id,
+                            'tax_regimes'
+                          ).then(tax_regime => {
 
-                          ticketData.tax_regime = tax_regime.rows[0];
-                          findBy('id', ticketId, 'tickets').then(ticket => {
+                            ticketData.tax_regime = tax_regime.rows[0];
+                            findBy('id', ticketId, 'tickets').then(ticket => {
 
-                            ticketData.ticket = ticket.rows[0];
-                            ticketData.cash_register = {
-                              name: 'TemporalName'
-                            };
+                              ticketData.ticket = ticket.rows[0];
 
-                            findBy('ticket_id', ticketId, 'payments').then(payments => {
-                              addPaymentFormData(ticketData, payments.rows, function(){
-                                printTicket(ticketData);
+                              findBy('ticket_id', ticketId, 'payments').then(payments => {
+                                addPaymentFormData(ticketData, payments.rows, function(){
+                                  printTicket(ticketData);
+                                });
                               });
+
                             });
 
                           });
 
                         });
-
                       });
-                    });
 
-                    //window.location.href = 'pos_sale.html';
+                      //window.location.href = 'pos_sale.html';
+                    });
 
                   });
 
