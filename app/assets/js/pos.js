@@ -488,7 +488,12 @@ $(document).ready(function() {
 
                               findBy('ticket_id', ticketId, 'payments').then(payments => {
                                 addPaymentFormData(ticketData, payments.rows, function(){
-                                  printTicket(ticketData);
+                                  printTicket(ticketData, function(){
+
+                                    window.location.href = 'pos_sale.html';
+
+                                  });
+
                                 });
                               });
 
@@ -499,7 +504,6 @@ $(document).ready(function() {
                         });
                       });
 
-                      //window.location.href = 'pos_sale.html';
                     });
 
                   });

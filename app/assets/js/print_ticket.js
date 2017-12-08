@@ -447,7 +447,7 @@ function getTicketsElements(ticketId, call){
   });
 }
 
-function printTicket(ticketInfo){
+function printTicket(ticketInfo, call){
 
   getTicketsElements(ticketInfo.ticket.id, function(products){
 
@@ -465,6 +465,7 @@ function printTicket(ticketInfo){
         win.webContents.on('did-finish-load', () => {
           win.webContents.print({silent: true});
           win = null;
+          return call();
         });
 
       });
