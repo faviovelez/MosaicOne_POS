@@ -126,8 +126,8 @@ function createDeliveryServiceCad(serviceOffered, call){
         '<td style="text-align:left; width: 50px"> Contacto: </td>' +
         '<td colspan="3" style="text-align:right; width: 280px">' +
         `${deliveryServiceObject.contact_name} <br>` +
-        `Tel. ${deliveryServiceObject.phone} <br>` +
-        `Cel. ${deliveryServiceObject.cellphone} <br>` +
+        `Tel. ${deliveryServiceObject.phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2 $3")} <br>` +
+        `Cel. ${deliveryServiceObject.cellphone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2 $3")} <br>` +
         `${deliveryServiceObject.email}` +
         '</td>' +
         '</tr>';
@@ -263,7 +263,7 @@ function initTicket(ticketData, call) {
         '</strong>' +
         `${ticketData.tax_regime.description} <br>` +
         '<br>' +
-        `Tel. ${ticketData.store.direct_phone} <br>` +
+        `Tel. ${ticketData.store.direct_phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2 $3") } <br>` +
         `${ticketData.store.email} <br>` +
         'www.disenosdecarton.com.mx <br>' +
         '_______________________________________ <br /> <br />' +
