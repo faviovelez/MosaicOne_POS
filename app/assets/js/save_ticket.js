@@ -464,7 +464,7 @@ function insertsPayments(ticketType, ticketId, userId, store, call) {
       data.credit_days = $(this).find('td[id^=creditDays]').html();
       data.payment_type = 'crédito';
     } else if (type === 'Efectivo') {
-      balanceSum += parseInt(data.total);
+      balanceSum += parseFloat(data.total);
     }
 
     insert(
@@ -477,7 +477,7 @@ function insertsPayments(ticketType, ticketId, userId, store, call) {
           let realBalance = cashRegisterObject.rows[0].balance + balanceSum;
           updateBy(
             {
-              balance: realBalance
+              balance: realBalance.toFixed(2)
             },
             'cash_registers',
             `id = ${cashRegisterObject.rows[0].id}`

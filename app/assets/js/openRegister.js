@@ -64,7 +64,7 @@ $(function(){
 
       findBy('store_id', storeInfo.id, 'cash_registers', false).then(cashRegisterObject => {
         $('#register_open_initial_cash').val(
-          cashRegisterObject.rows[0].balance.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
+          `$ ${cashRegisterObject.rows[0].balance.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} `
         );
         $('#register_open_cash_register').html(
           `  <option value="1"> Caja ${cashRegisterObject.rows[0].name} </option>`
