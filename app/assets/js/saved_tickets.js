@@ -113,7 +113,7 @@ $(function(){
       '</td><td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}" ` +
-      `value="${product.quantity}"></td>` +
+      `value="${Math.abs(product.quantity)}"></td>` +
       '<td> <a href="#" data-toggle="modal"' +
       'data-target="#discountChange" ' +
       `id="discount_${product.id}" data-id="${product.id}" ` +
