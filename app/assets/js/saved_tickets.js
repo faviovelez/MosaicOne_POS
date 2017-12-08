@@ -2,11 +2,11 @@ $(function(){
 
   function recalculateTotal(product, percent, table){
     if (table === 'products'){
-      let total = product.price.toFixed(2) * product.quantity;
+      let total = product.price.toFixed(2) * Math.abs(product.quantity);
 
       return total * (1 - percent / 100);
     } else {
-      let total = product.initial_price.toFixed(2) * product.quantity;
+      let total = product.initial_price.toFixed(2) * Math.abs(product.quantity);
 
       return total * (1 - percent / 100);
     }
@@ -64,9 +64,96 @@ $(function(){
           ).toFixed(2);
 
     if (convertPrice === "NaN") {
-      return price;
+      return price.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
     }
-    return convertPrice;
+    return convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+  }
+
+  function createRealSubtotal(){
+    let discount = 0;
+    $.each($(`td[id^=priceTo]`), function(){
+      let price       = parseFloat($(this).html()).toString() === 'NaN' ?
+                        $(this).find('input').val() :
+                        parseFloat($(this).html()),
+          tr          = $(this).parent(),
+          cuantity    = parseInt($(tr).find(
+            'input[id^=cuantityTo]'
+          ).val()),
+          total       = price * cuantity,
+          discountval = parseFloat($(tr.find(
+            'a[id^=discount]'
+          ))
+          .html().replace(' %',''));
+      if (total.toString() === 'NaN'){
+        total = 0;
+      }
+
+      discount += (parseFloat(discountval) / 100 * total);
+    });
+    $('#discountSum').html(
+      ` $ ${discount.toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
+    );
+
+    $('#savedSubtotal').html(
+      ` $ ${(
+        parseFloat($('#SubtotalSum').html().replace(
+          "$ ", ""
+        ).replace(/,/g,'')
+        ) + parseFloat(
+          translateInfo(
+            $('#discountSum').html().replace(
+              '$ ', ''
+            ).replace(/,/g,'')
+          )
+        )).toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
+    );
+
+  }
+
+  function createTotal(id){
+    let cuantity = $(`input[id^=cuantityTo_${id}]`).val(),
+      manualDiscount = !$('#manual-discount').hasClass('hidden'),
+      price    = parseFloat(
+        $(`td[id^=priceTo_${id}]`).html().replace(' $ ','')
+      );
+    if (!price){
+      price = $(`td[id^=priceTo_${id}] input`).val();
+    }
+    let total =  price * cuantity,
+        discount = $(`a[id^=discount_${id}]`)
+      .html().replace(' %',''),
+      discountVal = parseFloat(discount) / 100 * total,
+      productTotal    = total - discountVal;
+
+    if (manualDiscount){
+      let globalManual = parseFloat(
+        $('#manualDiscountQuantity').html().replace(' $ ','')
+      );
+
+      if (globalManual.toString() === 'NaN'){
+        globalManual = 0;
+      }
+
+      $('#manualDiscountQuantity').html(
+        ` $ ${(globalManual += discountVal).toFixed(
+          2
+        ).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}`
+      );
+    }
+
+    return productTotal.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    );
   }
 
   function addTr(product){
@@ -109,7 +196,7 @@ $(function(){
       '</a>' +
       '</td>' +
       `<td> ${color} </td>` +
-      `<td id="priceTo_${product.id}"> ${translatePrice(price)}` +
+      `<td id="priceTo_${product.id}"> $ ${translatePrice(price)}` +
       '</td><td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}" ` +
@@ -119,7 +206,7 @@ $(function(){
       `id="discount_${product.id}" data-id="${product.id}" ` +
       `data-table="${product.table}" > ${percent}% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}">` +
-      `$ ${total.toFixed(2)} </td>` +
+      `$ ${total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
       '</tr>';
   }
 

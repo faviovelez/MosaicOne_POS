@@ -866,9 +866,9 @@ $(document).ready(function() {
           ).toFixed(2);
 
     if (convertPrice === "NaN") {
-      return price;
+      return price.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
     }
-    return convertPrice;
+    return convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
   }
 
   function addTr(product){
@@ -905,7 +905,7 @@ $(document).ready(function() {
       description +
       '</td>' +
       `<td> ${color} </td>` +
-      `<td id="priceTo_${product.id}"> ${translatePrice(price)}` +
+      `<td id="priceTo_${product.id}"> $ ${translatePrice(price)}` +
       '</td><td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}"></td>` +
