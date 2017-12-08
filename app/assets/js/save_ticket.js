@@ -426,6 +426,7 @@ function clearDate(date){
 function insertsPayments(ticketId, userId, store, call) {
   limit = $('tr[id^=paymentMethod_]').length;
   count = 0;
+  balanceSum = 0;
 
   if (limit === 0){
     return call();
@@ -462,6 +463,8 @@ function insertsPayments(ticketId, userId, store, call) {
     } else if (type === 'Venta a Crédito') {
       data.credit_days = $(this).find('td[id^=creditDays]').html();
       data.payment_type = 'crédito';
+    } else if (type === 'Efectivo') {
+      balanceSum += parseInt(data.total);
     }
 
     insert(
@@ -469,10 +472,23 @@ function insertsPayments(ticketId, userId, store, call) {
       Object.values(data),
       'payments'
     ).then(() => {
-      count++;
-      if (limit === count){
-        return call();
-      }
+      findBy('store_id', store.id, 'cash_registers').then(cashRegisterObject => {
+        let realBalance = cashRegisterObject.rows[0].balance + balanceSum;
+        updateBy(
+          {
+            balance: realBalance
+          },
+          'cash_registers',
+          `id = ${cashRegisterObject.rows[0].id}`
+        ).then(updated => {
+
+          count++;
+          if (limit === count){
+            return call();
+          }
+
+        });
+      });
     });
 
   });
