@@ -3461,7 +3461,8 @@ CREATE TABLE service_offereds (
     subtotal double precision,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    prospect_id integer
 );
 
 
@@ -3609,7 +3610,8 @@ CREATE TABLE store_movements (
     bill_id integer,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    prospect_id integer
 );
 
 
