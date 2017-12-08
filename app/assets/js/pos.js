@@ -410,6 +410,23 @@ $(document).ready(function() {
     $('#cancelTicket').modal('hide');
   }
 
+  function addPaymentFormData(ticketData, payments, call){
+    let limit = payments.length,
+        count = 0;
+
+    ticketData.payments = {};
+    payments.forEach(payment => {
+      ticketData.payments[payment.id] = payment;
+      findBy('id', payment.payment_form_id, 'payment_forms', payment.id).then(paymentForm => {
+        count++;
+        ticketData.payments[paymentForm.lastId].paymentForm = paymentForm.rows[0];
+        if (count === limit){
+          return call();
+        }
+      });
+    });
+  }
+
   $('#completeSale').click(function() {
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
 
@@ -424,9 +441,13 @@ $(document).ready(function() {
         if (hasInventory){
 
           initStore().then(store => {
-            let user        = store.get('current_user').id,
-              storeObject = store.get('store'),
-              storeId     = store.id;
+            let user      = store.get('current_user').id,
+              storeObject = store.get('store');
+
+            ticketData = {
+              store : storeObject,
+              user  : store.get('current_user'),
+            };
 
             insertTicket(user, function(ticketId){
 
@@ -440,11 +461,50 @@ $(document).ready(function() {
                       $('#ticketNum').html()
                     ));
 
-                    let ticketInfo = {
-                      sucursal : storeObject.store_name,
-                    };
+                    findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
 
-                    window.location.href = 'pos_sale.html';
+                      ticketData.cashRegister = cashRegisterObject.rows[0];
+                      findBy(
+                        'id',
+                        storeObject.business_unit_id,
+                        'business_units'
+                      ).then(business_unit => {
+                        findBy(
+                          'id',
+                          business_unit.rows[0].billing_address_id,
+                          'billing_addresses'
+                        ).then(billing_address => {
+                          ticketData.billing_address = billing_address.rows[0];
+                          findBy(
+                            'id',
+                            ticketData.billing_address.tax_regime_id,
+                            'tax_regimes'
+                          ).then(tax_regime => {
+
+                            ticketData.tax_regime = tax_regime.rows[0];
+                            findBy('id', ticketId, 'tickets').then(ticket => {
+
+                              ticketData.ticket = ticket.rows[0];
+
+                              findBy('ticket_id', ticketId, 'payments').then(payments => {
+                                addPaymentFormData(ticketData, payments.rows, function(){
+                                  printTicket(ticketData, function(){
+
+                                    window.location.href = 'pos_sale.html';
+
+                                  });
+
+                                });
+                              });
+
+                            });
+
+                          });
+
+                        });
+                      });
+
+                    });
 
                   });
 

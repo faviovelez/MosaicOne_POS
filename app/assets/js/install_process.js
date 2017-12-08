@@ -69,7 +69,9 @@ function lotQueries(store, call){
       'cash_registers': 'SELECT * FROM cash_registers ' +
       `WHERE store_id = ${store.id}`,
       'cfdi_uses': 'SELECT * FROM cfdi_uses',
-      'banks':    'SELECT * FROM banks'
+      'banks':    'SELECT * FROM banks',
+      'tax_regimes' : 'SELECT * FROM tax_regimes',
+      'payment_forms' : 'SELECT * FROM payment_forms'
     });
   }
 
@@ -91,7 +93,9 @@ function lotQueries(store, call){
       ` SELECT COUNT (*) as rows FROM store_movements WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM cash_registers WHERE store_id = ${store.id} UNION ALL` +
       ' SELECT COUNT (*) as rows FROM cfdi_uses UNION ALL' +
-      ' SELECT COUNT (*) as rows FROM banks' +
+      ' SELECT COUNT (*) as rows FROM banks UNION ALL' +
+      ' SELECT COUNT (*) as rows FROM tax_regimes UNION ALL' +
+      ' SELECT COUNT (*) as rows FROM payment_forms' +
     ') as u';
   }
 
@@ -132,6 +136,7 @@ function lotQueries(store, call){
                   .attr("aria-valuenow", current_progress)
                   .text(current_progress + "%");
               }, err => {
+                console.log(err);
               });
             });
           });
@@ -151,6 +156,12 @@ function lotQueries(store, call){
       `< ${path}`;
     showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;
+
+    exec('mkdir -p ./tickets', function(err, stdout, stderr){
+      if(err){
+        showAlert('Error', stderr, cloneAlert());
+      }
+    });
 
     dbRestore = exec(script,
       function(err, stdout, stderr) {

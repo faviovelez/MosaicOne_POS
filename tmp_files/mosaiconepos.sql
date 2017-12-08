@@ -1552,7 +1552,6 @@ ALTER SEQUENCE expenses_id_seq OWNED BY expenses.id;
 CREATE TABLE exterior_colors (
     id integer NOT NULL,
     name character varying,
-    material_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1656,13 +1655,47 @@ ALTER SEQUENCE images_id_seq OWNED BY images.id;
 
 
 --
+-- Name: impression_types; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE impression_types (
+    id integer NOT NULL,
+    name character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE impression_types OWNER TO faviovelez;
+
+--
+-- Name: impression_types_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE impression_types_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE impression_types_id_seq OWNER TO faviovelez;
+
+--
+-- Name: impression_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE impression_types_id_seq OWNED BY impression_types.id;
+
+
+--
 -- Name: interior_colors; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
 CREATE TABLE interior_colors (
     id integer NOT NULL,
     name character varying,
-    material_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1731,6 +1764,43 @@ ALTER SEQUENCE inventories_id_seq OWNED BY inventories.id;
 
 
 --
+-- Name: material_children; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE material_children (
+    id integer NOT NULL,
+    name character varying,
+    material_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    children_id integer
+);
+
+
+ALTER TABLE material_children OWNER TO faviovelez;
+
+--
+-- Name: material_children_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE material_children_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE material_children_id_seq OWNER TO faviovelez;
+
+--
+-- Name: material_children_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE material_children_id_seq OWNED BY material_children.id;
+
+
+--
 -- Name: materials; Type: TABLE; Schema: public; Owner: faviovelez
 --
 
@@ -1738,11 +1808,121 @@ CREATE TABLE materials (
     id integer NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    parent_id integer,
+    children_id integer
 );
 
 
 ALTER TABLE materials OWNER TO faviovelez;
+
+--
+-- Name: materials_design_likes; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE materials_design_likes (
+    id integer NOT NULL,
+    material_id integer,
+    design_like_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE materials_design_likes OWNER TO faviovelez;
+
+--
+-- Name: materials_design_likes_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE materials_design_likes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE materials_design_likes_id_seq OWNER TO faviovelez;
+
+--
+-- Name: materials_design_likes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE materials_design_likes_id_seq OWNED BY materials_design_likes.id;
+
+
+--
+-- Name: materials_exterior_colors; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE materials_exterior_colors (
+    id integer NOT NULL,
+    material_id integer,
+    exterior_color_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE materials_exterior_colors OWNER TO faviovelez;
+
+--
+-- Name: materials_exterior_colors_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE materials_exterior_colors_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE materials_exterior_colors_id_seq OWNER TO faviovelez;
+
+--
+-- Name: materials_exterior_colors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE materials_exterior_colors_id_seq OWNED BY materials_exterior_colors.id;
+
+
+--
+-- Name: materials_finishings; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE materials_finishings (
+    id integer NOT NULL,
+    material_id integer,
+    finishing_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE materials_finishings OWNER TO faviovelez;
+
+--
+-- Name: materials_finishings_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE materials_finishings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE materials_finishings_id_seq OWNER TO faviovelez;
+
+--
+-- Name: materials_finishings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE materials_finishings_id_seq OWNED BY materials_finishings.id;
+
 
 --
 -- Name: materials_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
@@ -1763,6 +1943,78 @@ ALTER TABLE materials_id_seq OWNER TO faviovelez;
 --
 
 ALTER SEQUENCE materials_id_seq OWNED BY materials.id;
+
+
+--
+-- Name: materials_impression_types; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE materials_impression_types (
+    id integer NOT NULL,
+    material_id integer,
+    impression_type_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE materials_impression_types OWNER TO faviovelez;
+
+--
+-- Name: materials_impression_types_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE materials_impression_types_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE materials_impression_types_id_seq OWNER TO faviovelez;
+
+--
+-- Name: materials_impression_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE materials_impression_types_id_seq OWNED BY materials_impression_types.id;
+
+
+--
+-- Name: materials_interior_colors; Type: TABLE; Schema: public; Owner: faviovelez
+--
+
+CREATE TABLE materials_interior_colors (
+    id integer NOT NULL,
+    material_id integer,
+    interior_color_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE materials_interior_colors OWNER TO faviovelez;
+
+--
+-- Name: materials_interior_colors_id_seq; Type: SEQUENCE; Schema: public; Owner: faviovelez
+--
+
+CREATE SEQUENCE materials_interior_colors_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE materials_interior_colors_id_seq OWNER TO faviovelez;
+
+--
+-- Name: materials_interior_colors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: faviovelez
+--
+
+ALTER SEQUENCE materials_interior_colors_id_seq OWNED BY materials_interior_colors.id;
 
 
 --
@@ -2511,7 +2763,9 @@ CREATE TABLE products (
     average double precision,
     stores_discount double precision,
     franchises_discount double precision,
-    shared boolean
+    shared boolean,
+    armed boolean DEFAULT false,
+    armed_discount double precision DEFAULT 0.0
 );
 
 
@@ -3593,7 +3847,8 @@ CREATE TABLE stores_inventories (
     manual_price_update boolean DEFAULT false,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    manual_price double precision
 );
 
 
@@ -4608,6 +4863,13 @@ ALTER TABLE ONLY images ALTER COLUMN id SET DEFAULT nextval('images_id_seq'::reg
 -- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
+ALTER TABLE ONLY impression_types ALTER COLUMN id SET DEFAULT nextval('impression_types_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
 ALTER TABLE ONLY interior_colors ALTER COLUMN id SET DEFAULT nextval('interior_colors_id_seq'::regclass);
 
 
@@ -4622,7 +4884,49 @@ ALTER TABLE ONLY inventories ALTER COLUMN id SET DEFAULT nextval('inventories_id
 -- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
 --
 
+ALTER TABLE ONLY material_children ALTER COLUMN id SET DEFAULT nextval('material_children_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
 ALTER TABLE ONLY materials ALTER COLUMN id SET DEFAULT nextval('materials_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_design_likes ALTER COLUMN id SET DEFAULT nextval('materials_design_likes_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_exterior_colors ALTER COLUMN id SET DEFAULT nextval('materials_exterior_colors_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_finishings ALTER COLUMN id SET DEFAULT nextval('materials_finishings_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_impression_types ALTER COLUMN id SET DEFAULT nextval('materials_impression_types_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_interior_colors ALTER COLUMN id SET DEFAULT nextval('materials_interior_colors_id_seq'::regclass);
 
 
 --
@@ -5025,1514 +5329,6 @@ ALTER TABLE ONLY withdrawals ALTER COLUMN id SET DEFAULT nextval('withdrawals_id
 
 
 --
--- Data for Name: bank_balances; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY bank_balances (id, balance, store_id, business_unit_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: bank_balances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('bank_balances_id_seq', 1, false);
-
-
---
--- Data for Name: banks; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY banks (id, name, rfc, created_at, updated_at, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: banks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('banks_id_seq', 1, false);
-
-
---
--- Data for Name: bill_receiveds; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY bill_receiveds (id, folio, date_of_bill, subtotal, taxes_rate, taxes, total_amount, supplier_id, product_id, payment_day, payment_complete, payment_on_time, created_at, updated_at, business_unit_id, store_id) FROM stdin;
-\.
-
-
---
--- Name: bill_receiveds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('bill_receiveds_id_seq', 1, false);
-
-
---
--- Data for Name: bill_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY bill_sales (id, business_unit_id, store_id, sales_quantity, amount, month, year, created_at, updated_at, discount) FROM stdin;
-\.
-
-
---
--- Name: bill_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('bill_sales_id_seq', 1, false);
-
-
---
--- Data for Name: billing_addresses; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY billing_addresses (id, type_of_person, business_name, rfc, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, created_at, updated_at, tax_regime_id, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: billing_addresses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('billing_addresses_id_seq', 1, false);
-
-
---
--- Data for Name: bills; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY bills (id, status, discount_applied, created_at, updated_at, prospect_id, pdf, xml, issuing_company_id, receiving_company_id, store_id, sequence, folio, payment_method_id, payment_form_id, tax_regime_id, cfdi_use_id, tax_id, pac_id, relation_type_id, references_field, type_of_bill_id, currency_id, id_trib_reg_num, confirmation_key, exchange_rate, country_id, automatic_discount_applied, manual_discount_applied, taxes_transferred, taxes_witheld, sat_certificate_number, certificate_number, qr_string, original_chain, digital_stamp, subtotal, total, sat_zipcode_id, date_signed, leyend, uuid, taxes, payed, parent_id, sat_stamp, payment_conditions, "from", cancel_receipt, bill_type) FROM stdin;
-\.
-
-
---
--- Data for Name: bills_children; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY bills_children (id, bill_id, children_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: bills_children_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('bills_children_id_seq', 1, false);
-
-
---
--- Name: bills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('bills_id_seq', 1, false);
-
-
---
--- Data for Name: business_group_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY business_group_sales (id, business_group_id, month, year, cost, created_at, updated_at, discount, total, subtotal, taxes, quantity) FROM stdin;
-\.
-
-
---
--- Name: business_group_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('business_group_sales_id_seq', 1, false);
-
-
---
--- Data for Name: business_groups; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY business_groups (id, name, created_at, updated_at, business_group_type) FROM stdin;
-\.
-
-
---
--- Name: business_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('business_groups_id_seq', 1, false);
-
-
---
--- Data for Name: business_groups_suppliers; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY business_groups_suppliers (id, business_group_id, supplier_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: business_groups_suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('business_groups_suppliers_id_seq', 1, false);
-
-
---
--- Data for Name: business_unit_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY business_unit_sales (id, business_unit_id, cost, created_at, updated_at, month, year, discount, total, subtotal, taxes, quantity) FROM stdin;
-\.
-
-
---
--- Name: business_unit_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('business_unit_sales_id_seq', 1, false);
-
-
---
--- Data for Name: business_units; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY business_units (id, name, created_at, updated_at, business_group_id, billing_address_id, current, pending_balance, main) FROM stdin;
-\.
-
-
---
--- Name: business_units_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('business_units_id_seq', 1, false);
-
-
---
--- Data for Name: business_units_suppliers; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY business_units_suppliers (id, business_unit_id, supplier_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: business_units_suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('business_units_suppliers_id_seq', 1, false);
-
-
---
--- Data for Name: carriers; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY carriers (id, name, created_at, updated_at, delivery_address_id) FROM stdin;
-\.
-
-
---
--- Name: carriers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('carriers_id_seq', 1, false);
-
-
---
--- Data for Name: cash_registers; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY cash_registers (id, name, store_id, created_at, updated_at, balance, cash_number, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: cash_registers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('cash_registers_id_seq', 1, false);
-
-
---
--- Data for Name: cfdi_uses; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY cfdi_uses (id, description, created_at, updated_at, key) FROM stdin;
-\.
-
-
---
--- Name: cfdi_uses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('cfdi_uses_id_seq', 1, false);
-
-
---
--- Data for Name: change_tickets; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY change_tickets (id, ticket_id, ticket_number, created_at, updated_at, store_id, bill_id) FROM stdin;
-\.
-
-
---
--- Name: change_tickets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('change_tickets_id_seq', 1, false);
-
-
---
--- Data for Name: classifications; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY classifications (id, name, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: classifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('classifications_id_seq', 1, false);
-
-
---
--- Data for Name: cost_types; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY cost_types (id, warehouse_cost_type, created_at, updated_at, description) FROM stdin;
-\.
-
-
---
--- Name: cost_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('cost_types_id_seq', 1, false);
-
-
---
--- Data for Name: countries; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY countries (id, key, name, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: countries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('countries_id_seq', 1, false);
-
-
---
--- Data for Name: currencies; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY currencies (id, name, created_at, updated_at, description, decimals) FROM stdin;
-\.
-
-
---
--- Name: currencies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('currencies_id_seq', 1, false);
-
-
---
--- Data for Name: delivery_addresses; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY delivery_addresses (id, street, exterior_number, interior_number, zipcode, neighborhood, city, state, country, type_of_address, created_at, updated_at, additional_references, name) FROM stdin;
-\.
-
-
---
--- Name: delivery_addresses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('delivery_addresses_id_seq', 1, false);
-
-
---
--- Data for Name: delivery_attempts; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY delivery_attempts (id, product_request_id, created_at, updated_at, movement_id, driver_id, receiver_id) FROM stdin;
-\.
-
-
---
--- Name: delivery_attempts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('delivery_attempts_id_seq', 1, false);
-
-
---
--- Data for Name: delivery_packages; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY delivery_packages (id, length, width, height, weight, order_id, created_at, updated_at, delivery_attempt_id) FROM stdin;
-\.
-
-
---
--- Name: delivery_packages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('delivery_packages_id_seq', 1, false);
-
-
---
--- Data for Name: delivery_services; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY delivery_services (id, sender_name, sender_zipcode, tracking_number, receivers_name, contact_name, street, exterior_number, interior_number, neighborhood, city, state, country, phone, cellphone, email, company, service_offered_id, created_at, updated_at, receivers_zipcode, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: delivery_services_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('delivery_services_id_seq', 1, false);
-
-
---
--- Data for Name: deposits; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY deposits (id, user_id, store_id, amount, created_at, updated_at, cash_register_id, name) FROM stdin;
-\.
-
-
---
--- Name: deposits_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('deposits_id_seq', 1, false);
-
-
---
--- Data for Name: design_costs; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY design_costs (id, complexity, cost, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: design_costs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('design_costs_id_seq', 1, false);
-
-
---
--- Data for Name: design_likes; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY design_likes (id, name, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: design_likes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('design_likes_id_seq', 1, false);
-
-
---
--- Data for Name: design_request_users; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY design_request_users (id, design_request_id, user_id) FROM stdin;
-\.
-
-
---
--- Name: design_request_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('design_request_users_id_seq', 1, false);
-
-
---
--- Data for Name: design_requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY design_requests (id, design_type, cost, status, authorisation, created_at, updated_at, request_id, description, attachment, notes) FROM stdin;
-\.
-
-
---
--- Name: design_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('design_requests_id_seq', 1, false);
-
-
---
--- Data for Name: discount_rules; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY discount_rules (id, percentage, product_list, prospect_list, initial_date, final_date, user_id, rule, minimum_amount, minimum_quantity, exclusions, active, created_at, updated_at, business_unit_id, store_id, prospect_filter, product_filter, product_all, prospect_all, product_gift, line_filter, material_filter) FROM stdin;
-\.
-
-
---
--- Name: discount_rules_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('discount_rules_id_seq', 1, false);
-
-
---
--- Data for Name: documents; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY documents (id, request_id, created_at, updated_at, document_type, design_request_id, document) FROM stdin;
-\.
-
-
---
--- Name: documents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('documents_id_seq', 1, false);
-
-
---
--- Data for Name: estimate_docs; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY estimate_docs (id, prospect_id, user_id, created_at, updated_at, store_id) FROM stdin;
-\.
-
-
---
--- Name: estimate_docs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('estimate_docs_id_seq', 1, false);
-
-
---
--- Data for Name: estimates; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY estimates (id, product_id, quantity, discount, estimate_doc_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: estimates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('estimates_id_seq', 1, false);
-
-
---
--- Data for Name: exhibition_inventories; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY exhibition_inventories (id, store_id, product_id, quantity, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: exhibition_inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('exhibition_inventories_id_seq', 1, false);
-
-
---
--- Data for Name: expedition_zips; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY expedition_zips (id, zip, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: expedition_zips_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('expedition_zips_id_seq', 1, false);
-
-
---
--- Data for Name: expenses; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY expenses (id, subtotal, taxes_rate, total, store_id, business_unit_id, user_id, bill_received_id, month, year, expense_date, created_at, updated_at, expense_type, taxes, payment_id, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: expenses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('expenses_id_seq', 1, false);
-
-
---
--- Data for Name: exterior_colors; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY exterior_colors (id, name, material_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: exterior_colors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('exterior_colors_id_seq', 1, false);
-
-
---
--- Data for Name: finishings; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY finishings (id, name, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: finishings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('finishings_id_seq', 1, false);
-
-
---
--- Data for Name: images; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY images (id, image, created_at, updated_at, product_id, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: images_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('images_id_seq', 1, false);
-
-
---
--- Data for Name: interior_colors; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY interior_colors (id, name, material_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: interior_colors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('interior_colors_id_seq', 1, false);
-
-
---
--- Data for Name: inventories; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY inventories (id, product_id, created_at, updated_at, quantity, unique_code, alert, alert_type) FROM stdin;
-\.
-
-
---
--- Name: inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('inventories_id_seq', 1, false);
-
-
---
--- Data for Name: materials; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY materials (id, name, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: materials_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('materials_id_seq', 1, false);
-
-
---
--- Data for Name: materials_resistances; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY materials_resistances (id, material_id, resistance_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: materials_resistances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('materials_resistances_id_seq', 1, false);
-
-
---
--- Data for Name: movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY movements (id, product_id, quantity, movement_type, created_at, updated_at, order_id, user_id, cost, unique_code, store_id, initial_price, supplier_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, confirm, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, rule_could_be, ticket_id, tax_id, taxes, total_cost, total, subtotal, entry_movement_id) FROM stdin;
-\.
-
-
---
--- Name: movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('movements_id_seq', 1, false);
-
-
---
--- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY orders (id, status, delivery_address_id, created_at, updated_at, category, prospect_id, request_id, billing_address_id, carrier_id, store_id, confirm, delivery_notes, bill_id, delivery_attempt_id, total, subtotal, taxes, discount_applied, cost) FROM stdin;
-\.
-
-
---
--- Name: orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('orders_id_seq', 1, false);
-
-
---
--- Data for Name: orders_users; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY orders_users (id, order_id, user_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: orders_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('orders_users_id_seq', 1, false);
-
-
---
--- Data for Name: pacs; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY pacs (id, name, certificate, created_at, updated_at, active, rfc) FROM stdin;
-\.
-
-
---
--- Name: pacs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('pacs_id_seq', 1, false);
-
-
---
--- Data for Name: payment_conditions; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY payment_conditions (id, description, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: payment_conditions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('payment_conditions_id_seq', 1, false);
-
-
---
--- Data for Name: payment_forms; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY payment_forms (id, description, created_at, updated_at, payment_key) FROM stdin;
-\.
-
-
---
--- Name: payment_forms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('payment_forms_id_seq', 1, false);
-
-
---
--- Data for Name: payment_methods; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY payment_methods (id, description, created_at, updated_at, method) FROM stdin;
-\.
-
-
---
--- Name: payment_methods_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('payment_methods_id_seq', 1, false);
-
-
---
--- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY payments (id, payment_date, bill_received_id, supplier_id, created_at, updated_at, user_id, store_id, business_unit_id, payment_form_id, payment_type, bill_id, terminal_id, ticket_id, operation_number, payment_number, bank_id, credit_days, total, order_id, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('payments_id_seq', 1, false);
-
-
---
--- Data for Name: pending_movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY pending_movements (id, product_id, quantity, created_at, updated_at, order_id, cost, unique_code, store_id, initial_price, supplier_id, movement_type, user_id, business_unit_id, prospect_id, bill_id, product_request_id, maximum_date, discount_applied, final_price, automatic_discount, manual_discount, discount_rule_id, seller_user_id, buyer_user_id, ticket_id, total_cost, total, subtotal, taxes) FROM stdin;
-\.
-
-
---
--- Name: pending_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('pending_movements_id_seq', 1, false);
-
-
---
--- Data for Name: pos_entries; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY pos_entries (id, store_id, product_id, quantity, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: pos_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('pos_entries_id_seq', 1, false);
-
-
---
--- Data for Name: product_requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY product_requests (id, product_id, quantity, status, order_id, urgency_level, maximum_date, created_at, updated_at, armed, surplus, excess) FROM stdin;
-\.
-
-
---
--- Name: product_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('product_requests_id_seq', 1, false);
-
-
---
--- Data for Name: product_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY product_sales (id, cost, created_at, updated_at, product_id, month, year, store_id, business_unit_id, discount, total, subtotal, taxes, quantity) FROM stdin;
-\.
-
-
---
--- Name: product_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('product_sales_id_seq', 1, false);
-
-
---
--- Data for Name: product_types; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY product_types (id, product_type, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: product_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('product_types_id_seq', 1, false);
-
-
---
--- Data for Name: production_orders; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY production_orders (id, user_id, created_at, updated_at, status) FROM stdin;
-\.
-
-
---
--- Name: production_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('production_orders_id_seq', 1, false);
-
-
---
--- Data for Name: production_requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY production_requests (id, product_id, quantity, status, production_order_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: production_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('production_requests_id_seq', 1, false);
-
-
---
--- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY products (id, former_code, unique_code, description, product_type, exterior_material_color, interior_material_color, impression, exterior_color_or_design, main_material, resistance_main_material, inner_length, inner_width, inner_height, outer_length, outer_width, outer_height, design_type, number_of_pieces, accesories_kit, created_at, updated_at, price, bag_length, bag_width, bag_height, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, classification, line, image, pieces_per_package, business_unit_id, warehouse_id, cost, rack, level, sat_key_id, sat_unit_key_id, current, store_id, supplier_id, unit_id, "group", child_id, parent_id, unit, pos, web, date, discount_for_stores, discount_for_franchises, factor, average, stores_discount, franchises_discount, shared) FROM stdin;
-\.
-
-
---
--- Name: products_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('products_id_seq', 1, false);
-
-
---
--- Data for Name: prospect_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY prospect_sales (id, prospect_id, cost, created_at, updated_at, month, year, store_id, business_unit_id, discount, total, subtotal, taxes, quantity) FROM stdin;
-\.
-
-
---
--- Name: prospect_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('prospect_sales_id_seq', 1, false);
-
-
---
--- Data for Name: prospects; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY prospects (id, store_id, created_at, updated_at, prospect_type, contact_first_name, contact_middle_name, contact_last_name, contact_position, direct_phone, extension, cell_phone, business_type, prospect_status, legal_or_business_name, billing_address_id, delivery_address_id, second_last_name, business_unit_id, email, business_group_id, store_code, store_type_id, store_prospect_id, credit_days, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: prospects_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('prospects_id_seq', 1, false);
-
-
---
--- Data for Name: relation_types; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY relation_types (id, description, created_at, updated_at, key) FROM stdin;
-\.
-
-
---
--- Name: relation_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('relation_types_id_seq', 1, false);
-
-
---
--- Data for Name: request_users; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY request_users (id, request_id, user_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: request_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('request_users_id_seq', 1, false);
-
-
---
--- Data for Name: requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY requests (id, product_type, product_what, product_length, product_width, product_height, product_weight, for_what, quantity, inner_length, inner_width, outer_length, outer_width, outer_height, bag_length, bag_width, bag_height, main_material, resistance_main_material, secondary_material, resistance_secondary_material, third_material, resistance_third_material, impression, inks, impression_finishing, delivery_date, maximum_sales_price, observations, notes, prospect_id, created_at, updated_at, final_quantity, payment_uploaded, authorisation_signed, date_finished, internal_cost, internal_price, sales_price, impression_where, design_like, resistance_like, rigid_color, paper_type_rigid, store_id, require_design, exterior_material_color, interior_material_color, status, exhibitor_height, tray_quantity, tray_length, tray_width, tray_divisions, name_type, contraencolado, authorised_without_doc, how_many, authorised_without_pay, boxes_stow, specification, what_measures, specification_document, sensitive_fields_changed, payment, authorisation, authorised, last_status, product_id, estimate_doc_id, second_quantity, third_quantity, second_internal_cost, third_internal_cost, second_internal_price, third_internal_price, second_sales_price, third_sales_price, price_selected, inner_height) FROM stdin;
-\.
-
-
---
--- Name: requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('requests_id_seq', 1, false);
-
-
---
--- Data for Name: resistances; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY resistances (id, name, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: resistances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('resistances_id_seq', 1, false);
-
-
---
--- Data for Name: return_tickets; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY return_tickets (id, ticket_id, ticket_number, created_at, updated_at, store_id, bill_id) FROM stdin;
-\.
-
-
---
--- Name: return_tickets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('return_tickets_id_seq', 1, false);
-
-
---
--- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY roles (id, name, description, created_at, updated_at, translation) FROM stdin;
-\.
-
-
---
--- Name: roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('roles_id_seq', 1, false);
-
-
---
--- Data for Name: rows; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY rows (id, bill_id, product, service, unique_code, quantity, unit_value, ticket, sat_key, sat_unit_key, description, total, subtotal, taxes, discount, sat_unit_description, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: rows_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('rows_id_seq', 1, false);
-
-
---
--- Data for Name: sales_movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY sales_movements (id, sales_id, movement_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: sales_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('sales_movements_id_seq', 1, false);
-
-
---
--- Data for Name: sales_targets; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY sales_targets (id, store_id, month, year, target, actual_sales, achieved, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: sales_targets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('sales_targets_id_seq', 1, false);
-
-
---
--- Data for Name: sat_keys; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY sat_keys (id, sat_key, description, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: sat_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('sat_keys_id_seq', 1, false);
-
-
---
--- Data for Name: sat_unit_keys; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY sat_unit_keys (id, unit, description, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: sat_unit_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('sat_unit_keys_id_seq', 1, false);
-
-
---
--- Data for Name: sat_zipcodes; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY sat_zipcodes (id, zipcode, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: sat_zipcodes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('sat_zipcodes_id_seq', 1, false);
-
-
---
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY schema_migrations (version) FROM stdin;
-\.
-
-
---
--- Data for Name: service_offereds; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY service_offereds (id, service_id, store_id, created_at, updated_at, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, service_type, tax_id, taxes, cost, ticket_id, total_cost, quantity, discount_reason, total, subtotal, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: service_offereds_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('service_offereds_id_seq', 1, false);
-
-
---
--- Data for Name: service_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY service_sales (id, store_id, year, month, cost, total, subtotal, taxes, discount, quantity, created_at, updated_at, service_id) FROM stdin;
-\.
-
-
---
--- Name: service_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('service_sales_id_seq', 1, false);
-
-
---
--- Data for Name: services; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY services (id, unique_code, description, price, sat_key_id, unit, sat_unit_key_id, shared, store_id, business_unit_id, created_at, updated_at, delivery_company, current) FROM stdin;
-\.
-
-
---
--- Name: services_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('services_id_seq', 1, false);
-
-
---
--- Data for Name: store_movements; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY store_movements (id, product_id, quantity, movement_type, order_id, ticket_id, store_id, initial_price, automatic_discount, manual_discount, discount_applied, rule_could_be, final_price, tax_id, taxes, cost, supplier_id, product_request_id, created_at, updated_at, total_cost, discount_reason, total, subtotal, bill_id, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: store_movements_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('store_movements_id_seq', 1, false);
-
-
---
--- Data for Name: store_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY store_sales (id, store_id, month, year, cost, created_at, updated_at, discount, total, subtotal, taxes, quantity, payments, expenses) FROM stdin;
-\.
-
-
---
--- Name: store_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('store_sales_id_seq', 1, false);
-
-
---
--- Data for Name: store_types; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY store_types (id, store_type, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: store_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('store_types_id_seq', 1, false);
-
-
---
--- Data for Name: store_use_inventories; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY store_use_inventories (id, store_id, product_id, quantity, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: store_use_inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('store_use_inventories_id_seq', 1, false);
-
-
---
--- Data for Name: stores; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY stores (id, created_at, updated_at, store_code, store_name, delivery_address_id, business_unit_id, store_type_id, email, cost_type_id, cost_type_selected_since, months_in_inventory, reorder_point, critical_point, contact_first_name, contact_middle_name, contact_last_name, direct_phone, extension, type_of_person, second_last_name, business_group_id, cell_phone, zip_code, period_sales_achievement, inspection_approved, overprice, series, last_bill, install_code, certificate, key, certificate_password, certificate_number, certificate_content, bill_last_folio, credit_note_last_folio, debit_note_last_folio, return_last_folio, pay_bill_last_folio, advance_e_last_folio, advance_i_last_folio, initial_inventory, current_inventory, prospects_file) FROM stdin;
-\.
-
-
---
--- Name: stores_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('stores_id_seq', 1, false);
-
-
---
--- Data for Name: stores_inventories; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY stores_inventories (id, product_id, store_id, quantity, alert, alert_type, created_at, updated_at, rack, level, manual_price_update, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: stores_inventories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('stores_inventories_id_seq', 1, false);
-
-
---
--- Data for Name: stores_suppliers; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY stores_suppliers (id, store_id, supplier_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: stores_suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('stores_suppliers_id_seq', 1, false);
-
-
---
--- Data for Name: stores_warehouse_entries; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY stores_warehouse_entries (id, product_id, store_id, quantity, movement_id, created_at, updated_at, retail_units_per_unit, units_used, store_movement_id, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: stores_warehouse_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('stores_warehouse_entries_id_seq', 1, false);
-
-
---
--- Data for Name: suppliers; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY suppliers (id, name, business_type, created_at, updated_at, type_of_person, contact_first_name, contact_middle_name, contact_last_name, contact_position, direct_phone, extension, cell_phone, email, supplier_status, delivery_address_id, last_purchase_bill_date, store_id, last_purchase_folio) FROM stdin;
-\.
-
-
---
--- Name: suppliers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('suppliers_id_seq', 1, false);
-
-
---
--- Data for Name: tax_regimes; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY tax_regimes (id, description, created_at, updated_at, tax_id, corporate, particular, date_since) FROM stdin;
-\.
-
-
---
--- Name: tax_regimes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('tax_regimes_id_seq', 1, false);
-
-
---
--- Data for Name: taxes; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY taxes (id, description, value, created_at, updated_at, key, transfer, retention) FROM stdin;
-\.
-
-
---
--- Name: taxes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('taxes_id_seq', 1, false);
-
-
---
--- Data for Name: temporal_numbers; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY temporal_numbers (id, store_id, business_group_id, past_sales, future_sales, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: temporal_numbers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('temporal_numbers_id_seq', 1, false);
-
-
---
--- Data for Name: terminals; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY terminals (id, name, bank_id, number, store_id, created_at, updated_at, debit_comission, credit_comission, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: terminals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('terminals_id_seq', 1, false);
-
-
---
--- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY tickets (id, user_id, store_id, subtotal, tax_id, taxes, total, prospect_id, bill_id, ticket_type, created_at, updated_at, cash_register_id, ticket_number, cfdi_use_id, comments, payments_amount, discount_applied, cash_return, payed, parent_id, cost, saved, pos, web, date) FROM stdin;
-\.
-
-
---
--- Data for Name: tickets_children; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY tickets_children (id, ticket_id, children_id, created_at, updated_at, pos, web, date) FROM stdin;
-\.
-
-
---
--- Name: tickets_children_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('tickets_children_id_seq', 1, false);
-
-
---
--- Name: tickets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('tickets_id_seq', 1, false);
-
-
---
--- Data for Name: type_of_bills; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY type_of_bills (id, description, created_at, updated_at, key) FROM stdin;
-\.
-
-
---
--- Name: type_of_bills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('type_of_bills_id_seq', 1, false);
-
-
---
--- Data for Name: units; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY units (id, name, plural_name, abbreviation, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: units_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('units_id_seq', 1, false);
-
-
---
--- Data for Name: user_requests; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY user_requests (id, user_id, request_id) FROM stdin;
-\.
-
-
---
--- Name: user_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('user_requests_id_seq', 1, false);
-
-
---
--- Data for Name: user_sales; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY user_sales (id, user_id, month, year, sales_amount, sales_quantity, cost, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Name: user_sales_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('user_sales_id_seq', 1, false);
-
-
---
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY users (id, email, encrypted_password, reset_password_token, reset_password_sent_at, remember_created_at, sign_in_count, current_sign_in_at, last_sign_in_at, current_sign_in_ip, last_sign_in_ip, created_at, updated_at, first_name, middle_name, last_name, store_id, role_id, web, pos, date) FROM stdin;
-\.
-
-
---
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('users_id_seq', 1, false);
-
-
---
--- Data for Name: warehouse_entries; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY warehouse_entries (id, product_id, quantity, entry_number, created_at, updated_at, movement_id, store_id, retail_units_per_unit, units_used) FROM stdin;
-\.
-
-
---
--- Name: warehouse_entries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('warehouse_entries_id_seq', 1, false);
-
-
---
--- Data for Name: warehouses; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY warehouses (id, name, delivery_address_id, created_at, updated_at, business_unit_id, store_id, warehouse_code, business_group_id) FROM stdin;
-\.
-
-
---
--- Name: warehouses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('warehouses_id_seq', 1, false);
-
-
---
--- Data for Name: withdrawals; Type: TABLE DATA; Schema: public; Owner: faviovelez
---
-
-COPY withdrawals (id, user_id, store_id, amount, created_at, updated_at, cash_register_id, name) FROM stdin;
-\.
-
-
---
--- Name: withdrawals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: faviovelez
---
-
-SELECT pg_catalog.setval('withdrawals_id_seq', 1, false);
-
-
---
 -- Name: bank_balances_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
@@ -6853,6 +5649,14 @@ ALTER TABLE ONLY images
 
 
 --
+-- Name: impression_types_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY impression_types
+    ADD CONSTRAINT impression_types_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: interior_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
 --
 
@@ -6866,6 +5670,54 @@ ALTER TABLE ONLY interior_colors
 
 ALTER TABLE ONLY inventories
     ADD CONSTRAINT inventories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: material_children_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY material_children
+    ADD CONSTRAINT material_children_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: materials_design_likes_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_design_likes
+    ADD CONSTRAINT materials_design_likes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: materials_exterior_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_exterior_colors
+    ADD CONSTRAINT materials_exterior_colors_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: materials_finishings_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_finishings
+    ADD CONSTRAINT materials_finishings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: materials_impression_types_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_impression_types
+    ADD CONSTRAINT materials_impression_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: materials_interior_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: faviovelez
+--
+
+ALTER TABLE ONLY materials_interior_colors
+    ADD CONSTRAINT materials_interior_colors_pkey PRIMARY KEY (id);
 
 
 --
@@ -7823,13 +6675,6 @@ CREATE INDEX index_expenses_on_user_id ON expenses USING btree (user_id);
 
 
 --
--- Name: index_exterior_colors_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
---
-
-CREATE INDEX index_exterior_colors_on_material_id ON exterior_colors USING btree (material_id);
-
-
---
 -- Name: index_images_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
@@ -7837,17 +6682,108 @@ CREATE INDEX index_images_on_product_id ON images USING btree (product_id);
 
 
 --
--- Name: index_interior_colors_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
---
-
-CREATE INDEX index_interior_colors_on_material_id ON interior_colors USING btree (material_id);
-
-
---
 -- Name: index_inventories_on_product_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
 CREATE INDEX index_inventories_on_product_id ON inventories USING btree (product_id);
+
+
+--
+-- Name: index_material_children_on_children_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_material_children_on_children_id ON material_children USING btree (children_id);
+
+
+--
+-- Name: index_material_children_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_material_children_on_material_id ON material_children USING btree (material_id);
+
+
+--
+-- Name: index_materials_design_likes_on_design_like_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_design_likes_on_design_like_id ON materials_design_likes USING btree (design_like_id);
+
+
+--
+-- Name: index_materials_design_likes_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_design_likes_on_material_id ON materials_design_likes USING btree (material_id);
+
+
+--
+-- Name: index_materials_exterior_colors_on_exterior_color_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_exterior_colors_on_exterior_color_id ON materials_exterior_colors USING btree (exterior_color_id);
+
+
+--
+-- Name: index_materials_exterior_colors_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_exterior_colors_on_material_id ON materials_exterior_colors USING btree (material_id);
+
+
+--
+-- Name: index_materials_finishings_on_finishing_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_finishings_on_finishing_id ON materials_finishings USING btree (finishing_id);
+
+
+--
+-- Name: index_materials_finishings_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_finishings_on_material_id ON materials_finishings USING btree (material_id);
+
+
+--
+-- Name: index_materials_impression_types_on_impression_type_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_impression_types_on_impression_type_id ON materials_impression_types USING btree (impression_type_id);
+
+
+--
+-- Name: index_materials_impression_types_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_impression_types_on_material_id ON materials_impression_types USING btree (material_id);
+
+
+--
+-- Name: index_materials_interior_colors_on_interior_color_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_interior_colors_on_interior_color_id ON materials_interior_colors USING btree (interior_color_id);
+
+
+--
+-- Name: index_materials_interior_colors_on_material_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_interior_colors_on_material_id ON materials_interior_colors USING btree (material_id);
+
+
+--
+-- Name: index_materials_on_children_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_on_children_id ON materials USING btree (children_id);
+
+
+--
+-- Name: index_materials_on_parent_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_materials_on_parent_id ON materials USING btree (parent_id);
 
 
 --
