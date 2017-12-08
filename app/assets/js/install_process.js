@@ -136,6 +136,7 @@ function lotQueries(store, call){
                   .attr("aria-valuenow", current_progress)
                   .text(current_progress + "%");
               }, err => {
+                console.log(err);
               });
             });
           });

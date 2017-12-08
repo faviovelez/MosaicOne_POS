@@ -52,7 +52,7 @@ async function initStore(){
   return store;
 }
 
-async function query (q, lastId = 0) {
+async function query (q, lastId = 0, table = '') {
   const client = await localPool.connect();
   let res;
 
@@ -78,6 +78,7 @@ async function query (q, lastId = 0) {
   if (lastId !== 0) {
     res.lastId = lastId;
   }
+  res.table = table;
   return res;
 }
 
@@ -134,10 +135,10 @@ async function insert (columns, data, table, extras = true){
   return queryResult;
 }
 
-async function findBy(column, data, table, lastId = 0){
+async function findBy(column, data, table, lastId = 0, refTable = ''){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
-  return await query(`${localQuery}`, lastId);
+  return await query(`${localQuery}`, lastId, refTable);
 }
 
 async function getOnly(table, ids){

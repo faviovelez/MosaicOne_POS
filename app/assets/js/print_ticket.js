@@ -43,7 +43,7 @@ function getTime(datetime){
   return `${hour}:${minute}:${seconds}`;
 }
 
-function createDeliveryServiceCad(serviceOffered){
+function createDeliveryServiceCad(serviceOffered, call){
   let deliveryCad =  '<tr>' +
     '<td colspan="4"> <strong>' +
     'Detalles del envío' +
@@ -89,7 +89,7 @@ function createDeliveryServiceCad(serviceOffered){
         '<td colspan="2" style="text-align:right"> C.P. Dest.:' +
         '<span>' +
         '<strong>' +
-        `${deliveryServiceObject.recievers_zipcode}` +
+        `${deliveryServiceObject.receivers_zipcode}` +
         '</strong>' +
         '</span>' +
         '</td>' +
@@ -98,7 +98,7 @@ function createDeliveryServiceCad(serviceOffered){
         '<td colspan="1" style="text-align:left"> Destintario: </td>' +
         '<td colspan="3" style="text-align:right">' +
         '<strong>' +
-        `${deliveryServiceObject.recievers_name}` +
+        `${deliveryServiceObject.receivers_name}` +
         '</strong>' +
         '</td>' +
         '</tr>' +
@@ -117,7 +117,7 @@ function createDeliveryServiceCad(serviceOffered){
         deliveryCad += 'Col.  ' +
         `${deliveryServiceObject.neighborhood} `;
       }
-      deliveryCad += `deliveryServiceObject.city, ` +
+      deliveryCad += `${deliveryServiceObject.city}, ` +
         `${deliveryServiceObject.state}, ` +
         `${deliveryServiceObject.country}, ` +
         '</td>' +
@@ -146,13 +146,22 @@ function createTicketProductList(productList, discount, call){
 
   for (var productHead in productList){
     for (var productIndex in productList[productHead]){
-      object = productList[productHead][productIndex];
-      findBy('id', object.product_id, 'products').then(productObject => {
+      let object = productList[productHead][productIndex],
+          table  = '',
+          refId  = 0;
+      if (productHead === 'serviceOffereds'){
+        regId = object.service_id;
+        table = 'services';
+      } else {
+        regId = object.product_id;
+        table = 'products';
+      }
+      findBy('id', regId, table, productIndex, productHead).then(productObject => {
         object.product = productObject.rows[0];
         ticketList += '<tr>' +
           '<td colspan="3" style="text-align:left">' +
           '<span>' +
-          `${object.quantity} ` +
+          `${Math.abs(object.quantity)} ` +
           '</span>' +
           '<span>' +
           `${object.product.unique_code} ` +
@@ -162,22 +171,26 @@ function createTicketProductList(productList, discount, call){
           '</span>' +
           '</td>' +
           '<td colspan="1" style="width: 80px; text-align: right; vertical-align:text-top" >' +
-          `$ ${object.initial_price.toFixed(2)} </td>` +
+          `$ ${object.initial_price.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
           '</tr>';
         if (discount > 0){
           ticketList += '<tr>' +
-            `<td colspan="3" style="text-align:left"> ${((1 - (object.final_price / object.initial_price)) * 100).toFixed(2)} % de descuento </td>` +
-            `<td colspan="1" style="text-align:right; vertical-align:text-top"> - $ ${object.discount_applied} </td>` +
+            `<td colspan="3" style="text-align:left"> ${((1 - (object.final_price / object.initial_price)) * 100).toFixed(0)} % de descuento </td>` +
+            `<td colspan="1" style="text-align:right; vertical-align:text-top"> - $ ${object.discount_applied.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
             '</tr>';
         }
 
         ticketList += '<tr>' +
-          `<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ ${(object.total - object.taxes).toFixed(2)} </strong> </td>` +
+          `<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ ${(object.total - object.taxes).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </strong> </td>` +
           '</tr>';
 
-        if (productHead === 'serviceOffereds'){
-          createDeliveryServiceCad(product, function(deliveryCad){
+        if (productObject.table === 'serviceOffereds'){
+          createDeliveryServiceCad(object, function(deliveryCad){
             deliveriesCad += deliveryCad;
+            count++;
+            if (count === parseInt(limit)){
+              call(ticketList, deliveriesCad);
+            }
           });
         } else {
           count++;
@@ -200,8 +213,8 @@ function createPaymentFormList(payments, call){
   for(var paymentId in payments){
     let payment = payments[paymentId];
     ticketCad += '<tr>' +
-      `<td colspan="2" style="text-align:left"> ${payment.paymentform.description} </td>` +
-      `<td colspan="2" style="text-align:right"> $ ${payment.total.toFixed(2)} </td>` +
+      `<td colspan="2" style="text-align:left"> ${payment.paymentForm.description} </td>` +
+      `<td colspan="2" style="text-align:right"> $ ${payment.total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
       '</tr>';
     count++;
     if (count === limit){
@@ -304,18 +317,18 @@ function initTicket(ticketData, call) {
         '</tr>' +
         '<tr>' +
         '<td colspan="2" style="text-align: right"> Subtotal: </td>' +
-        `<td colspan="2" style="text-align: right"> $ ${ticketData.ticket.subtotal.toFixed(2)} </td>` +
+        `<td colspan="2" style="text-align: right"> $ ${ticketData.ticket.subtotal.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
         '</tr>' +
         '<tr>' +
         '<td colspan="2" style="text-align: right"> IVA 16%: </td>' +
-        `<td colspan="2" style="text-align: right"> $ ${ticketData.ticket.taxes.toFixed(2)} </td>` +
+        `<td colspan="2" style="text-align: right"> $ ${ticketData.ticket.taxes.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
         '</tr>' +
         '<tr>' +
         '<td colspan="2" style="text-align: right">' +
         '<strong> Total: </strong>' +
         '</td>' +
         '<td colspan="2" style="text-align: right">' +
-        `<strong> $ ${ticketData.ticket.total.toFixed(2)} </strong>` +
+        `<strong> $ ${ticketData.ticket.total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </strong>` +
         '</td>' +
         '</tr>' +
         '<tr>' +
@@ -340,7 +353,7 @@ function initTicket(ticketData, call) {
         '</td>' +
         '<td colspan="2" style="text-align:right">' +
         '<strong>' +
-        `$ ${ticketData.ticket.payments_amount}` +
+        `$ ${ticketData.ticket.payments_amount.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}` +
         '</strong>' +
         '</td>' +
         '</tr>' +
@@ -352,7 +365,7 @@ function initTicket(ticketData, call) {
         '</td>' +
         '<td colspan="2" style="text-align:right">' +
         '<strong>' +
-        `$ ${ticketData.ticket.cash_return}` +
+        `$ ${ticketData.ticket.cash_return.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}` +
         '</strong>' +
         '</td>' +
         '</tr>' +
