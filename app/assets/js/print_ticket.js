@@ -213,7 +213,7 @@ function createPaymentFormList(payments, call){
   for(var paymentId in payments){
     let payment = payments[paymentId];
     ticketCad += '<tr>' +
-      `<td colspan="2" style="text-align:left"> ${payment.paymentForm.description} </td>` +
+      `<td colspan="2" style="text-align:left"> ${payment.paymentForm.description.replace('Por definir', 'Pendiente de pago (Venta a Crédito)')} </td>` +
       `<td colspan="2" style="text-align:right"> $ ${payment.total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
       '</tr>';
     count++;
