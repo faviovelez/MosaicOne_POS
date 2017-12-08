@@ -173,7 +173,7 @@ function createTicketProductList(productList, discount, call){
           '<td colspan="1" style="width: 80px; text-align: right; vertical-align:text-top" >' +
           `$ ${object.initial_price.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
           '</tr>';
-        if (discount > 0){
+        if (object.discount_applied > 0){
           ticketList += '<tr>' +
             `<td colspan="3" style="text-align:left"> ${((1 - (object.final_price / object.initial_price)) * 100).toFixed(0)} % de descuento </td>` +
             `<td colspan="1" style="text-align:right; vertical-align:text-top; min-width:100px"> -$ ${object.discount_applied.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
