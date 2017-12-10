@@ -11,6 +11,36 @@ $(function(){
     return store;
   }
 
+  function updateProductPricesPrices(storeObject, call){
+    findBy('manual_price_update', 'FALSE', 'stores_inventories', false).then(storesInventoriesObjects => {
+      let limit = storesInventoriesObjects.rowCount,
+          count = 0,
+          pricesHistories = {};
+
+      storesInventoriesObjects.rows.forEach(storeInventory => {
+        let productId = storeInventory.product_id;
+        findBy('id', productId, 'products', false).then(productObject => {
+          let product = productObject.rows[0],
+              updatedPrice = product.price * ( 1 + (storeObject.overprice / 100) );
+          pricesHistories[product.id] = parseFloat(updatedPrice.toFixed(2));
+          updateBy(
+            {
+              price: updatedPrice
+            },
+            'products',
+            `id = ${product.id}`
+          ).then(productUpdated => {
+            count++;
+            if (count === limit){
+              call(pricesHistories);
+            }
+          });
+
+        });
+      });
+    });
+  }
+
   function cloneAlert(){
     let alerts = $('.alert').length + 1;
     $('.alerts-container').prepend(
@@ -195,7 +225,29 @@ function lotQueries(store, call){
                   .text(5 + "%");
 
                 cloneAllTables(queries, function(){
-                  window.location.href = 'sign_up.html';
+                  updateProductPricesPrices(store.get('store'), function(updatedPrices){
+                    let updatedPricesLimit = Object.keys(updatedPrices).length,
+                        count = 0;
+
+                    for (var productId in updatedPrices){
+                      findBy('product_id', productId, 'stores_inventories', false, productId).then(storeInventory => {
+                        updateBy(
+                          {
+                            manual_price: updatedPrices[storeInventory.lastId]
+                          },
+                          'stores_inventories',
+                          `product_id = ${storeInventory.lastId}`
+                        ).then(() => {
+                          count++;
+                          if (count === limit){
+                            window.location.href = 'sign_up.html';
+                          }
+                        });
+
+                      });
+                    }
+                  });
+
                 }, getQueryCount(store));
 
               });
