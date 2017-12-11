@@ -87,9 +87,10 @@ function lotQueries(store, call){
       `id = ${store.business_group_id}`,
       'prospects': 'SELECT * FROM prospects WHERE ' +
       `store_id = ${store.id}`,
-      'products' : 'SELECT * FROM products WHERE supplier_id IN (1,2)',
+      'products' : 'SELECT * FROM products WHERE shared = true AND current = true ' +
+      `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}`,
       'services' : 'SELECT * FROM services WHERE ' +
-      'store_id IS NULL AND shared = true',
+      `shared = true AND current = true OR store_id = ${store.id}`,
       'stores_inventories': 'SELECT * FROM stores_inventories ' +
       `WHERE store_id = ${store.id}`,
       'stores_warehouse_entries': 'SELECT * FROM stores_warehouse_entries ' +
@@ -116,8 +117,9 @@ function lotQueries(store, call){
       ` SELECT COUNT (*) as rows FROM cost_types WHERE id = ${store.cost_type_id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM business_groups WHERE id = ${store.business_group_id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM prospects WHERE store_id = ${store.id} UNION ALL` +
-      ' SELECT COUNT (*) as rows FROM products WHERE supplier_id IN (1,2) UNION ALL' +
-      ' SELECT COUNT (*) as rows FROM services WHERE store_id IS NULL AND shared = true UNION ALL' +
+      ' SELECT COUNT (*) as rows FROM products WHERE shared = true AND current = true AND' +
+      ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM services WHERE shared = true AND current = true OR store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores_inventories WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores_warehouse_entries WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM store_movements WHERE store_id = ${store.id} UNION ALL` +
@@ -225,7 +227,7 @@ function lotQueries(store, call){
                   .text(5 + "%");
 
                 cloneAllTables(queries, function(){
-                  updateProductPricesPrices(store.get('store'), function(updatedPrices){
+                  updateProductPricesPrices(store, function(updatedPrices){
                     let updatedPricesLimit = Object.keys(updatedPrices).length,
                         count = 0;
 

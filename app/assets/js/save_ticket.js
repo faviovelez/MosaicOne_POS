@@ -43,7 +43,7 @@ function createTicketProductJson(call){
 
       productsJson[id] = {
         sellQuantity   : $(this).find($('td input[id^=cuantityTo]')).val(),
-        sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,''),
+        sellTo         : $(this).find('td[id^=totalSinTo]').html().replace('$ ','').replace(/,/g,''),
         discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,''),
         discountReason : $(this).find('td[id^=discountReasonTo]').html()
       };
@@ -55,7 +55,7 @@ function createTicketProductJson(call){
     } else {
       servicesJson[id] = {
         sellQuantity   : $(this).find($('td input[id^=cuantityTo]')).val(),
-        sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,''),
+        sellTo         : $(this).find('td[id^=totalSinTo]').html().replace('$ ','').replace(/,/g,''),
         discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,''),
         discountReason : $(this).find('td[id^=discountReasonTo]').html(),
         selector       : $(this).attr('id')
@@ -346,7 +346,7 @@ function assignCost(ticketId, call) {
         fixedDiscount   = parseFloat(discount.toFixed(2)),
         data = {
           product_id         : productId,
-          quantity           : -1 * sellQuantity,
+          quantity           : sellQuantity,
           movement_type      : 'venta',
           ticket_id          : ticketId,
           initial_price      : productsJson[productId].price.toFixed(2),

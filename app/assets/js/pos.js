@@ -26,8 +26,7 @@ $(document).ready(function() {
   function createStoreMovementData(productId, quantity, action, call){
     findBy('id', productId, 'products').then(product => {
       productDetails = product.rows[0];
-      let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100)),
-        multipler = action === 'alta' ? 1 : -1;
+      let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100));
 
       if (productDetails.discount_for_stores === 0){
         final_price = productDetails.price * 0.65;
@@ -71,7 +70,7 @@ $(document).ready(function() {
 
   function destroyProcess(productId){
     let localQuery      =  specialQuery(productId),
-        processQuantity =  -1 * storeMovementData.quantity;
+        processQuantity =  storeMovementData.quantity;
     query(localQuery).then(entries => {
       let BreakException = {},
           totalCost      = 0;
@@ -112,7 +111,7 @@ $(document).ready(function() {
   function createWarehouseEntry(productId, storeMovementId){
     warehouseEntryData = {
       product_id : productId,
-      quantity   : storeMovementData.quantity,
+      quantity   : -1 * storeMovementData.quantity,
       store_movement_id : storeMovementId
     };
 
@@ -381,9 +380,17 @@ $(document).ready(function() {
       $(this).html(
         $('#globalDiscount input:first').val() + ' %'
       );
-      let id = $(this).attr('id').replace(/\D/g,'');
+      let id = $(this).attr('id').replace(/\D/g,''),
+          total = createTotal(id, true).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    );
       $(`#totalTo_${id}`).html(
-        `$ ${createTotal(id, true)}`
+        `$ ${(total * 1.16).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
+      );
+      $(`#totalSinTo_${id}`).html(
+        `$ ${total}`
       );
     });
     $('#ticketDiscountChange').modal('toggle');
@@ -586,7 +593,7 @@ $(document).ready(function() {
   function bigTotal(){
     let subTotalInput = $('table.subtotal #SubtotalSum'),
         subtotal      = 0;
-    $.each($(`td[id^=totalTo_]`), function(){
+    $.each($(`td[id^=totalSinTo_]`), function(){
       let productTotal = parseFloat(
         $(this).html().replace('$ ', '').replace(/,/g,'')
       );
@@ -644,9 +651,7 @@ $(document).ready(function() {
       );
     }
 
-    return productTotal.toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    );
+    return productTotal;
   }
 
   function addEvents(id){
@@ -656,15 +661,33 @@ $(document).ready(function() {
     });
 
     $(`#cuantityTo_${id}`).keyup(function(){
+      let total = createTotal(id).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    );
       $(`#totalTo_${id}`).html(
-        `$ ${createTotal(id)}`
+        `$ ${(total * 1.16).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
+      );
+
+      $(`#totalSinTo_${id}`).html(
+        `$ ${total}`
       );
       bigTotal();
     });
 
     $(`#priceToServiceTo_${id}`).keyup(function(){
+      let total = createTotal(id).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    );
       $(`#totalTo_${id}`).html(
-        `$ ${createTotal(id)}`
+        `$ ${(total * 1.16).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
+      );
+
+      $(`#totalSinTo_${id}`).html(
+        `$ ${total}`
       );
       bigTotal();
     });
@@ -820,6 +843,9 @@ $(document).ready(function() {
       '.modal-body'),
         id  = $(modalBody).attr('id').replace('discountTo_',''),
         tr = $(`#product_${id}`),
+        total = createTotal(id).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    ),
         discountReason = $(tr).find('td[id^=discountReasonTo]');
 
     if (discountReason) {
@@ -834,8 +860,15 @@ $(document).ready(function() {
       `${$(modalBody).find('#discountCount').val()} %`
     );
     $(`#totalTo_${id}`).html(
-      `$ ${createTotal(id)}`
+      `$ ${(total * 1.16).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
     );
+
+    $(`#totalSinTo_${id}`).html(
+      `$ ${total}`
+    );
+
     bigTotal();
     $('#discountRow').removeClass('hidden');
     $('#SubtotalRow').removeClass('hidden');
@@ -917,6 +950,7 @@ $(document).ready(function() {
       `id="discount_${product.id}" data-id="${product.id}" ` +
       `data-table="${product.table}" > 0% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}"> $ </td>` +
+      `<td class="right" id="totalSinTo_${product.id}"> $ </td>` +
       '</tr>';
   }
 
