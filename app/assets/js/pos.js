@@ -34,7 +34,7 @@ $(document).ready(function() {
 
       storeMovementData = {
         product_id    : productDetails.id,
-        quantity      : (multipler * quantity),
+        quantity      : quantity,
         movement_type : action,
         initial_price : productDetails.price.toFixed(2),
         final_price   : final_price.toFixed(2),
@@ -381,16 +381,16 @@ $(document).ready(function() {
         $('#globalDiscount input:first').val() + ' %'
       );
       let id = $(this).attr('id').replace(/\D/g,''),
-          total = createTotal(id, true).toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    );
+          total = createTotal(id, true);
       $(`#totalTo_${id}`).html(
         `$ ${(total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
       );
       $(`#totalSinTo_${id}`).html(
-        `$ ${total}`
+        `$ ${total.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
       );
     });
     $('#ticketDiscountChange').modal('toggle');
@@ -543,7 +543,7 @@ $(document).ready(function() {
 
   function createRealSubtotal(){
     let discount = 0;
-    $.each($(`td[id^=priceTo]`), function(){
+    $.each($(`td[id^=priceSinTo]`), function(){
       let price       = parseFloat($(this).html()).toString() === 'NaN' ?
                         $(this).find('input').val() :
                         parseFloat($(this).html()),
@@ -661,9 +661,7 @@ $(document).ready(function() {
     });
 
     $(`#cuantityTo_${id}`).keyup(function(){
-      let total = createTotal(id).toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    );
+      let total = createTotal(id);
       $(`#totalTo_${id}`).html(
         `$ ${(total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
@@ -671,15 +669,16 @@ $(document).ready(function() {
       );
 
       $(`#totalSinTo_${id}`).html(
-        `$ ${total}`
+        `$ ${total.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
       );
       bigTotal();
     });
 
     $(`#priceToServiceTo_${id}`).keyup(function(){
-      let total = createTotal(id).toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    );
+      let total = createTotal(id);
+
       $(`#totalTo_${id}`).html(
         `$ ${(total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
@@ -687,7 +686,9 @@ $(document).ready(function() {
       );
 
       $(`#totalSinTo_${id}`).html(
-        `$ ${total}`
+        `$ ${total.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
       );
       bigTotal();
     });
@@ -843,9 +844,7 @@ $(document).ready(function() {
       '.modal-body'),
         id  = $(modalBody).attr('id').replace('discountTo_',''),
         tr = $(`#product_${id}`),
-        total = createTotal(id).toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    ),
+        total = createTotal(id),
         discountReason = $(tr).find('td[id^=discountReasonTo]');
 
     if (discountReason) {
@@ -866,7 +865,9 @@ $(document).ready(function() {
     );
 
     $(`#totalSinTo_${id}`).html(
-      `$ ${total}`
+      `$ ${total.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
     );
 
     bigTotal();

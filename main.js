@@ -6,10 +6,10 @@ const electron = require('electron'),
   fs = require('fs'),
   {Pool} = require('pg'),
   localPool = new Pool({
-    user: 'oscar',
+    user: 'faviovelez',
     host: 'localhost',
-    database: 'local_db',
-    password: '12345678"',
+    database: 'mosaiconepos',
+    password: 'bafio44741',
     port: 5432,
   }),
   BrowserWindow = electron.BrowserWindow;

@@ -2,18 +2,18 @@ const {Pool} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-  user: 'oscar',
+  user: 'faviovelez',
   host: 'localhost',
   database: 'mosaicone',
-  password: '12345678"',
+  password: 'bafio44741',
   port: 5432,
 });
 
 const localPool = new Pool({
-  user: 'oscar',
+  user: 'faviovelez',
   host: 'localhost',
-  database: 'local_db',
-  password: '12345678"',
+  database: 'mosaiconepos',
+  password: 'bafio44741',
   port: 5432,
 });
 
@@ -81,10 +81,15 @@ async function createInsert (columns, data, table){
         if (typeof data === 'object'){
           localQuery += `, '${data.toUTCString()}'`;
         } else {
-          localQuery += `, '${data}'`;
+          try {
+            localQuery += `, '${data.replace(/'/,'\\u0027')}'`;
+          } catch (err) {
+            localQuery += `, '${data}'`;
+          }
         }
     }
   });
+
   return `${localQuery})`;
 }
 
