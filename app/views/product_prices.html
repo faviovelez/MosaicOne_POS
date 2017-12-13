@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../assets/css/pills.css">
   <link rel="stylesheet" href="../assets/css/pos.css">
   <link rel="stylesheet" href="../assets/css/bottom-nav.css">
+  <link rel="stylesheet" href="../vendor/assets/css/datatables.min.css">
 </head>
 <body>
 
@@ -37,12 +38,12 @@
         <li>
           <a href="#" id="username">
             <i class="fa fa-user-circle-o bigger-icon" aria-hidden="true"></i>
-            Bienvenido, Favio Velez
+              Bienvenido, Diseños de Cartón
           </a>
         </li>
         <li>
           <a href="#" id="store">
-             Franquicia - Aguascalientes
+             Tienda / Franquicia
           </a>
         </li>
         <li>
@@ -98,20 +99,20 @@
              </td>
            </tr>
            <tr>
-             <td class="left">
+             <td class="left hidden">
                Cambios en productos:
              </td>
-             <td>
+             <td class="hidden">
                <a href="#">
                  Consultar
                </a>
              </td>
            </tr>
            <tr>
-             <td class="left">
+             <td class="left hidden">
                Cambios en precios:
              </td>
-             <td>
+             <td class="hidden">
                <a href="#">
                  Consultar
                </a>
@@ -125,7 +126,7 @@
   <div class="page-container">
 
 
-    <table class="price-list-table">
+    <table class="price-list-table" id="priceList">
       <thead>
         <tr class="head-black">
           <th class="rounded-edges-left"> Código</th>
@@ -633,6 +634,8 @@
     <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
+    <script src="../vendor/assets/js/datatables.min.js" charset="utf-8"></script>
+    <script src="../assets/js/price_table.js" charset="utf-8"></script>
     <script src="../assets/js/pos.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>

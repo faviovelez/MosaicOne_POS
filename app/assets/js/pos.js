@@ -111,7 +111,7 @@ $(document).ready(function() {
   function createWarehouseEntry(productId, storeMovementId){
     warehouseEntryData = {
       product_id : productId,
-      quantity   : -1 * storeMovementData.quantity,
+      quantity   : storeMovementData.quantity,
       store_movement_id : storeMovementId
     };
 
@@ -382,12 +382,12 @@ $(document).ready(function() {
       );
       let id = $(this).attr('id').replace(/\D/g,''),
           total = createTotal(id, true);
-      $(`#totalTo_${id}`).html(
+      $(`td[id^=totalTo_${id}]`).html(
         `$ ${(total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
       );
-      $(`#totalSinTo_${id}`).html(
+      $(`td[id^=totalSinTo_${id}]`).html(
         `$ ${total.toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
@@ -461,7 +461,7 @@ $(document).ready(function() {
 
             insertTicket(user, function(ticketId){
 
-              assignCost(ticketId, function(){
+              assignCost('venta', ticketId, function(){
 
                 insertsServiceOffereds(ticketId, function(){
 
@@ -658,6 +658,7 @@ $(document).ready(function() {
     $(`button[id=delete_${id}]`).click(function(){
       $(`tr[id=product_${id}]`).remove();
       bigTotal();
+      resumePayment();
     });
 
     $(`#cuantityTo_${id}`).keyup(function(){
@@ -809,7 +810,7 @@ $(document).ready(function() {
 
   $('#productShow').on('shown.bs.modal', function(e) {
     let relatedObject = e.relatedTarget.dataset,
-        productId     = relatedObject.id;
+        productId     = relatedObject.id.replace(/_.*/,'');
 
     findBy('id', productId, relatedObject.table).then(product => {
       let productData = product.rows[0];
@@ -818,6 +819,9 @@ $(document).ready(function() {
       );
       $('.product_unique_code').html(
         productData.unique_code
+      );
+      $('#product_measures').html(
+        productData.only_measure
       );
       $('.product_main_material').html(
         productData.main_material
@@ -844,7 +848,6 @@ $(document).ready(function() {
       '.modal-body'),
         id  = $(modalBody).attr('id').replace('discountTo_',''),
         tr = $(`#product_${id}`),
-        total = createTotal(id),
         discountReason = $(tr).find('td[id^=discountReasonTo]');
 
     if (discountReason) {
@@ -858,6 +861,7 @@ $(document).ready(function() {
     $(tr).find('a[id^=discount]').html(
       `${$(modalBody).find('#discountCount').val()} %`
     );
+    let total = createTotal(id);
     $(`#totalTo_${id}`).html(
       `$ ${(total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
@@ -951,7 +955,7 @@ $(document).ready(function() {
       `id="discount_${product.id}" data-id="${product.id}" ` +
       `data-table="${product.table}" > 0% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}"> $ </td>` +
-      `<td class="right" id="totalSinTo_${product.id}"> $ </td>` +
+      `<td class="right hidden" id="totalSinTo_${product.id}"> $ </td>` +
       '</tr>';
   }
 

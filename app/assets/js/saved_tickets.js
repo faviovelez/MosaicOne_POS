@@ -8,7 +8,7 @@ $(function(){
     } else {
       let total = product.initial_price.toFixed(2) * Math.abs(product.quantity);
 
-      return total * (1 - percent / 100);
+      return parseFloat(total * (1 - percent / 100));
     }
   }
 
@@ -16,7 +16,7 @@ $(function(){
     let realTotal = product.total - product.taxes,
         percentPayment = realTotal * 100 / product.subtotal;
 
-    return 100 - parseInt(percentPayment.toFixed(0));
+    return 100 - parseFloat(percentPayment.toFixed(0));
   }
 
   function addProspectTr(object){
@@ -206,6 +206,8 @@ $(function(){
       `id="discount_${product.id}" data-id="${product.id}" ` +
       `data-table="${product.table}" > ${percent}% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}">` +
+      `$ ${(total * 1.16).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
+      '<td class="right hidden" id="totalSinTo_${product.id}">' + 
       `$ ${total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
       '</tr>';
   }
@@ -702,7 +704,7 @@ $(function(){
 
         insertTicket(user, function(ticketId){
 
-          assignCost(ticketId, function(){
+          assignCost('pending', ticketId, function(){
 
             insertsServiceOffereds(ticketId, function(){
 
