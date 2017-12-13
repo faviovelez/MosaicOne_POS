@@ -72,7 +72,45 @@ $(document).ready(function() {
     $('.create-cash-register').addClass('hidden');
   });
 
+  $('#registerCashWithdrawal').click(function(){
+    initStore().then(storage => {
+      let data = {
+        user_id          : storage.get('current_user').id,
+        store_id         : storage.get('store').id,
+        amount           : parseFloat($('#new_cash_withdrawal_amount').val()),
+        cash_register_id : parseInt($('#register_open_cash_register').val()),
+        name             : $('#new_cash_withdrawal_description').val()
+      };
+
+      insert(
+        Object.keys(data),
+        Object.values(data),
+        'deposits'
+      ).then(() => {});
+    });
+  });
+
+  function fillSpecialValues(){
+    query(getCashRegisterSum(), false).then(resultSum => {
+      $('#configCashValue strong:last').html(
+        `$ ${(resultSum.rows[0].sum || 0).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} `
+      );
+    });
+
+    findBy('store_id', storeInfo.id, 'cash_registers', false).then(cashRegisterObject => {
+      cashRegisterObject.rows.forEach(cashRegister => {
+        $('#register_open_cash_register option').remove();
+
+        $('#register_open_cash_register').append(
+          `  <option value="${cashRegister.id}"> Caja ${cashRegister.name} </option>`
+        );
+
+      });
+    });
+  }
+
   $("#registerDeposit").click(function () {
+    fillSpecialValues();
     $(this).addClass('active-list');
     $('#registerColaborator').removeClass('active-list');
     $('#addTerminal').removeClass('active-list');

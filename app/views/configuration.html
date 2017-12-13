@@ -163,7 +163,7 @@
                     <option value="2">Caja 2</option>
                   </select>
                 </td>
-                <td>
+                <td id='configCashValue'>
                   <strong>
                   Efectivo:
                 </strong>
@@ -189,7 +189,7 @@
           </table>
 
           <div class="actions">
-            <input type="submit" name="commit" value="Registrar retiro" class="main-button" />
+            <input type="submit" name="commit" value="Registrar retiro" id='registerCashWithdrawal' class="main-button" />
           </div>
         </form>
 
@@ -209,8 +209,6 @@
               <tr>
                 <td>
                   <select name="discount_rule_options" class="myfield" id="discount_rule_options">
-                    <option value="1">Caja 1</option>
-                    <option value="2">Caja 2</option>
                   </select>
                 </td>
                 <td>
@@ -418,6 +416,7 @@
   <script src="../assets/js/options.js" charset="utf-8"></script>
   <script src="../../validator.js" charset="utf-8"></script>
   <script src="../../store.js" charset="utf-8"></script>
+  <script src="../assets/js/specialQueries.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
 
