@@ -63,13 +63,20 @@ $(function(){
       });
 
       findBy('store_id', storeInfo.id, 'cash_registers', false).then(cashRegisterObject => {
-        $('#register_open_initial_cash').val(
-          `$ ${cashRegisterObject.rows[0].balance.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} `
-        );
         $('#register_open_cash_register').html(
           `  <option value="1"> Caja ${cashRegisterObject.rows[0].name} </option>`
         );
       });
+      localQuery = 'SELECT (SUM((SELECT SUM(deposits.amount) as d FROM deposits)) ' +
+      '- SUM((SELECT SUM(withdrawals.amount) as w FROM withdrawals)) + ' +
+      'SUM((SELECT (SUM(payments.total) - SUM(tickets.cash_return)) as s ' +
+      'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
+      "WHERE payment_type = 'pago' AND payment_form_id = 1 AND ticket_type = 'venta'))) as sum";
+      query(localQuery, false).then(resultSum => {
+        $('#register_open_initial_cash').val(
+          `$ ${(resultSum.rows[0].sum || 0).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} `
+        );
+      })
 
     });
   })();

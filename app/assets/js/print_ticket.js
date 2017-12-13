@@ -248,10 +248,10 @@ function initTicket(ticketData, call) {
         '</strong>' +
         `Sucursal ${ticketData.store.store_name} <br>` +
         '<br>' +
-        `${ticketData.billing_address.business_name}` +
+        `${ticketData.billing_address.business_name} <br>` +
         `${ticketData.billing_address.street} ` +
         `${ticketData.billing_address.exterior_number} ` +
-        `${ticketData.billing_address.interior_number} <br>` +
+        `${ticketData.billing_address.interior_number || ''} <br>` +
         `Col. ${ticketData.billing_address.neighborhood} <br>` +
         `${ticketData.billing_address.city}, ` +
         `${ticketData.billing_address.state}. ` +

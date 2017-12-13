@@ -26,8 +26,7 @@ $(document).ready(function() {
   function createStoreMovementData(productId, quantity, action, call){
     findBy('id', productId, 'products').then(product => {
       productDetails = product.rows[0];
-      let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100)),
-        multipler = action === 'alta' ? 1 : -1;
+      let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100));
 
       if (productDetails.discount_for_stores === 0){
         final_price = productDetails.price * 0.65;
@@ -35,7 +34,7 @@ $(document).ready(function() {
 
       storeMovementData = {
         product_id    : productDetails.id,
-        quantity      : (multipler * quantity),
+        quantity      : quantity,
         movement_type : action,
         initial_price : productDetails.price.toFixed(2),
         final_price   : final_price.toFixed(2),
@@ -71,7 +70,7 @@ $(document).ready(function() {
 
   function destroyProcess(productId){
     let localQuery      =  specialQuery(productId),
-        processQuantity =  -1 * storeMovementData.quantity;
+        processQuantity =  storeMovementData.quantity;
     query(localQuery).then(entries => {
       let BreakException = {},
           totalCost      = 0;
@@ -381,9 +380,17 @@ $(document).ready(function() {
       $(this).html(
         $('#globalDiscount input:first').val() + ' %'
       );
-      let id = $(this).attr('id').replace(/\D/g,'');
-      $(`#totalTo_${id}`).html(
-        `$ ${createTotal(id, true)}`
+      let id = $(this).attr('id').replace(/\D/g,''),
+          total = createTotal(id, true);
+      $(`td[id^=totalTo_${id}]`).html(
+        `$ ${(total * 1.16).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
+      );
+      $(`td[id^=totalSinTo_${id}]`).html(
+        `$ ${total.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
       );
     });
     $('#ticketDiscountChange').modal('toggle');
@@ -454,7 +461,7 @@ $(document).ready(function() {
 
             insertTicket(user, function(ticketId){
 
-              assignCost(ticketId, function(){
+              assignCost('venta', ticketId, function(){
 
                 insertsServiceOffereds(ticketId, function(){
 
@@ -536,7 +543,7 @@ $(document).ready(function() {
 
   function createRealSubtotal(){
     let discount = 0;
-    $.each($(`td[id^=priceTo]`), function(){
+    $.each($(`td[id^=priceSinTo]`), function(){
       let price       = parseFloat($(this).html()).toString() === 'NaN' ?
                         $(this).find('input').val() :
                         parseFloat($(this).html()),
@@ -586,7 +593,7 @@ $(document).ready(function() {
   function bigTotal(){
     let subTotalInput = $('table.subtotal #SubtotalSum'),
         subtotal      = 0;
-    $.each($(`td[id^=totalTo_]`), function(){
+    $.each($(`td[id^=totalSinTo_]`), function(){
       let productTotal = parseFloat(
         $(this).html().replace('$ ', '').replace(/,/g,'')
       );
@@ -644,27 +651,45 @@ $(document).ready(function() {
       );
     }
 
-    return productTotal.toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    );
+    return productTotal;
   }
 
   function addEvents(id){
     $(`button[id=delete_${id}]`).click(function(){
       $(`tr[id=product_${id}]`).remove();
       bigTotal();
+      resumePayment();
     });
 
     $(`#cuantityTo_${id}`).keyup(function(){
+      let total = createTotal(id);
       $(`#totalTo_${id}`).html(
-        `$ ${createTotal(id)}`
+        `$ ${(total * 1.16).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
+      );
+
+      $(`#totalSinTo_${id}`).html(
+        `$ ${total.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
       );
       bigTotal();
     });
 
     $(`#priceToServiceTo_${id}`).keyup(function(){
+      let total = createTotal(id);
+
       $(`#totalTo_${id}`).html(
-        `$ ${createTotal(id)}`
+        `$ ${(total * 1.16).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
+      );
+
+      $(`#totalSinTo_${id}`).html(
+        `$ ${total.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
       );
       bigTotal();
     });
@@ -785,7 +810,7 @@ $(document).ready(function() {
 
   $('#productShow').on('shown.bs.modal', function(e) {
     let relatedObject = e.relatedTarget.dataset,
-        productId     = relatedObject.id;
+        productId     = relatedObject.id.replace(/_.*/,'');
 
     findBy('id', productId, relatedObject.table).then(product => {
       let productData = product.rows[0];
@@ -794,6 +819,9 @@ $(document).ready(function() {
       );
       $('.product_unique_code').html(
         productData.unique_code
+      );
+      $('#product_measures').html(
+        productData.only_measure
       );
       $('.product_main_material').html(
         productData.main_material
@@ -833,9 +861,19 @@ $(document).ready(function() {
     $(tr).find('a[id^=discount]').html(
       `${$(modalBody).find('#discountCount').val()} %`
     );
+    let total = createTotal(id);
     $(`#totalTo_${id}`).html(
-      `$ ${createTotal(id)}`
+      `$ ${(total * 1.16).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
     );
+
+    $(`#totalSinTo_${id}`).html(
+      `$ ${total.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
+    );
+
     bigTotal();
     $('#discountRow').removeClass('hidden');
     $('#SubtotalRow').removeClass('hidden');
@@ -869,9 +907,9 @@ $(document).ready(function() {
           ).toFixed(2);
 
     if (convertPrice === "NaN") {
-      return price.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+      return price;
     }
-    return convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+    return ` $ ${convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
   }
 
   function addTr(product){
@@ -908,7 +946,7 @@ $(document).ready(function() {
       description +
       '</td>' +
       `<td> ${color} </td>` +
-      `<td id="priceTo_${product.id}"> $ ${translatePrice(price)}` +
+      `<td id="priceTo_${product.id}">${translatePrice(price)}` +
       '</td><td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}"></td>` +
@@ -917,6 +955,7 @@ $(document).ready(function() {
       `id="discount_${product.id}" data-id="${product.id}" ` +
       `data-table="${product.table}" > 0% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}"> $ </td>` +
+      `<td class="right hidden" id="totalSinTo_${product.id}"> $ </td>` +
       '</tr>';
   }
 

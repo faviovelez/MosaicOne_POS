@@ -502,7 +502,7 @@ select#discount_rule_options,
 
 .action-list > li {
   padding-bottom: 1rem;
-  padding-top: 1rem;
+  padding-top: 1.8rem;
   list-style-type: none;
 }
 
@@ -635,4 +635,10 @@ i.fa.fa-chevron-up.hide-payments:hover {
 
 .center {
   text-align: center;
+}
+
+div#priceList_wrapper {
+    margin-top: 140px;
+    margin-bottom: 50px;
+    margin-left: 30px;
 }

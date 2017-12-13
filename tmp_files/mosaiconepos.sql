@@ -219,7 +219,8 @@ CREATE TABLE billing_addresses (
     tax_regime_id integer,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    store_id integer
 );
 
 
@@ -2749,7 +2750,6 @@ CREATE TABLE products (
     current boolean,
     store_id integer,
     supplier_id integer,
-    unit_id integer,
     "group" boolean DEFAULT false,
     child_id integer,
     parent_id integer,
@@ -2765,7 +2765,8 @@ CREATE TABLE products (
     franchises_discount double precision,
     shared boolean,
     armed boolean DEFAULT false,
-    armed_discount double precision DEFAULT 0.0
+    armed_discount double precision DEFAULT 0.0,
+    price_was double precision
 );
 
 
@@ -3611,7 +3612,9 @@ CREATE TABLE store_movements (
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
     date date,
-    prospect_id integer
+    prospect_id integer,
+    temporal boolean,
+    down_applied boolean
 );
 
 
@@ -4214,7 +4217,8 @@ CREATE TABLE tickets_children (
     updated_at timestamp without time zone NOT NULL,
     pos boolean DEFAULT false,
     web boolean DEFAULT false,
-    date date
+    date date,
+    store_id integer
 );
 
 
@@ -6243,6 +6247,13 @@ CREATE INDEX index_bill_sales_on_store_id ON bill_sales USING btree (store_id);
 
 
 --
+-- Name: index_billing_addresses_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_billing_addresses_on_store_id ON billing_addresses USING btree (store_id);
+
+
+--
 -- Name: index_billing_addresses_on_tax_regime_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
@@ -7265,13 +7276,6 @@ CREATE INDEX index_products_on_supplier_id ON products USING btree (supplier_id)
 
 
 --
--- Name: index_products_on_unit_id; Type: INDEX; Schema: public; Owner: faviovelez
---
-
-CREATE INDEX index_products_on_unit_id ON products USING btree (unit_id);
-
-
---
 -- Name: index_products_on_warehouse_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
@@ -7440,6 +7444,13 @@ CREATE INDEX index_sales_targets_on_store_id ON sales_targets USING btree (store
 
 
 --
+-- Name: index_service_offereds_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_service_offereds_on_prospect_id ON service_offereds USING btree (prospect_id);
+
+
+--
 -- Name: index_service_offereds_on_service_id; Type: INDEX; Schema: public; Owner: faviovelez
 --
 
@@ -7535,6 +7546,13 @@ CREATE INDEX index_store_movements_on_product_id ON store_movements USING btree 
 --
 
 CREATE INDEX index_store_movements_on_product_request_id ON store_movements USING btree (product_request_id);
+
+
+--
+-- Name: index_store_movements_on_prospect_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_store_movements_on_prospect_id ON store_movements USING btree (prospect_id);
 
 
 --
@@ -7724,6 +7742,13 @@ CREATE INDEX index_terminals_on_store_id ON terminals USING btree (store_id);
 --
 
 CREATE INDEX index_tickets_children_on_children_id ON tickets_children USING btree (children_id);
+
+
+--
+-- Name: index_tickets_children_on_store_id; Type: INDEX; Schema: public; Owner: faviovelez
+--
+
+CREATE INDEX index_tickets_children_on_store_id ON tickets_children USING btree (store_id);
 
 
 --

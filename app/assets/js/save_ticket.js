@@ -42,9 +42,9 @@ function createTicketProductJson(call){
     if(table === 'products') {
 
       productsJson[id] = {
-        sellQuantity   : $(this).find($('td input[id^=cuantityTo]')).val(),
-        sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,''),
-        discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,''),
+        sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
+        sellTo         : parseFloat($(this).find('td[id^=totalSinTo]').html().replace('$ ','').replace(/,/g,'')),
+        discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html()
       };
 
@@ -54,9 +54,9 @@ function createTicketProductJson(call){
 
     } else {
       servicesJson[id] = {
-        sellQuantity   : $(this).find($('td input[id^=cuantityTo]')).val(),
-        sellTo         : $(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,''),
-        discount       : $(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,''),
+        sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
+        sellTo         : parseFloat($(this).find('td[id^=totalSinTo]').html().replace('$ ','').replace(/,/g,'')),
+        discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html(),
         selector       : $(this).attr('id')
       };
@@ -318,7 +318,7 @@ function insertsServiceOffereds(ticketId, call){
   }
 }
 
-function assignCost(ticketId, call) {
+function assignCost(ticketType, ticketId, call) {
   if ($.isEmptyObject(productsJson)){
     return call();
   }
@@ -346,7 +346,7 @@ function assignCost(ticketId, call) {
         fixedDiscount   = parseFloat(discount.toFixed(2)),
         data = {
           product_id         : productId,
-          quantity           : -1 * sellQuantity,
+          quantity           : sellQuantity,
           movement_type      : 'venta',
           ticket_id          : ticketId,
           initial_price      : productsJson[productId].price.toFixed(2),
@@ -367,7 +367,7 @@ function assignCost(ticketId, call) {
         data.discount_reason = discountReason;
       }
 
-      if (entries.rowCount === 0) {
+      if (entries.rowCount === 0 || ticketType === 'pending') {
         createStoreMovement(data, call);
       } else {
         let BreakException = {};
@@ -377,7 +377,7 @@ function assignCost(ticketId, call) {
               cost        = entry.cost,
               entryId     = entry.id;
 
-            if (processQuantity >= quantity) {
+            if (parseInt(processQuantity) >= quantity) {
               totalCost += (quantity * cost);
               deleteBy('stores_warehouse_entries', `id = ${entryId}`);
               updateStoreInventories(
@@ -463,8 +463,6 @@ function insertsPayments(ticketType, ticketId, userId, store, call) {
     } else if (type === 'Venta a Crédito') {
       data.credit_days = $(this).find('td[id^=creditDays]').html();
       data.payment_type = 'crédito';
-    } else if (type === 'Efectivo') {
-      balanceSum += parseFloat(data.total);
     }
 
     insert(
@@ -472,28 +470,10 @@ function insertsPayments(ticketType, ticketId, userId, store, call) {
       Object.values(data),
       'payments'
     ).then(() => {
-      if (ticketType === 'venta' && data.payment_type === 'pago') {
-        findBy('store_id', store.id, 'cash_registers').then(cashRegisterObject => {
-          let realBalance = cashRegisterObject.rows[0].balance + balanceSum;
-          updateBy(
-            {
-              balance: realBalance.toFixed(2)
-            },
-            'cash_registers',
-            `id = ${cashRegisterObject.rows[0].id}`
-          ).then(updated => {
-            count++;
-            if (limit === count){
-              return call();
-            }
-          });
-        });
-      } else {
         count++;
         if (limit === count){
           return call();
         }
-      }
     });
 
   });

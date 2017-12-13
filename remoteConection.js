@@ -2,22 +2,22 @@ const {Pool} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-  user: 'oscar',
+  user: 'faviovelez',
   host: 'localhost',
   database: 'mosaicone',
-  password: '12345678"',
+  password: 'bafio44741',
   port: 5432,
 });
 
 const localPool = new Pool({
-  user: 'oscar',
+  user: 'faviovelez',
   host: 'localhost',
-  database: 'local_db',
-  password: '12345678"',
+  database: 'mosaiconepos',
+  password: 'bafio44741',
   port: 5432,
 });
 
-async function query (q, remote = true, table = '') {
+async function query (q, remote = true, table = '', lastId = 0) {
   let client = null;
   if (remote){
     client = await remotePool.connect();
@@ -36,6 +36,9 @@ async function query (q, remote = true, table = '') {
     }
   } finally {
     client.release();
+  }
+  if (lastId !== 0) {
+    res.lastId = lastId;
   }
   res.table = table;
   return res;
@@ -78,17 +81,32 @@ async function createInsert (columns, data, table){
         if (typeof data === 'object'){
           localQuery += `, '${data.toUTCString()}'`;
         } else {
-          localQuery += `, '${data}'`;
+          try {
+            localQuery += `, '${data.replace(/'/,'\\u0027')}'`;
+          } catch (err) {
+            localQuery += `, '${data}'`;
+          }
         }
     }
   });
+
   return `${localQuery})`;
 }
 
-async function findBy(column, data, table, remote = true){
+async function findBy(column, data, table, remote = true, lastId = 0){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
-  return await query(`${localQuery}`, remote);
+  return await query(`${localQuery}`, remote, table, lastId);
+}
+
+async function updateBy(data, table, condition){
+  let localQuery = `UPDATE ${table} SET`;
+  for(var column in data) {
+    localQuery += ` ${column} = '${data[column]}',`;
+  }
+  localQuery = localQuery.replace(/,$/,'');
+  localQuery += ` WHERE ${condition}`;
+  return await query(localQuery, false);
 }
 
 async function updatePosData(table, id){

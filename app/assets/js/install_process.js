@@ -11,6 +11,36 @@ $(function(){
     return store;
   }
 
+  function updateProductPricesPrices(storeObject, call){
+    findBy('manual_price_update', 'FALSE', 'stores_inventories', false).then(storesInventoriesObjects => {
+      let limit = storesInventoriesObjects.rowCount,
+          count = 0,
+          pricesHistories = {};
+
+      storesInventoriesObjects.rows.forEach(storeInventory => {
+        let productId = storeInventory.product_id;
+        findBy('id', productId, 'products', false).then(productObject => {
+          let product = productObject.rows[0],
+              updatedPrice = product.price * ( 1 + (storeObject.overprice / 100) );
+          pricesHistories[product.id] = parseFloat(updatedPrice.toFixed(2));
+          updateBy(
+            {
+              price: updatedPrice
+            },
+            'products',
+            `id = ${product.id}`
+          ).then(productUpdated => {
+            count++;
+            if (count === limit){
+              call(pricesHistories);
+            }
+          });
+
+        });
+      });
+    });
+  }
+
   function cloneAlert(){
     let alerts = $('.alert').length + 1;
     $('.alerts-container').prepend(
@@ -38,6 +68,26 @@ $(function(){
     ", inspection_approved, overprice, series, last_bill, install_code";
   }
 
+  function storesInventoriesColumns(){
+    return [
+      "stores_inventories.id as id",
+      "stores_inventories.product_id as product_id",
+      "stores_inventories.store_id as store_id",
+      "stores_inventories.quantity as quantity",
+      "stores_inventories.alert as alert",
+      "stores_inventories.alert_type as alert_type",
+      "stores_inventories.created_at as created_at",
+      "stores_inventories.updated_at as updated_at",
+      "stores_inventories.rack as rack",
+      "stores_inventories.level as level",
+      "stores_inventories.manual_price_update as manual_price",
+      "stores_inventories.pos as pos",
+      "stores_inventories.web as web",
+      "stores_inventories.date as date",
+      "stores_inventories.manual_price as manual_price"
+    ].join(', ');
+  }
+
 function lotQueries(store, call){
     return call({
       'stores' : "SELECT * FROM stores " +
@@ -46,7 +96,7 @@ function lotQueries(store, call){
       "WHERE name IN ('store', 'store-admin')",
       'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
       `id = ${store.delivery_address_id}`,
-      'billing_addresses': 'SELECT * FROM billing_addresses',
+      'billing_addresses': getBillingAdressesQuery(store),
       'business_units': 'SELECT * FROM business_units WHERE ' +
       `id = ${store.business_unit_id}`,
       'store_types':  'SELECT * FROM store_types WHERE ' +
@@ -57,11 +107,13 @@ function lotQueries(store, call){
       `id = ${store.business_group_id}`,
       'prospects': 'SELECT * FROM prospects WHERE ' +
       `store_id = ${store.id}`,
-      'products' : 'SELECT * FROM products WHERE supplier_id IN (1,2)',
+      'products' : 'SELECT * FROM products WHERE shared = true AND current = true ' +
+      `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}`,
       'services' : 'SELECT * FROM services WHERE ' +
-      'store_id IS NULL AND shared = true',
-      'stores_inventories': 'SELECT * FROM stores_inventories ' +
-      `WHERE store_id = ${store.id}`,
+      `shared = true AND current = true OR store_id = ${store.id}`,
+      'stores_inventories': `SELECT ${storesInventoriesColumns()} FROM stores_inventories INNER JOIN products ` + 
+      'ON stores_inventories.product_id = products.id WHERE' +
+      ` stores_inventories.store_id = ${store.id} AND products.child_id IS NULL` ,
       'stores_warehouse_entries': 'SELECT * FROM stores_warehouse_entries ' +
       `WHERE store_id = ${store.id}`,
       'store_movements': 'SELECT * FROM store_movements ' +
@@ -75,9 +127,25 @@ function lotQueries(store, call){
     });
   }
 
+  function getBillingAdressesQuery(store){
+    return 'SELECT billing_addresses.id, billing_addresses.type_of_person, ' +
+           'billing_addresses.business_name, billing_addresses.rfc, ' + 
+           'billing_addresses.street, billing_addresses.exterior_number,' +
+           'billing_addresses.interior_number, billing_addresses.zipcode, ' +
+           'billing_addresses.neighborhood, billing_addresses.city, ' + 
+           'billing_addresses.state, billing_addresses.country, ' + 
+           'billing_addresses.created_at, billing_addresses.updated_at, ' + 
+           'billing_addresses.tax_regime_id, billing_addresses.pos, ' + 
+           'billing_addresses.web, billing_addresses.date, billing_addresses.store_id' +
+           ' FROM billing_addresses INNER JOIN business_units ON billing_addresses.id = ' + 
+           'business_units.billing_address_id INNER JOIN stores ON stores.business_unit_id ' +
+           `= business_units.id WHERE stores.id = ${store.id} UNION ALL ` +
+           `SELECT * FROM billing_addresses WHERE store_id = ${store.id}`; 
+  }
+
   function getQueryCount(store){
     return 'SELECT SUM(rows) as total_rows FROM (' +
-      " SELECT COUNT (*) as rows FROM billing_addresses UNION ALL" +
+      ` SELECT COUNT (*) as rows FROM billing_addresses WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores WHERE id = ${store.id} UNION ALL` +
       " SELECT COUNT (*) as rows FROM roles WHERE name IN ('store', 'store-admin') UNION ALL" +
       ` SELECT COUNT (*) as rows FROM delivery_addresses WHERE id = ${store.delivery_address_id} UNION ALL`+
@@ -86,9 +154,12 @@ function lotQueries(store, call){
       ` SELECT COUNT (*) as rows FROM cost_types WHERE id = ${store.cost_type_id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM business_groups WHERE id = ${store.business_group_id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM prospects WHERE store_id = ${store.id} UNION ALL` +
-      ' SELECT COUNT (*) as rows FROM products WHERE supplier_id IN (1,2) UNION ALL' +
-      ' SELECT COUNT (*) as rows FROM services WHERE store_id IS NULL AND shared = true UNION ALL' +
-      ` SELECT COUNT (*) as rows FROM stores_inventories WHERE store_id = ${store.id} UNION ALL` +
+      ' SELECT COUNT (*) as rows FROM products WHERE shared = true AND current = true AND' +
+      ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM services WHERE shared = true AND current = true OR store_id = ${store.id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM stores_inventories INNER JOIN products ` + 
+      'ON stores_inventories.product_id = products.id WHERE' + 
+      ` stores_inventories.store_id = ${store.id} AND products.child_id IS NULL UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores_warehouse_entries WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM store_movements WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM cash_registers WHERE store_id = ${store.id} UNION ALL` +
@@ -124,9 +195,8 @@ function lotQueries(store, call){
               Object.values(row),
               tablesResult.table
             ).then(localQuery => {
-
               query(localQuery, false).then(result => {
-                if (count++ === limit - 1){
+                if (count++ === limit){
                   call();
                 }
                 current_progress += parseInt(count * 92 / limit);
@@ -152,7 +222,7 @@ function lotQueries(store, call){
 
     let path = `./tmp_files/mosaiconepos.sql`;
 
-    script = `psql -U oscar -d local_db ` +
+    script = `psql -U faviovelez -d mosaiconepos ` +
       `< ${path}`;
     showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;
@@ -195,7 +265,29 @@ function lotQueries(store, call){
                   .text(5 + "%");
 
                 cloneAllTables(queries, function(){
-                  window.location.href = 'sign_up.html';
+                  updateProductPricesPrices(store, function(updatedPrices){
+                    let updatedPricesLimit = Object.keys(updatedPrices).length,
+                        updatedPricescount = 0;
+
+                    for (var productId in updatedPrices){
+                      findBy('product_id', productId, 'stores_inventories', false, productId).then(storeInventory => {
+                        updateBy(
+                          {
+                            manual_price: updatedPrices[storeInventory.lastId]
+                          },
+                          'stores_inventories',
+                          `product_id = ${storeInventory.lastId}`
+                        ).then(() => {
+                          updatedPricescount++;
+                          if (updatedPricescount === updatedPricesLimit){
+                            window.location.href = 'sign_up.html';
+                          }
+                        });
+
+                      });
+                    }
+                  });
+
                 }, getQueryCount(store));
 
               });
