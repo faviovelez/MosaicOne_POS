@@ -177,6 +177,14 @@ function setPayedLogic(data){
   }
 }
 
+function getCashRegisterInfo(call){
+  initStore().then(storage => {
+    findBy('name', storage.get('cash'), 'cash_registers').then( cashRegisterObject => {
+      call(cashRegisterObject.rows[0]);
+    });
+  });
+}
+
 function insertTicket(userId, call, type){
   let paymentsAmount = $('#sumPayments').html() === "" ? 0 
                        : $('#sumPayments').html(),
@@ -206,14 +214,17 @@ function insertTicket(userId, call, type){
     let prospectId   = $('#prospectList a').attr('data-id');
     data.prospect_id = prospectId;
   }
-
-  insert(
-    Object.keys(data),
-    Object.values(data),
-    'tickets'
-  ).then(ticket => {
-    call(ticket.lastId);
+  getCashRegisterInfo(cashRegister => {
+    data.cash_register_id = cashRegister.id;
+    insert(
+      Object.keys(data),
+      Object.values(data),
+      'tickets'
+    ).then(ticket => {
+      call(ticket.lastId);
+    });
   });
+  
 }
 
 function specialQuery(productId){
@@ -273,6 +284,11 @@ function insertsServiceOffereds(ticketId, call){
 
     if (discountReason){
       data.discount_reason = discountReason;
+    }
+
+    if ($('#prospectList a').length === 1) {
+      let prospectId   = $('#prospectList a').attr('data-id');
+      data.prospect_id = prospectId;
     }
 
     if (discountType !== 'none'){
@@ -344,6 +360,7 @@ function assignCost(ticketType, ticketId, call) {
         taxes           = ((subtotal - discount) * 0.16),
         total           = (subtotal - discount + taxes),
         fixedDiscount   = parseFloat(discount.toFixed(2)),
+        prospectId   = $('#prospectList a').attr('data-id'),
         data = {
           product_id         : productId,
           quantity           : sellQuantity,
@@ -367,6 +384,11 @@ function assignCost(ticketType, ticketId, call) {
         data.discount_reason = discountReason;
       }
 
+      if ($('#prospectList a').length === 1) {
+        let prospectId   = $('#prospectList a').attr('data-id');
+        data.prospect_id = prospectId;
+      }
+
       if (entries.rowCount === 0 || ticketType === 'pending') {
         createStoreMovement(data, call);
       } else {
@@ -378,7 +400,7 @@ function assignCost(ticketType, ticketId, call) {
               entryId     = entry.id;
 
             if (parseInt(processQuantity) >= quantity) {
-              totalCost += (quantity * cost);
+              totalCost += (quantity * cost); 
               deleteBy('stores_warehouse_entries', `id = ${entryId}`);
               updateStoreInventories(
                 productId, quantity

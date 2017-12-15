@@ -67,7 +67,7 @@ $(function(){
           $('#register_open_cash_register option').remove();
 
           $('#register_open_cash_register').append(
-            `  <option value="${cashRegister.id}"> Caja ${cashRegister.name} </option>`
+            `  <option value="${cashRegister.name}"> Caja ${cashRegister.name} </option>`
           );
 
         });

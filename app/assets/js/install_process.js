@@ -227,11 +227,11 @@ function lotQueries(store, call){
     showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;
 
-    exec('mkdir -p ./tickets', function(err, stdout, stderr){
-      if(err){
-        showAlert('Error', stderr, cloneAlert());
-      }
-    });
+//    exec('mkdir -p ./tickets', function(err, stdout, stderr){
+//      if(err){
+//        showAlert('Error', stderr, cloneAlert());
+//      }
+//    });
 
     dbRestore = exec(script,
       function(err, stdout, stderr) {

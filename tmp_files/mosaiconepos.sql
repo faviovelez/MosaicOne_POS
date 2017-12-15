@@ -648,7 +648,8 @@ CREATE TABLE cash_registers (
     cash_number integer,
     pos boolean DEFAULT false,
     web boolean DEFAULT false,
-    date date
+    date date,
+    cash_alert double precision
 );
 
 
@@ -2766,7 +2767,8 @@ CREATE TABLE products (
     shared boolean,
     armed boolean DEFAULT false,
     armed_discount double precision DEFAULT 0.0,
-    price_was double precision
+    price_was double precision,
+    only_measure character varying
 );
 
 

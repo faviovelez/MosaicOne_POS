@@ -140,7 +140,7 @@
 
           <br /><br />
           <div class="actions">
-            <input type="submit" name="commit" value="Crear alerta" class="main-button" />
+            <input type="submit" name="commit" value="Crear alerta" class="main-button" id="createCashAlert" />
           </div>
         </form>
       </div>
@@ -158,16 +158,16 @@
             <tbody>
               <tr>
                 <td>
-                  <select name="discount_rule_options" class="myfield" id="discount_rule_options">
-                    <option value="1">Caja 1</option>
-                    <option value="2">Caja 2</option>
+                  <select name="withdrawalOptions" class="myfield cashRegisterOptions" id="withdrawalOptionField">
                   </select>
                 </td>
-                <td id='configCashValue'>
+                <td>
                   <strong>
                   Efectivo:
                 </strong>
-                    $ 200.00
+                <span class="configCashValue">
+                  $ 200.00
+                </span>
                 </td>
               </tr>
               <tr>
@@ -208,14 +208,16 @@
             <tbody>
               <tr>
                 <td>
-                  <select name="discount_rule_options" class="myfield" id="discount_rule_options">
+                  <select name="depositOptions" class="myfield cashRegisterOptions" id="depositOptionField">
                   </select>
                 </td>
                 <td>
                   <strong>
                   Efectivo:
                 </strong>
+                <span class="configCashValue">
                     $ 200.00
+                </span>
                 </td>
               </tr>
               <tr>
@@ -237,7 +239,7 @@
           </table>
 
           <div class="actions">
-            <input type="submit" name="commit" value="Registrar depósito" class="main-button" />
+            <input type="submit" name="commit" value="Registrar depósito" class="main-button" id="registerCashDeposit" />
           </div>
         </form>
 
@@ -319,7 +321,7 @@
           <input name="utf8" type="hidden" value="&#x2713;" />
           <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
 
-          <select name="user_options" class="myfield" id="bank_select">
+          <select name="user_options" class="myfield" id="usersOptionsList">
             <option value="1">Juan Perez</option>
             <option value="2">Maria Antonieta</option>
           </select>
@@ -336,7 +338,7 @@
           <br />
 
           <div class="actions">
-            <input type="submit" name="commit" value="Cambiar contraseña" class="main-button" />
+            <input type="submit" name="commit" value="Cambiar contraseña" id="changePasswordAction" class="main-button" />
           </div>
 
         </form>
@@ -385,12 +387,12 @@
 
             <div class="field sign-in">
               <label for="user_password" class="white">Confirmar Contraseña</label><br />
-              <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password" />
+              <input placeholder="Ingresa tu contraseña" autocomplete="off" class="middle-sign-in" type="password" name="user[password]" id="user_password_confirm" />
             </div>
           </div>
 
           <div class="actions">
-            <input type="submit" name="commit" value="Registrar" class="main-button" />
+            <input type="submit" name="commit" value="Registrar" id="registerAction" class="main-button" />
           </div>
         </form>
 
@@ -414,9 +416,13 @@
   <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
   <script src="../../dbconnection.js" charset="utf-8"></script>
   <script src="../assets/js/options.js" charset="utf-8"></script>
+  <script src="../../esMx.js" charset="utf-8"></script>
   <script src="../../validator.js" charset="utf-8"></script>
   <script src="../../store.js" charset="utf-8"></script>
   <script src="../assets/js/specialQueries.js" charset="utf-8"></script>
+  <script src="../../users_gestor.js" charset="utf-8"></script>
+  <script src="../assets/js/sign_up.js" charset="utf-8"></script>
+
 
   <script>if (window.module) module = window.module;</script>
 

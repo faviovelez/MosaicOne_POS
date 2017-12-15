@@ -1,6 +1,22 @@
 $(document).ready(function() {
   const Inputmask = require('inputmask');
+  function cloneAlert(){
+    let alerts = $('.alert').length + 1;
+    $('.alerts-container').prepend(
+      `<div class="alert" id="alertNo_${alerts}" hidden>` +
+      `${$('.alert').html()} </div>`
+    );
+    return $('.alert:first').attr('id');
+  }
 
+  function showAlert(type, message, alertId){
+    $(`#${alertId} span.title`).html(`${type}: ${message}`);
+    $(`#${alertId}`)
+      .show()
+      .addClass('alert-danger')
+      .removeClass('hidden');
+  }
+  
   async function initStore(){
 
     const store = new Store({
@@ -22,22 +38,21 @@ $(document).ready(function() {
       '<input type="text" class="form-control" id="addProductInput" smaller-form" placeholder="1">' +
       '</td></tr>';
   }
+  function getCostPrice(price, overprice, discount){
+    return (
+        price /  (1 + overprice / 100) * (1 - discount / 100 ) 
+      ).toFixed(2);
+  }
 
   function createStoreMovementData(productId, quantity, action, call){
     findBy('id', productId, 'products').then(product => {
       productDetails = product.rows[0];
-      let final_price = productDetails.price * ( 1 - (productDetails.discount_for_stores / 100));
-
-      if (productDetails.discount_for_stores === 0){
-        final_price = productDetails.price * 0.65;
-      }
 
       storeMovementData = {
         product_id    : productDetails.id,
         quantity      : quantity,
         movement_type : action,
         initial_price : productDetails.price.toFixed(2),
-        final_price   : final_price.toFixed(2),
         supplier_id   : productDetails.supplier_id,
       };
 
@@ -45,15 +60,18 @@ $(document).ready(function() {
 
         let store = storage.get('store');
         if (store.store_type_id === 4) {
-          let final_price = productDetails.price * ( 1 - (productDetails.discount_for_franchises / 100));
-          if (productDetails.discount_for_franchises === 0){
-            final_price = productDetails.price * 0.65;
-          }
-          storeMovementData.final_price = final_price.toFixed(2);
+          storeMovementData.cost       = getCostPrice(
+            productDetails.price, store.overprice, productDetails.discount_for_franchises
+          );
+          storeMovementData.total_cost  = storeMovementData.cost * quantity;
+          storeMovementData.final_price = storeMovementData.cost;
+        } else if(store.store_type_id === 1) {
+          storeMovementData.cost       = getCostPrice(
+            productDetails.price, store.overprice, productDetails.discount_for_stores
+          );
+          storeMovementData.total_cost  = storeMovementData.cost * quantity;
+          storeMovementData.final_price = storeMovementData.cost;
         }
-
-        storeMovementData.cost       = storeMovementData.final_price;
-        storeMovementData.total_cost = (storeMovementData.cost * storeMovementData.quantity).toFixed(2);
 
         insert(
           Object.keys(storeMovementData),
@@ -380,7 +398,7 @@ $(document).ready(function() {
       $(this).html(
         $('#globalDiscount input:first').val() + ' %'
       );
-      let id = $(this).attr('id').replace(/\D/g,''),
+      let id = $(this).attr('id').replace(/discount_/,''),
           total = createTotal(id, true);
       $(`td[id^=totalTo_${id}]`).html(
         `$ ${(total * 1.16).toFixed(2).replace(
@@ -471,44 +489,60 @@ $(document).ready(function() {
                       $('#ticketNum').html()
                     ));
 
-                    findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
+                    query(getCashRegisterSum()).then(sumObject => {
+                      updateBy(
+                        {
+                          balance : sumObject.rows[0].sum
+                        },
+                        'cash_registers',
+                        `name = '${store.get("cash")}'`
+                      ).then(() => {
 
-                      ticketData.cashRegister = cashRegisterObject.rows[0];
-                      findBy(
-                        'id',
-                        storeObject.business_unit_id,
-                        'business_units'
-                      ).then(business_unit => {
-                        findBy(
-                          'id',
-                          business_unit.rows[0].billing_address_id,
-                          'billing_addresses'
-                        ).then(billing_address => {
-                          ticketData.billing_address = billing_address.rows[0];
+                        findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
+
+                          ticketData.cashRegister = cashRegisterObject.rows[0];
+                          if (ticketData.cashRegister.balance >= ticketData.cashRegister.cash_alert) {
+                            alert(`La caja tiene un saldo de ${ticketData.cashRegister.balance} ` +
+                              'pesos. Realice un retiro.');
+                          }
                           findBy(
                             'id',
-                            ticketData.billing_address.tax_regime_id,
-                            'tax_regimes'
-                          ).then(tax_regime => {
+                            storeObject.business_unit_id,
+                            'business_units'
+                          ).then(business_unit => {
+                            findBy(
+                              'id',
+                              business_unit.rows[0].billing_address_id,
+                              'billing_addresses'
+                            ).then(billing_address => {
+                              ticketData.billing_address = billing_address.rows[0];
+                              findBy(
+                                'id',
+                                ticketData.billing_address.tax_regime_id,
+                                'tax_regimes'
+                              ).then(tax_regime => {
 
-                            ticketData.tax_regime = tax_regime.rows[0];
-                            findBy('id', ticketId, 'tickets').then(ticket => {
+                                ticketData.tax_regime = tax_regime.rows[0];
+                                findBy('id', ticketId, 'tickets').then(ticket => {
 
-                              ticketData.ticket = ticket.rows[0];
+                                  ticketData.ticket = ticket.rows[0];
 
-                              findBy('ticket_id', ticketId, 'payments').then(payments => {
-                                addPaymentFormData(ticketData, payments.rows, function(){
-                                  printTicket(ticketData, function(){
+                                  findBy('ticket_id', ticketId, 'payments').then(payments => {
+                                    addPaymentFormData(ticketData, payments.rows, function(){
+                                      printTicket(ticketData, function(){
 
-                                    window.location.href = 'pos_sale.html';
+                                        window.location.href = 'pos_sale.html';
 
+                                      });
+
+                                    });
                                   });
 
                                 });
+
                               });
 
                             });
-
                           });
 
                         });
@@ -543,10 +577,10 @@ $(document).ready(function() {
 
   function createRealSubtotal(){
     let discount = 0;
-    $.each($(`td[id^=priceSinTo]`), function(){
-      let price       = parseFloat($(this).html()).toString() === 'NaN' ?
+    $.each($(`td[id^=priceTo]`), function(){
+      let price       = parseFloat($(this).html().replace(/\$|,/g,'')).toString() === 'NaN' ?
                         $(this).find('input').val() :
-                        parseFloat($(this).html()),
+                        parseFloat($(this).html().replace(/\$|,/g,'')),
           tr          = $(this).parent(),
           cuantity    = parseInt($(tr).find(
             'input[id^=cuantityTo]'
@@ -981,7 +1015,7 @@ $(document).ready(function() {
         ` ${lastTicket + 1} `
       );
 
-      $('#cashRegisterNum').html(
+      $('#cashName').html(
         ` ${store.get('cash')} `
       );
 

@@ -111,12 +111,12 @@ $(document).ready(function() {
             data: sendObjects,
             headers: { "Content-Type": "application/json" }
           };
-
+        debugger
         client.post("http://localhost:3000/pos/received_data", args, function (data, response) {
           delete sendObjects.installCode;
           delete sendObjects.storeId;
 
-          updateWebBan();
+          //updateWebBan();
           alert(data.message);
         });
 
