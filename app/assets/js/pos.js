@@ -48,7 +48,7 @@ $(document).ready(function() {
   }
   function getCostPrice(price, overprice, discount){
     return (
-        price /  (1 + overprice / 100) * (1 - discount / 100 ) 
+        price /  (1 + overprice / 100) * (1 - discount / 100 ) * (1.16)
       ).toFixed(2);
   }
 

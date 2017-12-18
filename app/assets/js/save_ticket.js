@@ -485,6 +485,8 @@ function insertsPayments(ticketType, ticketId, userId, store, call) {
     } else if (type === 'Venta a Crédito') {
       data.credit_days = $(this).find('td[id^=creditDays]').html();
       data.payment_type = 'crédito';
+    } else if (type === 'Efectivo') {
+      data.total = data.total - parseFloat($('#currencyChange strong').html().replace(/\s|\$|,/g,'')).toFixed(2);
     }
 
     insert(
