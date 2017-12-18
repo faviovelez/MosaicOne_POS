@@ -239,12 +239,12 @@ function initTicket(ticketData, call) {
         '<title> Ticket </title>' +
         '<style type="text/css">' +
         '@media print{' +
-        '@page { size:70mm auto; margin-left: 0mm !important}' +
+        '@page { size:63mm auto; margin-left: 0mm !important}' +
         '}' +
         '</style>' +
         '</head>' +
         '<body style="margin:0 auto !important; padding:0 auto !important">' +
-        '<table style="font-family: Courier New; font-size: 14px; width: 330px; text-align: center; vertical-align:text-top">' +
+        '<table style="font-family: Courier New; font-size: 14px; width: 300px; text-align: center; vertical-align:text-top">' +
         '<tbody>' +
         '<tr>' +
         '<td colspan="4">' +
