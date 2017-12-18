@@ -227,25 +227,7 @@ $(document).ready(function() {
   });
 
 
-  $('#addProductSearch').click(function(){
-
-      getProductsAndServices(list => {
-        $('#addProductSearch').autocomplete({
-          lookup: list,
-          lookupLimit: 10,
-          onSelect: function (suggestion) {
-            $('#addProductQuantity').append(
-              productAddChange(suggestion)
-            );
-
-            let selector = document.getElementById("addProductInput");
-            var im = new Inputmask("99999999");
-            im.mask(selector);
-            $(this).val('');
-          }
-        });
-      });
-  })
+  $('#addProductSearch')
   .addClass('hidden');
 
   function createFullName(user){
@@ -1037,8 +1019,27 @@ $(document).ready(function() {
       setTimeout(function(){
         if ($('#mainProductSearch').attr('autocomplete') === 'undefined'){
           $('#pos').click();
-        }
-      }, 500);
+        } 
+      }, 1000);
+
+      setTimeout(function(){
+        getProductsAndServices(list => {
+          $('#addProductSearch').autocomplete({
+            lookup: list,
+            lookupLimit: 10,
+            onSelect: function (suggestion) {
+              $('#addProductQuantity').append(
+                productAddChange(suggestion)
+              );
+
+              let selector = document.getElementById("addProductInput");
+              var im = new Inputmask("99999999");
+              im.mask(selector);
+              $(this).val('');
+            }
+          });
+        });
+      }, 3000);
 
       getProductsAndServices(list => {
         $('#mainProductSearch').autocomplete({

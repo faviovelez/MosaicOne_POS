@@ -427,7 +427,7 @@ function createHtmlFile(html, ticketId){
   let fs = require('fs');
 
   try{
-    fs.writeFileSync(`./tickets/TicketNo:_${ticketId}.html`, html);
+    fs.writeFileSync(`./tickets/TicketNo_${ticketId}.html`, html);
   }catch (e){
     console.log("Cannot write file ", e);
   }
