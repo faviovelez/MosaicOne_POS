@@ -304,7 +304,8 @@ $(document).ready(function() {
     ).replace(',',''),
        rest = (parseFloat(total) - sum).toFixed(2);
     $('#sumPayments').html(sum);
-    if (parseFloat(rest) <= 0){
+    let products = $('#ticketList tr[id^=product_]').length;
+    if (parseFloat(rest) <= 0 && products > 0){
       $('#paymentRest').html(
         '<strong>$ 0</strong>'
       );
@@ -691,6 +692,7 @@ $(document).ready(function() {
     )}`
       );
       bigTotal();
+      resumePayment();
     });
 
     $(`#priceToServiceTo_${id}`).keyup(function(){
@@ -708,6 +710,7 @@ $(document).ready(function() {
     )}`
       );
       bigTotal();
+      resumePayment();
     });
   }
 
@@ -1022,9 +1025,8 @@ $(document).ready(function() {
         } 
       }, 1000);
 
-      setTimeout(function(){
-        getProductsAndServices(list => {
-          $('#addProductSearch').autocomplete({
+      getProductsAndServices(list => {
+        $('#addProductSearch').autocomplete({
             lookup: list,
             lookupLimit: 10,
             onSelect: function (suggestion) {
@@ -1038,10 +1040,7 @@ $(document).ready(function() {
               $(this).val('');
             }
           });
-        });
-      }, 3000);
 
-      getProductsAndServices(list => {
         $('#mainProductSearch').autocomplete({
           lookup: list,
           lookupLimit: 10,
