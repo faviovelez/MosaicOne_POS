@@ -2,8 +2,8 @@ const {Pool} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-  user: 'faviovelez',
-  host: 'localhost',
+  user: 'ubuntu',
+  host: '34.211.223.225',
   database: 'mosaicone',
   password: 'bafio44741',
   port: 5432,

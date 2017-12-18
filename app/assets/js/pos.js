@@ -1,4 +1,12 @@
 $(document).ready(function() {
+  function getCashRegisterSum(){
+  return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
+      '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
+      'SUM((SELECT (COALESCE(SUM(payments.total),0) - COALESCE(SUM(tickets.cash_return),0)) as s ' +
+      'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
+      "WHERE payment_type = 'pago' AND payment_form_id = 1 AND ticket_type = 'venta'))) as sum";
+  }
+  
   const Inputmask = require('inputmask');
   function cloneAlert(){
     let alerts = $('.alert').length + 1;
@@ -148,6 +156,7 @@ $(document).ready(function() {
   }
 
   $('#confirmAddProduct').click(function(){
+    $('#confirmAddProduct').prop('disabled', true);
     let id = $('tr[id^=addProduct_]').attr(
       'id'
     ).replace(/\D/g,''),
@@ -181,6 +190,9 @@ $(document).ready(function() {
 
         $('input[type=radio][name=processProduct]').prop('checked', false);
         $('#addProductSearch').addClass('hidden');
+        $('#addProductQuantity tr[id^=addProduct_]').remove();
+        $('#confirmAddProduct').prop('disabled', false);
+        $('#warehouseEntry').modal('hide');
 
       });
 
@@ -190,8 +202,7 @@ $(document).ready(function() {
         }, err => {
         });
       }
-
-      $('#addProductQuantity tr[id^=addProduct_]').remove();
+    
     });
   });
 
@@ -1022,8 +1033,8 @@ $(document).ready(function() {
       setTimeout(function(){
         if ($('#mainProductSearch').attr('autocomplete') === 'undefined'){
           $('#pos').click();
-        } 
-      }, 1000);
+        }
+      }, 2000);
 
       getProductsAndServices(list => {
         $('#addProductSearch').autocomplete({

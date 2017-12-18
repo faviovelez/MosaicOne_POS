@@ -111,8 +111,7 @@ $(document).ready(function() {
             data: sendObjects,
             headers: { "Content-Type": "application/json" }
           };
-        debugger
-        client.post("http://localhost:3000/pos/received_data", args, function (data, response) {
+        client.post("http://34.211.223.225/pos/received_data", args, function (data, response) {
           delete sendObjects.installCode;
           delete sendObjects.storeId;
 
