@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  
+
   function getCashRegisterSum(){
     return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
       '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
@@ -7,7 +7,7 @@ $(document).ready(function() {
       'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
       "WHERE payment_type = 'pago' AND payment_form_id = 1 AND ticket_type = 'venta'))) as sum";
   }
-  
+
   const Inputmask = require('inputmask');
   function cloneAlert(){
     let alerts = $('.alert').length + 1;
@@ -25,7 +25,7 @@ $(document).ready(function() {
       .addClass('alert-danger')
       .removeClass('hidden');
   }
-  
+
   async function initStore(){
 
     const store = new Store({
@@ -203,7 +203,7 @@ $(document).ready(function() {
         }, err => {
         });
       }
-    
+
     });
   });
 
@@ -268,7 +268,7 @@ $(document).ready(function() {
               value: `${service.unique_code} ${service.description}`,
               id:    service.id,
               table:  'services',
-              company: service.delivery_company ? service.delivery_company 
+              company: service.delivery_company ? service.delivery_company
                                                 : '',
               description: service.description
             }
@@ -1040,7 +1040,7 @@ $(document).ready(function() {
       getProductsAndServices(list => {
         $('#addProductSearch').autocomplete({
             lookup: list,
-            lookupLimit: 10,
+//            lookupLimit: 10,
             onSelect: function (suggestion) {
               $('#addProductQuantity').append(
                 productAddChange(suggestion)
@@ -1055,7 +1055,7 @@ $(document).ready(function() {
 
         $('#mainProductSearch').autocomplete({
           lookup: list,
-          lookupLimit: 10,
+//          lookupLimit: 10,
           onSelect: function (suggestion) {
             $('#ticketList').append(addTr(suggestion));
             addEvents(suggestion.id);

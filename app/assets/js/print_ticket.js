@@ -239,7 +239,7 @@ function initTicket(ticketData, call) {
         '<title> Ticket </title>' +
         '<style type="text/css">' +
         '@media print{' +
-        '@page { size:63mm auto; margin-left: 0mm !important}' +
+        '@page { size:63mm auto; margin-left: 3mm !important; margin-right: 3mm !important;}' +
         '}' +
         '</style>' +
         '</head>' +
