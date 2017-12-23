@@ -64,9 +64,9 @@ $(function(){
           ).toFixed(2);
 
     if (convertPrice === "NaN") {
-      return price.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+      return price;
     }
-    return convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+    return `$ ${convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
   }
 
   function createRealSubtotal(){
@@ -196,7 +196,7 @@ $(function(){
       '</a>' +
       '</td>' +
       `<td> ${color} </td>` +
-      `<td id="priceTo_${product.id}"> $ ${translatePrice(price)}` +
+      `<td id="priceTo_${product.id}"> ${translatePrice(price)}` +
       '</td><td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}" ` +
@@ -359,12 +359,14 @@ $(function(){
       serviceOffereds.rows.forEach(service => {
         findBy('service_offered_id', service.id, 'delivery_services').then(
           deliveryService => {
-            let deliveryServiceObject = deliveryService.rows[0];
+            if (deliveryService.rowCount > 0) {
+              let deliveryServiceObject = deliveryService.rows[0];
 
-            $(`#product_${serviceId}_services`).append(
-              `<td id="deliveryServiceId${serviceId}" class="hidden">` +
-              `${deliveryServiceObject.id}</td>`
-            );
+              $(`#product_${serviceId}_services`).append(
+                `<td id="deliveryServiceId${serviceId}" class="hidden">` +
+                ` ${deliveryServiceObject.id}</td>`
+              );
+            }
           }
         );
 
@@ -498,7 +500,9 @@ $(function(){
   $('#ticketCancel').click(function(){
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
 
-    deleteTicket(ticketId);
+    if (!isNaN(parseInt(ticketId))) {
+      deleteTicket(ticketId);
+    }
     window.location.href = 'pos_sale.html';
   });
 

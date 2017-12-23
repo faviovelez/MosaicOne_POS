@@ -43,7 +43,7 @@ function createTicketProductJson(call){
 
       productsJson[id] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
-        sellTo         : parseFloat($(this).find('td[id^=totalSinTo]').html().replace('$ ','').replace(/,/g,'')),
+        sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html()
       };
@@ -55,7 +55,7 @@ function createTicketProductJson(call){
     } else {
       servicesJson[id] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
-        sellTo         : parseFloat($(this).find('td[id^=totalSinTo]').html().replace('$ ','').replace(/,/g,'')),
+        sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html(),
         selector       : $(this).attr('id')
@@ -177,8 +177,16 @@ function setPayedLogic(data){
   }
 }
 
+function getCashRegisterInfo(call){
+  initStore().then(storage => {
+    findBy('name', storage.get('cash'), 'cash_registers').then( cashRegisterObject => {
+      call(cashRegisterObject.rows[0]);
+    });
+  });
+}
+
 function insertTicket(userId, call, type){
-  let paymentsAmount = $('#sumPayments').html() === "" ? 0 
+  let paymentsAmount = $('#sumPayments').html() === "" ? 0
                        : $('#sumPayments').html(),
       data = {
         user_id          : userId,
@@ -206,14 +214,17 @@ function insertTicket(userId, call, type){
     let prospectId   = $('#prospectList a').attr('data-id');
     data.prospect_id = prospectId;
   }
-
-  insert(
-    Object.keys(data),
-    Object.values(data),
-    'tickets'
-  ).then(ticket => {
-    call(ticket.lastId);
+  getCashRegisterInfo(cashRegister => {
+    data.cash_register_id = cashRegister.id;
+    insert(
+      Object.keys(data),
+      Object.values(data),
+      'tickets'
+    ).then(ticket => {
+      call(ticket.lastId);
+    });
   });
+
 }
 
 function specialQuery(productId){
@@ -223,7 +234,7 @@ function specialQuery(productId){
     ' store_movements.cost FROM ' +
     ' stores_warehouse_entries' +
     ' INNER JOIN store_movements ON' +
-    ' stores_warehouse_entries.store_movement_id' + 
+    ' stores_warehouse_entries.store_movement_id' +
     ' = store_movements.id WHERE ' +
     `stores_warehouse_entries.product_id = ${productId} ` +
     ' ORDER BY stores_warehouse_entries.id ';
@@ -273,6 +284,11 @@ function insertsServiceOffereds(ticketId, call){
 
     if (discountReason){
       data.discount_reason = discountReason;
+    }
+
+    if ($('#prospectList a').length === 1) {
+      let prospectId   = $('#prospectList a').attr('data-id');
+      data.prospect_id = prospectId;
     }
 
     if (discountType !== 'none'){
@@ -342,8 +358,9 @@ function assignCost(ticketType, ticketId, call) {
         finalPrice      = (unitPrice * (1 - discountPercent)),
         discount        = (subtotal * discountPercent),
         taxes           = ((subtotal - discount) * 0.16),
-        total           = (subtotal - discount + taxes),
+        total           = productsJson[productId].sellTo,
         fixedDiscount   = parseFloat(discount.toFixed(2)),
+        prospectId   = $('#prospectList a').attr('data-id'),
         data = {
           product_id         : productId,
           quantity           : sellQuantity,
@@ -359,12 +376,17 @@ function assignCost(ticketType, ticketId, call) {
           cost               : 0,
           supplier_id        : productsJson[productId].supplier_id,
           total_cost         : totalCost,
-          total              : total.toFixed(2),
+          total              : total,
           subtotal           : subtotal.toFixed(2)
         };
 
       if (discountReason){
         data.discount_reason = discountReason;
+      }
+
+      if ($('#prospectList a').length === 1) {
+        let prospectId   = $('#prospectList a').attr('data-id');
+        data.prospect_id = prospectId;
       }
 
       if (entries.rowCount === 0 || ticketType === 'pending') {
@@ -463,6 +485,8 @@ function insertsPayments(ticketType, ticketId, userId, store, call) {
     } else if (type === 'Venta a Crédito') {
       data.credit_days = $(this).find('td[id^=creditDays]').html();
       data.payment_type = 'crédito';
+    } else if (type === 'Efectivo') {
+      data.total = data.total - parseFloat($('#currencyChange strong').html().replace(/\s|\$|,/g,'')).toFixed(2);
     }
 
     insert(

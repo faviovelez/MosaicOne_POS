@@ -66,7 +66,8 @@
      </ul>
      <span class="label label-danger cash-ticket-info">
        Caja
-       <span id="cashRegisterNum"> 1 </span>
+       <span id="cashName"> </span>
+       <span id="cashRegisterNum" class="hidden"> 1 </span>
        /
        Ticket <span id="ticketNum"> 1 </span>
      </span>
@@ -1266,7 +1267,7 @@
              </table>
 
              <div class="actions">
-               <input data-dismiss="modal" type="submit" name="commit" id="confirmAddProduct" value="Confirmar alta" class="main-button" />
+               <input type="submit" name="commit" id="confirmAddProduct" value="Confirmar alta" class="main-button" />
              </div>
            </div>
 
@@ -1315,7 +1316,7 @@
 
     <script src="../vendor/assets/js/jquery-3.1.1.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/jquery-ui.min.js" charset="utf-8"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.3/jquery.autocomplete.min.js" charset="utf-8"></script>
+    <script src="../vendor/assets/js/jquery.autocomplete.min.js" charset="utf-8"></script>
     <script src="../vendor/assets/js/bootstrap.min.js" charset="utf-8"></script>
     <script src="../../dbconnection.js" charset="utf-8"></script>
     <script src="../../users_gestor.js" charset="utf-8"></script>
@@ -1327,6 +1328,7 @@
     <script src="../assets/js/pos.js" charset="utf-8"></script>
     <script src="../assets/js/pos_customers.js" charset="utf-8"></script>
     <script src="../assets/js/saved_tickets.js" charset="utf-8"></script>
+    <script src="../assets/js/specialQueries.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
 

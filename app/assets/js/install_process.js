@@ -111,7 +111,7 @@ function lotQueries(store, call){
       `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}`,
       'services' : 'SELECT * FROM services WHERE ' +
       `shared = true AND current = true OR store_id = ${store.id}`,
-      'stores_inventories': `SELECT ${storesInventoriesColumns()} FROM stores_inventories INNER JOIN products ` + 
+      'stores_inventories': `SELECT ${storesInventoriesColumns()} FROM stores_inventories INNER JOIN products ` +
       'ON stores_inventories.product_id = products.id WHERE' +
       ` stores_inventories.store_id = ${store.id} AND products.child_id IS NULL` ,
       'stores_warehouse_entries': 'SELECT * FROM stores_warehouse_entries ' +
@@ -129,18 +129,19 @@ function lotQueries(store, call){
 
   function getBillingAdressesQuery(store){
     return 'SELECT billing_addresses.id, billing_addresses.type_of_person, ' +
-           'billing_addresses.business_name, billing_addresses.rfc, ' + 
+           'billing_addresses.business_name, billing_addresses.rfc, ' +
            'billing_addresses.street, billing_addresses.exterior_number,' +
            'billing_addresses.interior_number, billing_addresses.zipcode, ' +
-           'billing_addresses.neighborhood, billing_addresses.city, ' + 
-           'billing_addresses.state, billing_addresses.country, ' + 
-           'billing_addresses.created_at, billing_addresses.updated_at, ' + 
-           'billing_addresses.tax_regime_id, billing_addresses.pos, ' + 
-           'billing_addresses.web, billing_addresses.date, billing_addresses.store_id' +
-           ' FROM billing_addresses INNER JOIN business_units ON billing_addresses.id = ' + 
+           'billing_addresses.neighborhood, billing_addresses.city, ' +
+           'billing_addresses.state, billing_addresses.country, ' +
+           'billing_addresses.created_at, billing_addresses.updated_at, ' +
+           'billing_addresses.tax_regime_id, billing_addresses.pos, ' +
+           'billing_addresses.web, billing_addresses.date, billing_addresses.store_id, ' +
+           'billing_addresses.web_id, billing_addresses.pos_id' +
+           ' FROM billing_addresses INNER JOIN business_units ON billing_addresses.id = ' +
            'business_units.billing_address_id INNER JOIN stores ON stores.business_unit_id ' +
            `= business_units.id WHERE stores.id = ${store.id} UNION ALL ` +
-           `SELECT * FROM billing_addresses WHERE store_id = ${store.id}`; 
+           `SELECT * FROM billing_addresses WHERE store_id = ${store.id}`;
   }
 
   function getQueryCount(store){
@@ -157,8 +158,8 @@ function lotQueries(store, call){
       ' SELECT COUNT (*) as rows FROM products WHERE shared = true AND current = true AND' +
       ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM services WHERE shared = true AND current = true OR store_id = ${store.id} UNION ALL` +
-      ` SELECT COUNT (*) as rows FROM stores_inventories INNER JOIN products ` + 
-      'ON stores_inventories.product_id = products.id WHERE' + 
+      ` SELECT COUNT (*) as rows FROM stores_inventories INNER JOIN products ` +
+      'ON stores_inventories.product_id = products.id WHERE' +
       ` stores_inventories.store_id = ${store.id} AND products.child_id IS NULL UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores_warehouse_entries WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM store_movements WHERE store_id = ${store.id} UNION ALL` +
@@ -227,11 +228,11 @@ function lotQueries(store, call){
     showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
     exec = require('child_process').exec;
 
-    exec('mkdir -p ./tickets', function(err, stdout, stderr){
-      if(err){
-        showAlert('Error', stderr, cloneAlert());
-      }
-    });
+//    exec('mkdir -p ./tickets', function(err, stdout, stderr){
+//      if(err){
+//        showAlert('Error', stderr, cloneAlert());
+//      }
+//    });
 
     dbRestore = exec(script,
       function(err, stdout, stderr) {

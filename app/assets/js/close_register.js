@@ -19,6 +19,25 @@ $(document).ready(function() {
     ];
   }
 
+  function getTranslateLotTables(){
+    return {
+      'users' : 'user',
+      'billing_addresses' : 'billing_address',
+      'prospects' : 'prospect',
+      'cash_registers' : 'cash_register',
+      'tickets' : 'ticket',
+      'tickets_children' : 'tickets_child',
+      'terminals' : 'terminal',
+      'payments' : 'payment',
+      'store_movements' : 'store_movement',
+      'stores_warehouse_entries' : 'stores_warehouse_entry',
+      'stores_inventories' : 'stores_inventory',
+      'service_offereds' : 'service_offered',
+      'delivery_services' : 'delivery_service',
+      'expenses' : 'expense'
+    };
+  }
+
   function iterateRows(rowsLot, table, call){
     if (rowsLot.length === 0) {
       return call();
@@ -90,6 +109,26 @@ $(document).ready(function() {
     }
   }
 
+  function fillSpecialIds(idsCollection){
+    tableNames = getTranslateLotTables();
+
+    for (var tableName in sendObjects){
+      delete sendObjects[tableName].rowsLimit;
+      delete sendObjects[tableName].processRow;
+
+      for (var posId in sendObjects[tableName]){
+        insertWebPosIds(
+          tableName,
+          posId,
+          idsCollection[
+            tableNames[tableName]
+          ][parseInt(posId)]
+        ).then(() => {})
+      }
+    }
+
+  }
+
   $('#closeDay').click(function(){
 
     createStoreObjectsLot(function(){
@@ -117,6 +156,7 @@ $(document).ready(function() {
           delete sendObjects.storeId;
 
           updateWebBan();
+          fillSpecialIds(data.ids);
           alert(data.message);
         });
 

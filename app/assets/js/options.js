@@ -1,4 +1,13 @@
 $(document).ready(function() {
+
+  function getCashRegisterSum(){
+    return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
+      '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
+      'SUM((SELECT (COALESCE(SUM(payments.total),0)) as s ' +
+      'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
+      "WHERE payment_type = 'pago' AND payment_form_id = 1 AND ticket_type = 'venta'))) as sum";
+  }
+
   async function initStore(){
 
     const store = new Store({
@@ -29,6 +38,57 @@ $(document).ready(function() {
       $('#store').html(store.get('store').store_name);
     });
   })();
+
+  function passwordValidation(){
+    return equals(
+      $('#password').val(),
+      $('#password_confirmation').val(),
+      false
+    );
+  }
+
+  /* $('#changePasswordAction').click(function(){
+    let validatePassword = passwordValidation();
+
+    if (!validatePassword.result) {
+
+      showAlert(validatePassword.type, validatePassword.message, cloneAlert());
+      return false;
+
+    } else {
+      if ($('#password_confirmation').val() !== '') {
+        updateBy(
+          {
+            encrypted_password : createPassword($('#password').val())
+          },
+          'users',
+          `id = ${parseInt($("#usersOptionsList").val())}`
+        ).then(() => {
+          alert('Contraseña Cambiada');
+          window.location.reload(true);
+        });
+      } else {
+        showAlert('Error', 'Favor de llenar todos los campos', cloneAlert());
+      }
+    }
+    
+  }); */
+
+  $('#createCashAlert').click(function(){
+    initStore().then(storage => {
+      let cashName = storage.get('cash');
+      updateBy(
+      {
+        cash_alert : parseFloat($('#register_open_initial_cash').val())
+      },
+      'cash_registers',
+      `name = '${cashName}'`
+      ).then(() => {
+        window.location.reload(true);
+      });
+    });
+    return false;
+  });
 
   $('#addTerminalSave').click(function(){
     let data = {
@@ -71,6 +131,78 @@ $(document).ready(function() {
     $('.delete-cash-register').addClass('hidden');
     $('.create-cash-register').addClass('hidden');
   });
+
+  $('#registerCashDeposit').click(function(){
+    initStore().then(storage => {
+      let data = {
+        user_id          : storage.get('current_user').id,
+        amount           : parseFloat($('#new_cash_deposit_amount').val()),
+        cash_register_id : parseInt($('.cashRegisterOptions').val()),
+        name             : $('#new_cash_deposit_description').val()
+      };
+
+      insert(
+        Object.keys(data),
+        Object.values(data),
+        'deposits',
+        false
+      ).then(() => {
+        window.location.reload(true);
+      });
+    });
+    return false;
+  });
+
+  $('#registerCashWithdrawal').click(function(){
+    initStore().then(storage => {
+      let data = {
+        user_id          : storage.get('current_user').id,
+        amount           : parseFloat($('#new_cash_withdrawal_amount').val()),
+        cash_register_id : parseInt($('.cashRegisterOptions').val()),
+        name             : $('#new_cash_withdrawal_description').val()
+      };
+
+      insert(
+        Object.keys(data),
+        Object.values(data),
+        'withdrawals',
+        false
+      ).then(() => {
+        window.location.reload(true);
+      });
+    });
+    return false;
+  });
+
+  (function fillSpecialValues(){
+    query(getCashRegisterSum(), false).then(resultSum => {
+      $('.configCashValue').html(
+        `$ ${(resultSum.rows[0].sum || 0).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} `
+      );
+    });
+
+    getAll('users').then(usersList => {
+      usersList.rows.forEach(user => {
+        $('#usersOptionsList').append(
+          `<option value="${user.id}">${createFullName(user)}</option>`
+        );
+      });
+    });
+
+    initStore().then(storage => {
+      let storeInfo = storage.get('store');
+       findBy('store_id', storeInfo.id, 'cash_registers', false).then(cashRegisterObject => {
+        cashRegisterObject.rows.forEach(cashRegister => {
+          $('.cashRegisterOptions option').remove();
+
+          $('.cashRegisterOptions').append(
+            `  <option value="${cashRegister.id}"> Caja ${cashRegister.name} </option>`
+          );
+
+        });
+      });
+    });
+  })();
 
   $("#registerDeposit").click(function () {
     $(this).addClass('active-list');

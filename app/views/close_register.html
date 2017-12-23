@@ -86,7 +86,7 @@
 
       <div class="returns-changes-container">
 
-        <table class="closure-returns-table">
+        <table class="closure-returns-table hidden">
           <tbody>
             <tr>
               <td class="top-of-table">
@@ -120,7 +120,7 @@
           </tbody>
         </table>
 
-        <table class="closure-changes-table">
+        <table class="closure-changes-table hidden">
           <tbody>
             <tr>
               <td class="top-of-table">
@@ -176,7 +176,7 @@
 
       <div class="sales-payments-container">
 
-        <table class="closure-sales-table">
+        <table class="closure-sales-table hidden">
           <tbody>
             <tr>
               <td class="top-of-table">
@@ -238,7 +238,7 @@
           </tbody>
         </table>
 
-        <table class="closure-payments-table">
+        <table class="closure-payments-table hidden">
           <tbody>
             <tr>
               <td class="top-of-table">
@@ -298,7 +298,7 @@
 
       </div> <!-- Terminan sales-payments-container -->
 
-      <div class="total-cash-container">
+      <div class="total-cash-container hidden">
         <table class="total-cash-table">
           <tbody>
             <tr>
@@ -316,7 +316,7 @@
         <form class="new_register_close" id="new_register_close" action="configuration.html" accept-charset="UTF-8" method="post">
           <input name="utf8" type="hidden" value="&#x2713;" />
           <input type="hidden" name="authenticity_token" value="NTK5uX3QCLZG2RaB2P/w72rV0xhp10n/RIl6eS05AsHEHF+hBTfZCMCD3tnWJ3qMTeQI7TI6ePtA6RoUZpAuRg==" />
-          <div class="actions">
+          <div class="actions hidden">
             <a href="close_register.html">
               <p>
                 Resumen de cierre
@@ -349,6 +349,7 @@
             </a>
 
           </div>
+          <br /><br /><br /><br /><br /> <!-- Estos los quitaré, así como todos los hidden cuando quede lista la funcionalidad-->
           <div class="actions">
             <input type="submit" name="commit" id='closeDay' value="Cerrar caja" class="third-button" />
           </div>
@@ -399,6 +400,7 @@
     <script src="../../users_gestor.js" charset="utf-8"></script>
     <script src="../../validator.js" charset="utf-8"></script>
     <script src="../../store.js" charset="utf-8"></script>
+    <script src="../assets/js/loadbasicdata.js" charset="utf-8"></script>
     <script src="../assets/js/close_register.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
