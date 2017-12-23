@@ -43,7 +43,7 @@ function createTicketProductJson(call){
 
       productsJson[id] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
-        sellTo         : parseFloat($(this).find('td[id^=totalSinTo]').html().replace('$ ','').replace(/,/g,'')),
+        sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html()
       };
@@ -55,7 +55,7 @@ function createTicketProductJson(call){
     } else {
       servicesJson[id] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
-        sellTo         : parseFloat($(this).find('td[id^=totalSinTo]').html().replace('$ ','').replace(/,/g,'')),
+        sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html(),
         selector       : $(this).attr('id')
@@ -186,7 +186,7 @@ function getCashRegisterInfo(call){
 }
 
 function insertTicket(userId, call, type){
-  let paymentsAmount = $('#sumPayments').html() === "" ? 0 
+  let paymentsAmount = $('#sumPayments').html() === "" ? 0
                        : $('#sumPayments').html(),
       data = {
         user_id          : userId,
@@ -224,7 +224,7 @@ function insertTicket(userId, call, type){
       call(ticket.lastId);
     });
   });
-  
+
 }
 
 function specialQuery(productId){
@@ -234,7 +234,7 @@ function specialQuery(productId){
     ' store_movements.cost FROM ' +
     ' stores_warehouse_entries' +
     ' INNER JOIN store_movements ON' +
-    ' stores_warehouse_entries.store_movement_id' + 
+    ' stores_warehouse_entries.store_movement_id' +
     ' = store_movements.id WHERE ' +
     `stores_warehouse_entries.product_id = ${productId} ` +
     ' ORDER BY stores_warehouse_entries.id ';
@@ -358,7 +358,7 @@ function assignCost(ticketType, ticketId, call) {
         finalPrice      = (unitPrice * (1 - discountPercent)),
         discount        = (subtotal * discountPercent),
         taxes           = ((subtotal - discount) * 0.16),
-        total           = (subtotal - discount + taxes),
+        total           = productsJson[productId].sellTo,
         fixedDiscount   = parseFloat(discount.toFixed(2)),
         prospectId   = $('#prospectList a').attr('data-id'),
         data = {
@@ -376,7 +376,7 @@ function assignCost(ticketType, ticketId, call) {
           cost               : 0,
           supplier_id        : productsJson[productId].supplier_id,
           total_cost         : totalCost,
-          total              : total.toFixed(2),
+          total              : total,
           subtotal           : subtotal.toFixed(2)
         };
 
@@ -400,7 +400,7 @@ function assignCost(ticketType, ticketId, call) {
               entryId     = entry.id;
 
             if (parseInt(processQuantity) >= quantity) {
-              totalCost += (quantity * cost); 
+              totalCost += (quantity * cost);
               deleteBy('stores_warehouse_entries', `id = ${entryId}`);
               updateStoreInventories(
                 productId, quantity

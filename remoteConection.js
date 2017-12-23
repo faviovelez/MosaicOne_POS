@@ -44,11 +44,34 @@ async function query (q, remote = true, table = '', lastId = 0) {
   return res;
 }
 
+async function insertWebPosIds(table, posId, webId){
+  let localQuery = `UPDATE ${table} SET web_id=${webId}, pos_id=${posId}`+
+                    ` WHERE id = ${posId}`,
+      remoteQuery = `UPDATE ${table} SET web_id=${webId}, pos_id=${posId}`+
+                                      ` WHERE id = ${webId}`;
+  await query(localQuery, false, table);
+  return await query(remoteQuery);
+}
+
 async function getToTransfer(table){
   let localQuery = `SELECT * FROM ${table}` +
     ' WHERE web = false';
 
-  return await query(localQuery, false, table);
+  if (table === 'tickets') {
+    localQuery += ` AND ticket_type = 'venta'`
+  }
+
+  if (table === 'store_movements' || table === 'service_offereds' || table === 'payments'){
+    let resultQuery = `SELECT ${table}.id FROM ${table} INNER JOIN ` +
+    `tickets ON tickets.id = ${table}.ticket_id WHERE tickets.ticket_type = 'pending'`;
+    let ids = await query(resultQuery, false, table);
+    if (ids.rowCount > 0){
+      localQuery += ` AND id NOT IN (${$.map(ids.rows, function(row){return row.id}).toString()})`;
+    }
+    return await query(localQuery, false, table);
+  } else {
+    return await query(localQuery, false, table);
+  }
 }
 
 async function toDayRows(table){

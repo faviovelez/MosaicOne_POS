@@ -14,14 +14,14 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -82,7 +82,9 @@ CREATE TABLE banks (
     updated_at timestamp without time zone NOT NULL,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -220,7 +222,9 @@ CREATE TABLE billing_addresses (
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
     date date,
-    store_id integer
+    store_id integer,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -649,7 +653,9 @@ CREATE TABLE cash_registers (
     pos boolean DEFAULT false,
     web boolean DEFAULT false,
     date date,
-    cash_alert double precision
+    cash_alert double precision,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -1045,7 +1051,9 @@ CREATE TABLE delivery_services (
     receivers_zipcode character varying,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -1520,7 +1528,9 @@ CREATE TABLE expenses (
     payment_id integer,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -2379,7 +2389,9 @@ CREATE TABLE payments (
     order_id integer,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -2768,7 +2780,9 @@ CREATE TABLE products (
     armed boolean DEFAULT false,
     armed_discount double precision DEFAULT 0.0,
     price_was double precision,
-    only_measure character varying
+    only_measure character varying,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -2872,7 +2886,9 @@ CREATE TABLE prospects (
     credit_days integer,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -3465,7 +3481,9 @@ CREATE TABLE service_offereds (
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
     date date,
-    prospect_id integer
+    prospect_id integer,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -3554,7 +3572,9 @@ CREATE TABLE services (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     delivery_company character varying,
-    current boolean
+    current boolean,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -3616,7 +3636,9 @@ CREATE TABLE store_movements (
     date date,
     prospect_id integer,
     temporal boolean,
-    down_applied boolean
+    down_applied boolean,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -3855,7 +3877,9 @@ CREATE TABLE stores_inventories (
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
     date date,
-    manual_price double precision
+    manual_price double precision,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -3935,7 +3959,9 @@ CREATE TABLE stores_warehouse_entries (
     store_movement_id integer,
     pos boolean DEFAULT false,
     web boolean DEFAULT true,
-    date date
+    date date,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -4144,7 +4170,9 @@ CREATE TABLE terminals (
     credit_comission double precision,
     pos boolean DEFAULT false,
     web boolean DEFAULT false,
-    date date
+    date date,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -4201,7 +4229,9 @@ CREATE TABLE tickets (
     saved boolean,
     pos boolean DEFAULT false,
     web boolean DEFAULT false,
-    date date
+    date date,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -4220,7 +4250,9 @@ CREATE TABLE tickets_children (
     pos boolean DEFAULT false,
     web boolean DEFAULT false,
     date date,
-    store_id integer
+    store_id integer,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -4440,7 +4472,9 @@ CREATE TABLE users (
     role_id integer,
     web boolean,
     pos boolean,
-    date date
+    date date,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -7955,4 +7989,3 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 -- PostgreSQL database dump complete
 --
-
