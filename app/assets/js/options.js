@@ -8,6 +8,23 @@ $(document).ready(function() {
       "WHERE payment_type = 'pago' AND payment_form_id = 1 AND ticket_type = 'venta'))) as sum";
   }
 
+  function cloneAlert(){
+    let alerts = $('.alert').length + 1;
+    $('.alerts-container').prepend(
+      `<div class="alert" id="alertNo_${alerts}" hidden>` +
+      `${$('.alert').html()} </div>`
+    );
+    return $('.alert:first').attr('id');
+  }
+
+  function showAlert(type, message, alertId){
+    $(`#${alertId} span.title`).html(`${type}: ${message}`);
+    $(`#${alertId}`)
+      .show()
+      .addClass('alert-danger')
+      .removeClass('hidden');
+  }
+  
   async function initStore(){
 
     const store = new Store({
@@ -47,7 +64,7 @@ $(document).ready(function() {
     );
   }
 
-  /* $('#changePasswordAction').click(function(){
+  $('#changePasswordAction').click(function(){
     let validatePassword = passwordValidation();
 
     if (!validatePassword.result) {
@@ -69,10 +86,11 @@ $(document).ready(function() {
         });
       } else {
         showAlert('Error', 'Favor de llenar todos los campos', cloneAlert());
+        return false;
       }
     }
-    
-  }); */
+    return false;
+  });
 
   $('#createCashAlert').click(function(){
     initStore().then(storage => {
@@ -182,6 +200,7 @@ $(document).ready(function() {
     });
 
     getAll('users').then(usersList => {
+      $('#usersOptionsList option').remove();
       usersList.rows.forEach(user => {
         $('#usersOptionsList').append(
           `<option value="${user.id}">${createFullName(user)}</option>`

@@ -207,7 +207,7 @@ $(function(){
       `data-table="${product.table}" > ${percent}% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}">` +
       `$ ${(total * 1.16).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
-      '<td class="right hidden" id="totalSinTo_${product.id}">' + 
+      '<td class="right hidden" id="totalSinTo_${product.id}">' +
       `$ ${total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
       '</tr>';
   }
@@ -338,7 +338,7 @@ $(function(){
     let ticketId = window.location.href.replace(/.*ticket_id=/,''),
         localQuery = 'SELECT * FROM products INNER JOIN' +
                      ' store_movements ON products.id = ' +
-                     ' store_movements.product_id WHERE' + 
+                     ' store_movements.product_id WHERE' +
                      ` ticket_id = ${ticketId}`;
 
     query(localQuery).then(storeMovementProducts => {
@@ -353,7 +353,7 @@ $(function(){
 
     localQuery = 'SELECT * FROM services INNER JOIN' +
       ' service_offereds ON services.id = ' +
-      ' service_offereds.service_id WHERE' + 
+      ' service_offereds.service_id WHERE' +
       ` ticket_id = ${ticketId}`;
     query(localQuery).then(serviceOffereds => {
       serviceOffereds.rows.forEach(service => {

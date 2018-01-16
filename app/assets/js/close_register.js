@@ -130,7 +130,8 @@ $(document).ready(function() {
   }
 
   $('#closeDay').click(function(){
-
+    $(this).prop( "disabled", true );
+    alert('Proceso de carga iniciado');
     createStoreObjectsLot(function(){
 
       initStore().then(storage => {
@@ -151,7 +152,7 @@ $(document).ready(function() {
             headers: { "Content-Type": "application/json" }
           };
 
-        client.post("http://localhost:3000/pos/received_data", args, function (data, response) {
+        client.post("http://34.214.130.203/pos/received_data", args, function (data, response) {
           delete sendObjects.installCode;
           delete sendObjects.storeId;
 

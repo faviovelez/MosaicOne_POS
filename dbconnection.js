@@ -53,8 +53,13 @@ async function initStore(){
 }
 
 async function query (q, lastId = 0, table = '') {
+
   const client = await localPool.connect();
   let res;
+  var timmer = setInterval(function(){
+    return {lastId: false};
+  }, 4000);
+
 
   try {
     await client.query('BEGIN');
@@ -73,12 +78,13 @@ async function query (q, lastId = 0, table = '') {
       }
     }
   } finally {
-    client.release();
+    client.release(true);
   }
   if (lastId !== 0) {
     res.lastId = lastId;
   }
   res.table = table;
+  clearInterval(timmer);
   return res;
 }
 
@@ -112,7 +118,16 @@ async function insert (columns, data, table, extras = true){
   }
 
   data.forEach(data => {
-    localQuery += `, '${data}'`;
+    switch(data){
+      case null:
+      case true:
+      case false:
+        localQuery += ', ';
+        localQuery += data;
+        break;
+      default:
+        localQuery += `, '${data}'`;
+    }
   });
   let createDate = new Date(),
     updateDate = new Date();

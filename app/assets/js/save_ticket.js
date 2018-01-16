@@ -77,6 +77,8 @@ function createTicketProductJson(call){
 }
 
 function quantityMessage(call){
+  productsJson  = {};
+  servicesJson  = {};
   createTicketProductJson(function(){
     if ($.isEmptyObject(productsJson)){
       return call('', false);
@@ -130,6 +132,7 @@ function validateQuantity (call) {
     '</div>');
 
     if (openModal){
+      $('#completeSale').prop( "disabled", false );
       $('#modalInfo').modal('show');
     }
     return call(!openModal);
@@ -152,7 +155,7 @@ function updateStoreInventories(productId, quantity){
 
 }
 
-function createStoreMovement(data, call){
+function createStoreMovement(data, call, warehouseInfo = {}){
   insert(
     Object.keys(data),
     Object.values(data),
@@ -160,7 +163,7 @@ function createStoreMovement(data, call){
   ).then(storeMovement => {
     count++;
     if (count === Object.keys(productsJson).length){
-      return call();
+      return call(warehouseInfo);
     }
   });
 }
@@ -229,9 +232,7 @@ function insertTicket(userId, call, type){
 
 function specialQuery(productId){
   return ' SELECT stores_warehouse_entries.product_id' +
-    ` as idIs${productId}, stores_warehouse_entries.id,` +
-    ' stores_warehouse_entries.quantity,' +
-    ' store_movements.cost FROM ' +
+    ` as idIs${productId}, store_movements.cost, stores_warehouse_entries.* FROM ` +
     ' stores_warehouse_entries' +
     ' INNER JOIN store_movements ON' +
     ' stores_warehouse_entries.store_movement_id' +
@@ -338,7 +339,7 @@ function assignCost(ticketType, ticketId, call) {
   if ($.isEmptyObject(productsJson)){
     return call();
   }
-
+  let warehouseInfo = {};
   count = 0;
   for (var productId in productsJson){
     let localQuery = specialQuery(productId);
@@ -401,6 +402,7 @@ function assignCost(ticketType, ticketId, call) {
 
             if (parseInt(processQuantity) >= quantity) {
               totalCost += (quantity * cost);
+              warehouseInfo[productId] = entry;
               deleteBy('stores_warehouse_entries', `id = ${entryId}`);
               updateStoreInventories(
                 productId, quantity
@@ -431,7 +433,7 @@ function assignCost(ticketType, ticketId, call) {
         if (discountType !== 'none'){
           data[`${discountType}_discount`] = fixedDiscount;
         }
-        createStoreMovement(data, call);
+        createStoreMovement(data, call, warehouseInfo);
       }
 
     });
@@ -443,6 +445,43 @@ function assignCost(ticketType, ticketId, call) {
 function clearDate(date){
   let strDate = date.toString();
   return strDate.replace(/GMT.*/,'');
+}
+
+function saveExpenses(ticket_id, call){
+  let localQuery = 'SELECT payments.total, payments.payment_form_id, payments.id, terminals.credit_comission, terminals.debit_comission ' +
+      'FROM payments INNER JOIN terminals ON payments.terminal_id = terminals.id ' +
+      ` WHERE (payment_form_id = 18 OR payment_form_id = 4) AND ticket_id = ${ticket_id} `
+
+  query(localQuery).then( paymentsObjects => {
+    let limit = paymentsObjects.rowCount,
+        count = 0;
+    if (limit === 0) {
+      return call();
+    }
+    paymentsObjects.rows.forEach(paymentData => {
+      let field = paymentData.payment_form_id === 4 ? 'credit_comission' : 'debit_comission',
+        subtotal = (paymentData[field] / 100 * paymentData.total).toFixed(2),
+        expensesData = {
+          "subtotal": subtotal,
+          "taxes_rate": (subtotal * 0.16).toFixed(2),
+          "total": (subtotal * 1.16).toFixed(2),
+          "expense_date": Date().toString().replace(/GMT.*/,''),
+          "expense_type": 'comisión',
+          "taxes": (subtotal * 0.16).toFixed(2),
+          "payment_id" : paymentData.id
+        }
+        insert(
+          Object.keys(expensesData),
+          Object.values(expensesData),
+          'expenses'
+        ).then(() => {
+          count++;
+          if (count === limit) {
+            call();
+          }
+        });
+    });
+  });
 }
 
 function insertsPayments(ticketType, ticketId, userId, store, call) {
@@ -478,7 +517,9 @@ function insertsPayments(ticketType, ticketId, userId, store, call) {
           total            : $(this).find('td.cuantity').html().replace('$ ','').replace(/,/g,'')
         };
 
-    if (type === 'Débito' || type === 'Crédito'){
+    if (type === 'Débito' ) {
+      data.terminal_id = $(this).find('td[id^=terminal]').html();
+    } else if (type === 'Crédito'){
       data.terminal_id = $(this).find('td[id^=terminal]').html();
     } else if (type === 'Cheque' || type === 'Transferencia') {
       data.operation_number = $(this).find('td[id^=reference]').html();
@@ -493,7 +534,7 @@ function insertsPayments(ticketType, ticketId, userId, store, call) {
       Object.keys(data),
       Object.values(data),
       'payments'
-    ).then(() => {
+    ).then(paymentObject => {
         count++;
         if (limit === count){
           return call();

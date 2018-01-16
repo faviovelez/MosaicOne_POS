@@ -274,7 +274,8 @@ function lotQueries(store, call){
                       findBy('product_id', productId, 'stores_inventories', false, productId).then(storeInventory => {
                         updateBy(
                           {
-                            manual_price: updatedPrices[storeInventory.lastId]
+                            manual_price: updatedPrices[storeInventory.lastId],
+                            web: false
                           },
                           'stores_inventories',
                           `product_id = ${storeInventory.lastId}`

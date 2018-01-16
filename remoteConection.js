@@ -2,8 +2,8 @@ const {Pool} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-  user: 'faviovelez',
-  host: 'localhost',
+  user: 'ubuntu',
+  host: '34.214.130.203',
   database: 'mosaicone',
   password: 'bafio44741',
   port: 5432,
@@ -31,7 +31,7 @@ async function query (q, remote = true, table = '', lastId = 0) {
       res = await client.query(q);
       await client.query('COMMIT');
     } catch (err) {
-      await client.query('ROLLBACK');
+      await client.query('ROLLBACK');34
       throw err;
     }
   } finally {

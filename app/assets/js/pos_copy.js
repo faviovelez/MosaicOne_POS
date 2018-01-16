@@ -95,42 +95,9 @@ $(document).ready(function() {
     });
   }
 
-  function updateStoreInventories(productId, quantity){
-    quantity = quantity;
-
-    findBy('product_id', productId, 'stores_inventories').then(inventory => {
-      updateBy(
-        {
-          quantity: (inventory.rows[0].quantity - quantity)
-        },
-        'stores_inventories',
-        `id = ${inventory.rows[0].id}`
-      );
-    });
-
-  }
-
-  function localUpdateStoreInventories(productId, quantity){
-    quantity = quantity;
-
-    findBy('product_id', productId, 'stores_inventories').then(inventory => {
-      updateBy(
-        {
-          quantity: (inventory.rows[0].quantity - quantity)
-        },
-        'stores_inventories',
-        `id = ${inventory.rows[0].id}`
-      );
-    });
-
-  }
-
-  function destroyProcess(productId, totalQuantity){
+  function destroyProcess(productId){
     let localQuery      =  specialQuery(productId),
-        processQuantity =  totalQuantity;
-    localUpdateStoreInventories(
-      productId, totalQuantity
-    );
+        processQuantity =  storeMovementData.quantity;
     query(localQuery).then(entries => {
       let BreakException = {},
           totalCost      = 0;
@@ -143,9 +110,15 @@ $(document).ready(function() {
           if (processQuantity >= quantity) {
             totalCost += (quantity * cost);
             deleteBy('stores_warehouse_entries', `id = ${entryId}`);
+            updateStoreInventories(
+              productId, quantity
+            );
             processQuantity -= quantity;
           } else {
             totalCost += (processQuantity * cost);
+            updateStoreInventories(
+              productId, processQuantity
+            );
             updateBy(
               {
                 quantity: (quantity - processQuantity)
@@ -161,23 +134,6 @@ $(document).ready(function() {
       }
     });
   }
-
-  $('#warehouseEntry').on('hidden.bs.modal', function () {
-    $('#addProductDetails')
-      .removeClass('head-red')
-      .addClass('head-blue');
-
-    $('#modalTitleAltaBaja').html('Entrada de mercancías');
-    $('#confirmAddProduct')
-      .addClass('main-button')
-      .val('Confirmar alta')
-      .removeClass('third-button');
-
-    $('input[type=radio][name=processProduct]').prop('checked', false);
-    $('#addProductSearch').addClass('hidden');
-    $('#addProductQuantity tr[id^=addProduct_]').remove();
-    $('#confirmAddProduct').prop('disabled', false);
-  })
 
   function createWarehouseEntry(productId, storeMovementId){
     warehouseEntryData = {
@@ -216,17 +172,27 @@ $(document).ready(function() {
     findBy('product_id', id, table).then(inventory => {
       inventoryObject = inventory.rows[0];
       createStoreMovementData(id, data.quantity, action, function(storeMovementId){
-        if (!storeMovementId){
-          $('#warehouseEntry').modal('hide');
-          alert('Proceso no concluido, por favor realice el alta/baja de nuevo');
-        }
 
         if ( action === 'alta') {
           createWarehouseEntry(id, storeMovementId);
         } else {
-          destroyProcess(id, $('#addProductInput').val().replace(/_/g,''));
+          destroyProcess(id);
         }
 
+        $('#addProductDetails')
+          .removeClass('head-red')
+          .addClass('head-blue');
+
+        $('#modalTitleAltaBaja').html('Entrada de mercancías');
+        $('#confirmAddProduct')
+          .addClass('main-button')
+          .val('Confirmar alta')
+          .removeClass('third-button');
+
+        $('input[type=radio][name=processProduct]').prop('checked', false);
+        $('#addProductSearch').addClass('hidden');
+        $('#addProductQuantity tr[id^=addProduct_]').remove();
+        $('#confirmAddProduct').prop('disabled', false);
         $('#warehouseEntry').modal('hide');
 
       });
@@ -242,7 +208,6 @@ $(document).ready(function() {
   });
 
   function toggleProductAction(type){
-    $('#addProductQuantity tr[id^=addProduct_]').remove();
     if (type === 'Baja'){
 
       $('#addProductDetails')
@@ -291,7 +256,7 @@ $(document).ready(function() {
             id:    product.id,
             price: product.price,
             color: product.exterior_color_or_design || 'Sin Diseno',
-            description: `${product.unique_code} ${product.description}`,
+            description: product.description,
             table: 'products'
           }
         );
@@ -441,8 +406,6 @@ $(document).ready(function() {
     )}`
       );
     });
-    bigTotal();
-    resumePayment();
     $('#ticketDiscountChange').modal('toggle');
   });
 
@@ -487,10 +450,85 @@ $(document).ready(function() {
     });
   }
 
+  function restoreStoreInventories(productId, quantity){
+    findBy('product_id', productId, 'stores_inventories').then(inventory => {
+      updateBy(
+        {
+          quantity: (inventory.rows[0].quantity + quantity)
+        },
+        'stores_inventories',
+        `id = ${inventory.rows[0].id}`
+      );
+    });
+  }
+
+  function rollBackData(ticketData, call){
+    deleteBy('tickets', `id = ${ticketData.ticket.id}`).then(() => {
+      let rollbackLimit = Object.keys(ticketData.payments).length;
+      let count = 0;
+
+      for (var paymentId in ticketData.payments) {
+        deleteBy('payments', `id = ${paymentId}`).then(() => {
+          count++;
+          if (rollbackLimit === count){
+            rollbackLimit = ticketData.products.storeMovements.length;
+            count = 0;
+
+            for (var storeMovement in ticketData.products.storeMovements) {
+              let productId = storeMovement.produc_id;
+              let localQuery = specialQuery(productId);
+              query(localQuery).then(entries => {
+                let entry = entries.rows[0];
+                if (typeof entry === 'undefined') {
+                  let warehouseEntry = ticketData.storeWarehouseInfo[productId];
+                  delete warehouseEntry.id;
+                  delete warehouseEntry[`idis${productId}`];
+                  insert(
+                    Object.keys(warehouseEntry),
+                    Object.values(warehouseEntry),
+                    'stores_warehouse_entries'
+                  )
+                } else {
+                  updateBy(
+                    {
+                      quantity: (quantity + storeMovement.quantity)
+                    },
+                    'stores_warehouse_entries',
+                    `id = ${entry.id}`
+                  );
+                }
+              });
+              restoreStoreInventories(
+                storeMovement.product_id, storeMovement.quantity
+              );
+              deleteBy('store_movements', `id = ${storeMovement.id}`).then(() => {
+                count++;
+                if (rollbackLimit === count){
+                  call();
+                }
+              });
+            }
+          }
+        });
+      }
+
+    });
+  }
 
   $('#completeSale').click(function() {
     $(this).prop( "disabled", true );
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
+    let timmer = new Promise((resolve, reject) => {
+      setTimeout(function(){
+          rollBackData(ticketData, function(){
+            resolve();
+          });
+        }, 10000);
+    });
+
+    timmer.then(function(){
+      window.location.href = 'pos_sale.html';
+    });
 
     if (!isNaN(parseInt(ticketId))){
       deleteTicket(ticketId);
@@ -520,7 +558,7 @@ $(document).ready(function() {
                   insertsPayments('venta', ticketId, user, storeObject, function(){
 
                     store.set('lastTicket', parseInt(
-                      ticketId
+                      $('#ticketNum').html()
                     ));
 
                     saveExpenses(ticketId, function() {
@@ -1086,7 +1124,6 @@ $(document).ready(function() {
             lookup: list,
 //            lookupLimit: 10,
             onSelect: function (suggestion) {
-              $('#addProductQuantity tr[id^=addProduct_]').remove();
               $('#addProductQuantity').append(
                 productAddChange(suggestion)
               );

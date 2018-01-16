@@ -95,42 +95,9 @@ $(document).ready(function() {
     });
   }
 
-  function updateStoreInventories(productId, quantity){
-    quantity = quantity;
-
-    findBy('product_id', productId, 'stores_inventories').then(inventory => {
-      updateBy(
-        {
-          quantity: (inventory.rows[0].quantity - quantity)
-        },
-        'stores_inventories',
-        `id = ${inventory.rows[0].id}`
-      );
-    });
-
-  }
-
-  function localUpdateStoreInventories(productId, quantity){
-    quantity = quantity;
-
-    findBy('product_id', productId, 'stores_inventories').then(inventory => {
-      updateBy(
-        {
-          quantity: (inventory.rows[0].quantity - quantity)
-        },
-        'stores_inventories',
-        `id = ${inventory.rows[0].id}`
-      );
-    });
-
-  }
-
-  function destroyProcess(productId, totalQuantity){
+  function destroyProcess(productId){
     let localQuery      =  specialQuery(productId),
-        processQuantity =  totalQuantity;
-    localUpdateStoreInventories(
-      productId, totalQuantity
-    );
+        processQuantity =  storeMovementData.quantity;
     query(localQuery).then(entries => {
       let BreakException = {},
           totalCost      = 0;
@@ -143,9 +110,15 @@ $(document).ready(function() {
           if (processQuantity >= quantity) {
             totalCost += (quantity * cost);
             deleteBy('stores_warehouse_entries', `id = ${entryId}`);
+            updateStoreInventories(
+              productId, quantity
+            );
             processQuantity -= quantity;
           } else {
             totalCost += (processQuantity * cost);
+            updateStoreInventories(
+              productId, processQuantity
+            );
             updateBy(
               {
                 quantity: (quantity - processQuantity)
@@ -161,23 +134,6 @@ $(document).ready(function() {
       }
     });
   }
-
-  $('#warehouseEntry').on('hidden.bs.modal', function () {
-    $('#addProductDetails')
-      .removeClass('head-red')
-      .addClass('head-blue');
-
-    $('#modalTitleAltaBaja').html('Entrada de mercancías');
-    $('#confirmAddProduct')
-      .addClass('main-button')
-      .val('Confirmar alta')
-      .removeClass('third-button');
-
-    $('input[type=radio][name=processProduct]').prop('checked', false);
-    $('#addProductSearch').addClass('hidden');
-    $('#addProductQuantity tr[id^=addProduct_]').remove();
-    $('#confirmAddProduct').prop('disabled', false);
-  })
 
   function createWarehouseEntry(productId, storeMovementId){
     warehouseEntryData = {
@@ -216,17 +172,27 @@ $(document).ready(function() {
     findBy('product_id', id, table).then(inventory => {
       inventoryObject = inventory.rows[0];
       createStoreMovementData(id, data.quantity, action, function(storeMovementId){
-        if (!storeMovementId){
-          $('#warehouseEntry').modal('hide');
-          alert('Proceso no concluido, por favor realice el alta/baja de nuevo');
-        }
 
         if ( action === 'alta') {
           createWarehouseEntry(id, storeMovementId);
         } else {
-          destroyProcess(id, $('#addProductInput').val().replace(/_/g,''));
+          destroyProcess(id);
         }
 
+        $('#addProductDetails')
+          .removeClass('head-red')
+          .addClass('head-blue');
+
+        $('#modalTitleAltaBaja').html('Entrada de mercancías');
+        $('#confirmAddProduct')
+          .addClass('main-button')
+          .val('Confirmar alta')
+          .removeClass('third-button');
+
+        $('input[type=radio][name=processProduct]').prop('checked', false);
+        $('#addProductSearch').addClass('hidden');
+        $('#addProductQuantity tr[id^=addProduct_]').remove();
+        $('#confirmAddProduct').prop('disabled', false);
         $('#warehouseEntry').modal('hide');
 
       });
@@ -242,7 +208,6 @@ $(document).ready(function() {
   });
 
   function toggleProductAction(type){
-    $('#addProductQuantity tr[id^=addProduct_]').remove();
     if (type === 'Baja'){
 
       $('#addProductDetails')
@@ -291,7 +256,7 @@ $(document).ready(function() {
             id:    product.id,
             price: product.price,
             color: product.exterior_color_or_design || 'Sin Diseno',
-            description: `${product.unique_code} ${product.description}`,
+            description: product.description,
             table: 'products'
           }
         );
@@ -441,8 +406,6 @@ $(document).ready(function() {
     )}`
       );
     });
-    bigTotal();
-    resumePayment();
     $('#ticketDiscountChange').modal('toggle');
   });
 
@@ -487,9 +450,7 @@ $(document).ready(function() {
     });
   }
 
-
   $('#completeSale').click(function() {
-    $(this).prop( "disabled", true );
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
 
     if (!isNaN(parseInt(ticketId))){
@@ -513,14 +474,14 @@ $(document).ready(function() {
 
             insertTicket(user, function(ticketId){
 
-              assignCost('venta', ticketId, function(warehouseInfo){
-                ticketData.storeWarehouseInfo = warehouseInfo;
+              assignCost('venta', ticketId, function(){
+
                 insertsServiceOffereds(ticketId, function(){
 
                   insertsPayments('venta', ticketId, user, storeObject, function(){
 
                     store.set('lastTicket', parseInt(
-                      ticketId
+                      $('#ticketNum').html()
                     ));
 
                     saveExpenses(ticketId, function() {
@@ -535,9 +496,9 @@ $(document).ready(function() {
                         ).then(() => {
 
                           findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
-                            ticketData.cashRegister = cashRegisterObject.rows[0];
 
-                            findBy(
+
+findBy(
                               'id',
                               storeObject.business_unit_id,
                               'business_units'
@@ -563,12 +524,7 @@ $(document).ready(function() {
                                       addPaymentFormData(ticketData, payments.rows, function(){
                                         printTicket(ticketData, function(){
 
-                                          if (ticketData.cashRegister.balance >= ticketData.cashRegister.cash_alert) {
-                                            alert(`La caja tiene un saldo de ${ticketData.cashRegister.balance} ` +
-                                              'pesos. Realice un retiro.');
-                                          }
-
-                                          //window.location.href = 'pos_sale.html';
+                                          window.location.href = 'pos_sale.html';
 
                                         });
 
@@ -1086,7 +1042,6 @@ $(document).ready(function() {
             lookup: list,
 //            lookupLimit: 10,
             onSelect: function (suggestion) {
-              $('#addProductQuantity tr[id^=addProduct_]').remove();
               $('#addProductQuantity').append(
                 productAddChange(suggestion)
               );

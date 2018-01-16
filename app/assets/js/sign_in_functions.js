@@ -16,6 +16,14 @@ $(function(){
       .removeClass('hidden');
   }
 
+  function tablesToCheck(){
+    return ['products', 'services', 'prospects', 'billing_addresses', 'stores'];
+  }
+
+  function checkNewData(){
+
+  }
+
   async function checkFillAll(objects){
     let error = false;
     for (var key in objects) {

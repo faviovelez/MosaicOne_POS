@@ -184,7 +184,7 @@ function createTicketProductList(productList, discount, call){
           `<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ ${(object.total - object.taxes).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </strong> </td>` +
           '</tr>';
 
-        if (productObject.table === 'serviceOffereds'){
+        if (productObject.table === 'serviceOffereds' && object.product.delivery_company != null){
           createDeliveryServiceCad(object, function(deliveryCad){
             deliveriesCad += deliveryCad;
             count++;
@@ -244,7 +244,7 @@ function initTicket(ticketData, call) {
         '</style>' +
         '</head>' +
         '<body style="margin:0 auto !important; padding:0 auto !important">' +
-        '<table style="font-family: Arial; font-size: 11px; width: 200px; text-align: center; vertical-align:text-top">' +
+        '<table style="font-family: Arial; font-size: 12.5px; width: 69mm; text-align: center; vertical-align:text-top">' +
         '<tbody>' +
         '<tr>' +
         '<td colspan="4">' +
@@ -289,7 +289,7 @@ function initTicket(ticketData, call) {
         '<td colspan="2" style="text-align:right">' +
         'Ticket: ' +
         '<span>' +
-        `<strong> ${ticketData.ticket.ticket_number} </strong>` +
+        `<strong> ${ticketData.ticket.id} </strong>` +
         '</span>' +
         '</td>' +
         '</tr>' +
@@ -307,7 +307,7 @@ function initTicket(ticketData, call) {
         'Prod. / Serv.' +
         '</strong>' +
         '</td>' +
-        '<td colspan="1" style="width: 80px">' +
+        '<td colspan="1">' +
         '<strong>' +
         'Precio unit. /' +
         '</strong>' +
@@ -398,6 +398,13 @@ function initTicket(ticketData, call) {
         '</td>' +
         '</tr>' +
         '<tr>' +
+        '<td colspan="5"> <br /> </td>' +
+        '</tr>' +
+        '<tr>' +
+        '<td colspan="5"> <strong> Solo se podrá facturar este ticket ' +
+        'dentro de las siguientes 72 horas de emisión del mismo. </strong>  </td>' +
+        '</tr>' +
+        '<tr>' +
         '<td colspan="5">' +
         '_______________________________________ <br /> <br />' +
         '</td>' +
@@ -429,8 +436,6 @@ function initTicket(ticketData, call) {
 }
 
 function createHtmlFile(html, ticketId){
-  let fs = require('fs');
-
   try{
     fs.writeFileSync(`./tickets/TicketNo_${ticketId}.html`, html);
   }catch (e){
@@ -452,31 +457,167 @@ function getTicketsElements(ticketId, call){
   });
 }
 
+
+function restoreStoreInventories(productId, quantity){
+    findBy('product_id', productId, 'stores_inventories').then(inventory => {
+      updateBy(
+        {
+          quantity: (inventory.rows[0].quantity + quantity)
+        },
+        'stores_inventories',
+        `id = ${inventory.rows[0].id}`
+      );
+    });
+  }
+
+function deleteTicketFile(ticketId){
+  try {
+    fs.unlinkSync(`./tickets/TicketNo_${ticketId}.html`);
+  } catch (err) {
+    console.log('Error al borrar el archivo');
+  }
+}
+
+function rollBackData(ticketData, call){
+  deleteTicketFile(ticketData.ticket.id);
+  deleteBy('tickets', `id = ${ticketData.ticket.id}`).then(() => {
+    let rollbackLimit = Object.keys(ticketData.payments).length;
+    let count = 0;
+
+    for (var paymentId in ticketData.payments) {
+      deleteBy('payments', `id = ${paymentId}`).then(() => {
+        count++;
+        if (rollbackLimit === count){
+          rollbackLimit = ticketData.products.storeMovements.length;
+          count = 0;
+
+          for (var storeMovementIndex in ticketData.products.storeMovements) {
+            let storeMovement = ticketData.products.storeMovements[storeMovementIndex];
+            let productId = storeMovement.product_id;
+            let localQuery = specialQuery(productId);
+            query(localQuery).then(entries => {
+              let entry = entries.rows[0];
+              if (typeof entry === 'undefined') {
+                let warehouseEntry = ticketData.storeWarehouseInfo[productId];
+                delete warehouseEntry[`idis${productId}`];
+                delete warehouseEntry.id;
+                delete warehouseEntry.cost;
+                delete warehouseEntry.created_at;
+                delete warehouseEntry.updated_at;
+                delete warehouseEntry.store_id;
+                delete warehouseEntry.pos;
+                delete warehouseEntry.web;
+                insert(
+                  Object.keys(warehouseEntry),
+                  Object.values(warehouseEntry),
+                  'stores_warehouse_entries'
+                ).then(() => {
+                  restoreStoreInventories(
+                    storeMovement.product_id, storeMovement.quantity
+                  );
+                  deleteBy('store_movements', `id = ${storeMovement.id}`).then(() => {
+                    count++;
+                    if (rollbackLimit === count){
+                      if (ticketData.products.serviceOffereds.length > 0)
+                      {
+                        count = 0;
+                        for (var serviceOfferedIndex in ticketData.products.serviceOffereds) {
+                          let serviceOffered = ticketData.products.serviceOffereds[serviceOfferedIndex];
+                          deleteBy('service_offereds', `id = ${serviceOffered.id}`).then(() => {
+                            count++;
+                            if (rollbackLimit === count){
+                              call();
+                            }
+                          });
+                        }
+                      } else {
+                        call();
+                      }
+                    }
+                  });
+                })
+              } else {
+                updateBy(
+                  {
+                    quantity: (entry.quantity + storeMovement.quantity)
+                  },
+                  'stores_warehouse_entries',
+                  `id = ${entry.id}`
+                );
+
+                restoreStoreInventories(
+                  storeMovement.product_id, storeMovement.quantity
+                );
+                deleteBy('store_movements', `id = ${storeMovement.id}`).then(() => {
+                  count++;
+                  if (rollbackLimit === count){
+                    if (ticketData.products.serviceOffereds.length > 0)
+                    {
+                      count = 0;
+                      for (var serviceOfferedIndex in ticketData.products.serviceOffereds) {
+                        let serviceOffered = ticketData.products.serviceOffereds[serviceOfferedIndex];
+                        deleteBy('service_offereds', `id = ${serviceOffered.id}`).then(() => {
+                          count++;
+                          if (rollbackLimit === count){
+                            call();
+                          }
+                        });
+                      }
+                    } else {
+                      call();
+                    }
+                  }
+                });
+              }
+            });
+          }
+        }
+      });
+    }
+
+  });
+}
+
 function printTicket(ticketInfo, call){
+  let timmer = new Promise((resolve, reject) => {
+    setTimeout(function(){
+        rollBackData(ticketInfo, function(){
+          resolve();
+        });
+      }, 4000);
+  });
 
-  getTicketsElements(ticketInfo.ticket.id, function(products){
+  timmer.then(function(){
+    window.location.href = 'pos_sale.html';
+  });
 
-    findBy('id', ticketInfo.store.delivery_address_id, 'delivery_addresses').then(deliveryAddress => {
-      ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
+  try {
+    getTicketsElements(ticketInfo.ticket.id, function(products){
 
-      ticketInfo.products = products;
+      findBy('id', ticketInfo.store.delivery_address_id, 'delivery_addresses').then(deliveryAddress => {
+        ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
 
-      initTicket(ticketInfo, function(htmlContent){
+        ticketInfo.products = products;
 
-        createHtmlFile(htmlContent, ticketInfo.ticket.id);
-        win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
+        initTicket(ticketInfo, function(htmlContent){
 
-        let contents = win.webContents;
-        win.webContents.on('did-finish-load', () => {
-          win.webContents.print({silent: true});
-          win = null;
-          return call();
+          createHtmlFile(htmlContent, ticketInfo.ticket.id);
+          win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
+
+          let contents = win.webContents;
+          win.webContents.on('did-finish-load', () => {
+            win.webContents.print({silent: true});
+            win = null;
+            return call();
+          });
+
         });
 
       });
 
     });
-
-  });
+  } catch (err) {
+     rollBackData();
+  }
 
 }
