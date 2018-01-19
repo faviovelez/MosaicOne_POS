@@ -10,7 +10,6 @@ function iterateInventories(products, call){
     productsJson[jsonId].exterior_color_or_design = product.exterior_color_or_design;
     productsJson[jsonId].unique_code              = product.unique_code;
     productsJson[jsonId].supplier_id              = product.supplier_id;
-    productsJson[jsonId].price                    = product.price;
 
     findBy('product_id', product.id, 'stores_inventories').then(inventory => {
 
@@ -40,12 +39,12 @@ function createTicketProductJson(call){
         table = $(this).attr('id').replace(regex, '');
 
     if(table === 'products') {
-
       productsJson[id] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
         sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
-        discountReason : $(this).find('td[id^=discountReasonTo]').html()
+        discountReason : $(this).find('td[id^=discountReasonTo]').html(),
+        price          : parseFloat($(this).find('td[id^=priceTo]').html().replace('$ ','').replace(/,/g,''))
       };
 
       idsCollection.push(
@@ -261,8 +260,8 @@ function insertsServiceOffereds(ticketId, call){
       ).val(),
       subtotal        = (unitPrice * sellQuantity),
       finalPrice      = (unitPrice * (1 - discountPercent)),
-      discount        = (subtotal * discountPercent),
-      taxes           = ((subtotal - discount) * 0.16),
+      discount        = parseFloat((subtotal * discountPercent).toFixed(2)),
+      taxes           = parseFloat( ((subtotal - discount) * 0.16).toFixed(2) ),
       total           = (subtotal - discount + taxes),
       fixedDiscount   = parseFloat(discount.toFixed(2)),
       data = {
@@ -341,6 +340,7 @@ function assignCost(ticketType, ticketId, call) {
   }
   let warehouseInfo = {};
   count = 0;
+
   for (var productId in productsJson){
     let localQuery = specialQuery(productId);
 
@@ -357,10 +357,9 @@ function assignCost(ticketType, ticketId, call) {
         unitPrice       = productsJson[productId].price,
         subtotal        = (unitPrice * sellQuantity),
         finalPrice      = (unitPrice * (1 - discountPercent)),
-        discount        = (subtotal * discountPercent),
+        discount        = parseFloat((subtotal * discountPercent).toFixed(2)),
         taxes           = ((subtotal - discount) * 0.16),
         total           = productsJson[productId].sellTo,
-        fixedDiscount   = parseFloat(discount.toFixed(2)),
         prospectId   = $('#prospectList a').attr('data-id'),
         data = {
           product_id         : productId,
@@ -369,8 +368,8 @@ function assignCost(ticketType, ticketId, call) {
           ticket_id          : ticketId,
           initial_price      : productsJson[productId].price.toFixed(2),
           automatic_discount : 0,
-          manual_discount    : fixedDiscount,
-          discount_applied   : fixedDiscount,
+          manual_discount    : discount,
+          discount_applied   : discount,
           final_price        : finalPrice.toFixed(2),
           tax_id             : 2,
           taxes              : taxes.toFixed(2),
@@ -380,6 +379,10 @@ function assignCost(ticketType, ticketId, call) {
           total              : total,
           subtotal           : subtotal.toFixed(2)
         };
+
+      updateStoreInventories(
+          productId, sellQuantity
+      );
 
       if (discountReason){
         data.discount_reason = discountReason;
@@ -404,15 +407,9 @@ function assignCost(ticketType, ticketId, call) {
               totalCost += (quantity * cost);
               warehouseInfo[productId] = entry;
               deleteBy('stores_warehouse_entries', `id = ${entryId}`);
-              updateStoreInventories(
-                productId, quantity
-              );
               processQuantity -= quantity;
             } else {
               totalCost += (processQuantity * cost);
-              updateStoreInventories(
-                productId, processQuantity
-              );
               updateBy(
                 {
                   quantity: (quantity - processQuantity)

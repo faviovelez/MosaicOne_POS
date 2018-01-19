@@ -211,7 +211,7 @@ CREATE TABLE billing_addresses (
     street character varying,
     exterior_number character varying,
     interior_number character varying,
-    zipcode integer,
+    zipcode character varying,
     neighborhood character varying,
     city character varying,
     state character varying,
@@ -2888,7 +2888,9 @@ CREATE TABLE prospects (
     web boolean DEFAULT true,
     date date,
     pos_id integer,
-    web_id integer
+    web_id integer,
+    email_2 character varying,
+    email_3 character varying
 );
 
 

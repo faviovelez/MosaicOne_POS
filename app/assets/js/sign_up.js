@@ -60,15 +60,13 @@ $(function(){
 
         params.middle_name = $('#user_middle_name').val();
 
-        addUser(params).then(result => {
+        addUser(params).then(user => {
           showAlert('Éxito', 'Usuario creado correctamente', cloneAlert());
 
-          findBy('email', $('#user_email').val(), 'users').then(user => {
             setTimeout(function(){
-              loginUser(user.rows[0]).then({});
+              loginUser(user).then({});
             }, 1000);
 
-          });
         }, err => {
           showAlert('Error', err, cloneAlert());
         });

@@ -95,21 +95,6 @@ $(document).ready(function() {
     });
   }
 
-  function updateStoreInventories(productId, quantity){
-    quantity = quantity;
-
-    findBy('product_id', productId, 'stores_inventories').then(inventory => {
-      updateBy(
-        {
-          quantity: (inventory.rows[0].quantity - quantity)
-        },
-        'stores_inventories',
-        `id = ${inventory.rows[0].id}`
-      );
-    });
-
-  }
-
   function localUpdateStoreInventories(productId, quantity){
     quantity = quantity;
 
@@ -568,7 +553,7 @@ $(document).ready(function() {
                                               'pesos. Realice un retiro.');
                                           }
 
-                                          //window.location.href = 'pos_sale.html';
+                                          window.location.href = 'pos_sale.html';
 
                                         });
 
@@ -633,7 +618,7 @@ $(document).ready(function() {
         total = 0;
       }
 
-      discount += (parseFloat(discountval) / 100 * total);
+      discount += parseFloat( ( parseFloat(discountval) / 100 * total).toFixed(2) );
     });
     $('#discountSum').html(
       ` $ ${discount.toFixed(
@@ -700,10 +685,10 @@ $(document).ready(function() {
     if (!price){
       price = $(`td[id^=priceTo_${id}] input`).val();
     }
-    let total =  price * cuantity,
+    let total =  parseFloat( (price * cuantity).toFixed(2) ),
         discount = $(`a[id^=discount_${id}]`)
       .html().replace(' %',''),
-      discountVal = parseFloat(discount) / 100 * total,
+      discountVal = parseFloat ( (parseFloat(discount) / 100 * total).toFixed(2) ),
       productTotal    = total - discountVal;
 
     if (manualDiscount){
