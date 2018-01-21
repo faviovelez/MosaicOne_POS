@@ -9,6 +9,8 @@ $(document).ready(function() {
   }
 
   const Inputmask = require('inputmask');
+  const Promise = require("bluebird");
+
   function cloneAlert(){
     let alerts = $('.alert').length + 1;
     $('.alerts-container').prepend(
@@ -269,7 +271,7 @@ $(document).ready(function() {
   function getProductsAndServices(call){
     getAll('products').then(products => {
       options = [];
-      products.rows.forEach(product => {
+      Promise.each(products.rows, product => {
         options.push(
           {
             value: `${product.unique_code} ${product.description}`,
@@ -280,22 +282,24 @@ $(document).ready(function() {
             table: 'products'
           }
         );
-      });
-      getAll('services').then(services => {
-        services.rows.forEach(service => {
-          options.push(
-            {
-              value: `${service.unique_code} ${service.description}`,
-              id:    service.id,
-              table:  'services',
-              company: service.delivery_company ? service.delivery_company
-                                                : '',
-              description: service.description
-            }
-          );
+      }).then(() => {
+        getAll('services').then(services => {
+          Promise.each(services.rows, service => {
+            options.push(
+              {
+                value: `${service.unique_code} ${service.description}`,
+                id:    service.id,
+                table:  'services',
+                company: service.delivery_company ? service.delivery_company
+                                                  : '',
+                description: `${service.unique_code} ${service.description}`,
+              }
+            );
 
-        });
-        return call(options);
+          }).then(() => {
+            return call(options);
+          });
+        })
       });
     });
   }
@@ -475,10 +479,11 @@ $(document).ready(function() {
 
   $('#completeSale').click(function() {
     $(this).prop( "disabled", true );
-    let ticketId = window.location.href.replace(/.*ticket_id=/,'');
 
-    if (!isNaN(parseInt(ticketId))){
-      deleteTicket(ticketId);
+    let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
+
+    if (!isNaN(parseInt(restoreTicketId))){
+      deleteTicket(restoreTicketId);
     }
 
     if (validateAllServiceOfferedFill()){
@@ -495,9 +500,8 @@ $(document).ready(function() {
               store : storeObject,
               user  : store.get('current_user'),
             };
-
+            let ticketId = null;
             insertTicket(user, function(ticketId){
-
               assignCost('venta', ticketId, function(warehouseInfo){
                 ticketData.storeWarehouseInfo = warehouseInfo;
                 insertsServiceOffereds(ticketId, function(){

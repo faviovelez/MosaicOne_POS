@@ -526,12 +526,12 @@ function rollBackData(ticketData, call){
                           deleteBy('service_offereds', `id = ${serviceOffered.id}`).then(() => {
                             count++;
                             if (rollbackLimit === count){
-                              call();
+                              return call();
                             }
                           });
                         }
                       } else {
-                        call();
+                        return call();
                       }
                     }
                   });
@@ -559,12 +559,12 @@ function rollBackData(ticketData, call){
                         deleteBy('service_offereds', `id = ${serviceOffered.id}`).then(() => {
                           count++;
                           if (rollbackLimit === count){
-                            call();
+                            return call();
                           }
                         });
                       }
                     } else {
-                      call();
+                      return call();
                     }
                   }
                 });
@@ -581,6 +581,7 @@ function rollBackData(ticketData, call){
 function printTicket(ticketInfo, call){
   let timmer = new Promise((resolve, reject) => {
     setTimeout(function(){
+        alert('El ticket no fue generado correctamente, por favor intente de nuevo');
         rollBackData(ticketInfo, function(){
           resolve();
         });

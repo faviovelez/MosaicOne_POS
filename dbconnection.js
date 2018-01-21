@@ -1,4 +1,4 @@
-const {Pool} = require('pg');
+const { Pool, Client } = require('pg')
 require('dotenv').config();
 
 const localPool = new Pool({
@@ -52,15 +52,8 @@ async function initStore(){
   return store;
 }
 
-async function query (q, lastId = 0, table = '') {
-
-  const client = await localPool.connect();
+async function runQuery(q, client, lastId, table){
   let res;
-  var timmer = setInterval(function(){
-    return {lastId: false};
-  }, 4000);
-
-
   try {
     await client.query('BEGIN');
     try {
@@ -78,14 +71,103 @@ async function query (q, lastId = 0, table = '') {
       }
     }
   } finally {
-    client.release(true);
+    if (client.release)
+      client.release(true);
   }
   if (lastId !== 0) {
     res.lastId = lastId;
   }
   res.table = table;
+  return res;
+}
+
+async function query (q, lastId = 0, table = '') {
+  var timmer = setInterval(async function(){
+    let client = new Client({
+      user: 'faviovelez',
+      host: 'localhost',
+      database: 'mosaiconepos',
+      password: 'bafio44741',
+      port: 5432,
+    });
+    await client.connect();
+    res = await runQuery(q, client, lastId, table)
+    clearInterval(timmer);
+    await client.end();
+    return res;
+  }, 4000);
+  let client = await localPool.connect();
+  let res = await runQuery(q, client, lastId, table)
   clearInterval(timmer);
   return res;
+}
+
+function integrateDataToQuery(data, localQuery, table, extras){
+  return new Promise(function(resolve, reject){
+    data.forEach(data => {
+      switch(data){
+        case null:
+        case true:
+        case false:
+          localQuery += ', ';
+          localQuery += data;
+          break;
+        default:
+          localQuery += `, '${data}'`;
+      }
+    });
+    let createDate = new Date(),
+      updateDate = new Date();
+
+    localQuery += `, '${createDate.toString().replace(/GMT.*/,'')}',`;
+    localQuery += `'${updateDate.toString().replace(/GMT.*/,'')}'`;
+    initStore().then(store => {
+      if ($.inArray(table, storeIdsTables) > -1) {
+        let storeId = store.get('store').id;
+        localQuery += `, '${storeId}'`;
+      }
+      extrasData = extras ? ', true, false)' : ')';
+      resolve(`${localQuery}${extrasData}`);
+    });
+  });
+}
+
+function getLastId(localQuery){
+  return new Promise(function(resolve, reject){
+    query(localQuery).then(queryResult => {
+      resolve(queryResult);
+    });
+  })
+}
+
+async function validateValidId(queryResult, localQuery){
+  while (queryResult.err){
+    let newId = queryResult.lastId + 1;
+    localQuery = localQuery.replace(queryResult.lastId, newId);
+    queryResult = await query(localQuery, newId);
+  }
+  return queryResult;
+}
+
+function completeInsertProcess(localQuery, columns, table, data, extras){
+  return new Promise(function(resolve, reject){
+    if ($.inArray(columns, 'id') === -1) {
+      getLastId(`SELECT MAX(id) as id FROM ${table}`).then(lastId => {
+        recordId = (lastId.rows[0].id + 1);
+        localQuery += ` VALUES ('${recordId}', '${data.shift()}'`;
+        integrateDataToQuery(data, localQuery, table, extras).then(async dataString => {
+          let queryResult = await query(dataString, recordId);
+          resolve(await validateValidId(queryResult, dataString));
+        });
+      });
+    } else {
+      localQuery += ` VALUES ('${data.shift()}'`;
+      integrateDataToQuery(data, localQuery, table, extras).then(async dataString => {
+        let queryResult = await query(dataString, recordId);
+        resolve(await validateValidId(queryResult, dataString));
+      });
+    }
+  });
 }
 
 async function insert (columns, data, table, extras = true){
@@ -97,7 +179,6 @@ async function insert (columns, data, table, extras = true){
   if ($.inArray(columns, 'id') === -1) {
     localQuery += 'id, ';
   }
-  store = await initStore();
   localQuery += columns.shift();
   columns.forEach(fieldName => {
     localQuery += `, ${fieldName}`;
@@ -109,45 +190,7 @@ async function insert (columns, data, table, extras = true){
     localQuery += `, created_at, updated_at${extrasData}`;
   }
 
-  if ($.inArray(columns, 'id') === -1) {
-    let lastId   = await query(`SELECT MAX(id) as id FROM ${table}`);
-    recordId = (lastId.rows[0].id + 1);
-    localQuery += ` VALUES ('${recordId}', '${data.shift()}'`;
-  } else {
-    localQuery += ` VALUES ('${data.shift()}'`;
-  }
-
-  data.forEach(data => {
-    switch(data){
-      case null:
-      case true:
-      case false:
-        localQuery += ', ';
-        localQuery += data;
-        break;
-      default:
-        localQuery += `, '${data}'`;
-    }
-  });
-  let createDate = new Date(),
-    updateDate = new Date();
-
-  localQuery += `, '${createDate.toString().replace(/GMT.*/,'')}',`;
-  localQuery += `'${updateDate.toString().replace(/GMT.*/,'')}'`;
-  if ($.inArray(table, storeIdsTables) > -1) {
-    let storeId = store.get('store').id;
-    localQuery += `, '${storeId}'`;
-  }
-  extrasData = extras ? ', true, false)' : ')';
-  let queryResult = await query(`${localQuery}${extrasData}`, recordId);
-
-  while (queryResult.err) {
-    let newId = queryResult.lastId + 1;
-    localQuery = localQuery.replace(queryResult.lastId, newId);
-    queryResult = await query(`${localQuery}${extrasData}`, newId);
-  }
-
-  return queryResult;
+  return await completeInsertProcess(localQuery, columns, table, data, extras)
 }
 
 async function findBy(column, data, table, lastId = 0, refTable = ''){

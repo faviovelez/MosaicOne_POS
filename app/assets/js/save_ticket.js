@@ -160,8 +160,8 @@ function createStoreMovement(data, call, warehouseInfo = {}){
     Object.values(data),
     'store_movements'
   ).then(storeMovement => {
-    count++;
-    if (count === Object.keys(productsJson).length){
+    assignCostcount++;
+    if (assignCostcount === Object.keys(productsJson).length){
       return call(warehouseInfo);
     }
   });
@@ -245,7 +245,7 @@ function insertsServiceOffereds(ticketId, call){
     return call();
   }
 
-  count = 0;
+  let serviceOfferedCount = 0;
   for (var serviceId in servicesJson){
 
     let discountReason  = servicesJson[serviceId].discountReason,
@@ -307,8 +307,8 @@ function insertsServiceOffereds(ticketId, call){
           ).html();
 
           if (typeof deliveryServiceId === 'undefined'){
-            count++;
-            if (count === Object.keys(servicesJson).length){
+            serviceOfferedCount++;
+            if (serviceOfferedCount === Object.keys(servicesJson).length){
               return call();
             }
           } else {
@@ -321,8 +321,8 @@ function insertsServiceOffereds(ticketId, call){
               'delivery_services',
               `id = ${deliveryServiceId}`).then(() => {
 
-                count++;
-                if (count === Object.keys(servicesJson).length){
+                serviceOfferedCount++;
+                if (serviceOfferedCount === Object.keys(servicesJson).length){
                   return call();
                 }
 
@@ -339,7 +339,7 @@ function assignCost(ticketType, ticketId, call) {
     return call();
   }
   let warehouseInfo = {};
-  count = 0;
+  assignCostcount = 0;
 
   for (var productId in productsJson){
     let localQuery = specialQuery(productId);
@@ -428,7 +428,7 @@ function assignCost(ticketType, ticketId, call) {
         data.cost       = (totalCost / sellQuantity).toFixed(2);
 
         if (discountType !== 'none'){
-          data[`${discountType}_discount`] = fixedDiscount;
+          data[`${discountType}_discount`] = discount;
         }
         createStoreMovement(data, call, warehouseInfo);
       }
