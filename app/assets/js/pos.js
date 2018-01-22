@@ -1,4 +1,52 @@
 $(document).ready(function() {
+  $('#changeSinglePrice').on('shown.bs.modal', function(e) {
+    $('#changeSinglePriceProductId').html(e.relatedTarget.dataset.id.replace(/_products/, ''));
+  });
+
+  $('#saveNewPrice').click(function(){
+    let productId = $('#changeSinglePriceProductId').html();
+
+    updateBy(
+      {
+        price: $('#changeSinglePriceInput').val()
+      },
+      'products',
+      `id = ${productId}`
+    ).then(() => {});
+
+    updateBy(
+      {
+        manual_price: $('#changeSinglePriceInput').val(),
+        manual_price_update: !!$("#changeSinglePriceCheckBox").is(':checked')
+      },
+      'stores_inventories',
+      `product_id = ${productId}`
+    ).then(() => {});
+
+    $(`td[id^=priceTo_${productId}] a`).html(`
+      $ ${parseFloat($('#changeSinglePriceInput').val()).toFixed(2).replace(
+          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+        )}
+    `);
+    $('#changeSinglePrice').modal('hide');
+    $('#changeSinglePriceInput').val('');
+    $("#changeSinglePriceCheckBox").prop('checked', false);
+    let total = createTotal(productId);
+    $(`#totalTo_${productId}_products`).html(
+      `$ ${(total * 1.16).toFixed(2).replace(
+    /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+  )}`
+    );
+
+    $(`#totalSinTo_${productId}_products`).html(
+      `$ ${total.toFixed(2).replace(
+    /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+  )}`
+    );
+    bigTotal();
+    resumePayment();
+  });
+
 
   function getCashRegisterSum(){
     return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
@@ -413,6 +461,9 @@ $(document).ready(function() {
   });
 
   $('#ticketDiscountChange .confirm').click(function(){
+    $('#discountRow').removeClass('hidden');
+    $('#SubtotalRow').removeClass('hidden');
+    $('#manualDiscountQuantity').parent().addClass('hidden')
     $.each($('a[id^=discount]'), function(){
       $(this).html(
         $('#globalDiscount input:first').val() + ' %'
@@ -606,11 +657,16 @@ $(document).ready(function() {
   function createRealSubtotal(){
     let discount = 0;
     $.each($(`td[id^=priceTo]`), function(){
-      let price       = parseFloat($(this).html().replace(/\$|,/g,'')).toString() === 'NaN' ?
-                        $(this).find('input').val() :
-                        parseFloat($(this).html().replace(/\$|,/g,'')),
-          tr          = $(this).parent(),
-          cuantity    = parseInt($(tr).find(
+      let price = 0,
+          tr = null;
+      if (!$(this).find('a').html()) {
+        price = $(this).find('input').val();
+        tr    = $(this).parent();
+      } else {
+        price = parseFloat($(this).find('a').html().replace(/\$|,/g,''));
+        tr    = $(this).parent().parent()
+      }
+      let cuantity    = parseInt($(tr).find(
             'input[id^=cuantityTo]'
           ).val()),
           total       = price * cuantity,
@@ -624,6 +680,7 @@ $(document).ready(function() {
 
       discount += parseFloat( ( parseFloat(discountval) / 100 * total).toFixed(2) );
     });
+
     $('#discountSum').html(
       ` $ ${discount.toFixed(
           2
@@ -683,11 +740,14 @@ $(document).ready(function() {
   function createTotal(id){
     let cuantity = $(`input[id^=cuantityTo_${id}]`).val(),
       manualDiscount = !$('#manual-discount').hasClass('hidden'),
-      price    = parseFloat(
-        $(`td[id^=priceTo_${id}]`).html().replace(' $ ','')
-      );
-    if (!price){
+      price = 0;
+      priceElement = $(`td[id^=priceTo_${id}] a`);
+    if (!$(priceElement).html()){
       price = $(`td[id^=priceTo_${id}] input`).val();
+    } else {
+      price    = parseFloat(
+        $(priceElement).html().replace(' $ ','')
+      );
     }
     let total =  parseFloat( (price * cuantity).toFixed(2) ),
         discount = $(`a[id^=discount_${id}]`)
@@ -967,13 +1027,19 @@ $(document).ready(function() {
 
   function translatePrice(price){
     let convertPrice =  parseFloat(
-            price.replace(' $ ','')
+            price
           ).toFixed(2);
 
     if (convertPrice === "NaN") {
       return price;
     }
     return ` $ ${convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
+  }
+
+  function stringPrice(price, id){
+    return `<a href="#" data-toggle="modal" data-target="#changeSinglePrice" data-id="${id}">` +
+      `${translatePrice(price)}` +
+    '</a>';
   }
 
   function addTr(product){
@@ -994,7 +1060,7 @@ $(document).ready(function() {
 
     product.id = `${product.id}_${product.table}`;
 
-    let price = product.table === 'products' ? ` $ ${product.price}` :
+    let price = product.table === 'products' ? stringPrice(product.price, product.id) :
       '<input type="text" class="form-control ' +
       `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
 
@@ -1010,7 +1076,8 @@ $(document).ready(function() {
       description +
       '</td>' +
       `<td> ${color} </td>` +
-      `<td id="priceTo_${product.id}">${translatePrice(price)}` +
+      `<td id="priceTo_${product.id}">` +
+       price +
       '</td><td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}"></td>` +

@@ -244,7 +244,7 @@ function initTicket(ticketData, call) {
         '</style>' +
         '</head>' +
         '<body style="margin:0 auto !important; padding:0 auto !important">' +
-        '<table style="font-family: Arial; font-size: 12.5px; width: 69mm; text-align: center; vertical-align:text-top">' +
+        '<table style="font-family: Arial; font-size: 11px; width: 69mm; text-align: center; vertical-align:text-top">' +
         '<tbody>' +
         '<tr>' +
         '<td colspan="4">' +
@@ -478,103 +478,68 @@ function deleteTicketFile(ticketId){
   }
 }
 
-function rollBackData(ticketData, call){
-  deleteTicketFile(ticketData.ticket.id);
-  deleteBy('tickets', `id = ${ticketData.ticket.id}`).then(() => {
-    let rollbackLimit = Object.keys(ticketData.payments).length;
-    let count = 0;
-
-    for (var paymentId in ticketData.payments) {
-      deleteBy('payments', `id = ${paymentId}`).then(() => {
-        count++;
-        if (rollbackLimit === count){
-          rollbackLimit = ticketData.products.storeMovements.length;
-          count = 0;
-
-          for (var storeMovementIndex in ticketData.products.storeMovements) {
-            let storeMovement = ticketData.products.storeMovements[storeMovementIndex];
-            let productId = storeMovement.product_id;
-            let localQuery = specialQuery(productId);
-            query(localQuery).then(entries => {
-              let entry = entries.rows[0];
-              if (typeof entry === 'undefined') {
-                let warehouseEntry = ticketData.storeWarehouseInfo[productId];
-                delete warehouseEntry[`idis${productId}`];
-                delete warehouseEntry.id;
-                delete warehouseEntry.cost;
-                delete warehouseEntry.created_at;
-                delete warehouseEntry.updated_at;
-                delete warehouseEntry.store_id;
-                delete warehouseEntry.pos;
-                delete warehouseEntry.web;
-                insert(
-                  Object.keys(warehouseEntry),
-                  Object.values(warehouseEntry),
-                  'stores_warehouse_entries'
-                ).then(() => {
-                  restoreStoreInventories(
-                    storeMovement.product_id, storeMovement.quantity
-                  );
-                  deleteBy('store_movements', `id = ${storeMovement.id}`).then(() => {
-                    count++;
-                    if (rollbackLimit === count){
-                      if (ticketData.products.serviceOffereds.length > 0)
-                      {
-                        count = 0;
-                        for (var serviceOfferedIndex in ticketData.products.serviceOffereds) {
-                          let serviceOffered = ticketData.products.serviceOffereds[serviceOfferedIndex];
-                          deleteBy('service_offereds', `id = ${serviceOffered.id}`).then(() => {
-                            count++;
-                            if (rollbackLimit === count){
-                              return call();
-                            }
-                          });
-                        }
-                      } else {
-                        return call();
-                      }
-                    }
-                  });
-                })
-              } else {
-                updateBy(
-                  {
-                    quantity: (entry.quantity + storeMovement.quantity)
-                  },
-                  'stores_warehouse_entries',
-                  `id = ${entry.id}`
-                );
-
-                restoreStoreInventories(
-                  storeMovement.product_id, storeMovement.quantity
-                );
-                deleteBy('store_movements', `id = ${storeMovement.id}`).then(() => {
-                  count++;
-                  if (rollbackLimit === count){
-                    if (ticketData.products.serviceOffereds.length > 0)
-                    {
-                      count = 0;
-                      for (var serviceOfferedIndex in ticketData.products.serviceOffereds) {
-                        let serviceOffered = ticketData.products.serviceOffereds[serviceOfferedIndex];
-                        deleteBy('service_offereds', `id = ${serviceOffered.id}`).then(() => {
-                          count++;
-                          if (rollbackLimit === count){
-                            return call();
-                          }
-                        });
-                      }
-                    } else {
-                      return call();
-                    }
-                  }
-                });
-              }
-            });
-          }
+function restoreWarehousesEntries(storeMovements, storeWarehouseInfo){
+  return new Promise(function(resolve, reject){
+    let restoreCount = 0;
+    let restoreLimit = storeMovements.length;
+    storeMovements.forEach(storeMovement => {
+      let processQuantity = storeMovement.quantity;
+      restoreStoreInventories(storeMovement.product_id, storeMovement.quantity);
+      query(specialQuery(storeMovement.product_id), storeMovement.product_id).then(warehouseEntries => {
+        if (warehouseEntries.rowCount === 0) {
+          let productId = warehouseEntries.lastId;
+          let warehouseEntry = storeWarehouseInfo[productId];
+          delete warehouseEntry[`idis${productId}`];
+          delete warehouseEntry.id;
+          delete warehouseEntry.cost;
+          delete warehouseEntry.created_at;
+          delete warehouseEntry.updated_at;
+          delete warehouseEntry.store_id;
+          delete warehouseEntry.pos;
+          delete warehouseEntry.web;
+          insert(
+            Object.keys(warehouseEntry),
+            Object.values(warehouseEntry),
+            'stores_warehouse_entries'
+          ).then(() => {
+            restoreCount++;
+            if (restoreCount === restoreLimit)
+              resolve();
+          });
+        } else {
+          updateBy(
+            {
+              quantity: warehouseEntries.rows[0].quantity + processQuantity
+            },
+            'stores_warehouse_entries',
+            `id = ${warehouseEntries.rows[0].id}`
+          ).then(() => {
+            restoreCount++;
+            if (restoreCount === restoreLimit)
+              resolve();
+          });
         }
       });
-    }
+    });
+  });
+}
 
+
+
+function rollBackData(ticketData, call){
+  let Promise = require("bluebird");
+  let ticketId = ticketData.ticket.id;
+  Promise.each(ticketData.products.serviceOffereds, function(serviceOffered){
+    deleteBy('delivery_services', `service_offered_id = ${serviceOffered.id}`).then(() => {});
+  }).then(() => {
+    let deleteThings = ['store_movements', 'service_offereds', 'payments'];
+    Promise.each(deleteThings, function(table){
+      deleteBy(table, `ticket_id = ${ticketId}`).then(() => {});
+    }).then(() => {
+      restoreWarehousesEntries(ticketData.products.storeMovements, ticketData.storeWarehouseInfo).then(() => {
+        return call();
+      });
+    });
   });
 }
 
@@ -583,7 +548,10 @@ function printTicket(ticketInfo, call){
     setTimeout(function(){
         alert('El ticket no fue generado correctamente, por favor intente de nuevo');
         rollBackData(ticketInfo, function(){
-          resolve();
+          deleteBy('tickets', `id = ${ticketData.ticket.id}`).then(() => {
+            deleteTicketFile(ticketData.ticket.id);
+            resolve();
+          });
         });
       }, 4000);
   });

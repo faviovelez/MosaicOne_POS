@@ -44,7 +44,7 @@ function createTicketProductJson(call){
         sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html(),
-        price          : parseFloat($(this).find('td[id^=priceTo]').html().replace('$ ','').replace(/,/g,''))
+        price          : parseFloat($(this).find('td[id^=priceTo] a').html().replace('$ ','').replace(/,/g,''))
       };
 
       idsCollection.push(
@@ -237,7 +237,7 @@ function specialQuery(productId){
     ' stores_warehouse_entries.store_movement_id' +
     ' = store_movements.id WHERE ' +
     `stores_warehouse_entries.product_id = ${productId} ` +
-    ' ORDER BY stores_warehouse_entries.id ';
+    " AND movement_type = 'alta' ORDER BY stores_warehouse_entries.id ";
 }
 
 function insertsServiceOffereds(ticketId, call){
@@ -405,6 +405,7 @@ function assignCost(ticketType, ticketId, call) {
 
             if (parseInt(processQuantity) >= quantity) {
               totalCost += (quantity * cost);
+              entry.quantity = processQuantity;
               warehouseInfo[productId] = entry;
               deleteBy('stores_warehouse_entries', `id = ${entryId}`);
               processQuantity -= quantity;
