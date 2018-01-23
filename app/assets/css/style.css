@@ -21,6 +21,14 @@ html {
   margin-top: 4.8%;
 }
 
+.gray-background {
+  background-color: #E8EBEF;
+}
+
+.blue-background {
+  background-color: #CEEAF7;
+}
+
 .alerts-container {
   position: absolute;
   top: 9%;

@@ -643,6 +643,7 @@ $(document).ready(function() {
       });
     } else {
       alert('Favor de llenar toda la informacion de envios');
+      $('#completeSale').prop( "disabled", false );
     }
 
   });
