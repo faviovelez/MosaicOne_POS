@@ -197,7 +197,8 @@ function lotQueries(store, call){
               tablesResult.table
             ).then(localQuery => {
               query(localQuery, false).then(result => {
-                if (count++ === limit){
+                count++;
+                if (count === limit){
                   call();
                 }
                 current_progress += parseInt(count * 92 / limit);

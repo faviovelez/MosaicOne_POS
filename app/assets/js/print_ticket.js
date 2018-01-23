@@ -544,21 +544,6 @@ function rollBackData(ticketData, call){
 }
 
 function printTicket(ticketInfo, call){
-  let timmer = new Promise((resolve, reject) => {
-    setTimeout(function(){
-        alert('El ticket no fue generado correctamente, por favor intente de nuevo');
-        rollBackData(ticketInfo, function(){
-          deleteBy('tickets', `id = ${ticketData.ticket.id}`).then(() => {
-            deleteTicketFile(ticketData.ticket.id);
-            resolve();
-          });
-        });
-      }, 4000);
-  });
-
-  timmer.then(function(){
-    window.location.href = 'pos_sale.html';
-  });
 
   try {
     getTicketsElements(ticketInfo.ticket.id, function(products){
@@ -567,6 +552,22 @@ function printTicket(ticketInfo, call){
         ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
 
         ticketInfo.products = products;
+        
+        let timmer = new Promise((resolve, reject) => {
+          setTimeout(function(){
+              alert('El ticket no fue generado correctamente, por favor intente de nuevo');
+              rollBackData(ticketInfo, function(){
+                deleteBy('tickets', `id = ${ticketData.ticket.id}`).then(() => {
+                  deleteTicketFile(ticketData.ticket.id);
+                  resolve();
+                });
+              });
+            }, 4000);
+        });
+
+        timmer.then(function(){
+          window.location.href = 'pos_sale.html';
+        });
 
         initTicket(ticketInfo, function(htmlContent){
 

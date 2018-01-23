@@ -82,23 +82,16 @@ async function runQuery(q, client, lastId, table){
 }
 
 async function query (q, lastId = 0, table = '') {
-  var timmer = setInterval(async function(){
-    let client = new Client({
-      user: 'faviovelez',
-      host: 'localhost',
-      database: 'mosaiconepos',
-      password: 'bafio44741',
-      port: 5432,
-    });
-    await client.connect();
-    let res = await runQuery(q, client, lastId, table)
-    clearInterval(timmer);
-    await client.end();
-    return res;
-  }, 1000);
-  let client = await localPool.connect();
+  let client = new Client({
+    user: 'faviovelez',
+    host: 'localhost',
+    database: 'mosaiconepos',
+    password: 'bafio44741',
+    port: 5432,
+  });
+  await client.connect();
   let res = await runQuery(q, client, lastId, table)
-  clearInterval(timmer);
+  await client.end();
   return res;
 }
 

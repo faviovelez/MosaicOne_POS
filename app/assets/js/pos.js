@@ -657,15 +657,13 @@ $(document).ready(function() {
   function createRealSubtotal(){
     let discount = 0;
     $.each($(`td[id^=priceTo]`), function(){
-      let price = 0,
-          tr = null;
+      let price = 0;
       if (!$(this).find('a').html()) {
         price = $(this).find('input').val();
-        tr    = $(this).parent();
       } else {
         price = parseFloat($(this).find('a').html().replace(/\$|,/g,''));
-        tr    = $(this).parent().parent()
       }
+      let tr    = $(this).parent();
       let cuantity    = parseInt($(tr).find(
             'input[id^=cuantityTo]'
           ).val()),

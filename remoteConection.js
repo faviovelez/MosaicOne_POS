@@ -138,3 +138,11 @@ async function updatePosData(table, id){
 
   return query(localQuery, false);
 }
+
+async function getAll(table, columns = '*', condition = false, remote = false){
+  let localQuery = `SELECT ${columns} FROM ${table}`;
+  if (condition){
+    localQuery += ` WHERE ${condition}`;
+  }
+  return await query(localQuery, remote);
+}
