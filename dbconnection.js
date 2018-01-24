@@ -37,7 +37,8 @@ const storeIdsTables = [
   "tickets",
   "users",
   "warehouses",
-  "withdrawals"
+  "withdrawals",
+  "billing_addresses"
 ];
 
 async function initStore(){
@@ -82,17 +83,24 @@ async function runQuery(q, client, lastId, table){
 }
 
 async function query (q, lastId = 0, table = '') {
-  let client = new Client({
-    user: 'faviovelez',
-    host: 'localhost',
-    database: 'mosaiconepos',
-    password: 'bafio44741',
-    port: 5432,
-  });
-  await client.connect();
-  let res = await runQuery(q, client, lastId, table)
-  await client.end();
-  return res;
+  //let timmer = setInterval(async function(){
+    let client = new Client({
+      user: 'faviovelez',
+      host: 'localhost',
+      database: 'mosaiconepos',
+      password: 'bafio44741',
+      port: 5432,
+    });
+    await client.connect();
+    let res = await runQuery(q, client, lastId, table)
+    //clearInterval(timmer);
+    await client.end();
+    return res;
+  //}, 2000);
+  //let client = await localPool.connect();
+  //let res = await runQuery(q, client, lastId, table)
+  //clearInterval(timmer);
+  //return res;
 }
 
 function integrateDataToQuery(data, localQuery, table, extras){
@@ -172,6 +180,7 @@ async function insert (columns, data, table, extras = true){
   if ($.inArray(columns, 'id') === -1) {
     localQuery += 'id, ';
   }
+  store = await initStore();
   localQuery += columns.shift();
   columns.forEach(fieldName => {
     localQuery += `, ${fieldName}`;
@@ -183,7 +192,36 @@ async function insert (columns, data, table, extras = true){
     localQuery += `, created_at, updated_at${extrasData}`;
   }
 
-  return await completeInsertProcess(localQuery, columns, table, data, extras)
+  if ($.inArray(columns, 'id') === -1) {
+    let lastId   = await query(`SELECT MAX(id) as id FROM ${table}`);
+    recordId = (lastId.rows[0].id + 1);
+    localQuery += ` VALUES ('${recordId}', '${data.shift()}'`;
+  } else {
+    localQuery += ` VALUES ('${data.shift()}'`;
+  }
+
+  data.forEach(data => {
+    localQuery += `, '${data}'`;
+  });
+  let createDate = new Date(),
+    updateDate = new Date();
+
+  localQuery += `, '${createDate.toString().replace(/GMT.*/,'')}',`;
+  localQuery += `'${updateDate.toString().replace(/GMT.*/,'')}'`;
+  if ($.inArray(table, storeIdsTables) > -1) {
+    let storeId = store.get('store').id;
+    localQuery += `, '${storeId}'`;
+  }
+  extrasData = extras ? ', true, false)' : ')';
+  let queryResult = await query(`${localQuery}${extrasData}`, recordId);
+
+  while (queryResult.err) {
+    let newId = queryResult.lastId + 1;
+    localQuery = localQuery.replace(queryResult.lastId, newId);
+    queryResult = await query(`${localQuery}${extrasData}`, newId);
+  }
+
+  return queryResult;
 }
 
 async function findBy(column, data, table, lastId = 0, refTable = ''){

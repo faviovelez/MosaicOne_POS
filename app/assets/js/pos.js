@@ -607,8 +607,8 @@ $(document).ready(function() {
                                             alert(`La caja tiene un saldo de ${ticketData.cashRegister.balance} ` +
                                               'pesos. Realice un retiro.');
                                           }
-
-                                          window.location.href = 'pos_sale.html';
+                                          $(this).prop( "disabled", false );
+                                           window.location.href = 'pos_sale.html';
 
                                         });
 

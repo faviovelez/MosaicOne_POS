@@ -62,7 +62,7 @@ $(function(){
       '<tbody>' +
       '<tr>' +
       '<td>' +
-      '<input placeholder="Nombre o Razón social" class="form-control round-form transparent-field" type="text" value="' +
+      '<input placeholder="Nombre o Razón social" class="form-control round-form transparent-field gray-background" type="text" value="' +
         clearData(prospect.legal_or_business_name) +
       `" name="prospect[legal_or_business_name]" id="prospect_legal_or_business_name" />` +
       '</td>' +
@@ -101,7 +101,7 @@ $(function(){
       '<tbody>' +
       '<tr>' +
       '<td>' +
-      '<input placeholder="Nombre" class="form-control round-form transparent-field" type="text" value="' +
+      '<input placeholder="Nombre" class="form-control round-form transparent-field gray-background" type="text" value="' +
       clearData(prospect.contact_first_name) +
       '" name="prospect[contact_first_name]" id="prospect_contact_first_name" />' +
       '</td>' +
@@ -111,7 +111,7 @@ $(function(){
       '" name="prospect[contact_middle_name]" id="prospect_contact_middle_name" />' +
       '</td>' +
       '<td>' +
-      '<input placeholder="Apellido paterno" class="form-control round-form transparent-field" type="text" value="' +
+      '<input placeholder="Apellido paterno" class="form-control round-form transparent-field gray-background" type="text" value="' +
       clearData(prospect.contact_last_name) +
       '" name="prospect[contact_last_name]" id="prospect_contact_last_name" />' +
       '</td>' +
@@ -156,7 +156,7 @@ $(function(){
       '" name="prospect[email]" id="prospect_email" />' +
       '</td>' +
       '<td>' +
-      '<input placeholder="Teléfono fijo" class="form-control round-form transparent-field" type="text" value="' +
+      '<input placeholder="Teléfono fijo" class="form-control round-form transparent-field blue-background" type="text" value="' +
       clearData(prospect.direct_phone) +
       '" name="prospect[direct_phone]" id="prospect_direct_phone" />' +
       '</td>' +
@@ -166,7 +166,7 @@ $(function(){
       '" name="prospect[extension]" id="prospect_extension" />' +
       '</td>' +
       '<td>' +
-      '<input placeholder="Celular" class="form-control round-form transparent-field" type="text" value="' +
+      '<input placeholder="Celular" class="form-control round-form transparent-field blue-background" type="text" value="' +
       clearData(prospect.cell_phone) +
       '" name="prospect[cell_phone]" id="prospect_cell_phone" />' +
       '</td>' +
@@ -197,7 +197,7 @@ $(function(){
       '<tbody>' +
       '<tr>' +
       '<td>' +
-      '<input placeholder="RFC" class="form-control round-form transparent-field" type="text" value="' +
+      '<input placeholder="RFC" class="form-control round-form transparent-field blue-background" type="text" value="' +
       clearData(billing_address.rfc) +
       '" name="prospect[billing_address_rfc]" id="prospect_billing_address_rfc" />' +
       '</td>' +

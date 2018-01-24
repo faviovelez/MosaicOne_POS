@@ -60,13 +60,13 @@ $(function(){
 
   function translatePrice(price){
     let convertPrice =  parseFloat(
-            price.replace(' $ ','')
+            price
           ).toFixed(2);
 
     if (convertPrice === "NaN") {
       return price;
     }
-    return `$ ${convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
+    return ` $ ${convercretPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
   }
 
   function createRealSubtotal(){
@@ -156,6 +156,12 @@ $(function(){
     );
   }
 
+  function stringPrice(price, id){
+    return `<a href="#" data-toggle="modal" data-target="#changeSinglePrice" data-id="${id}">` +
+      `${translatePrice(price)}` +
+    '</a>';
+  }
+
   function addTr(product){
     let percent = recalculateDescount(product),
         total = recalculateTotal(product, percent, product.table),
@@ -178,7 +184,7 @@ $(function(){
       price ='<input type="text" class="form-control ' +
       `smaller-form" id="priceToServiceTo_${product.id}" value="${product.initial_price}">`;
     } else {
-      price = ` $ ${product.price}`;
+      price = stringPrice(product.price, product.id);
     }
 
     return `<tr id="product_${product.id}"><td>` +

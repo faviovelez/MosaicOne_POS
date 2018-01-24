@@ -244,7 +244,7 @@ function initTicket(ticketData, call) {
         '</style>' +
         '</head>' +
         '<body style="margin:0 auto !important; padding:0 auto !important">' +
-        '<table style="font-family: Arial; font-size: 11px; width: 69mm; text-align: center; vertical-align:text-top">' +
+        '<table style="font-family: Arial; font-size: 11px; width: 65mm; text-align: center; vertical-align:text-top">' +
         '<tbody>' +
         '<tr>' +
         '<td colspan="4">' +
@@ -552,21 +552,22 @@ function printTicket(ticketInfo, call){
         ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
 
         ticketInfo.products = products;
-        
+
         let timmer = new Promise((resolve, reject) => {
           setTimeout(function(){
-              alert('El ticket no fue generado correctamente, por favor intente de nuevo');
-              rollBackData(ticketInfo, function(){
-                deleteBy('tickets', `id = ${ticketData.ticket.id}`).then(() => {
-                  deleteTicketFile(ticketData.ticket.id);
-                  resolve();
-                });
-              });
+            resolve();
+//              alert('El ticket no fue generado correctamente, por favor intente de nuevo');
+//              rollBackData(ticketInfo, function(){
+//                deleteBy('tickets', `id = ${ticketData.ticket.id}`).then(() => {
+//                  deleteTicketFile(ticketData.ticket.id);
+//                  resolve();
+//                });
+//              });
             }, 4000);
         });
 
         timmer.then(function(){
-          window.location.href = 'pos_sale.html';
+          //window.location.href = 'pos_sale.html';
         });
 
         initTicket(ticketInfo, function(htmlContent){
