@@ -66,7 +66,7 @@ $(function(){
     if (convertPrice === "NaN") {
       return price;
     }
-    return ` $ ${convercretPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
+    return ` $ ${convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
   }
 
   function createRealSubtotal(){
