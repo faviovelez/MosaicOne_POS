@@ -710,25 +710,27 @@ $(document).ready(function() {
 
   function bigTotal(){
     let subTotalInput = $('table.subtotal #SubtotalSum'),
+        taxSum        = 0,
         subtotal      = 0;
     $.each($(`td[id^=totalSinTo_]`), function(){
       let productTotal = parseFloat(
         $(this).html().replace('$ ', '').replace(/,/g,'')
       );
-      subtotal += productTotal.toString() === 'NaN' ? 0 : productTotal;
+      productTotal = productTotal.toString() === 'NaN' ? 0 : productTotal;
+      subtotal += productTotal;
+      taxSum += parseFloat(parseFloat( (productTotal * 0.16).toFixed(3) ).toFixed(2) );
     });
     $(subTotalInput).html(`$ ${subtotal.toFixed(
       2
     ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`);
 
-    let iva = subtotal * 0.16;
     $('table.subtotal td.subtotal.iva').html(
-      `$ ${iva.toFixed(2).replace(
+      `$ ${taxSum.toFixed(2).replace(
         /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
       )}`
     );
     $('table.subtotal td.total, #paymentRest').html(
-      `<strong>$ ${(subtotal + parseFloat(iva)).toFixed(
+      `<strong>$ ${(subtotal + parseFloat(taxSum)).toFixed(
         2
       ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}</strong>`
     );
@@ -751,7 +753,7 @@ $(document).ready(function() {
     let total =  parseFloat( (price * cuantity).toFixed(2) ),
         discount = $(`a[id^=discount_${id}]`)
       .html().replace(' %',''),
-      discountVal = parseFloat ( (parseFloat(discount) / 100 * total).toFixed(2) ),
+      discountVal = parseFloat(parseFloat ( (parseFloat(discount) / 100 * total).toFixed(3) ).toFixed(2)),
       productTotal    = total - discountVal;
 
     if (manualDiscount){
@@ -1292,46 +1294,6 @@ $(document).ready(function() {
     $("#advance-option").removeClass('hidden');
     $("#estimate-option").removeClass('hidden');
     $('.payments-received-on-ticket').addClass('hidden');
-
-    $('.second-search').addClass('hidden');
-  });
-
-  $("#advance-option").click(function () {
-    $('#creditSale').addClass('hidden');
-    $('#returnCash').addClass('hidden');
-    $('.items-sales').removeClass('hidden');
-    $('.ticket-results').addClass('hidden');
-    $('.ticket-selected').addClass('hidden');
-    $('.items-returns').addClass('hidden');
-    $('.items-changes').addClass('hidden');
-    $('.extra-search').removeClass('hidden');
-    $('.main-search').addClass('hidden');
-    $('.items-sales').addClass('hidden');
-    /* Muestra una parte de la sección lateral derecha no necesaria para cotización */
-    $('.pay-forms-table').removeClass('hidden');
-    $('.payment-form-wrapper').removeClass('hidden');
-    $('.process-sale').removeClass('hidden');
-    $('.pause-stop').removeClass('hidden');
-
-
-    /*Esta sección muestra el botón elegido de la barra de navegación y oculta los demás botones*/
-    $('#advance').removeClass('hidden');
-    $('#change').addClass('hidden');
-    $('#sale').addClass('hidden');
-    $('#return').addClass('hidden');
-    $('#estimate').addClass('hidden');
-    $('#advance').addClass('active-sale-option');
-    $('#sale').removeClass('active-sale-option');
-    $('#change').removeClass('active-sale-option');
-    $('#return').removeClass('active-sale-option');
-    $('#estimate').removeClass('active-sale-option');
-
-    /*Esta sección oculta la opción elegida y muestra las demás*/
-    $("#advance-option").addClass('hidden');
-    $("#change-option").removeClass('hidden');
-    $("#sale-option").removeClass('hidden');
-    $("#return-option").removeClass('hidden');
-    $("#estimate-option").removeClass('hidden');
 
     $('.second-search').addClass('hidden');
   });

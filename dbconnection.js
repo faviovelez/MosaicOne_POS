@@ -9,6 +9,10 @@ const localPool = new Pool({
   port: 5432,
 });
 
+localPool.on('error', function (err) {
+  console.log('Database error!', err);
+});
+
 const storeIdsTables = [
   "bill_receiveds",
   "bills",
@@ -91,6 +95,12 @@ async function query (q, lastId = 0, table = '') {
       password: 'bafio44741',
       port: 5432,
     });
+
+
+    client.on('error', function (err) {
+      console.log('Database error!', err);
+    });
+
     await client.connect();
     let res = await runQuery(q, client, lastId, table)
     //clearInterval(timmer);

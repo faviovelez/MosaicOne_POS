@@ -207,21 +207,11 @@
           <tr>
             <th> No. ticket </th>
             <th> Fecha </th>
-            <th> Productos </th>
-            <th class="quantity-width"> Piezas </th>
             <th> Total </th>
             <th> Atendió </th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td> <a href="#" class="hide-results"> 147 </a> </td>
-            <td> 01/10/2017 </td>
-            <td> 4 </td>
-            <td> 8 </td>
-            <td class="right"> $ 1,007.00 </td>
-            <td> Favio Velez </td>
-          </tr>
+        <tbody id='resultTicketList'>
           <tr>
             <td> <a href="#" class="hide-results"> 148 </a> </td>
             <td> 02/10/2017 </td>
@@ -243,6 +233,7 @@
       <!-- Termina la tabla de resultados de tickets -->
 
       <!-- Inicia la tabla del ticket seleccionado en la búsqueda-->
+      <div id='resultOfTicketSearch'></div>
       <table class="ticket-selected hidden">
         <thead>
           <tr>
@@ -1356,6 +1347,7 @@
     <script src="../assets/js/pos_customers.js" charset="utf-8"></script>
     <script src="../assets/js/saved_tickets.js" charset="utf-8"></script>
     <script src="../assets/js/specialQueries.js" charset="utf-8"></script>
+    <script src="../assets/js/ticketSearch.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
 

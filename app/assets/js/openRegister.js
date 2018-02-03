@@ -202,6 +202,7 @@ $(function(){
   });
 
   $('#openCash').click(function(){
+    $(this).prop('disabled', true);
 
     initStore().then(store => {
       store.set('cash', $('#register_open_cash_register').val());
@@ -210,6 +211,7 @@ $(function(){
         window.location.href = 'pos_sale.html';
       })
     });
+
     return false;
   });
 
