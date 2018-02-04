@@ -47,7 +47,7 @@ $(function(){
   }
 
   function carIcon(id, company){
-    if (company === '') {
+    if (company === '' || !company) {
       return '';
     }
 
@@ -165,7 +165,7 @@ $(function(){
   function addTr(product){
     let percent = recalculateDescount(product),
         total = recalculateTotal(product, percent, product.table),
-        color = product.table === 'services' ? carIcon(product.id, product.company) :
+        color = product.table === 'services' ? carIcon(product.id, product.delivery_company) :
         product.exterior_color_or_design,
         price = '',
         productInList = $(`#product_${product.id}`);
@@ -198,7 +198,7 @@ $(function(){
       '<td class="left">' +
       '<a href="#" data-toggle="modal" data-target="#productShow"' +
       `data-id="${product.id}" data-table="${product.table}" >` +
-      product.description +
+      `${product.unique_code} ${product.description}` +
       '</a>' +
       '</td>' +
       `<td> ${color} </td>` +

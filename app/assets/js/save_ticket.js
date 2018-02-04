@@ -384,9 +384,10 @@ function assignCost(ticketType, ticketId, call) {
             subtotal           : subtotal
           };
 
-        updateStoreInventories(
-          productId, sellQuantity
-        );
+        if (ticketType === 'venta')
+          updateStoreInventories(
+            productId, sellQuantity
+          );
 
         if (discountReason){
           data.discount_reason = discountReason;

@@ -72,15 +72,27 @@ $(function(){
     });
   }
 
-  function ticketInfoQuery(ticketId){
+  function ticketInfoQuery(ticketId, type){
+    let productQuery = '';
+    let attribute = '';
+    switch(type){
+      case 'product':
+        attribute = 'exterior_color_or_design';
+        productQuery = ' SELECT * FROM store_movements INNER JOIN products ON products.id = store_movements.product_id';
+        break;
+      case 'service':
+        attribute = 'delivery_company';
+        productQuery = ' SELECT * FROM service_offereds INNER JOIN services ON services.id = service_offereds.service_id';
+        break;
+    }
     return 'SELECT CONCAT (warehouseWithProducts.unique_code, ' +
       "' ', warehouseWithProducts.description) as description," +
-      ' warehouseWithProducts.exterior_color_or_design as color, warehouseWithProducts.price,' +
+      ` warehouseWithProducts.${attribute} as color, warehouseWithProducts.price,` +
       ' warehouseWithProducts.quantity, warehouseWithProducts.discount_applied,' +
       ' warehouseWithProducts.total' +
       ' FROM tickets INNER JOIN ' +
       ' (' +
-      ' SELECT * FROM store_movements INNER JOIN products ON products.id = store_movements.product_id' +
+      productQuery +
       ` ) as warehouseWithProducts ON warehouseWithProducts.ticket_id = tickets.id WHERE tickets.id = ${ticketId}`
   }
 
@@ -109,8 +121,9 @@ $(function(){
   function displayTicketInfo(ticket){
     return new Promise(function(resolve, reject){
       setUserData(ticket.userId, function(userName){
-        query(ticketInfoQuery(ticket.id)).then(resultData => {
-          let html = '<table class="ticket-selected">' +
+        query(ticketInfoQuery(ticket.id, 'product')).then(resultData => {
+          let html = `<a href="#" onclick="reimpresion(${ticket.id})" class"b">Reemprimir</a>` +
+            '<table class="ticket-selected">' +
             '<thead>' +
             '<tr>' +
             '<th colspan="6" class="head-blue edge-right">' +
@@ -151,8 +164,14 @@ $(function(){
           Promise.each(resultData.rows, function(ticketProductInfo){
             html += addProductToTicket(ticketProductInfo);
           }).then(function(){
-            html += '</tbody></table>'
-            resolve(html);
+            query(ticketInfoQuery(ticket.id, 'service')).then(resultData => {
+              Promise.each(resultData.rows, function(ticketProductInfo){
+                html += addProductToTicket(ticketProductInfo);
+              }).then(function(){
+                html += '</tbody></table>'
+                resolve(html);
+              });
+            });
           })
         });
       })
