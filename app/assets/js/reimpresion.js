@@ -1,9 +1,10 @@
 const localRemote = require('electron').remote;
 let localWin = null;
-localWin = new localRemote.BrowserWindow({width: 800, height: 600, show: false });
 
 function reimpresion(ticketId) {
-  localWin.loadURL(`file://\./tickets/TicketNo_${ticketId}.html)`);
+  localWin = new localRemote.BrowserWindow({width: 800, height: 600, show: false });
+  let path = `../../../tickets/TicketNo_${ticketId}.html)`;
+  localWin.loadURL(`file://${path}`);
 
   let contents = localWin.webContents;
   localWin.webContents.on('did-finish-load', () => {
