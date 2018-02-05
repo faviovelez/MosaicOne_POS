@@ -142,6 +142,7 @@ $(function(){
       return '<span class="label label-sucess">Pagado</span>';
     }
     else {
+      $('.paymentProcess').removeClass('hidden');
       return '<span class="label label-danger">Pendiente</span>';
     }
   }
@@ -196,7 +197,7 @@ $(function(){
               Promise.each(resultData.rows, function(ticketProductInfo){
                 html += addProductToTicket(ticketProductInfo);
               }).then(function(){
-                html += '</tbody></table>'
+                html += `</tbody></table><div id="ticketTotalId" class="hidden">${ticket.total}</div>`
                 resolve(html);
               });
             });
@@ -216,14 +217,6 @@ $(function(){
   }
 
   function getPaymentType(typeId, total){
-    if (typeId === 21) {
-      $('#addPayment').addClass('adNewPayments');
-      let paymentRest = $('#paymentRest strong').html().replace(/\s|\$|,/g,'');
-      $('#paymentRest strong').html(
-        convertToPrice(parseFloat(paymentRest) + total)
-      );
-      $('table.subtotal td.total strong').html($('#paymentRest').html());
-    }
     return {
        1  :   'Efectivo',
        18 :   'Débito',
@@ -244,6 +237,31 @@ $(function(){
          ') AS ticketChildTable WHERE payments.ticket_id ' +
          '= ticketChildTable.ticket_id ' +
          'OR payments.ticket_id = ticketChildTable.children_id';
+  }
+
+  function insertLotPayments(payments){
+    let html = '';
+    let count = 0;
+    let limit = payments.length;
+    return new Promise(function(resolve, reject){
+      payments.forEach(function(payment) {
+        setUserData(payment.user_id, function(userName){
+          html += '<tr class="paymentData">' +
+            `<td> ${payment.ticket_id} </td>` +
+            `<td> ${getPaymentType(payment.payment_form_id, payment.total)} </td>` +
+            `<td data-type="${payment.payment_form_id}" class="paymentTotal"> ${convertToPrice(payment.total)} </td>` +
+            `<td> ${getDate(payment.created_at)} </td>` +
+            `<td> ${userName} </td>` +
+          '</tr>';
+          count++;
+          if(limit === count){
+            html += '</tbody>' +
+                    '</table>';
+            resolve(html);
+          }
+        });
+      });
+    });
   }
 
   function createPagosTable(ticket){
@@ -278,27 +296,37 @@ $(function(){
         '</thead>' +
         '<tbody>';
         query(paymentQuery(ticket.id)).then(paymentsDataInfo => {
-          let count = 0;
-          let limit = paymentsDataInfo.rowCount;
-          paymentsDataInfo.rows.forEach(function(payment) {
-            setUserData(payment.user_id, function(userName){
-              html += '<tr>' +
-                `<td> ${payment.ticket_id} </td>` +
-                `<td> ${getPaymentType(payment.payment_form_id, payment.total)} </td>` +
-                `<td> ${convertToPrice(payment.total)} </td>` +
-                `<td> ${getDate(payment.created_at)} </td>` +
-                `<td> ${userName} </td>` +
-              '</tr>';
-              count++;
-              if(limit === count){
-                html += '</tbody>' +
-                        '</table>';
+          if (paymentsDataInfo.rowCount === 0) {
+            getAll('payments', '*', `ticket_id = ${ticket.id}`).then(paymentsDataInfo => {
+              insertLotPayments(paymentsDataInfo.rows).then(function(htmlContent){
+                html += htmlContent;
                 resolve(html);
-              }
+              });
             });
-          });
+          } else {
+            insertLotPayments(paymentsDataInfo.rows).then(function(htmlContent){
+              html += htmlContent;
+              resolve(html);
+            });
+          }
         });
     });
+  }
+
+  function calculatePaymentRest(){
+    let totalPagado = 0;
+    $.each($('.paymentData'), function(){
+      let paymentType = parseInt($(this).find('td.paymentTotal').attr('data-type'));
+      if (paymentType < 21) {
+        totalPagado += $(this).find('td.paymentTotal').html().replace(/\s|\$|,/g,'');
+      }
+    });
+
+    let paymentRest = parseFloat($('#ticketTotalId').html()) - parseFloat(totalPagado);
+    $('#paymentRest strong').html(
+      convertToPrice(paymentRest)
+    );
+
   }
 
   $("#advance-option").click(function () {
@@ -344,8 +372,11 @@ $(function(){
         $('#ticketSearch').autocomplete({
           lookup: list,
           onSelect: function(ticket) {
+            $('#paymentRest strong').html('$ 0.00');
+            $('table.subtotal td.total strong').html('$ 0.00');
             $('#resultTicketList tr').remove();
             $('#resultOfTicketSearch table').remove();
+            $('#ticketTotalId').remove();
             addTr(ticket).then(trInfo => {
               $('#resultTicketList').append(trInfo);
               $('.ticket-results').removeClass('hidden');
@@ -356,6 +387,7 @@ $(function(){
                   tableHtmlContent = null;
                   createPagosTable(ticket).then(tableHtmlContent => {
                     $('#resultOfTicketSearch').append(tableHtmlContent);
+                    calculatePaymentRest();
                   });
                 });
               })
