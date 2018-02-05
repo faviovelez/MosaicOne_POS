@@ -389,7 +389,8 @@ $(document).ready(function() {
        rest = (parseFloat(total) - sum).toFixed(2);
     $('#sumPayments').html(sum);
     let products = $('#ticketList tr[id^=product_]').length;
-    if (parseFloat(rest) <= 0 && products > 0){
+    let paymentsTable = $('.payments-received-on-ticket').length;
+    if (parseFloat(rest) <= 0 && (products > 0 || paymentsTable === 1)){
       $('#paymentRest').html(
         '<strong>$ 0</strong>'
       );
@@ -416,7 +417,8 @@ $(document).ready(function() {
   }
 
   $('#addPayment').click(function(){
-    if ($('#ticketList tr').length === 0){
+    let paymentsTable = $('.payments-received-on-ticket').length;
+    if ($('#ticketList tr').length === 0 && paymentsTable === 0){
       return false;
     }
     let count = $('#paymentMethodList tr').length - 2,
@@ -527,9 +529,14 @@ $(document).ready(function() {
     });
   }
 
-
   $('#completeSale').click(function() {
     $(this).prop( "disabled", true );
+    let paymentsTable = $('.payments-received-on-ticket').length;
+
+    if (paymentsTable === 1){
+      addPaymentToTicket();
+      return false;
+    }
 
     let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
 
@@ -1262,7 +1269,6 @@ $(document).ready(function() {
   $("#sale-option").click(function () {
     $('#creditSale').removeClass('hidden');
     $('#returnCash').addClass('hidden');
-
     $('.extra-search').addClass('hidden');
     $('.main-search').removeClass('hidden');
     $('.items-sales').removeClass('hidden');

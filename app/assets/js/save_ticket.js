@@ -188,7 +188,42 @@ function getCashRegisterInfo(call){
   });
 }
 
-function insertTicket(userId, call, type){
+function addPaymentToTicket(){
+  initStore().then(store => {
+    let user      = store.get('current_user').id,
+      storeObject = store.get('store');
+
+    ticketData = {
+      store : storeObject,
+      user  : store.get('current_user'),
+    };
+
+    let parentTicket = parseInt($('#ticket-id').html());
+    insertTicket(user, function(ticketId){
+        insertsPayments('venta', ticketId, user, storeObject, function(){
+          window.location.href = 'pos_sale.html';
+        });
+    }, 'pago', parentTicket);
+  });
+}
+
+function getCurrentDate(){
+  let datetime = new Date();
+  let month = datetime.getMonth() + 1,
+      date  = datetime.getDate();
+
+  if (month < 10) {
+    month = `0${month}`;
+  }
+
+  if (date < 10) {
+    date = `0${date}`;
+  }
+
+  return `${date}/${month}/${datetime.getFullYear()}`;
+}
+
+function insertTicket(userId, call, type, parentTicket = null){
   let paymentsAmount = $('#sumPayments').html() === "" ? 0
                        : $('#sumPayments').html(),
       data = {
@@ -219,13 +254,42 @@ function insertTicket(userId, call, type){
   }
   getCashRegisterInfo(cashRegister => {
     data.cash_register_id = cashRegister.id;
+    if ( parentTicket ){
+      data.parent_id = parentTicket;
+    }
     insert(
       Object.keys(data),
       Object.values(data),
       'tickets'
     ).then(ticket => {
-      data = null;
-      call(ticket.lastId);
+      if (data.parent_id)
+      {
+        let childTicketData = {
+          children_id: ticket.lastId,
+          ticket_id: data.parent_id,
+          date: getCurrentDate()
+        };
+
+        updateBy(
+          {
+            payed: data.payed
+          },
+          'tickets',
+          `id = ${data.parent_id}`
+        ).then(function(){
+          insert(
+            Object.keys(childTicketData),
+            Object.values(childTicketData),
+            'tickets_children'
+          ).then(function(){
+            data = null;
+            return call(ticket.lastId);
+          });
+        });
+      } else {
+        data = null;
+        return call(ticket.lastId);
+      }
     });
   });
 

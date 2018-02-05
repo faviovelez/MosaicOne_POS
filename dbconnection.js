@@ -42,7 +42,8 @@ const storeIdsTables = [
   "users",
   "warehouses",
   "withdrawals",
-  "billing_addresses"
+  "billing_addresses",
+  "tickets_children"
 ];
 
 async function initStore(){

@@ -29,6 +29,11 @@
   width: 300px;
 }
 
+a.b {
+    margin-left: 15px;
+    color: #fff;
+}
+
 .list-status-table > tbody > tr > td > .label > a {
   color: #fff;
   padding: 0.5rem 1rem;
