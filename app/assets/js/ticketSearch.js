@@ -170,7 +170,8 @@ $(function(){
             prospectInfo(ticket) +
             '</th>' +
             '<th class="head-blue edge-left">' +
-            getPayed(ticket.payed) + /* Aquí poner una lógica dependiendo si está o no pagado*/
+            getPayed(ticket.payed) +
+            `<a href="#" onclick="cancelarTicket(${ticket.id})" >Cancelar ticket</a>` +
             `<a href="#" onclick="reimpresion(${ticket.id})" class="b">` +
               '<i class="fa fa-print bigger-icon" aria-hidden="true">' +
               '</i>' +
@@ -213,7 +214,7 @@ $(function(){
      'tickets.cash_register_id, tickets.ticket_number, tickets.comments, ' +
      'tickets.payments_amount, tickets.cash_return, tickets.payed, tickets.parent_id, ' +
      'tickets.created_at, prospects.legal_or_business_name FROM tickets LEFT JOIN prospects ' +
-     'ON tickets.prospect_id = prospects.id'
+     'ON tickets.prospect_id = prospects.id WHERE tickets.ticket_type = \'venta\''
   }
 
   function getPaymentType(typeId, total){
