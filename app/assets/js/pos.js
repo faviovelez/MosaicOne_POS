@@ -512,32 +512,28 @@ $(document).ready(function() {
     $('#cancelTicket').modal('hide');
   }
 
-  function addPaymentFormData(ticketData, payments, call){
-    let limit = payments.length,
-        count = 0;
+  function isPago(){
+    return $('#tipoDeMovimiento button[class*=active]').html(
+    ).indexOf('Pago') > 0 ;
+  }
 
-    ticketData.payments = {};
-    payments.forEach(payment => {
-      ticketData.payments[payment.id] = payment;
-      findBy('id', payment.payment_form_id, 'payment_forms', payment.id).then(paymentForm => {
-        count++;
-        ticketData.payments[paymentForm.lastId].paymentForm = paymentForm.rows[0];
-        if (count === limit){
-          return call();
-        }
-      });
-    });
+  function isVenta(){
+    return $('#tipoDeMovimiento button[class*=active]').html(
+    ).indexOf('Venta') > 0 ;
   }
 
   $('#completeSale').click(function() {
     $(this).prop( "disabled", true );
-    let paymentsTable = $('.payments-received-on-ticket').length;
 
-    if (paymentsTable === 1){
+    if (isPago()){
       addPaymentToTicket();
       return false;
     }
 
+    if (!isVenta()) {
+      alert('algo pasa xD');
+      debugger
+    }
     let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
 
     if (!isNaN(parseInt(restoreTicketId))){

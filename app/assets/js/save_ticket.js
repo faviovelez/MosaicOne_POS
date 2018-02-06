@@ -188,6 +188,23 @@ function getCashRegisterInfo(call){
   });
 }
 
+function addPaymentFormData(ticketData, payments, call){
+  let limit = payments.length,
+      count = 0;
+
+  ticketData.payments = {};
+  payments.forEach(payment => {
+    ticketData.payments[payment.id] = payment;
+    findBy('id', payment.payment_form_id, 'payment_forms', payment.id).then(paymentForm => {
+      count++;
+      ticketData.payments[paymentForm.lastId].paymentForm = paymentForm.rows[0];
+      if (count === limit){
+        return call();
+      }
+    });
+  });
+}
+
 function addPaymentToTicket(){
   initStore().then(store => {
     let user      = store.get('current_user').id,
@@ -199,9 +216,47 @@ function addPaymentToTicket(){
     };
 
     let parentTicket = parseInt($('#ticket-id').html());
-    insertTicket(user, function(ticketId){
+    insertTicket(user, function(ticketId, parentTicket){
+        store.set('lastTicket', parseInt(
+          ticketId
+        ));
+        ticketData.parentTicket = parentTicket;
         insertsPayments('venta', ticketId, user, storeObject, function(){
-          window.location.href = 'pos_sale.html';
+          findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
+            ticketData.cashRegister = cashRegisterObject.rows[0];
+            findBy(
+              'id',
+              storeObject.business_unit_id,
+              'business_units'
+            ).then(business_unit => {
+              findBy(
+                'id',
+                business_unit.rows[0].billing_address_id,
+                'billing_addresses'
+              ).then(billing_address => {
+                ticketData.billing_address = billing_address.rows[0];
+                findBy(
+                  'id',
+                  ticketData.billing_address.tax_regime_id,
+                  'tax_regimes'
+                ).then(tax_regime => {
+
+                  ticketData.tax_regime = tax_regime.rows[0];
+                  findBy('id', ticketId, 'tickets').then(ticket => {
+                    ticketData.ticket = ticket.rows[0];
+                    findBy('ticket_id', ticketId, 'payments').then(payments => {
+                      addPaymentFormData(ticketData, payments.rows, function(){
+                        printTicketPayment(ticketData, function(){
+                          window.location.href = 'pos_sale.html';
+                        })
+                      });
+                    });
+                  });
+
+                });
+              });
+            });
+          });
         });
     }, 'pago', parentTicket);
   });
@@ -283,7 +338,7 @@ function insertTicket(userId, call, type, parentTicket = null){
             'tickets_children'
           ).then(function(){
             data = null;
-            return call(ticket.lastId);
+            return call(ticket.lastId, childTicketData.ticket_id);
           });
         });
       } else {

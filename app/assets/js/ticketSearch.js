@@ -139,7 +139,7 @@ $(function(){
   function getPayed(isPayed){
     if (isPayed) {
       $('.paymentProcess').addClass('hidden');
-      return '<span class="label label-sucess">Pagado</span>';
+      return '<span class="label label-success">Pagado</span>';
     }
     else {
       $('.paymentProcess').removeClass('hidden');
@@ -228,7 +228,7 @@ $(function(){
   }
 
   function paymentQuery(ticketId){
-      return 'SELECT payments.payment_date, payments.user_id, ' +
+      return 'SELECT DISTINCT(payments.id) AS payment_id, payments.payment_date, payments.user_id, ' +
         'payments.payment_form_id, payments.payment_type, ' +
         'payments.ticket_id, payments.total, payments.created_at FROM payments, ' +
         '(' +
@@ -318,7 +318,7 @@ $(function(){
     $.each($('.paymentData'), function(){
       let paymentType = parseInt($(this).find('td.paymentTotal').attr('data-type'));
       if (paymentType < 21) {
-        totalPagado += $(this).find('td.paymentTotal').html().replace(/\s|\$|,/g,'');
+        totalPagado += parseFloat($(this).find('td.paymentTotal').html().replace(/\s|\$|,/g,''));
       }
     });
 
@@ -326,6 +326,8 @@ $(function(){
     $('#paymentRest strong').html(
       convertToPrice(paymentRest)
     );
+
+    $('table.subtotal td.total strong').html($('#paymentRest strong').html());
 
   }
 
