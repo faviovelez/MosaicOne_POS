@@ -118,6 +118,8 @@ $(document).ready(function() {
       initStore().then(storage => {
 
         let store = storage.get('store');
+        let user = storage.get('current_user');
+
         if (store.store_type_id === 4) {
           storeMovementData.cost       = getCostPrice(
             productDetails.price, store.overprice, productDetails.discount_for_franchises
@@ -131,6 +133,8 @@ $(document).ready(function() {
           storeMovementData.total_cost  = storeMovementData.cost * quantity;
           storeMovementData.final_price = storeMovementData.cost;
         }
+
+        storeMovementData.user_id = user.id;
 
         insert(
           Object.keys(storeMovementData),
@@ -532,7 +536,6 @@ $(document).ready(function() {
 
     if (!isVenta()) {
       alert('algo pasa xD');
-      debugger
     }
     let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
 
@@ -556,7 +559,7 @@ $(document).ready(function() {
             };
             let ticketId = null;
             insertTicket(user, function(ticketId){
-              assignCost('venta', ticketId, function(warehouseInfo){
+              assignCost(user, 'venta', ticketId, function(warehouseInfo){
                 ticketData.storeWarehouseInfo = warehouseInfo;
                 insertsServiceOffereds(ticketId, function(){
 
@@ -607,7 +610,7 @@ $(document).ready(function() {
                                         printTicket(ticketData, function(){
 
                                           if (ticketData.cashRegister.balance >= ticketData.cashRegister.cash_alert) {
-                                            alert(`La caja tiene un saldo de ${ticketData.cashRegister.balance} ` +
+                                            alert(`La caja tiene un saldo de ${translatePrice(ticketData.cashRegister.balance)} ` +
                                               'pesos. Realice un retiro.');
                                           }
                                           $(this).prop( "disabled", false );
@@ -843,6 +846,7 @@ $(document).ready(function() {
     $('#delivery_service_email').val('');
     $('#delivery_service_company').val('');
     $('#delivery_service_receivers_zipcode').val('');
+
     $('#secretServiceId').val(serviceId);
 
   });
@@ -910,7 +914,7 @@ $(document).ready(function() {
     validateDeliveryService(function(validate){
       if (validate){
 
-        findBy('id', $('#secretServiceId').val(), 'services').then(service => {
+        findBy('id', $('#secretServiceId').val().replace(/_.*/,''), 'services').then(service => {
 
           data.company = service.rows[0].delivery_company;
 
@@ -921,10 +925,12 @@ $(document).ready(function() {
           ).then(deliveryServices => {
 
             let secretId = $('#secretServiceId').val();
-            $(`#product_${secretId}_services`).append(
+
+            $(`tr[id$=_${secretId}_services`).append(
               `<td id="deliveryServiceId${secretId}" class="hidden">` +
               `${deliveryServices.lastId}</td>`
             );
+
             $('#deliveryService').modal('hide');
 
           });
@@ -1345,15 +1351,15 @@ $(document).ready(function() {
 
 /* Métodos para los buscadores de productos / tickets / clientes (mostrar tabla de resultados) */
 $("#searchProducts").click(function () {
-  $('.ticket-results').removeClass('hidden');
+//  $('.ticket-results').removeClass('hidden');
 });
 
 $("#searchProspects").click(function () {
-  $('.ticket-results').removeClass('hidden');
+//  $('.ticket-results').removeClass('hidden');
 });
 
 $("#searchTickets").click(function () {
-  $('.ticket-results').removeClass('hidden');
+//  $('.ticket-results').removeClass('hidden');
 });
 
 /* Método para ocultar tabla de resultados ymostrar tablas y buscadores pagos / cambios / devoluciones */

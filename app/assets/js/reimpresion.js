@@ -13,7 +13,6 @@ function reimpresion(ticketId) {
   });
 }
 
-
 function cancelarTicket(ticketId){
   let Promise = require("bluebird");
   updateBy(
@@ -67,7 +66,9 @@ function cancelarTicket(ticketId){
               'tickets',
               `id = ${ticketId}`
             ).then(function(){
-              alert(`${ticketId} Cancelado`);
+              alert(`El Ticket ${ticketId} ha sido cancelado.`);
+              $('#askForConfirmCancel').modal('hide');
+              window.location.href = 'pos_sale.html';
             });
           });
         });

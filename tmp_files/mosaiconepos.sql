@@ -1092,7 +1092,11 @@ CREATE TABLE deposits (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     cash_register_id integer,
-    name character varying
+    name character varying,
+    pos boolean,
+    web boolean,
+    pos_id integer,
+    web_id integer
 );
 
 
@@ -3640,7 +3644,8 @@ CREATE TABLE store_movements (
     temporal boolean,
     down_applied boolean,
     pos_id integer,
-    web_id integer
+    web_id integer,
+    user_id integer
 );
 
 
@@ -4596,7 +4601,11 @@ CREATE TABLE withdrawals (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     cash_register_id integer,
-    name character varying
+    name character varying,
+    pos boolean,
+    web boolean,
+    pos_id integer,
+    web_id integer
 );
 
 

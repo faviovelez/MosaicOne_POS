@@ -15,7 +15,9 @@ $(document).ready(function() {
       'stores_inventories',
       'service_offereds',
       'delivery_services',
-      'expenses'
+      'expenses',
+      'deposits',
+      'withdrawals'
     ];
   }
 
@@ -34,7 +36,9 @@ $(document).ready(function() {
       'stores_inventories' : 'stores_inventory',
       'service_offereds' : 'service_offered',
       'delivery_services' : 'delivery_service',
-      'expenses' : 'expense'
+      'expenses' : 'expense',
+      'deposits' : 'deposit',
+      'withdrawals' : 'withdrawal'
     };
   }
 

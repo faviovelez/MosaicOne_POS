@@ -96,25 +96,25 @@
           <input type="text" class="form-control main-search" placeholder="Producto o servicio" id="mainProductSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
 
           <span class="input-group-btn extra-search hidden">
-            <button class="btn btn-default pos-main-btn gray-btn" type="button" id="searchProducts">
-              <i class="fa fa-archive" aria-hidden="true"></i>
+            <button class="btn btn-default pos-main-btn gray-btn hidden" type="button" id="searchProducts"> <!-- Lo oculté para después -->
+              <i class="fa fa-archive hidden" aria-hidden="true"></i> <!-- Lo oculté para después -->
             </button>
           </span>
-          <input type="text" class="form-control extra-search hidden" placeholder="Producto o servicio" id="productSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <input type="text" class="form-control extra-search hidden" placeholder="Producto o servicio" id="productSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)--> <!-- Lo oculté para después -->
 
           <span class="input-group-btn extra-search hidden">
-            <button class="btn btn-default pos-main-btn gray-btn" type="button" id="searchProspects">
-              <i class="fa fa-user-o" aria-hidden="true"></i>
+            <button class="btn btn-default pos-main-btn gray-btn hidden" type="button" id="searchProspects"> <!-- Lo oculté para después -->
+              <i class="fa fa-user-o hidden" aria-hidden="true"></i> <!-- Lo oculté para después -->
             </button>
           </span>
-          <input type="text" class="form-control extra-search hidden" placeholder="Cliente"id="prospectSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <input type="text" class="form-control extra-search hidden" placeholder="Cliente"id="prospectSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)--> <!-- Lo oculté para después -->
 
-          <span class="input-group-btn extra-search hidden">
+          <span class="input-group-btn extra-search hidden ticket-search">
             <button class="btn btn-default pos-main-btn gray-btn" type="button" id="searchTickets">
               <i class="fa fa-file-o" aria-hidden="true"></i>
             </button>
           </span>
-          <input type="text" class="form-control extra-search hidden" placeholder="Número de ticket" id="ticketSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <input type="text" class="form-control extra-search ticket-search hidden" placeholder="Número de ticket" id="ticketSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
 
           <!-- Inician botones de la barra de búsqueda (cambian de acuerdo a la selección de opciones) -->
           <span class="input-group-btn" id="tipoDeMovimiento">
@@ -830,6 +830,27 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
   <!-- Termina mini Modal para confirmar si desea cancelar el ticket -->
+
+  <!-- Inicia mini Modal para confirmar si desea cancelar el ticket (en la tabla de tickets) -->
+   <div class="modal fade" id="askForConfirmCancel" tabindex="-1" role="dialog">
+     <div class="modal-dialog discount-change-modal" role="document">
+       <div class="modal-content">
+         <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+           <h4 class="modal-title">Cancelar ticket</h4>
+         </div>
+         <div class="modal-body">
+           ¿Desea cancelar este ticket? Si lo hace, no podrá recuperarlo.
+         </div>
+         <div class="modal-footer">
+           <button class="btn btn-default pos-main-btn" id='ticketCancelinList' type="button">
+             Confirmar
+           </button>
+         </div>
+       </div><!-- /.modal-content -->
+     </div><!-- /.modal-dialog -->
+   </div><!-- /.modal -->
+   <!-- Termina mini Modal para confirmar si desea cancelar el ticket (en la tabla de tickets) -->
 
   <!-- Inicia mini Modal para llenar datos de uso de la factura -->
    <div class="modal fade" id="billCfdiUse" tabindex="-1" role="dialog">

@@ -139,13 +139,19 @@ $(function(){
   function getPayed(isPayed){
     if (isPayed) {
       $('.paymentProcess').addClass('hidden');
-      return '<span class="label label-success">Pagado</span>';
+      return '<span class="label label-success left-10">Pagado</span>';
     }
     else {
       $('.paymentProcess').removeClass('hidden');
-      return '<span class="label label-danger">Pendiente</span>';
+      return '<span class="label label-danger left-10">Pendiente</span>';
     }
   }
+
+  $("#ticketCancelinList").click(function () {
+    cancelarTicket(
+      parseInt($("#ticket-id").html())
+    );
+  });
 
   function displayTicketInfo(ticket){
     return new Promise(function(resolve, reject){
@@ -154,7 +160,7 @@ $(function(){
           let html = '<table class="ticket-selected">' +
             '<thead>' +
             '<tr>' +
-            '<th colspan="6" class="head-blue edge-right">' +
+            '<th colspan="6" class="head-blue">' +
             'Ticket:' +
             '<span id="ticket-id">' +
             `  ${ticket.id}` +
@@ -168,14 +174,19 @@ $(function(){
             `  Usuario: ${userName}` +
             '</span>' +
             prospectInfo(ticket) +
-            '</th>' +
-            '<th class="head-blue edge-left">' +
+            '<span>' +
             getPayed(ticket.payed) +
-            `<a href="#" onclick="cancelarTicket(${ticket.id})" >Cancelar ticket</a>` +
-            `<a href="#" onclick="reimpresion(${ticket.id})" class="b">` +
+            `<a href="#" data-toggle="modal" data-target="#askForConfirmCancel"` +
+            'class="left-10" data-placement="left" data-toggle="tooltip" title="Cancelar">' +
+            '<i class="fa fa-ban bigger-icon red-icon" aria-hidden="true"></i></a>' +
+            '</span>' +
+            '<span>' +
+            `<a href="#" onclick="reimpresion(${ticket.id})"` +
+            'data-placement="left" data-toggle="tooltip" title="Reimprimir" class="left-10 b">' +
               '<i class="fa fa-print bigger-icon" aria-hidden="true">' +
               '</i>' +
             '</a>' +
+            '</span>' +
             '</th>' +
             '</tr>' +
             '<tr>' +
@@ -334,13 +345,15 @@ $(function(){
 
   $("#advance-option").click(function () {
     //$('#creditSale').addClass('hidden');
+    $('.btn-group').removeClass('open');
     $('#returnCash').addClass('hidden');
     $('.items-sales').removeClass('hidden');
     $('.ticket-results').addClass('hidden');
     $('.ticket-selected').addClass('hidden');
     $('.items-returns').addClass('hidden');
     $('.items-changes').addClass('hidden');
-    $('.extra-search').removeClass('hidden');
+//    $('.extra-search').removeClass('hidden');
+    $('.ticket-search').removeClass('hidden');
     $('.main-search').addClass('hidden');
     $('.items-sales').addClass('hidden');
     /* Muestra una parte de la sección lateral derecha no necesaria para cotización */

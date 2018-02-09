@@ -30,8 +30,11 @@
 }
 
 a.b {
-    margin-left: 15px;
-    color: #fff;
+  color: #fff;
+}
+
+.left-10 {
+  margin-left: 10px;
 }
 
 .list-status-table > tbody > tr > td > .label > a {

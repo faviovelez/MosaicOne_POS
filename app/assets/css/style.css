@@ -36,6 +36,10 @@ html {
   z-index: 100;
 }
 
+.red-icon {
+  color: #D72638
+}
+
 .alert {
   width: 200px;
   background-color: #00B3D3 !important;

@@ -239,7 +239,7 @@ function initTicket(ticketData, call) {
         '<title> Ticket </title>' +
         '<style type="text/css">' +
         '@media print{' +
-        '@page { size:65mm auto; margin-left: 0mm !important; margin-right: 0mm !important;}' +
+        '@page { size:65mm auto; margin-left: 3mm !important; margin-right: 3mm !important;}' +
         '}' +
         '</style>' +
         '</head>' +
@@ -401,8 +401,9 @@ function initTicket(ticketData, call) {
         '<td colspan="5"> <br /> </td>' +
         '</tr>' +
         '<tr>' +
-        '<td colspan="5"> <strong> Solo se podrá facturar este ticket ' +
-        'dentro de las siguientes 72 horas de emisión del mismo. </strong>  </td>' +
+        '<td colspan="5"> <strong> En cumplimiento a las disposiciones fiscales vigentes, ' +
+        'no procederán sin excepción alguna, la solicitud de facturas con ticket de fecha ' +
+        'anterior a la manifestada en el presente documento. </strong>  </td>' +
         '</tr>' +
         '<tr>' +
         '<td colspan="5">' +

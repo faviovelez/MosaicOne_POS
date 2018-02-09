@@ -714,7 +714,7 @@ $(function(){
 
         insertTicket(user, function(ticketId){
 
-          assignCost('pending', ticketId, function(){
+          assignCost(user, 'pending', ticketId, function(){
 
             insertsServiceOffereds(ticketId, function(){
 

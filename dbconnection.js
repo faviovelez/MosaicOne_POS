@@ -182,7 +182,63 @@ function completeInsertProcess(localQuery, columns, table, data, extras){
   });
 }
 
-async function insert (columns, data, table, extras = true){
+async function aLotInsert(columns, datas, table, extras = true){
+  let Promise = require("bluebird");
+
+  let storeMovQuery = `INSERT INTO public.${table}(`,
+    store,
+    extrasData = extras ? ', pos, web)' : ')',
+    recordId;
+
+  if ($.inArray(columns, 'id') === -1) {
+    storeMovQuery += 'id, ';
+  }
+
+  let lastId = await query(`SELECT MAX(id) as id FROM ${table}`);
+  store = await initStore();
+
+  storeMovQuery += columns.shift();
+  columns.forEach(fieldName => {
+    storeMovQuery += `, ${fieldName}`;
+  });
+
+  if ($.inArray(table, storeIdsTables) > -1) {
+    storeMovQuery += `, created_at, updated_at, store_id${extrasData}`;
+  } else {
+    storeMovQuery += `, created_at, updated_at${extrasData}`;
+  }
+
+  let countId = lastId.rows[0].id;
+  Promise.each(datas, function(objectData){
+    let data = Object.values(objectData);
+    countId++;
+    if (storeMovQuery.indexOf('VALUES') === -1) {
+      storeMovQuery += ' VALUES ';
+    }
+    storeMovQuery += `('${countId}', '${data.shift()}'`;
+    data.forEach(data => {
+      storeMovQuery += `, '${data}'`;
+    });
+    let createDate = new Date(),
+      updateDate = new Date();
+
+    storeMovQuery += `, '${createDate.toString().replace(/GMT.*/,'')}',`;
+    storeMovQuery += `'${updateDate.toString().replace(/GMT.*/,'')}'`;
+    if ($.inArray(table, storeIdsTables) > -1) {
+      let storeId = store.get('store').id;
+      storeMovQuery += `, '${storeId}'`;
+    }
+    extrasData = extras ? ', true, false),' : '),';
+    storeMovQuery += extrasData
+  })
+  .then(async function(){
+    storeMovQuery = storeMovQuery.replace(/,$/,'');
+    return await query(`${storeMovQuery}`, recordId);
+  });
+
+}
+
+async function insert (columns, data, table, extras = true, extraInfo = ''){
   let localQuery = `INSERT INTO public.${table}(`,
     store,
     extrasData = extras ? ', pos, web)' : ')',
@@ -231,7 +287,7 @@ async function insert (columns, data, table, extras = true){
     localQuery = localQuery.replace(queryResult.lastId, newId);
     queryResult = await query(`${localQuery}${extrasData}`, newId);
   }
-
+  queryResult.extraInfo = extraInfo;
   return queryResult;
 }
 

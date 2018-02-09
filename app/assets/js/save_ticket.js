@@ -1,6 +1,7 @@
 let productsJson  = {},
     servicesJson  = {},
     count        = 0;
+    storeMovementArray = [];
 
 function iterateInventories(products, call){
   count = 0;
@@ -35,7 +36,7 @@ function createTicketProductJson(call){
 
   $.each($('#ticketList tr'), function(){
     let id = $(this).attr('id').replace(/product_|_products|_services/g,''),
-        regex = new RegExp(`.*${id}_`),
+        regex = new RegExp(`.*_`),
         table = $(this).attr('id').replace(regex, '');
 
     if(table === 'products') {
@@ -52,7 +53,7 @@ function createTicketProductJson(call){
       );
 
     } else {
-      servicesJson[id] = {
+      servicesJson[$(this).attr('id')] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
         sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
@@ -155,15 +156,22 @@ function updateStoreInventories(productId, quantity){
 }
 
 function createStoreMovement(localData, call, warehouseInfo = {}){
-  insert(
-    Object.keys(localData),
-    Object.values(localData),
-    'store_movements'
-  ).then(storeMovement => {
-    assignCostcount++;
-    localData = null;
-    if (assignCostcount === Object.keys(productsJson).length){
-      return call(warehouseInfo);
+  let storeMovementJson = {};
+
+  let Promise = require("bluebird");
+  Promise.each(Object.keys(localData), function(header){
+    storeMovementJson[header] = localData[header];
+  })
+  .then(function(){
+    storeMovementArray.push(storeMovementJson);
+    if (storeMovementArray.length === Object.keys(productsJson).length){
+      aLotInsert(
+        Object.keys(storeMovementJson),
+        storeMovementArray,
+        'store_movements'
+      ).then(function(){
+        return call(warehouseInfo);
+      });
     }
   });
 }
@@ -386,7 +394,7 @@ function insertsServiceOffereds(ticketId, call){
       total           = parseFloat((subtotal - discount + taxes).toFixed(2)),
       fixedDiscount   = parseFloat(discount.toFixed(2)),
       data = {
-        service_id         : serviceId.replace(/_.*/,''),
+        service_id         : serviceId.replace(/product_/,'').replace(/_.*/,''),
         quantity           : sellQuantity,
         service_type       : 'venta',
         ticket_id          : ticketId,
@@ -419,16 +427,18 @@ function insertsServiceOffereds(ticketId, call){
     insert(
       Object.keys(data),
       Object.values(data),
-      'service_offereds'
+      'service_offereds',
+      true,
+      serviceId
     ).then(serviceOffered => {
       data = null;
-      findBy('id', serviceOffered.lastId, 'service_offereds' ).then(
+      findBy('id', serviceOffered.lastId, 'service_offereds', serviceOffered.extraInfo).then(
         serviceOffered => {
-          let deliveryServiceId = $(
-            `#deliveryServiceId${serviceOffered.rows[0].service_id}`
-          ).html();
 
-          if (typeof deliveryServiceId === 'undefined'){
+          let element = `#${serviceOffered.lastId} td:last`;
+          let deliveryServiceId = $(`${element}`).html();
+
+          if ($(`${element}`).attr('id').indexOf('totalSinTo_') > -1){
             serviceOfferedCount++;
             if (serviceOfferedCount === Object.keys(servicesJson).length){
               return call();
@@ -456,11 +466,12 @@ function insertsServiceOffereds(ticketId, call){
   }
 }
 
-function assignCost(ticketType, ticketId, call) {
+function assignCost(userId, ticketType, ticketId, call) {
   try {
     if ($.isEmptyObject(productsJson)){
       return call();
     }
+    storeMovementArray = [];
     let warehouseInfo = {};
     assignCostcount = 0;
 
@@ -500,7 +511,8 @@ function assignCost(ticketType, ticketId, call) {
             supplier_id        : productsJson[productId].supplier_id,
             total_cost         : totalCost,
             total              : total,
-            subtotal           : subtotal
+            subtotal           : subtotal,
+            user_id            : userId
           };
 
         if (ticketType === 'venta')
