@@ -40,13 +40,12 @@ $(function(){
     });
   })();
 
-  function getQueryCount(store, localIds){
+  function getQueryCount(store){
     return 'SELECT SUM(rows) as total_rows FROM (' +
       ' SELECT COUNT (*) as rows FROM products WHERE (shared = true AND current = true AND' +
       ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ` +
-      ` AND id NOT IN (${localIds.products}) UNION ALL` +
+      ` UNION ALL` +
       ` SELECT COUNT (*) as rows FROM services WHERE (shared = true AND current = true OR store_id = ${store.id})` +
-      ` AND id NOT IN (${localIds.services}) ` +
     ') as u';
   }
 
@@ -58,92 +57,27 @@ $(function(){
     })
   }
 
-  function lotQueries(store, localIds){
+  function lotQueries(store){
       return {
         'products' : 'SELECT * FROM products WHERE (shared = true AND current = true ' +
-        `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id})` +
-        ` AND id NOT IN (${localIds.products})`,
+        `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id})`,
         'services' : 'SELECT * FROM services WHERE ' +
-        `(shared = true AND current = true OR store_id = ${store.id})` +
-        ` AND id NOT IN (${localIds.services})`
+        `(shared = true AND current = true OR store_id = ${store.id})`
       };
     }
 
-  function getLocalIds(){
-    let localIds = {};
-    return new Promise(function(resolve, reject){
-      getAll('products', 'id').then(productsIdsResult => {
-        localIds.products = $.map(productsIdsResult.rows, function(row){
-          return row.id;
-        });
-        getAll('services', 'id').then(servicesIdsResult => {
-          localIds.services = $.map(servicesIdsResult.rows, function(row){
-            return row.id;
-          });
-          resolve(localIds);
-        });
-      });
-    });
+  function createLocalArray(){
+
+  }
+
+  function createRemoteArray(){
+
   }
 
   function getProductsAndServices(store){
     return new Promise(function(resolve, reject){
-      getLocalIds().then(localIds => {
-        query(getQueryCount(store, localIds)).then(limitCount => {
-          let count = 0;
-          let limit = parseInt(limitCount.rows[0].total_rows);
-          let newProductsIds = [];
-          let queries = lotQueries(store, localIds);
-          if (limit === 0) {
-            resolve();
-          }
-          for(var key in queries){
-            query(queries[key], true, key).then(tablesResult => {
+      query(getQueryCount(store)).then(limitCount => {
 
-              tablesResult.rows.forEach(row => {
-                if (tablesResult.table === 'products')
-                  newProductsIds.push(row.id);
-
-                createInsert(
-                  Object.keys(row),
-                  Object.values(row),
-                  tablesResult.table
-                ).then(localQuery => {
-                  query(localQuery, false).then(() => {
-                    count++;
-                    if (count === limit){
-                      getStoresInventories(newProductsIds, store).then(function(storesInventoriesRows){
-                        count = 0;
-                        limit = storesInventoriesRows.length;
-
-                        storesInventoriesRows.forEach(row => {
-                          createInsert(
-                            Object.keys(row),
-                            Object.values(row),
-                            'stores_inventories'
-                          ).then(localQuery => {
-                            query(localQuery, false).then(() => {
-                              count++;
-                              if (count === limit){
-                                resolve();
-                              }
-                            })
-                            .catch(function(err){
-                              console.log(err);
-                            })
-                          })
-                        });
-                      });
-                    }
-                  })
-                  .catch(function(err) {
-                    console.log(err);
-                  })
-                });
-              });
-            });
-          }
-        });
       });
     });
   }
