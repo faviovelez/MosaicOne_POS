@@ -321,8 +321,10 @@ $(document).ready(function() {
   }
 
   function getProductsAndServices(call){
+    console.log(1)
     getAll('products').then(products => {
       options = [];
+      console.log(2)
       Promise.each(products.rows, product => {
         options.push(
           {
@@ -335,7 +337,9 @@ $(document).ready(function() {
           }
         );
       }).then(() => {
+        console.log(3)
         getAll('services').then(services => {
+          console.log(4);
           Promise.each(services.rows, service => {
             options.push(
               {
@@ -349,14 +353,18 @@ $(document).ready(function() {
             );
 
           }).then(() => {
+            console.log(5)
             return call(options);
           });
         })
+        .catch(function(err){
+          console.log(err);
+        });
       });
     });
   }
 
-  function addPaymentTr(){
+  function addPaymentTr(total){
     let count = $('#paymentMethodList tr').length - 2,
         type  = $('.payment-form-wrapper .selected')
       .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
@@ -372,9 +380,7 @@ $(document).ready(function() {
       '</button></div>' +
       `${type}</td>` +
       '<td class="right cuantity" >' +
-      `$ ${$('#paymentMethodCuantity').val().replace(
-         /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-       )}` +
+      `$ ${total}` +
       '</td>' +
       '</tr>';
   }
@@ -420,6 +426,15 @@ $(document).ready(function() {
     }
   }
 
+  function sumaPayment(total, paymentType){
+    let actualAmount = $(paymentType).find(
+      'td[class*=cuantity]'
+    ).html().replace(/\s|\$|,/g,'');
+    let roundValue = Math.round(actualAmount * 100) / 100;
+
+    $(paymentType).find('td[class*=cuantity]').html(roundValue + total);
+  }
+
   $('#addPayment').click(function(){
     let paymentsTable = $('.payments-received-on-ticket').length;
     if ($('#ticketList tr').length === 0 && paymentsTable === 0){
@@ -430,8 +445,14 @@ $(document).ready(function() {
       .html().replace(/\s/g,'').replace(/.*<\/i>/,''),
       referenceSelector  = 'input[type=text][placeholder="Referencia bancaria"]',
       creditDaysSelector = 'input[type=text][placeholder="Ejemplo: 30 (solo número)"]';
+      paymentTypeSelector = $(`tr[data-type=${type}]`);
+      paymentAmountTotal = parseFloat($('#paymentMethodCuantity').val());
 
-    $('#paymentMethodList').prepend(addPaymentTr());
+    if (paymentTypeSelector.length === 0){
+      $('#paymentMethodList').prepend(addPaymentTr(paymentAmountTotal));
+    } else {
+      sumaPayment(paymentAmountTotal, paymentTypeSelector);
+    }
 
     if (type === 'Débito' || type === 'Crédito'){
       $(`tr[id=paymentMethod_${count}]`).append(
@@ -526,8 +547,16 @@ $(document).ready(function() {
     ).indexOf('Venta') > 0 ;
   }
 
+  function validateAllInputsFill(){
+    let allFill = true;
+    $.each($('#ticketList input'), function(){
+      if($(this).val() === '')
+        allFill = false;
+    });
+    return allFill;
+  }
+
   $('#completeSale').click(function() {
-    $(this).prop( "disabled", true );
 
     if (isPago()){
       addPaymentToTicket();
@@ -545,6 +574,12 @@ $(document).ready(function() {
 
     if (validateAllServiceOfferedFill()){
 
+      if (!validateAllInputsFill()) {
+        alert('Favor de llenar todos los campos');
+        return false;
+      }
+
+      $(this).prop( "disabled", true );
       validateQuantity(function(hasInventory){
 
         if (hasInventory){
@@ -673,7 +708,7 @@ $(document).ready(function() {
       let tr    = $(this).parent();
       let cuantity    = parseInt($(tr).find(
             'input[id^=cuantityTo]'
-          ).val()),
+          ).val().replace(/_/g,'')),
           total       = price * cuantity,
           discountval = parseFloat($(tr.find(
             'a[id^=discount]'
@@ -724,7 +759,9 @@ $(document).ready(function() {
       );
       productTotal = productTotal.toString() === 'NaN' ? 0 : productTotal;
       subtotal += productTotal;
-      taxSum += parseFloat(parseFloat( (productTotal * 0.16).toFixed(3) ).toFixed(2) );
+      taxSum += Math.round(productTotal * 0.16 * 100) / 100;
+
+//      taxSum += parseFloat(parseFloat( (productTotal * 0.16).toFixed(3) ).toFixed(2) );
     });
     $(subTotalInput).html(`$ ${subtotal.toFixed(
       2
@@ -745,7 +782,7 @@ $(document).ready(function() {
   }
 
   function createTotal(id){
-    let cuantity = $(`input[id^=cuantityTo_${id}]`).val(),
+    let cuantity = $(`input[id^=cuantityTo_${id}]`).val().replace(/_/g,''),
       manualDiscount = !$('#manual-discount').hasClass('hidden'),
       price = 0;
       priceElement = $(`td[id^=priceTo_${id}] a`);
@@ -1146,8 +1183,9 @@ $(document).ready(function() {
           $('#pos').click();
         }
       }, 2000);
-
+      $('#addProductSearch').prop('disabled', true);
       getProductsAndServices(list => {
+        $('#addProductSearch').prop('disabled', false);
         $('#addProductSearch').autocomplete({
             lookup: list,
 //            lookupLimit: 10,
@@ -1170,6 +1208,9 @@ $(document).ready(function() {
           onSelect: function (suggestion) {
             $('#ticketList').append(addTr(suggestion));
             addEvents(suggestion.id);
+            let selector = $(`input[id^=cuantityTo_${suggestion.id}]`);
+            var im = new Inputmask("99999999");
+            im.mask(selector);
             $(this).val('');
           }
         });

@@ -307,7 +307,7 @@ function insertTicket(userId, call, type, parentTicket = null){
 
   setPayedLogic(data);
 
-  if (typeof data.cfdi_use_id === 'undefined') {
+  if (typeof data.cfdi_use_id === 'undefined' || !data.cfdi_use_id) {
     delete data.cfdi_use_id;
   }
 
@@ -488,11 +488,16 @@ function assignCost(userId, ticketType, ticketId, call) {
           discountType    = $('.discounts-form-wrapper button.selected')
           .attr('id'),
           discountPercent = parseFloat(productsJson[productId].discount) / 100,
-          unitPrice       = parseFloat(parseFloat((productsJson[productId].price).toFixed(3)).toFixed(2)),
-          subtotal        = parseFloat(parseFloat((unitPrice * sellQuantity).toFixed(3)).toFixed(2)),
-          finalPrice      = parseFloat(parseFloat((unitPrice * (1 - discountPercent)).toFixed(3)).toFixed(2)),
-          discount        = parseFloat(parseFloat((subtotal * discountPercent).toFixed(3)).toFixed(2)),
-          taxes           = parseFloat(parseFloat(((subtotal - discount) * 0.16).toFixed(3)).toFixed(2)),
+          unitPrice       = Math.round(productsJson[productId].price * 100) / 100,
+          subtotal        = Math.round(unitPrice * sellQuantity * 100) / 100,
+          finalPrice      = Math.round(unitPrice * (1 - discountPercent) * 100) / 100,
+          discount        = Math.round(subtotal * discountPercent * 100 ) / 100,
+          taxes           = Math.round((subtotal - discount) * 0.16 * 100) / 100,
+//          unitPrice       = parseFloat(parseFloat((productsJson[productId].price).toFixed(3)).toFixed(2)),
+//          subtotal        = parseFloat(parseFloat((unitPrice * sellQuantity).toFixed(3)).toFixed(2)),
+//          finalPrice      = parseFloat(parseFloat((unitPrice * (1 - discountPercent)).toFixed(3)).toFixed(2)),
+//          discount        = parseFloat(parseFloat((subtotal * discountPercent).toFixed(3)).toFixed(2)),
+//          taxes           = parseFloat(parseFloat(((subtotal - discount) * 0.16).toFixed(3)).toFixed(2)),
           total           = subtotal - discount + taxes,
           prospectId   = $('#prospectList a').attr('data-id'),
           data = {

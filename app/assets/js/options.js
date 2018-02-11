@@ -24,7 +24,7 @@ $(document).ready(function() {
       .addClass('alert-danger')
       .removeClass('hidden');
   }
-  
+
   async function initStore(){
 
     const store = new Store({
@@ -156,7 +156,9 @@ $(document).ready(function() {
         user_id          : storage.get('current_user').id,
         amount           : parseFloat($('#new_cash_deposit_amount').val()),
         cash_register_id : parseInt($('.cashRegisterOptions').val()),
-        name             : $('#new_cash_deposit_description').val()
+        name             : $('#new_cash_deposit_description').val(),
+        pos              : true,
+        web              : false
       };
 
       insert(
@@ -177,7 +179,9 @@ $(document).ready(function() {
         user_id          : storage.get('current_user').id,
         amount           : parseFloat($('#new_cash_withdrawal_amount').val()),
         cash_register_id : parseInt($('.cashRegisterOptions').val()),
-        name             : $('#new_cash_withdrawal_description').val()
+        name             : $('#new_cash_withdrawal_description').val(),
+        pos              : true,
+        web              : false
       };
 
       insert(
