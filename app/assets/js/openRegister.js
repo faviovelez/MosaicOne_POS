@@ -60,23 +60,118 @@ $(function(){
   function lotQueries(store){
       return {
         'products' : 'SELECT * FROM products WHERE (shared = true AND current = true ' +
-        `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id})`,
+        `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ORDER BY id`,
         'services' : 'SELECT * FROM services WHERE ' +
-        `(shared = true AND current = true OR store_id = ${store.id})`
+        `(shared = true AND current = true OR store_id = ${store.id}) ORDER BY id`
       };
     }
 
-  function createLocalArray(){
+  function createLocalArray(localQuery, type){
+    return new Promise(function(resolve, reject){
+      let Promise = require("bluebird");
+      let table = type;
+      let promises = [];
+      query(localQuery, false).then(localObjects => {
 
+        Promise.each(localObjects.rows, function(row){
+
+          ['created_at', 'updated_at'].forEach(field => {
+            delete row[field];
+          });
+
+          promises.push(createInsert(
+            Object.keys(row),
+            Object.values(row),
+            table
+          ));
+
+        }).then(function(){
+          Promise.all(promises).then(insertQuery => {
+            resolve(insertQuery);
+          })
+        });
+
+      });
+    });
   }
 
-  function createRemoteArray(){
+  function createRemoteArray(localQuery, type){
+    return new Promise(function(resolve, reject){
+      let Promise = require("bluebird");
+      let table = type;
+      let promises = [];
+
+      query(localQuery).then(remoteObjects => {
+
+        Promise.each(remoteObjects.rows, function(row){
+
+          ['created_at', 'updated_at'].forEach(field => {
+            delete row[field];
+          });
+
+          promises.push(createInsert(
+            Object.keys(row),
+            Object.values(row),
+            table
+          ));
+
+        }).then(function(){
+          Promise.all(promises).then(insertQuery => {
+            resolve(insertQuery);
+          })
+        });
+
+      });
+    });
+  }
+
+  function getProcessIds(localInserts, remoteInserts){
+    let Promise = require("bluebird");
+    return new Promise(function(resolve, reject){
+      let validatedProductsIds = [];
+      Promise.each(remoteInserts, function(object, index){
+
+        if (object !== localInserts[index] || !localInserts[index]){
+          validatedProductsIds.push({
+            id: object.replace(/.* VALUES \( /,'').split(',')[0],
+            query: object
+          });
+        }
+
+      }).then(function(){
+        resolve(validatedProductsIds);
+      });
+
+    });
 
   }
 
   function getProductsAndServices(store){
+    let promises = [];
     return new Promise(function(resolve, reject){
       query(getQueryCount(store)).then(limitCount => {
+        let jsonQueries = lotQueries(store);
+
+        for (var type in jsonQueries) {
+          promises.push(createLocalArray(jsonQueries[type], type));
+          promises.push(createRemoteArray(jsonQueries[type], type));
+        }
+
+        Promise.all(promises).then(function(returnArray){
+          let localProducts = returnArray[0];
+          let remoteProducts = returnArray[1];
+          let localServices = returnArray[2];
+          let remoteServices = returnArray[3];
+          let promisesArray = [];
+
+          promisesArray.push(getProcessIds(localProducts, remoteProducts));
+          promisesArray.push(getProcessIds(localServices, remoteServices));
+
+          Promise.all(promisesArray).then(function(validProcessIds){
+            debugger
+          });
+
+        });
 
       });
     });

@@ -22,6 +22,15 @@
   padding-left: 0;
 }
 
+table.payments-received-on-ticket {
+    margin-top: 3rem;
+}
+
+table.ticket-results {
+    width: 90%;
+    margin-left: 2.5%;
+}
+
 .list-status-table {
   position: absolute;
   top: 10%;

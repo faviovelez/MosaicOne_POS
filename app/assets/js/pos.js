@@ -93,8 +93,9 @@ $(document).ready(function() {
       '<td class="left">' +
       product.description +
       '</td>' +
-      `<td> ${product.color} </td><td>` +
-      '<input type="text" class="form-control" id="addProductInput" smaller-form" placeholder="1">' +
+      `<td> ${product.color} </td>` +
+      '<td><input type="text" class="form-control" id="addProductInput" smaller-form" placeholder="1"></td>' +
+      '<td><input type="text" class="form-control" id="addReason" smaller-form" placeholder="Motivo">' +
       '</td></tr>';
   }
   function getCostPrice(price, overprice, discount){
@@ -111,6 +112,7 @@ $(document).ready(function() {
         product_id    : productDetails.id,
         quantity      : quantity,
         movement_type : action,
+        reason        : $("#addReason").val(),
         initial_price : productDetails.price.toFixed(2),
         supplier_id   : productDetails.supplier_id,
       };

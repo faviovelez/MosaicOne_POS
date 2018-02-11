@@ -160,7 +160,7 @@ $(function(){
           let html = '<table class="ticket-selected">' +
             '<thead>' +
             '<tr>' +
-            '<th colspan="6" class="head-blue">' +
+            '<th colspan="7" class="head-blue">' +
             'Ticket:' +
             '<span id="ticket-id">' +
             `  ${ticket.id}` +

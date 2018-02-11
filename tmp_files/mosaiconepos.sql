@@ -2107,7 +2107,8 @@ CREATE TABLE movements (
     total_cost double precision,
     total double precision,
     subtotal double precision,
-    entry_movement_id integer
+    entry_movement_id integer,
+    reason text
 );
 
 
@@ -3645,7 +3646,8 @@ CREATE TABLE store_movements (
     down_applied boolean,
     pos_id integer,
     web_id integer,
-    user_id integer
+    user_id integer,
+    reason text
 );
 
 

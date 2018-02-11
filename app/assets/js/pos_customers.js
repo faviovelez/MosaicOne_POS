@@ -130,9 +130,6 @@ $(function(){
       '<label for="prospect_contact_position">Puesto</label><br>' +
       '</th>' +
       '<th>' +
-      '<label for="prospect_email">Email</label><br>' +
-      '</th>' +
-      '<th>' +
       '<label for="prospect_direct_phone">Teléfono fijo</label><br>' +
       '</th>' +
       '<th>' +
@@ -149,11 +146,6 @@ $(function(){
       '<input placeholder="Puesto" class="form-control round-form transparent-field" type="text" value="' +
       clearData(prospect.contact_position) +
       '" name="prospect[contact_position]" id="prospect_contact_position" />' +
-      '</td>' +
-      '<td>' +
-      '<input placeholder="ejemplo@ejemplo.com" class="form-control round-form transparent-field" type="text" value="' +
-      clearData(prospect.email) +
-      '" name="prospect[email]" id="prospect_email" />' +
       '</td>' +
       '<td>' +
       '<input placeholder="Teléfono fijo" class="form-control round-form transparent-field blue-background" type="text" value="' +
@@ -173,6 +165,40 @@ $(function(){
       '</tr>' +
       '</tbody>' +
       '</table>' +
+
+      '<table class="table-margin-modal prospect-details-table">' +
+      '<thead>' +
+      '<tr>' +
+      '<th>' +
+      '<label for="prospect_email">Email</label><br>' +
+      '</th>' +
+      '<th>' +
+      '<label for="prospect_email_2">Segundo Email</label><br>' +
+      '</th>' +
+      '<th>' +
+      '<label for="prospect_email_3">Tercer Email</label><br>' +
+      '</th>' +
+      '</tr>' +
+      '</thead>' +
+      '<tr>' +
+      '<td>' +
+      '<input placeholder="ejemplo@ejemplo.com" class="form-control round-form transparent-field" type="text" value="' +
+      clearData(prospect.email) +
+      '" name="prospect[email]" id="prospect_email" />' +
+      '</td>' +
+      '<td>' +
+      '<input placeholder="ejemplo@ejemplo.com" class="form-control round-form transparent-field" type="text" value="' +
+      clearData(prospect.email_2) +
+      '" name="prospect[email_2]" id="prospect_email_2" />' +
+      '</td>' +
+      '<td>' +
+      '<input placeholder="ejemplo@ejemplo.com" class="form-control round-form transparent-field" type="text" value="' +
+      clearData(prospect.email_3) +
+      '" name="prospect[email_3]" id="prospect_email_3" />' +
+      '</tr>' +
+      '</tbody>' +
+      '</table>' +
+
       '<h4 class="title-margin-modal"> Datos de facturación </h4>' +
       '<table class="table-margin-modal prospect-details-table">' +
       '<thead>' +
@@ -322,6 +348,8 @@ $(function(){
       second_last_name:       $('#prospect_second_last_name').val(),
       contact_position:       $('#prospect_contact_position').val(),
       email:                  $('#prospect_email').val(),
+      email_2:                $('#prospect_email_2').val(),
+      email_3:                $('#prospect_email_3').val(),
       direct_phone:           $('#prospect_direct_phone').val(),
       extension:              $('#prospect_extension').val(),
       cell_phone:             $('#prospect_cell_phone').val(),
