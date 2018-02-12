@@ -146,10 +146,13 @@ $(function(){
 
   }
 
-  function updateProductWithThisInfo(productId, withoutPrice){
+  function updateProductWithThisInfo(productId, withoutPrice, storeObject){
     return new Promise(function(resolve, reject){
       findBy('id', productId, 'products').then(productObject => {
         let product = productObject.rows[0];
+        let newPrice = product.price * ( 1 + (storeObject.overprice / 100) );
+
+        product.price = Math.round(newPrice * 100) / 100;
 
         if (withoutPrice)
           delete product.price;
@@ -159,7 +162,22 @@ $(function(){
           'products',
           `id = ${product.id}`
         ).then(function(updateResult){
-          resolve(updateResult);
+          if (!withoutPrice) {
+            debugger
+            updateBy(
+              {
+                manual_price: product.price,
+                web: false
+              },
+              'stores_inventories',
+              `product_id = ${product.id}`
+            ).then((storeInventoryUpdate) => {
+              resolve(storeInventoryUpdate);
+            });
+          } else {
+            resolve(updateResult);
+          }
+
         });
       });
     });
@@ -168,7 +186,7 @@ $(function(){
   function getProductsAndServices(store){
     let promises = [];
     let Promise = require("bluebird");
-    return new Promise(function(resolve, reject){
+    return new Promise(function(globalResolve, globalReject){
       query(getQueryCount(store)).then(limitCount => {
         let jsonQueries = lotQueries(store);
 
@@ -197,7 +215,7 @@ $(function(){
                   findBy('product_id', product.id, 'stores_inventories', false).then(storeInventoryObect => {
                     let storeInventory = storeInventoryObect.rows[0];
 
-                    updateProductWithThisInfo(storeInventory.product_id, storeInventory.manual_price_update).then(function(updateResult){
+                    updateProductWithThisInfo(storeInventory.product_id, storeInventory.manual_price_update, store).then(function(updateResult){
                       internalResolve(updateResult);
                     });
 
@@ -207,13 +225,140 @@ $(function(){
               )
             });
 
-            Promise.all(promisesChanges).then(function(aProductQueryLot){
-              debugger
+            Promise.all(promisesChanges).then(function(aProductQueryResult){
+              let promisesChangesServices = [];
+              validProcessIds[1].forEach(function(service){
+
+                promisesChangesServices.push(
+
+                  new Promise(function(internalResolve, internalReject){
+                    let internalService = service;
+
+                    findBy('id', service.id, 'services').then(serviceObject => {
+
+                      updateBy(
+                        serviceObject.rows[0],
+                        'services',
+                        `id = ${internalService.id}`
+                      ).then(updateResult => {
+                        internalResolve(updateResult);
+                      });
+
+                    });
+
+                  })
+
+                );
+              });
+
+              Promise.all(promisesChangesServices).then(function(aServiceQueryResult){
+                globalResolve();
+              });
             });
           });
 
         });
 
+      });
+    });
+  }
+
+  function getQueryCountForNew(store, localIds){
+    return 'SELECT SUM(rows) as total_rows FROM (' +
+      ' SELECT COUNT (*) as rows FROM products WHERE (shared = true AND current = true AND' +
+      ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ` +
+      ` AND id NOT IN (${localIds.products}) UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM services WHERE (shared = true AND current = true OR store_id = ${store.id})` +
+      ` AND id NOT IN (${localIds.services}) ` +
+    ') as u';
+  }
+
+  function lotQueriesForNew(store, localIds){
+      return {
+        'products' : 'SELECT * FROM products WHERE (shared = true AND current = true ' +
+        `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id})` +
+        ` AND id NOT IN (${localIds.products})`,
+        'services' : 'SELECT * FROM services WHERE ' +
+        `(shared = true AND current = true OR store_id = ${store.id})` +
+        ` AND id NOT IN (${localIds.services})`
+      };
+    }
+
+  function getLocalIds(){
+    let localIds = {};
+    return new Promise(function(resolve, reject){
+      getAll('products', 'id').then(productsIdsResult => {
+        localIds.products = $.map(productsIdsResult.rows, function(row){
+          return row.id;
+        });
+        getAll('services', 'id').then(servicesIdsResult => {
+          localIds.services = $.map(servicesIdsResult.rows, function(row){
+            return row.id;
+          });
+          resolve(localIds);
+        });
+      });
+    });
+  }
+
+  function getProductsAndServicesForNew(store){
+    return new Promise(function(resolve, reject){
+      getLocalIds().then(localIds => {
+        query(getQueryCountForNew(store, localIds)).then(limitCount => {
+          let count = 0;
+          let limit = parseInt(limitCount.rows[0].total_rows);
+          let newProductsIds = [];
+          let queries = lotQueriesForNew(store, localIds);
+          if (limit === 0) {
+            resolve();
+          }
+          for(var key in queries){
+            query(queries[key], true, key).then(tablesResult => {
+
+              tablesResult.rows.forEach(row => {
+                if (tablesResult.table === 'products')
+                  newProductsIds.push(row.id);
+
+                createInsert(
+                  Object.keys(row),
+                  Object.values(row),
+                  tablesResult.table
+                ).then(localQuery => {
+                  query(localQuery, false).then(() => {
+                    count++;
+                    if (count === limit){
+                      getStoresInventories(newProductsIds, store).then(function(storesInventoriesRows){
+                        count = 0;
+                        limit = storesInventoriesRows.length;
+
+                        storesInventoriesRows.forEach(row => {
+                          createInsert(
+                            Object.keys(row),
+                            Object.values(row),
+                            'stores_inventories'
+                          ).then(localQuery => {
+                            query(localQuery, false).then(() => {
+                              count++;
+                              if (count === limit){
+                                resolve();
+                              }
+                            })
+                            .catch(function(err){
+                              console.log(err);
+                            })
+                          })
+                        });
+                      });
+                    }
+                  })
+                  .catch(function(err) {
+                    console.log(err);
+                  })
+                });
+              });
+            });
+          }
+        });
       });
     });
   }
@@ -278,7 +423,9 @@ $(function(){
       store.set('cash', $('#register_open_cash_register').val());
       alert('Actualizando base de datos, por favor espere un momento');
       getProductsAndServices(store.get('store')).then(function(){
-        window.location.href = 'pos_sale.html';
+        getProductsAndServicesForNew(store.get('store')).then(function(){
+          window.location.href = 'pos_sale.html';
+        });
       })
     });
 

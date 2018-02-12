@@ -1,6 +1,6 @@
 $(document).ready(function() {
   $('#changeSinglePrice').on('shown.bs.modal', function(e) {
-    $('#changeSinglePriceProductId').html(e.relatedTarget.dataset.id.replace(/_products/, ''));
+    $('#changeSinglePriceProductId').html(e.relatedTarget.dataset.id.replace(/_products/, '').replace(/_.*/,''));
   });
 
   $('#saveNewPrice').click(function(){
