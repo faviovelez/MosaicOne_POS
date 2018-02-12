@@ -122,12 +122,32 @@ async function findBy(column, data, table, remote = true, lastId = 0){
   return await query(`${localQuery}`, remote, table, lastId);
 }
 
-async function updateBy(data, table, condition){
+async function updateBy(dataJson, table, condition){
   let localQuery = `UPDATE ${table} SET`;
-  for(var column in data) {
-    localQuery += ` ${column} = '${data[column]}',`;
+  for(var column in dataJson) {
+    localQuery += (column === 'group') ? ` "${column}" = ` : ` ${column} = `;
+
+    let data = dataJson[column];
+    switch(data){
+      case null:
+      case true:
+      case false:
+        localQuery += data;
+        localQuery += ', '
+        break;
+      default:
+        if (typeof data === 'object'){
+          localQuery += `'${data.toUTCString()}', `;
+        } else {
+          try {
+            localQuery += `'${data.replace(/'/,'\\u0027')}', `;
+          } catch (err) {
+            localQuery += `'${data}', `;
+          }
+        }
+    }
   }
-  localQuery = localQuery.replace(/,$/,'');
+  localQuery = localQuery.replace(/, $/,'');
   localQuery += ` WHERE ${condition}`;
   return await query(localQuery, false);
 }

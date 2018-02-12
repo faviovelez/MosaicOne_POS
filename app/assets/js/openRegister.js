@@ -129,11 +129,11 @@ $(function(){
     let Promise = require("bluebird");
     return new Promise(function(resolve, reject){
       let validatedProductsIds = [];
-      Promise.each(remoteInserts, function(object, index){
+      Promise.each(localInserts, function(object, index){
 
-        if (object !== localInserts[index] || !localInserts[index]){
+        if (object !== remoteInserts[index]){
           validatedProductsIds.push({
-            id: object.replace(/.* VALUES \( /,'').split(',')[0],
+            id: object.replace(/.* VALUES \( /,'').split(',')[0].replace(/\'/g,''),
             query: object
           });
         }
@@ -146,8 +146,28 @@ $(function(){
 
   }
 
+  function updateProductWithThisInfo(productId, withoutPrice){
+    return new Promise(function(resolve, reject){
+      findBy('id', productId, 'products').then(productObject => {
+        let product = productObject.rows[0];
+
+        if (withoutPrice)
+          delete product.price;
+
+        updateBy(
+          product,
+          'products',
+          `id = ${product.id}`
+        ).then(function(updateResult){
+          resolve(updateResult);
+        });
+      });
+    });
+  }
+
   function getProductsAndServices(store){
     let promises = [];
+    let Promise = require("bluebird");
     return new Promise(function(resolve, reject){
       query(getQueryCount(store)).then(limitCount => {
         let jsonQueries = lotQueries(store);
@@ -168,7 +188,28 @@ $(function(){
           promisesArray.push(getProcessIds(localServices, remoteServices));
 
           Promise.all(promisesArray).then(function(validProcessIds){
-            debugger
+            let promisesChanges = [];
+            validProcessIds[0].forEach(function(product){
+
+              promisesChanges.push(
+                new Promise(function(internalResolve, internalReject){
+                  let internalProduct = product;
+                  findBy('product_id', product.id, 'stores_inventories', false).then(storeInventoryObect => {
+                    let storeInventory = storeInventoryObect.rows[0];
+
+                    updateProductWithThisInfo(storeInventory.product_id, storeInventory.manual_price_update).then(function(updateResult){
+                      internalResolve(updateResult);
+                    });
+
+                  });
+
+                })
+              )
+            });
+
+            Promise.all(promisesChanges).then(function(aProductQueryLot){
+              debugger
+            });
           });
 
         });
