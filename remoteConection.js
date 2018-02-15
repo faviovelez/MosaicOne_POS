@@ -58,7 +58,7 @@ async function getToTransfer(table){
     ' WHERE web = false';
 
   if (table === 'tickets') {
-    localQuery += ` AND ticket_type = 'venta' OR ticket_type = 'cancelado'`
+    localQuery += ` AND ticket_type = 'venta' OR ticket_type = 'cancelado' OR ticket_type = 'pago'`
   }
 
   if (table === 'store_movements' || table === 'service_offereds' || table === 'payments'){

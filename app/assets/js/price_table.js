@@ -1,4 +1,7 @@
 $(document).ready(function(){
+
+  const Inputmask = require('inputmask');
+
   function initDataTables(){
     $('#priceList').DataTable({
       "language": {
@@ -33,6 +36,11 @@ $(document).ready(function(){
   }
 
   $('#changeSinglePrice').on('shown.bs.modal', function(e) {
+
+    let changeSinglePriceOption = document.getElementById("changeSinglePriceInput");
+    var im = new Inputmask("decimal");
+    im.mask(changeSinglePriceOption);
+
     $('#changeSinglePriceProductId').html(e.relatedTarget.dataset.id);
   });
 

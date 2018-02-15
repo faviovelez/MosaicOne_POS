@@ -404,6 +404,14 @@ $(function(){
                   createPagosTable(ticket).then(tableHtmlContent => {
                     $('#resultOfTicketSearch').append(tableHtmlContent);
                     calculatePaymentRest();
+
+                    // Líneas agregadas para poder esconder las secciones no necesarias
+                    $('#cash').addClass('selected');
+                    $('.credit-days-container').addClass('hidden');
+                    $('.operation-number-container').addClass('hidden');
+                    $('.select-register-container').addClass('hidden');
+                    // Líneas agregadas para poder esconder las secciones no necesarias
+
                   });
                 });
               })

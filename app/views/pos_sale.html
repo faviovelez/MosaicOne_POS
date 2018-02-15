@@ -514,7 +514,7 @@
           <tbody>
             <tr>
               <td> Descuento total ticket % </td>
-              <td class="right"> <a href="#" data-toggle="modal" data-target="#ticketDiscountChange" >Aplicar descuento</a> </td>
+              <td class="right"> <a href="#" data-toggle="modal" data-target="#ticketDiscountChange" id="applyDiscountToTicket">Aplicar descuento</a> </td>
             </tr>
             <tr>
               <td> Total descuento </td>
@@ -628,7 +628,7 @@
       </div><!-- /.row -->
 
       <div class="input-group margin-bottom credit-days-container hidden paymentProcess">
-        <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)">
+        <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)" id="creditDaysNumber">
         <span class="input-group-btn">
           <button class="btn btn-default color-button pos-main-btn" type="button" id="creditDays">Días de crédito</button>
         </span>
@@ -775,7 +775,7 @@
              Aplicar descuento a todo el ticket.
            </p>
          <div class="input-group">
-           <input type="text" class="form-control smaller-form round-form"  placeholder="5%">
+           <input type="text" class="form-control smaller-form round-form"  placeholder="5%" id="allTicketDiscount">
            <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
          </div><!-- /input-group -->
        </div>
@@ -915,7 +915,7 @@
                      <input placeholder="Número de guía" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[tracking_number]" id="delivery_service_tracking_number" />
                    </td>
                    <td>
-                     <input placeholder="Nombre compelto" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[sender_name]" id="delivery_service_sender_name" />
+                     <input placeholder="Nombre completo" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[sender_name]" id="delivery_service_sender_name" />
                    </td>
                    <td>
                      <input placeholder="Código postal" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[sender_zipcode]" id="delivery_service_sender_zipcode" />

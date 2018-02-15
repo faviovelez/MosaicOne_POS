@@ -438,7 +438,7 @@ function insertsServiceOffereds(ticketId, call){
           let element = `#${serviceOffered.lastId} td:last`;
           let deliveryServiceId = $(`${element}`).html();
 
-          if ($(`${element}`).attr('id').indexOf('totalSinTo_') > -1){
+          if ($(`${element}`).attr('id').indexOf('totalSinTo_') > -1 || $(`${element}`).attr('id').indexOf('discountReasonTo_') > -1){
             serviceOfferedCount++;
             if (serviceOfferedCount === Object.keys(servicesJson).length){
               return call();

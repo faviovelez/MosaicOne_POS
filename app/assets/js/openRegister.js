@@ -163,7 +163,6 @@ $(function(){
           `id = ${product.id}`
         ).then(function(updateResult){
           if (!withoutPrice) {
-            debugger
             updateBy(
               {
                 manual_price: product.price,

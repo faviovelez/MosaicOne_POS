@@ -1,5 +1,10 @@
 $(document).ready(function() {
   $('#changeSinglePrice').on('shown.bs.modal', function(e) {
+
+    let changeSinglePriceOption = document.getElementById("changeSinglePriceInput");
+    var im = new Inputmask("decimal");
+    im.mask(changeSinglePriceOption);
+
     $('#changeSinglePriceProductId').html(e.relatedTarget.dataset.id.replace(/_products/, '').replace(/_.*/,''));
   });
 
@@ -448,7 +453,13 @@ $(document).ready(function() {
       referenceSelector  = 'input[type=text][placeholder="Referencia bancaria"]',
       creditDaysSelector = 'input[type=text][placeholder="Ejemplo: 30 (solo número)"]';
       paymentTypeSelector = $(`tr[data-type=${type}]`);
-      paymentAmountTotal = parseFloat($('#paymentMethodCuantity').val());
+
+      if ( isNaN(parseFloat( $('#paymentMethodCuantity').val() )) ) {
+        paymentAmountTotal = 0;
+        alert('Por favor seleccione una cantidad válida: sin espacios, letras o caracteres especiales')
+      } else {
+        paymentAmountTotal = parseFloat($('#paymentMethodCuantity').val());
+      }
 
     if (paymentTypeSelector.length === 0){
       $('#paymentMethodList').prepend(addPaymentTr(paymentAmountTotal));
@@ -468,7 +479,7 @@ $(document).ready(function() {
       );
     }
     if (type === 'VentaaCrédito') {
-      let creditDays = parseInt($(creditDaysSelector).val());
+      let creditDays = parseInt($(creditDaysSelector).val().replace(/_/g,''));
       if (creditDays.toString() === 'NaN') {
         creditDays = 0;
       }
@@ -1053,6 +1064,11 @@ $(document).ready(function() {
   });
 
   $('#discountChange').on('shown.bs.modal', function(e) {
+
+    let individualDiscount = document.getElementById("discountCount");
+    var im = new Inputmask("decimal");
+    im.mask(individualDiscount);
+
     let relatedObject = e.relatedTarget.dataset,
         productId     = relatedObject.id;
     $(this).find('.modal-body').attr('id',
@@ -1430,6 +1446,11 @@ $(".hide-results").click(function () {
 
 /* Métodos para descuentos*/
   $("#manual").click(function () {
+
+    let ticketDiscountField = document.getElementById("allTicketDiscount");
+    var im = new Inputmask("decimal");
+    im.mask(ticketDiscountField);
+
     $(this).addClass('selected');
     $('#automatic-discount').addClass('hidden');
     $('#manual-discount').removeClass('hidden');
@@ -1539,6 +1560,9 @@ $(".hide-results").click(function () {
   });
 
   $("#creditSale").click(function () {
+    let selectorDays = document.getElementById("creditDaysNumber");
+    var imc = new Inputmask("99999999");
+    imc.mask(selectorDays);
     $(this).addClass('selected');
     $('.credit-days-container').removeClass('hidden');
     $('#debit').removeClass('selected');

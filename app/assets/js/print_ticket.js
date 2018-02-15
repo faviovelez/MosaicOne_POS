@@ -579,7 +579,7 @@ function printTicket(ticketInfo, call){
           let contents = win.webContents;
           win.webContents.on('did-finish-load', () => {
             win.webContents.print({silent: true});
-            win = null;
+            win.close();
             return call();
           });
 
