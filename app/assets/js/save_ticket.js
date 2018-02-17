@@ -41,7 +41,7 @@ function createTicketProductJson(call){
 
     if(table === 'products') {
       productsJson[id] = {
-        sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
+        sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val().replace(/_/g,'')),
         sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html(),
@@ -54,7 +54,7 @@ function createTicketProductJson(call){
 
     } else {
       servicesJson[$(this).attr('id')] = {
-        sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val()),
+        sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val().replace(/_/g,'')),
         sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html(),
