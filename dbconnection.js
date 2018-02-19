@@ -73,7 +73,7 @@ async function runQuery(q, client, lastId, table){
           err : true
         };
       } else {
-        throw err;
+        console.log(err);
       }
     }
   } finally {

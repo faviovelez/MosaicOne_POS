@@ -333,20 +333,25 @@ function insertTicket(userId, call, type, parentTicket = null){
           date: getCurrentDate()
         };
 
-        updateBy(
-          {
-            payed: data.payed
-          },
-          'tickets',
-          `id = ${data.parent_id}`
-        ).then(function(){
-          insert(
-            Object.keys(childTicketData),
-            Object.values(childTicketData),
-            'tickets_children'
+        findBy('id', data.parent_id, 'tickets').then(function(ticketInfoData){
+          let ticketInfo = ticketInfoData.rows[0];
+          updateBy(
+            {
+              payed: data.payed,
+              payments_amount: parseFloat(data.payments_amount) + ticketInfo.payments_amount,
+              cash_return: data.cash_return
+            },
+            'tickets',
+            `id = ${data.parent_id}`
           ).then(function(){
-            data = null;
-            return call(ticket.lastId, childTicketData.ticket_id);
+            insert(
+              Object.keys(childTicketData),
+              Object.values(childTicketData),
+              'tickets_children'
+            ).then(function(){
+              data = null;
+              return call(ticket.lastId, childTicketData.ticket_id);
+            });
           });
         });
       } else {

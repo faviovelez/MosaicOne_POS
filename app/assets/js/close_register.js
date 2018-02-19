@@ -81,7 +81,6 @@ $(document).ready(function() {
     limit = lotTables.length;
     count = 0;
     limitRows = 0;
-
     lotTables.forEach(table => {
       getToTransfer(table).then(transferRows => {
 
@@ -108,7 +107,10 @@ $(document).ready(function() {
       delete sendObjects[tableName].processRow;
 
       for (var objectId in sendObjects[tableName]){
-        updatePosData(tableName, objectId).then(() => {});
+        let localQuery = `UPDATE ${tableName} SET ` +
+          ` web = true WHERE id = ${objectId}`;
+
+          runLocalQuery(localQuery).then(() => {});
       }
     }
   }
@@ -155,7 +157,7 @@ $(document).ready(function() {
             data: sendObjects,
             headers: { "Content-Type": "application/json" }
           };
-        client.post("http://34.214.130.203/pos/received_data", args, function (data, response) {
+        client.post("http://localhost:3000/pos/received_data", args, function (data, response) {
           delete sendObjects.installCode;
           delete sendObjects.storeId;
 

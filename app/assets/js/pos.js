@@ -456,7 +456,7 @@ $(document).ready(function() {
 
       if ( isNaN(parseFloat( $('#paymentMethodCuantity').val() )) ) {
         paymentAmountTotal = 0;
-        alert('Por favor seleccione una cantidad válida: sin espacios, letras o caracteres especiales')
+        alert('Por favor seleccione una cantidad válida: sin espacios, letras o caracteres especiales');
       } else {
         paymentAmountTotal = parseFloat($('#paymentMethodCuantity').val());
       }

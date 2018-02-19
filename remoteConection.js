@@ -1,9 +1,9 @@
-const {Pool} = require('pg');
+const {Pool, Client} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-  user: 'ubuntu',
-  host: '34.214.130.203',
+  user: 'faviovelez',
+  host: 'localhost',
   database: 'mosaicone',
   password: 'bafio44741',
   port: 5432,
@@ -16,6 +16,42 @@ const localPool = new Pool({
   password: 'bafio44741',
   port: 5432,
 });
+
+function runLocalQuery(q){
+  return new Promise(function(resolve){
+    let res;
+
+    let client = new Client({
+      user: 'faviovelez',
+      host: 'localhost',
+      database: 'mosaiconepos',
+      password: 'bafio44741',
+      port: 5432,
+    });
+
+    client.connect()
+    .then(async function(){
+      try {
+        await client.query('BEGIN');
+        try {
+          res = await client.query(q);
+          await client.query('COMMIT');
+        } catch (err) {
+          await client.query('ROLLBACK');
+          console.log(err);
+        }
+      } finally {
+        await client.end();
+      }
+      return resolve(res);
+    })
+    .catch(function(err){
+      client.end();
+      runLocalQuery(q);
+      return resolve();
+    });
+  });
+}
 
 async function query (q, remote = true, table = '', lastId = 0) {
   let client = null;
@@ -31,7 +67,7 @@ async function query (q, remote = true, table = '', lastId = 0) {
       res = await client.query(q);
       await client.query('COMMIT');
     } catch (err) {
-      await client.query('ROLLBACK');34
+      await client.query('ROLLBACK');
       throw err;
     }
   } finally {
@@ -150,13 +186,6 @@ async function updateBy(dataJson, table, condition){
   localQuery = localQuery.replace(/, $/,'');
   localQuery += ` WHERE ${condition}`;
   return await query(localQuery, false);
-}
-
-async function updatePosData(table, id){
-  let localQuery = `UPDATE ${table} SET ` +
-    ` web = true WHERE id = ${id}`;
-
-  return query(localQuery, false);
 }
 
 async function getAll(table, columns = '*', condition = false, remote = false){
