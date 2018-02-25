@@ -1,124 +1,4 @@
 $(function(){
-  function createFullName(user){
-    return `${user.first_name} ${user.middle_name} ${user.last_name}`;
-  }
-
-  function getDate(datetime){
-    let month = datetime.getMonth() + 1,
-        date  = datetime.getDate();
-
-    if (month < 10) {
-      month = `0${month}`;
-    }
-
-    if (date < 10) {
-      date = `0${date}`;
-    }
-
-    return `${date}/${month}/${datetime.getFullYear()}`;
-  }
-
-  function setUserData(userId, call){
-    if (userId){
-      findBy(
-        'id',
-        userId,
-        'users'
-      ).then(user => {
-        call(createFullName(user.rows[0]));
-      });
-    } else {
-      return call(null);
-    }
-  }
-
-  function convertToPrice(price){
-    return ` $ ${price.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
-  }
-
-  function addTr(ticket){
-    return new Promise (function(resolve, reject){
-      setUserData(ticket.userId, function(userName){
-        resolve('<tr>' +
-          `<td> <a href="#" class="hide-results" id="ticketNumber${ticket.id}"> ${ticket.id} </a> </td>` +
-          `<td> ${ticket.createdAt} </td>` +
-          `<td class="right">${convertToPrice(ticket.total)} </td>` +
-          `<td> ${userName} </td>` +
-          '</tr>');
-      });
-    });
-  }
-
-  function createTicketOptions(tickets){
-    let options = [];
-    return new Promise(function(resolve, reject){
-      let count = 0;
-      let limit = tickets.length;
-      tickets.forEach(function(ticket, index){
-        options.push(
-          {
-            value: `${ticket.id}`,
-            id:    ticket.id,
-            createdAt: getDate(ticket.created_at),
-            total: ticket.total,
-            userId: ticket.user_id,
-            prospect: ticket.legal_or_business_name,
-            payed: ticket.payed
-          }
-        );
-        count++;
-        if (limit === count){
-          resolve(options);
-        }
-      });
-    });
-  }
-
-  function ticketInfoQuery(ticketId, type){
-    let productQuery = '';
-    let attribute = '';
-    switch(type){
-      case 'product':
-        attribute = 'exterior_color_or_design';
-        productQuery = ' SELECT * FROM store_movements INNER JOIN products ON products.id = store_movements.product_id';
-        break;
-      case 'service':
-        attribute = 'delivery_company';
-        productQuery = ' SELECT * FROM service_offereds INNER JOIN services ON services.id = service_offereds.service_id';
-        break;
-    }
-    return 'SELECT CONCAT (warehouseWithProducts.unique_code, ' +
-      "' ', warehouseWithProducts.description) as description," +
-      ` warehouseWithProducts.${attribute} as color, warehouseWithProducts.price,` +
-      ' warehouseWithProducts.quantity, warehouseWithProducts.discount_applied,' +
-      ' warehouseWithProducts.total' +
-      ' FROM tickets INNER JOIN ' +
-      ' (' +
-      productQuery +
-      ` ) as warehouseWithProducts ON warehouseWithProducts.ticket_id = tickets.id WHERE tickets.id = ${ticketId}`
-  }
-
-  function addProductToTicket(ticketProductData){
-      return '<tr>' +
-        '<td>' +
-          '<div class="close-icon invisible">' +
-            '<button type="button" class="close center-close" aria-label="Close">' +
-              '<span aria-hidden="true" class="white-light">&times;</span>' +
-            '</button>' +
-          '</div>' +
-        '</td>' +
-        '<td class="left">' +
-          '<a href="#">' +
-            `${ticketProductData.description}` +
-          '</a>' +
-        '</td>' +
-        `<td> ${ticketProductData.color || 'Sin color'} </td>` +
-        `<td> ${convertToPrice(ticketProductData.price)} </td>` +
-        `<td> ${ticketProductData.quantity} </td>` +
-        `<td> ${ticketProductData.discount_applied}% </td>` +
-        `<td class="right"> ${convertToPrice(ticketProductData.total)} </td>` +
-      '</tr>';
-  }
 
   function setProspectData(){
     return new Promise(function(resolve, reject){
@@ -126,107 +6,11 @@ $(function(){
     });
   }
 
-  function prospectInfo(ticket){
-    if (!ticket.prospect)
-      return '';
-
-    return ' - ' +
-    '<span id="ticket-prospect">' +
-     `Cliente: ${ticket.prospect}` + /*Aquí agregar la lógica para obtener al cliente*/
-    '</span>'
-  }
-
-  function getPayed(isPayed){
-    if (isPayed) {
-      $('.paymentProcess').addClass('hidden');
-      return '<span class="label label-success left-10">Pagado</span>';
-    }
-    else {
-      $('.paymentProcess').removeClass('hidden');
-      return '<span class="label label-danger left-10">Pendiente</span>';
-    }
-  }
-
   $("#ticketCancelinList").click(function () {
     cancelarTicket(
       parseInt($("#ticket-id").html())
     );
   });
-
-  function displayTicketInfo(ticket){
-    return new Promise(function(resolve, reject){
-      setUserData(ticket.userId, function(userName){
-        query(ticketInfoQuery(ticket.id, 'product')).then(resultData => {
-          let html = '<table class="ticket-selected">' +
-            '<thead>' +
-            '<tr>' +
-            '<th colspan="7" class="head-blue">' +
-            'Ticket:' +
-            '<span id="ticket-id">' +
-            `  ${ticket.id}` +
-            '</span>' +
-            ' - ' +
-            '<span id="ticket-date">' +
-            ticket.createdAt +
-            '</span>' +
-            ' - ' +
-            '<span id="ticket-user">' +
-            `  Usuario: ${userName}` +
-            '</span>' +
-            prospectInfo(ticket) +
-            '<span>' +
-            getPayed(ticket.payed) +
-            `<a href="#" data-toggle="modal" data-target="#askForConfirmCancel"` +
-            'class="left-10" data-placement="left" data-toggle="tooltip" title="Cancelar">' +
-            '<i class="fa fa-ban bigger-icon red-icon" aria-hidden="true"></i></a>' +
-            '</span>' +
-            '<span>' +
-            `<a href="#" onclick="reimpresion(${ticket.id})"` +
-            'data-placement="left" data-toggle="tooltip" title="Reimprimir" class="left-10 b">' +
-              '<i class="fa fa-print bigger-icon" aria-hidden="true">' +
-              '</i>' +
-            '</a>' +
-            '</span>' +
-            '</th>' +
-            '</tr>' +
-            '<tr>' +
-            '<th> </th>' +
-            '<th> Producto o Servicio </th>' +
-            '<th> Color/Diseño </th>' +
-            '<th> Precio </th>' +
-            '<th class="quantity-width"> Cantidad </th>' +
-            '<th> Descuento </th>' +
-            '<th> Total </th>' +
-            '</tr>' +
-            '</thead>' +
-            '<tbody>';
-          let Promise = require("bluebird");
-          let ticketInfo = ticket;
-          Promise.each(resultData.rows, function(ticketProductInfo){
-            html += addProductToTicket(ticketProductInfo);
-          }).then(function(){
-            query(ticketInfoQuery(ticket.id, 'service')).then(resultData => {
-              Promise.each(resultData.rows, function(ticketProductInfo){
-                html += addProductToTicket(ticketProductInfo);
-              }).then(function(){
-                html += `</tbody></table><div id="ticketTotalId" class="hidden">${ticket.total}</div>`
-                resolve(html);
-              });
-            });
-          })
-        });
-      })
-    });
-  }
-
-  function ticketQuery(){
-     return 'SELECT tickets.id, tickets.user_id, tickets.store_id, tickets.subtotal, ' +
-     'tickets.taxes, tickets.total, tickets.discount_applied, tickets.ticket_type, ' +
-     'tickets.cash_register_id, tickets.ticket_number, tickets.comments, ' +
-     'tickets.payments_amount, tickets.cash_return, tickets.payed, tickets.parent_id, ' +
-     'tickets.created_at, prospects.legal_or_business_name FROM tickets LEFT JOIN prospects ' +
-     'ON tickets.prospect_id = prospects.id WHERE tickets.ticket_type = \'venta\''
-  }
 
   function getPaymentType(typeId, total){
     return {
@@ -343,6 +127,53 @@ $(function(){
 
   }
 
+  function loadPagoTable(ticketObject){
+    displayTicketInfo(ticketObject).then(tableHtmlContent => {
+      $('#resultOfTicketSearch').append(tableHtmlContent);
+      tableHtmlContent = null;
+      createPagosTable(ticketObject).then(tableHtmlContent => {
+        $('#resultOfTicketSearch').append(tableHtmlContent);
+        calculatePaymentRest();
+
+        // Líneas agregadas para poder esconder las secciones no necesarias
+        $('#cash').addClass('selected');
+        $('.credit-days-container').addClass('hidden');
+        $('.operation-number-container').addClass('hidden');
+        $('.select-register-container').addClass('hidden');
+        // Líneas agregadas para poder esconder las secciones no necesarias
+
+      });
+    });
+  }
+
+  function initTicketSearch(){
+    query(ticketQuery()).then(result => {
+      createTicketOptions(result.rows).then(list => {
+        $('#ticketSearch').autocomplete({
+          lookup: list,
+          onSelect: function(ticket) {
+            $('#paymentRest strong').html('$ 0.00');
+            $('table.subtotal td.total strong').html('$ 0.00');
+            $('#resultTicketList tr').remove();
+            $('#resultOfTicketSearch table').remove();
+            $('#ticketTotalId').remove();
+            addSearchTicketTr(ticket).then(trInfo => {
+              $('#resultTicketList').append(trInfo);
+              $('.ticket-results').removeClass('hidden');
+              $(`#ticketNumber${ticket.id}`).click(function(){
+
+                $('.ticket-results').addClass('hidden');
+                loadPagoTable(ticket);
+
+              })
+            });
+            $(this).val('');
+          }
+        });
+      })
+    });
+  }
+
   $("#advance-option").click(function () {
     //$('#creditSale').addClass('hidden');
     $('.btn-group').removeClass('open');
@@ -383,45 +214,12 @@ $(function(){
     $("#estimate-option").removeClass('hidden');
 
     $('.second-search').addClass('hidden');
-    query(ticketQuery()).then(result => {
-      createTicketOptions(result.rows).then(list => {
-        $('#ticketSearch').autocomplete({
-          lookup: list,
-          onSelect: function(ticket) {
-            $('#paymentRest strong').html('$ 0.00');
-            $('table.subtotal td.total strong').html('$ 0.00');
-            $('#resultTicketList tr').remove();
-            $('#resultOfTicketSearch table').remove();
-            $('#ticketTotalId').remove();
-            addTr(ticket).then(trInfo => {
-              $('#resultTicketList').append(trInfo);
-              $('.ticket-results').removeClass('hidden');
-              $(`#ticketNumber${ticket.id}`).click(function(){
-                $('.ticket-results').addClass('hidden');
-                displayTicketInfo(ticket).then(tableHtmlContent => {
-                  $('#resultOfTicketSearch').append(tableHtmlContent);
-                  tableHtmlContent = null;
-                  createPagosTable(ticket).then(tableHtmlContent => {
-                    $('#resultOfTicketSearch').append(tableHtmlContent);
-                    calculatePaymentRest();
-
-                    // Líneas agregadas para poder esconder las secciones no necesarias
-                    $('#cash').addClass('selected');
-                    $('.credit-days-container').addClass('hidden');
-                    $('.operation-number-container').addClass('hidden');
-                    $('.select-register-container').addClass('hidden');
-                    // Líneas agregadas para poder esconder las secciones no necesarias
-
-                  });
-                });
-              })
-            });
-            $(this).val('');
-          }
-        });
-      })
-    });
-
+    $('#ticketList tr').remove();
+    $('.items-returns').addClass('hidden');
+    $('#devolucionTable tr').remove();
+    initTicketSearch();
+    bigTotal();
+    resumePayment();
     return false;
   });
 

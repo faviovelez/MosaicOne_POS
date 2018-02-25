@@ -712,7 +712,7 @@ $(function(){
     getProspectList(lista => {
       $('#prospectsList').autocomplete({
         lookup: lista,
-        lookupLimit: 10,
+//        lookupLimit: 10,
         onSelect: function (suggestion) {
           $('#prospectList tr').remove();
           $('#prospectList').append(addTr(suggestion));

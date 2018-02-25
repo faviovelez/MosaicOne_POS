@@ -1,4 +1,6 @@
 $(document).ready(function() {
+
+
   $('#changeSinglePrice').on('shown.bs.modal', function(e) {
 
     let changeSinglePriceOption = document.getElementById("changeSinglePriceInput");
@@ -248,6 +250,10 @@ $(document).ready(function() {
 
   $('#confirmAddProduct').click(function(){
     $('#confirmAddProduct').prop('disabled', true);
+    downUpField = $('#addProductInput').val();
+    if (isNaN(parseInt(downUpField))) {
+      downUpField = 0;
+    }
     let id = $('tr[id^=addProduct_]').attr(
       'id'
     ).replace(/\D/g,''),
@@ -256,7 +262,7 @@ $(document).ready(function() {
       condition = `product_id = ${id}`,
       data = {
         'quantity': parseInt(
-          $('#addProductInput').val().replace(/_/g,'')
+          downUpField.replace(/_/g,'')
         )
       };
     findBy('product_id', id, table).then(inventory => {
@@ -392,47 +398,6 @@ $(document).ready(function() {
       '</tr>';
   }
 
-  function resumePayment(){
-    let sum = 0;
-    $.each($('tr[id^=paymentMethod_]'), function(){
-      let currency = $(this).find('.cuantity').html().replace(
-        '$ ', ''
-      ).replace(',', '');
-      sum += parseFloat(currency);
-    });
-    let total = $('table.subtotal td.total strong').html().replace(
-      '$ ', ''
-    ).replace(',',''),
-       rest = (parseFloat(total) - sum).toFixed(2);
-    $('#sumPayments').html(sum);
-    let products = $('#ticketList tr[id^=product_]').length;
-    let paymentsTable = $('.payments-received-on-ticket').length;
-    if (parseFloat(rest) <= 0 && (products > 0 || paymentsTable === 1)){
-      $('#paymentRest').html(
-        '<strong>$ 0</strong>'
-      );
-      $('#currencyChange').html(
-        `<strong>$ ${(rest * -1).toFixed(2).replace(
-            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-          )}</strong>`
-      );
-      $('.paymentProcess').addClass('hidden');
-      $('#completeSale').removeClass('hidden');
-    } else {
-      $('#currencyChange').html(
-        '<strong> $0.00 </strong>'
-      );
-      $('#paymentRest').html(
-        `<strong>$ ${rest.replace(
-            /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-         )}</strong>`
-      );
-      $('#completeSale').addClass('hidden');
-      $('.paymentProcess').removeClass('hidden');
-      $('.payment-form-wrapper.paymentProcess button.selected').click();
-    }
-  }
-
   function sumaPayment(total, paymentType){
     let actualAmount = $(paymentType).find(
       'td[class*=cuantity]'
@@ -504,9 +469,13 @@ $(document).ready(function() {
     $('#discountRow').removeClass('hidden');
     $('#SubtotalRow').removeClass('hidden');
     $('#manualDiscountQuantity').parent().addClass('hidden')
+    ticketDiscInput = $('#globalDiscount input:first').val();
+    if (isNaN(parseFloat(ticketDiscInput))) {
+      ticketDiscInput = 0;
+    }
     $.each($('a[id^=discount]'), function(){
       $(this).html(
-        $('#globalDiscount input:first').val() + ' %'
+        ticketDiscInput + ' %'
       );
       let id = $(this).attr('id').replace(/discount_/,''),
           total = createTotal(id, true);
@@ -550,16 +519,6 @@ $(document).ready(function() {
     $('#cancelTicket').modal('hide');
   }
 
-  function isPago(){
-    return $('#tipoDeMovimiento button[class*=active]').html(
-    ).indexOf('Pago') > 0 ;
-  }
-
-  function isVenta(){
-    return $('#tipoDeMovimiento button[class*=active]').html(
-    ).indexOf('Venta') > 0 ;
-  }
-
   function validateAllInputsFill(){
     let allFill = true;
     $.each($('#ticketList input'), function(){
@@ -577,7 +536,8 @@ $(document).ready(function() {
     }
 
     if (!isVenta()) {
-      alert('algo pasa xD');
+      processDevolucion();
+      return false;
     }
     let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
 
@@ -701,98 +661,6 @@ $(document).ready(function() {
     }
 
   });
-
-  function translateInfo(info){
-    if (info === " NaN"){
-      return 0;
-    }
-    return info;
-  }
-
-  function createRealSubtotal(){
-    let discount = 0;
-    $.each($(`td[id^=priceTo]`), function(){
-      let price = 0;
-      if (!$(this).find('a').html()) {
-        price = $(this).find('input').val();
-      } else {
-        price = parseFloat($(this).find('a').html().replace(/\$|,/g,''));
-      }
-      let tr    = $(this).parent();
-      let cuantity    = parseInt($(tr).find(
-            'input[id^=cuantityTo]'
-          ).val().replace(/_/g,'')),
-          total       = price * cuantity,
-          discountval = parseFloat($(tr.find(
-            'a[id^=discount]'
-          ))
-          .html().replace(' %',''));
-      if (total.toString() === 'NaN'){
-        total = 0;
-      }
-
-      discount += parseFloat( ( parseFloat(discountval) / 100 * total).toFixed(2) );
-    });
-
-    $('#discountSum').html(
-      ` $ ${discount.toFixed(
-          2
-        ).replace(
-          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-        )}`
-    );
-
-    $('#savedSubtotal').html(
-      ` $ ${(
-        parseFloat($('#SubtotalSum').html().replace(
-          "$ ", ""
-        ).replace(/,/g,'')
-        ) + parseFloat(
-          translateInfo(
-            $('#discountSum').html().replace(
-              '$ ', ''
-            ).replace(/,/g,'')
-          )
-        )).toFixed(
-          2
-        ).replace(
-          /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-        )}`
-    );
-
-  }
-
-  function bigTotal(){
-    let subTotalInput = $('table.subtotal #SubtotalSum'),
-        taxSum        = 0,
-        subtotal      = 0;
-    $.each($(`td[id^=totalSinTo_]`), function(){
-      let productTotal = parseFloat(
-        $(this).html().replace('$ ', '').replace(/,/g,'')
-      );
-      productTotal = productTotal.toString() === 'NaN' ? 0 : productTotal;
-      subtotal += productTotal;
-      taxSum += Math.round(productTotal * 0.16 * 100) / 100;
-
-//      taxSum += parseFloat(parseFloat( (productTotal * 0.16).toFixed(3) ).toFixed(2) );
-    });
-    $(subTotalInput).html(`$ ${subtotal.toFixed(
-      2
-    ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`);
-
-    $('table.subtotal td.subtotal.iva').html(
-      `$ ${taxSum.toFixed(2).replace(
-        /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-      )}`
-    );
-    $('table.subtotal td.total, #paymentRest').html(
-      `<strong>$ ${(subtotal + parseFloat(taxSum)).toFixed(
-        2
-      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}</strong>`
-    );
-
-    createRealSubtotal();
-  }
 
   function createTotal(id){
     let cuantity = $(`input[id^=cuantityTo_${id}]`).val().replace(/_/g,''),
@@ -1042,8 +910,12 @@ $(document).ready(function() {
         $(modalBody).find('#discountMotive').val() +
       '</td>'
     );
+    discountInput = `${$(modalBody).find('#discountCount').val()}`;
+    if (isNaN(parseFloat(discountInput))) {
+      discountInput = 0;
+    }
     $(tr).find('a[id^=discount]').html(
-      `${$(modalBody).find('#discountCount').val()} %`
+      `${discountInput} %`
     );
     let total = createTotal(id);
     $(`#totalTo_${id}`).html(
@@ -1088,23 +960,6 @@ $(document).ready(function() {
       `id="service_1" data-id=${id}>` +
       '<i class="fa fa-truck" aria-hidden="true"></i>' +
       '</a>';
-  }
-
-  function translatePrice(price){
-    let convertPrice =  parseFloat(
-            price
-          ).toFixed(2);
-
-    if (convertPrice === "NaN") {
-      return price;
-    }
-    return ` $ ${convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
-  }
-
-  function stringPrice(price, id){
-    return `<a href="#" data-toggle="modal" data-target="#changeSinglePrice" data-id="${id}">` +
-      `${translatePrice(price)}` +
-    '</a>';
   }
 
   function addTr(product){
@@ -1239,7 +1094,6 @@ $(document).ready(function() {
 
 /* Métodos para cambiar botón de tipo de ventas*/
   $("#change-option").click(function () {
-
     /*Oculta las formas de pago no necesarias en esta sección*/
     $('#creditSale').removeClass('hidden');
     $('#returnCash').removeClass('hidden');
@@ -1285,49 +1139,13 @@ $(document).ready(function() {
     $('.payments-received-on-ticket').addClass('hidden');
 
     $('.second-search').addClass('hidden');
-  });
-
-  $("#return-option").click(function () {
-    $('#creditSale').addClass('hidden');
-    $('#returnCash').removeClass('hidden');
-    $('.items-sales').addClass('hidden');
-    $('.ticket-results').addClass('hidden');
-    $('.ticket-selected').addClass('hidden');
-    $('.items-returns').addClass('hidden');
-    $('.items-changes').addClass('hidden');
-    $('.extra-search').removeClass('hidden');
-    $('.main-search').addClass('hidden');
-    $('.items-sales').addClass('hidden');
-    /* Muestra una parte de la sección lateral derecha no necesaria para cotización */
-    $('.pay-forms-table').removeClass('hidden');
-    $('.payment-form-wrapper').removeClass('hidden');
-    $('.process-sale').removeClass('hidden');
-    $('.pause-stop').removeClass('hidden');
-
-    /*Esta sección muestra el botón elegido de la barra de navegación (también le da estilo) y oculta los demás botones*/
-    $('#return').removeClass('hidden');
-    $('#sale').addClass('hidden');
-    $('#change').addClass('hidden');
-    $('#advance').addClass('hidden');
-    $('#estimate').addClass('hidden');
-    $('#return').addClass('active-sale-option');
-    $('#sale').removeClass('active-sale-option');
-    $('#advance').removeClass('active-sale-option');
-    $('#change').removeClass('active-sale-option');
-    $('#estimate').removeClass('active-sale-option');
-
-    /*Esta sección oculta la opción elegida y muestra las demás*/
-    $("#return-option").addClass('hidden');
-    $("#sale-option").removeClass('hidden');
-    $("#change-option").removeClass('hidden');
-    $("#advance-option").removeClass('hidden');
-    $("#estimate-option").removeClass('hidden');
-    $('.payments-received-on-ticket').addClass('hidden');
-
-    $('.second-search').addClass('hidden');
+    bigTotal();
+    resumePayment();
   });
 
   $("#sale-option").click(function () {
+    $('.items-returns').addClass('hidden');
+    $('#devolucionTable tr').remove();
     $('#creditSale').removeClass('hidden');
     $('#returnCash').addClass('hidden');
     $('.extra-search').addClass('hidden');
@@ -1363,6 +1181,8 @@ $(document).ready(function() {
     $('.payments-received-on-ticket').addClass('hidden');
 
     $('.second-search').addClass('hidden');
+    bigTotal();
+    resumePayment();
   });
 
   $("#estimate-option").click(function () {
@@ -1405,6 +1225,8 @@ $(document).ready(function() {
     $('.payments-received-on-ticket').addClass('hidden');
 
     $('.second-search').addClass('hidden');
+    bigTotal();
+    resumePayment();
   });
 
 

@@ -1,24 +1,5 @@
 $(function(){
 
-  function recalculateTotal(product, percent, table){
-    if (table === 'products'){
-      let total = product.price.toFixed(2) * Math.abs(product.quantity);
-
-      return total * (1 - percent / 100);
-    } else {
-      let total = product.initial_price.toFixed(2) * Math.abs(product.quantity);
-
-      return parseFloat(total * (1 - percent / 100));
-    }
-  }
-
-  function recalculateDescount(product){
-    let realTotal = product.total - product.taxes,
-        percentPayment = realTotal * 100 / product.subtotal;
-
-    return 100 - parseFloat(percentPayment.toFixed(0));
-  }
-
   function addProspectTr(object){
     cfdiUseSelect = '';
     return '<tr>' +
@@ -163,7 +144,7 @@ $(function(){
   }
 
   function addTr(product){
-    let percent = recalculateDescount(product),
+    let percent = recalculateDiscount(product),
         total = recalculateTotal(product, percent, product.table),
         color = product.table === 'services' ? carIcon(product.id, product.delivery_company) :
         product.exterior_color_or_design,

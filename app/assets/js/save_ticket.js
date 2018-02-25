@@ -213,6 +213,62 @@ function addPaymentFormData(ticketData, payments, call){
   });
 }
 
+function processDevolucion(){
+  initStore().then(store => {
+    let user      = store.get('current_user').id,
+      storeObject = store.get('store');
+
+    ticketData = {
+      store : storeObject,
+      user  : store.get('current_user'),
+    };
+
+    let parentTicket = parseInt($('#ticket-id').html());
+    insertTicket(user, function(ticketId, parentTicket){
+        store.set('lastTicket', parseInt(
+          ticketId
+        ));
+        ticketData.parentTicket = parentTicket;
+
+        findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
+          ticketData.cashRegister = cashRegisterObject.rows[0];
+          findBy(
+            'id',
+            storeObject.business_unit_id,
+            'business_units'
+          ).then(business_unit => {
+            findBy(
+              'id',
+              business_unit.rows[0].billing_address_id,
+              'billing_addresses'
+            ).then(billing_address => {
+              ticketData.billing_address = billing_address.rows[0];
+              findBy(
+                'id',
+                ticketData.billing_address.tax_regime_id,
+                'tax_regimes'
+              ).then(tax_regime => {
+
+                ticketData.tax_regime = tax_regime.rows[0];
+                findBy('id', ticketId, 'tickets').then(ticket => {
+                  ticketData.ticket = ticket.rows[0];
+                  findBy('ticket_id', ticketId, 'payments').then(payments => {
+                    addPaymentFormData(ticketData, payments.rows, function(){
+                      printTicketDevolucion(ticketData, function(){
+                        window.location.href = 'pos_sale.html';
+                      })
+                    });
+                  });
+                });
+
+              });
+            });
+          });
+        });
+      });
+    });
+}
+
 function addPaymentToTicket(){
   initStore().then(store => {
     let user      = store.get('current_user').id,
