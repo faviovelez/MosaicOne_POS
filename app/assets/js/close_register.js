@@ -55,12 +55,19 @@ $(document).ready(function() {
         row.email = `pos_${row.email}`
       }
 
+      row.pos_id = objectId;
       sendObjects[table][objectId] = {
         object : row
       };
 
       sendObjects[table].processRow++;
-
+      updateBy(
+        {
+          pos_id : objectId
+        },
+        table,
+        `id = ${objectId}`
+      ).then(function(){});
       if (
         sendObjects[
           table
@@ -157,7 +164,7 @@ $(document).ready(function() {
             data: sendObjects,
             headers: { "Content-Type": "application/json" }
           };
-        client.post("http://34.214.130.203/pos/received_data", args, function (data, response) {
+        client.post("http://localhost:3000/pos/received_data", args, function (data, response) {
           delete sendObjects.installCode;
           delete sendObjects.storeId;
 

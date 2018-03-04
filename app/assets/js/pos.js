@@ -96,7 +96,7 @@ $(document).ready(function() {
   }
 
   function productAddChange(product){
-    return `<tr id="addProduct_${product.id}">` +
+    return `<tr id="addProduct_${product.productId}">` +
       '<td class="left">' +
       product.description +
       '</td>' +
@@ -251,7 +251,7 @@ $(document).ready(function() {
   $('#confirmAddProduct').click(function(){
     $('#confirmAddProduct').prop('disabled', true);
     downUpField = $('#addProductInput').val();
-    if (isNaN(parseInt(downUpField))) {
+    if (isNaN(parseInt(downUpField.replace(/_/g,'')))) {
       downUpField = 0;
     }
     let id = $('tr[id^=addProduct_]').attr(
@@ -342,7 +342,7 @@ $(document).ready(function() {
         options.push(
           {
             value: `${product.unique_code} ${product.description}`,
-            id:    product.id,
+            productId:    product.id,
             price: product.price,
             color: product.exterior_color_or_design || 'Sin Diseno',
             description: `${product.unique_code} ${product.description}`,
@@ -357,7 +357,7 @@ $(document).ready(function() {
             options.push(
               {
                 value: `${service.unique_code} ${service.description}`,
-                id:    service.id,
+                productId:    service.id,
                 table:  'services',
                 company: service.delivery_company ? service.delivery_company
                                                   : '',
@@ -517,15 +517,6 @@ $(document).ready(function() {
     deleteBy('tickets', `id = ${ticketId}`).then(() => {});
     $(`#ticket${ticketId}`).remove();
     $('#cancelTicket').modal('hide');
-  }
-
-  function validateAllInputsFill(){
-    let allFill = true;
-    $.each($('#ticketList input'), function(){
-      if($(this).val() === '')
-        allFill = false;
-    });
-    return allFill;
   }
 
   $('#completeSale').click(function() {
@@ -699,6 +690,14 @@ $(document).ready(function() {
     }
 
     return productTotal;
+  }
+
+  function cleanRows(){
+    $("tr[id*='product_'").each(function() {
+      $(this).remove();
+    });
+    bigTotal();
+    resumePayment();
   }
 
   function addEvents(id){
@@ -963,20 +962,19 @@ $(document).ready(function() {
   }
 
   function addTr(product){
+    product.id = product.productId
+    if ($(`#product_${product.id}_products`).length > 0)
+      return false;
+
     let color = product.table === 'services' ? carIcon(product.id, product.company) :
       product.color,
       description = product.table === 'products' ? '<a href="#" data-toggle="modal" ' +
       ` data-target="#productShow" data-id="${product.id}" data-table="${product.table}" >` +
       ` ${product.description} </a>` : product.description,
-      productInList = $(`#product_${product.id}`);
+      productInList = $(`tr[id^=product_${product.id}_services]`);
 
-    if (productInList.length === 1) {
-      if (product.table === 'products'){
-        return '';
-      } else {
+    if (productInList.length === 1)
         product.id = `${product.id}_${product.id}`;
-      }
-    }
 
     product.id = `${product.id}_${product.table}`;
 
@@ -984,7 +982,7 @@ $(document).ready(function() {
       '<input type="text" class="form-control ' +
       `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
 
-    return `<tr id="product_${product.id}"><td>` +
+    return `<tr id="product_${product.id}"><td id="infoTableName" class="hidden">${product.table}</td><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +
       'class="close center-close" aria-label="Close">' +
@@ -1141,9 +1139,12 @@ $(document).ready(function() {
     $('.second-search').addClass('hidden');
     bigTotal();
     resumePayment();
+    $('#prospectSearch').addClass('hidden');
+    $('#productSearch').addClass('hidden');
   });
 
   $("#sale-option").click(function () {
+    cleanRows();
     $('.items-returns').addClass('hidden');
     $('#devolucionTable tr').remove();
     $('#creditSale').removeClass('hidden');
@@ -1186,6 +1187,7 @@ $(document).ready(function() {
   });
 
   $("#estimate-option").click(function () {
+    cleanRows();
     /*Oculta las formas de pago no necesarias en esta sección*/
     $('#creditSale').removeClass('hidden');
     $('#returnCash').addClass('hidden');
@@ -1200,7 +1202,6 @@ $(document).ready(function() {
 
     /* Oculta una parte de la sección lateral derecha no necesaria para cotización */
     $('.pay-forms-table').addClass('hidden');
-    $('.payment-form-wrapper').addClass('hidden');
     $('.process-sale').addClass('hidden');
     $('.pause-stop').addClass('hidden');
 
@@ -1227,6 +1228,8 @@ $(document).ready(function() {
     $('.second-search').addClass('hidden');
     bigTotal();
     resumePayment();
+    $("[placeholder=Comentarios]").addClass("hidden");
+    $(".payment-form-wrapper").addClass("hidden");
   });
 
 

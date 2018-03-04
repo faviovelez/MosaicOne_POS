@@ -918,7 +918,8 @@ CREATE TABLE delivery_addresses (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     additional_references text,
-    name character varying
+    name character varying,
+    store_id integer
 );
 
 

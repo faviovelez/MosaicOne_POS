@@ -144,20 +144,19 @@ $(function(){
   }
 
   function addTr(product){
+    product.id = product.productId
+    if ($(`#product_${product.id}_products`).length > 0)
+      return false;
+
     let percent = recalculateDiscount(product),
         total = recalculateTotal(product, percent, product.table),
         color = product.table === 'services' ? carIcon(product.id, product.delivery_company) :
         product.exterior_color_or_design,
         price = '',
-        productInList = $(`#product_${product.id}`);
+        productInList = $(`tr[id^=product_${product.id}_services]`);
 
-    if (productInList.length === 1) {
-      if (product.table === 'products'){
-        return '';
-      } else {
-        product.id = `${product.id}_${product.id}`;
-      }
-    }
+    if (productInList.length === 1)
+      product.id = `${product.id}_${product.id}`;
 
     product.id = `${product.id}_${product.table}`;
 
@@ -168,7 +167,7 @@ $(function(){
       price = stringPrice(product.price, product.id);
     }
 
-    return `<tr id="product_${product.id}"><td>` +
+    return `<tr id="product_${product.id}"><td id="infoTableName" class="hidden">${product.table}</td><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +
       'class="close center-close" aria-label="Close">' +
@@ -331,7 +330,7 @@ $(function(){
     query(localQuery).then(storeMovementProducts => {
       storeMovementProducts.rows.forEach(product => {
         product.table = 'products';
-        product.id    = product.product_id;
+        product.productId    = product.product_id;
 
         $('#ticketList').append(addTr(product));
         addEvents(product.id);
@@ -358,7 +357,7 @@ $(function(){
         );
 
         service.table = 'services';
-        service.id    = service.service_id;
+        service.productId    = service.service_id;
         serviceId     = service.id;
 
         $('#ticketList').append(addTr(service));
@@ -681,6 +680,11 @@ $(function(){
 
   $('#ticketSave').click(function(){
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
+
+    if (!validateAllInputsFill()) {
+      alert('Favor de llenar todos los campos');
+      return false;
+    }
 
     if (!isNaN(parseInt(ticketId))){
       deleteTicket(ticketId);

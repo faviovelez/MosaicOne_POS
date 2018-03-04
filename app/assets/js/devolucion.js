@@ -29,6 +29,9 @@ $(function(){
           color = productOrService.table === 'services' ? carIcon(productOrService.id, productOrService.delivery_company) :
           productOrService.exterior_color_or_design,
           price = '',
+          description = productOrService.table === 'products' ? '<a href="#" data-toggle="modal" ' +
+          ` data-target="#productShow" data-id="${productOrService.id}" data-table="${productOrService.table}" >` +
+          `${productOrService.unique_code} ${productOrService.description} </a>` : productOrService.description
           productInList = $(`#product_${productOrService.id}`);
 
       if (productOrService.table === 'services'){
@@ -39,7 +42,7 @@ $(function(){
       }
 
       return `<tr id="productDevolucion_${productOrService.id}">` +
-        '<td>' +
+        `<td id="infoTableName" class="hidden">${productOrService.table}</td><td>` +
           '<div class="close-icon">' +
             `<button id="deleteDevolucion_${productOrService.id}" type="button" class="close center-close" aria-label="Close">` +
               '<span aria-hidden="true" class="white-light">&times;</span>' +
@@ -47,38 +50,35 @@ $(function(){
           '</div>' +
         '</td>' +
         '<td class="left">' +
-          '<a href="#" data-toggle="modal" data-target="#productShow"' +
-          `data-id="${productOrService.id}" data-table="${productOrService.table}" >` +
-          `${productOrService.unique_code} ${productOrService.description}` +
-          '</a>' +
+          description +
         '</td>' +
         `<td> ${color} </td>` +
-        `<td id="priceDevolucionTo_${productOrService.id}"> ${translatePrice(price)}` +
+        `<td id="priceToDevolucion_${productOrService.id}"> ${translatePrice(price)}` +
         '<td>' +
         '<input type="text" class="form-control smaller-form" ' +
-        `placeholder="1" data-valueLimit="${Math.abs(productOrService.quantity)}" id="cuantityDevolucionTo_${productOrService.id}" ` +
+        `placeholder="1" data-valueLimit="${Math.abs(productOrService.quantity)}" id="cuantityToDevolucion_${productOrService.id}" ` +
         `value="${Math.abs(productOrService.quantity)}">` +
         '</td>' +
-        `<td id="discountDevolucionTo_${productOrService.id}"> ${percent}% </td>` +
-        `<td class="right" id="totalDevolucionTo_${productOrService.id}">` +
+        `<td id="discountToDevolucion_${productOrService.id}"> ${percent}% </td>` +
+        `<td class="right" id="totalToDevolucion_${productOrService.id}">` +
         ` $ ${(total * 1.16).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
         `<td class="right hidden" id="totalSinTo_${productOrService.id}"> ${(total).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
       '</tr>';
     }
 
 function createDevolucionTotal(id){
-  let cuantity = $(`input[id^=cuantityDevolucionTo_${id}]`).val().replace(/_/g,''),
+  let cuantity = $(`input[id^=cuantityToDevolucion_${id}]`).val().replace(/_/g,''),
     price = 0;
-    priceElement = $(`td[id^=priceDevolucionTo_${id}] a`);
+    priceElement = $(`td[id^=priceToDevolucion_${id}] a`);
   if (!$(priceElement).html()){
-    price = $(`td[id^=priceDevolucionTo_${id}] input`).val();
+    price = $(`td[id^=priceToDevolucion_${id}] input`).val();
   } else {
     price    = parseFloat(
       $(priceElement).html().replace(' $ ','')
     );
   }
   let total =  parseFloat( (price * cuantity).toFixed(2) ),
-      discount = $(`td[id^=discountDevolucionTo_${id}]`)
+      discount = $(`td[id^=discountToDevolucion_${id}]`)
     .html().replace(' %',''),
     discountVal = parseFloat(parseFloat ( (parseFloat(discount) / 100 * total).toFixed(3) ).toFixed(2)),
     productTotal    = total - discountVal;
@@ -93,7 +93,7 @@ function addEvents(id, productOrServiceObject){
     bigTotal();
   });
 
-  $(`#cuantityDevolucionTo_${id}`).keyup(function(){
+  $(`#cuantityToDevolucion_${id}`).keyup(function(){
     let limitValue = parseInt($(this).attr('data-valueLimit'));
     let tryValue = parseInt($(this).val().replace(/_/g,''));
     if ( tryValue > limitValue ){
@@ -101,7 +101,7 @@ function addEvents(id, productOrServiceObject){
     }
 
     let total = createDevolucionTotal(id);
-    $(`#totalDevolucionTo_${id}`).html(
+    $(`#totalToDevolucion_${id}`).html(
         `$ ${(total * 1.16).toFixed(2).replace(
         /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
       )}`
@@ -146,7 +146,7 @@ const Inputmask = require('inputmask');
           $('#devolucionTable').append(devoluAddTr(product));
           addEvents(product.id, product);
           bigTotal();
-          let selector = $(`input[id^=cuantityDevolucionTo_${product.id}]`);
+          let selector = $(`input[id^=cuantityToDevolucion_${product.id}]`);
           var im = new Inputmask("99999999");
           im.mask(selector);
         });
@@ -181,13 +181,14 @@ const Inputmask = require('inputmask');
             $('table.subtotal td.total strong').html('$ 0.00');
             $('#resultTicketList tr').remove();
             $('#resultOfTicketSearch table').remove();
+            $('#devolucionTable tr').remove();
             $('#ticketTotalId').remove();
             $('.items-returns').addClass('hidden');
             addSearchTicketTr(ticket).then(trInfo => {
               $('#resultTicketList').append(trInfo);
               $('.ticket-results').removeClass('hidden');
               $(`#ticketNumber${ticket.id}`).click(function(){
-                
+
                 $('.ticket-results').addClass('hidden');
                 loadDevelocionTable(ticket);
               })
@@ -200,6 +201,7 @@ const Inputmask = require('inputmask');
   }
 
   $("#return-option").click(function () {
+    $('.btn-group').removeClass('open');
     $('#ticketList tr').remove();
     $('#creditSale').addClass('hidden');
     $('#returnCash').removeClass('hidden');
@@ -238,6 +240,9 @@ const Inputmask = require('inputmask');
     $('.payments-received-on-ticket').addClass('hidden');
 
     $('.second-search').addClass('hidden');
+    $('#prospectSearch').addClass('hidden');
+    $('#productSearch').addClass('hidden');
+
     bigTotal();
     $('.paymentProcess').addClass('hidden');
     $('#completeSale').removeClass('hidden');

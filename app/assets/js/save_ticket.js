@@ -30,14 +30,13 @@ function iterateInventories(products, call){
 
 }
 
-function createTicketProductJson(call){
+function createTicketProductJson(call, selector = 'ticketList'){
   json = {};
   let idsCollection = [];
 
-  $.each($('#ticketList tr'), function(){
-    let id = $(this).attr('id').replace(/product_|_products|_services/g,''),
-        regex = new RegExp(`.*_`),
-        table = $(this).attr('id').replace(regex, '');
+  $.each($(`#${selector} tr`), function(){
+    let id = $(this).attr('id').replace(/product_|_products|_services|productDevolucion_/g,''),
+        table = $(this).find('#infoTableName').html();
 
     if(table === 'products') {
       productsJson[id] = {
@@ -67,10 +66,12 @@ function createTicketProductJson(call){
   if (idsCollection.length > 0){
     getOnly('products', idsCollection).then(products => {
       iterateInventories(products, function(){
+//        debugger
         return call();
       });
     });
   } else {
+//    debugger
     return call();
   }
 
@@ -213,6 +214,35 @@ function addPaymentFormData(ticketData, payments, call){
   });
 }
 
+function devolucionPayment(ticketId, userId, store, call){
+  let data = {
+    payment_date     : clearDate(new Date()),
+    user_id          : userId,
+    business_unit_id : store.business_unit_id,
+    payment_form_id  : 1,
+    payment_type     : 'devolución',
+    ticket_id        : ticketId,
+    payment_number   : 1,
+    total            : $(this).find('td.cuantity').html().replace('$ ','').replace(/,/g,'')
+  };
+
+  insert(
+    Object.keys(data),
+    Object.values(data),
+    'payments'
+  ).then(paymentObject => {
+      data = null;
+      count++;
+      return call(paymentObject.rows[0]);
+  });
+}
+
+function processProductToDevolucion(userId, ticketId, call){
+  storeMovementArray = [];
+  let warehouseInfo = {};
+  assignCostcount = 0;
+}
+
 function processDevolucion(){
   initStore().then(store => {
     let user      = store.get('current_user').id,
@@ -222,51 +252,56 @@ function processDevolucion(){
       store : storeObject,
       user  : store.get('current_user'),
     };
+    createTicketProductJson(function(){
+      let parentTicket = parseInt($('#ticket-id').html());
+      insertTicket(user, function(ticketId, parentTicket){
+          store.set('lastTicket', parseInt(
+            ticketId
+          ));
+          ticketData.parentTicket = parentTicket;
 
-    let parentTicket = parseInt($('#ticket-id').html());
-    insertTicket(user, function(ticketId, parentTicket){
-        store.set('lastTicket', parseInt(
-          ticketId
-        ));
-        ticketData.parentTicket = parentTicket;
-
-        findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
-          ticketData.cashRegister = cashRegisterObject.rows[0];
-          findBy(
-            'id',
-            storeObject.business_unit_id,
-            'business_units'
-          ).then(business_unit => {
-            findBy(
-              'id',
-              business_unit.rows[0].billing_address_id,
-              'billing_addresses'
-            ).then(billing_address => {
-              ticketData.billing_address = billing_address.rows[0];
+          devolucionPayment(ticketId, user, storeObject, function(paymentObject){
+            ticketData.payments[paymentObject.id] = paymentObject;
+            ticketData.payments[paymentObject.id].paymentForm = 'Efectivo';
+            findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
+              ticketData.cashRegister = cashRegisterObject.rows[0];
               findBy(
                 'id',
-                ticketData.billing_address.tax_regime_id,
-                'tax_regimes'
-              ).then(tax_regime => {
+                storeObject.business_unit_id,
+                'business_units'
+              ).then(business_unit => {
+                findBy(
+                  'id',
+                  business_unit.rows[0].billing_address_id,
+                  'billing_addresses'
+                ).then(billing_address => {
+                  ticketData.billing_address = billing_address.rows[0];
+                  findBy(
+                    'id',
+                    ticketData.billing_address.tax_regime_id,
+                    'tax_regimes'
+                  ).then(tax_regime => {
 
-                ticketData.tax_regime = tax_regime.rows[0];
-                findBy('id', ticketId, 'tickets').then(ticket => {
-                  ticketData.ticket = ticket.rows[0];
-                  findBy('ticket_id', ticketId, 'payments').then(payments => {
-                    addPaymentFormData(ticketData, payments.rows, function(){
-                      printTicketDevolucion(ticketData, function(){
-                        window.location.href = 'pos_sale.html';
-                      })
+                    ticketData.tax_regime = tax_regime.rows[0];
+                    findBy('id', ticketId, 'tickets').then(ticket => {
+                      ticketData.ticket = ticket.rows[0];
+                      findBy('ticket_id', ticketId, 'payments').then(payments => {
+                        addPaymentFormData(ticketData, payments.rows, function(){
+                          printTicketDevolucion(ticketData, function(){
+                            window.location.href = 'pos_sale.html';
+                          })
+                        });
+                      });
                     });
+
                   });
                 });
-
               });
             });
           });
-        });
-      });
-    });
+        }, 'devolución');
+    }, 'devolucionTable')
+  });
 }
 
 function addPaymentToTicket(){
@@ -497,9 +532,9 @@ function insertsServiceOffereds(ticketId, call){
         serviceOffered => {
 
           let element = `#${serviceOffered.lastId} td:last`;
-          let deliveryServiceId = $(`${element}`).html();
+          let deliveryServiceId = $(`#${serviceOffered.lastId}`).find('td[id^=deliveryService]').html();
 
-          if ($(`${element}`).attr('id').indexOf('totalSinTo_') > -1 || $(`${element}`).attr('id').indexOf('discountReasonTo_') > -1){
+          if (!deliveryServiceId){
             serviceOfferedCount++;
             if (serviceOfferedCount === Object.keys(servicesJson).length){
               return call();
@@ -554,11 +589,6 @@ function assignCost(userId, ticketType, ticketId, call) {
           finalPrice      = Math.round(unitPrice * (1 - discountPercent) * 100) / 100,
           discount        = Math.round(subtotal * discountPercent * 100 ) / 100,
           taxes           = Math.round((subtotal - discount) * 0.16 * 100) / 100,
-//          unitPrice       = parseFloat(parseFloat((productsJson[productId].price).toFixed(3)).toFixed(2)),
-//          subtotal        = parseFloat(parseFloat((unitPrice * sellQuantity).toFixed(3)).toFixed(2)),
-//          finalPrice      = parseFloat(parseFloat((unitPrice * (1 - discountPercent)).toFixed(3)).toFixed(2)),
-//          discount        = parseFloat(parseFloat((subtotal * discountPercent).toFixed(3)).toFixed(2)),
-//          taxes           = parseFloat(parseFloat(((subtotal - discount) * 0.16).toFixed(3)).toFixed(2)),
           total           = subtotal - discount + taxes,
           prospectId   = $('#prospectList a').attr('data-id'),
           data = {
@@ -693,7 +723,6 @@ function saveExpenses(ticket_id, call){
 function insertsPayments(ticketType, ticketId, userId, store, call) {
   limit = $('tr[id^=paymentMethod_]').length;
   count = 0;
-  balanceSum = 0;
 
   if (limit === 0){
     return call();

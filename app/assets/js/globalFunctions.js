@@ -179,6 +179,15 @@ function displayTicketInfo(ticket, extraAction = false){
   });
 }
 
+function validateAllInputsFill(){
+  let allFill = true;
+  $.each($('#ticketList input'), function(){
+    if($(this).val() === '')
+      allFill = false;
+  });
+  return allFill;
+}
+
 function deleteIcon(){
   return `<div class="close-icon invisible">` +
     '<button type="button" class="close center-close" aria-label="Close">' +
@@ -188,9 +197,9 @@ function deleteIcon(){
 }
 
 function addDevelocionIcon(productId){
-  return `<div class="close-icon">` +
+  return `<div class="close-icon blue-button">` +
     `<button type="button" id="addToDevelucionTable_${productId}" class="close center-close" aria-label="Close">` +
-      '<span aria-hidden="true" class="white-light">&times;</span>' +
+      '<span aria-hidden="true" class="white-light">+</span>' +
     '</button>' +
   '</div>';
 }

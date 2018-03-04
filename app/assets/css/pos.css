@@ -22,10 +22,16 @@
   padding-left: 0;
 }
 
-table.ticket-selected {
-    width: 95%;
-    margin-left: 2.5%;
-    margin-right: 2.5%;
+.blue-button {
+  background-color: #00A8EA !important;
+}
+
+table.ticket-selected,
+table.payments-received-on-ticket,
+table.items-returns {
+  width: 95%;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
 }
 
 table.payments-received-on-ticket {

@@ -43,7 +43,8 @@ const storeIdsTables = [
   "warehouses",
   "withdrawals",
   "billing_addresses",
-  "tickets_children"
+  "tickets_children",
+  'delivery_services'
 ];
 
 async function initStore(){
@@ -73,6 +74,7 @@ async function runQuery(q, client, lastId, table){
           err : true
         };
       } else {
+//        debugger
         console.log(err);
       }
     }
