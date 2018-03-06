@@ -69,7 +69,7 @@ function createTicketProductListDevolucion(productList, discount, call){
   }
 }
 
-function initTicketPayment(ticketData, call) {
+function initTicketDevolucion(ticketData, call) {
   createTicketProductListDevolucion(ticketData.products, ticketData.parentTicket, function(productsCad){
     return call('<!DOCTYPE html>' +
       '<html lang="es">' +
@@ -182,7 +182,7 @@ function initTicketPayment(ticketData, call) {
       '<tr>' +
       '<td colspan="2" style="text-align:left">' +
       '<strong>' +
-      'Total pagado:' +
+      'Total devuelto:' +
       '</strong>' +
       '</td>' +
       '<td colspan="2" style="text-align:right">' +
@@ -266,26 +266,27 @@ function createHtmlFilePayment(html, ticketId){
   }
 }
 
-function printTicketPayment(ticketInfo, call){
+function printTicketDevolucion(ticketInfo, call){
   const remotePraintTicketPayment = require('electron').remote;
   let winTicketPayment = null;
   winTicketPayment = new remotePraintTicketPayment.BrowserWindow({width: 800, height: 600, show: false });
+  getTicketsElements(ticketInfo.ticket.id, function(products){
+    ticketInfo.products = products;
+    findBy('id', ticketInfo.store.delivery_address_id, 'delivery_addresses').then(deliveryAddress => {
+      ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
+      initTicketDevolucion(ticketInfo, function(htmlContent){
 
-  findBy('id', ticketInfo.store.delivery_address_id, 'delivery_addresses').then(deliveryAddress => {
-    ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
-    initTicketPayment(ticketInfo, function(htmlContent){
+        createHtmlFilePayment(htmlContent, ticketInfo.ticket.id);
+        winTicketPayment.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
 
-      createHtmlFilePayment(htmlContent, ticketInfo.ticket.id);
-      winTicketPayment.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
+        let contents = win.webContents;
+        winTicketPayment.webContents.on('did-finish-load', () => {
+          winTicketPayment.webContents.print({silent: true});
+          winTicketPayment = null;
+          return call();
+        });
 
-      let contents = win.webContents;
-      winTicketPayment.webContents.on('did-finish-load', () => {
-        winTicketPayment.webContents.print({silent: true});
-        winTicketPayment = null;
-        return call();
       });
-
     });
   });
-
 }

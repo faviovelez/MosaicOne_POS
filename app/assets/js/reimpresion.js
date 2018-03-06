@@ -1,6 +1,11 @@
 const localRemote = require('electron').remote;
+const userHomeRePrint = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+
 let localWin = null;
 
+// function reimpresion(ticketId) {
+//     cmd.get(`chrome --kiosk-printing --kiosk ${userHomeRePrint}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketId}.html`);
+// }
 
 function reimpresion(ticketId) {
   localWin = new localRemote.BrowserWindow({width: 800, height: 600, show: false });

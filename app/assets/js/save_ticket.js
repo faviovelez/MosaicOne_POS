@@ -30,7 +30,7 @@ function iterateInventories(products, call){
 
 }
 
-function createTicketProductJson(call, selector = 'ticketList'){
+function createTicketProductJson(call, selector = 'ticketList', discountSelector = 'a[id^=discount]', priceSelector = 'td[id^=priceTo] a'){
   json = {};
   let idsCollection = [];
 
@@ -42,9 +42,9 @@ function createTicketProductJson(call, selector = 'ticketList'){
       productsJson[id] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val().replace(/_/g,'')),
         sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
-        discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
+        discount       : parseFloat($(this).find(discountSelector).html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html(),
-        price          : parseFloat($(this).find('td[id^=priceTo] a').html().replace('$ ','').replace(/,/g,''))
+        price          : parseFloat($(this).find(priceSelector).html().replace('$ ','').replace(/,/g,''))
       };
 
       idsCollection.push(
@@ -55,7 +55,7 @@ function createTicketProductJson(call, selector = 'ticketList'){
       servicesJson[$(this).attr('id')] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val().replace(/_/g,'')),
         sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
-        discount       : parseFloat($(this).find('td a[id^=discount_]').html().replace(/\s|%|,/g,'')),
+        discount       : parseFloat($(this).find(discountSelector).html().replace(/\s|%|,/g,'')),
         discountReason : $(this).find('td[id^=discountReasonTo]').html(),
         selector       : $(this).attr('id')
       };
@@ -223,7 +223,7 @@ function devolucionPayment(ticketId, userId, store, call){
     payment_type     : 'devolución',
     ticket_id        : ticketId,
     payment_number   : 1,
-    total            : $(this).find('td.cuantity').html().replace('$ ','').replace(/,/g,'')
+    total            : $('.bigger.total strong').html().replace('$ ','').replace(/,/g,'')
   };
 
   insert(
@@ -232,8 +232,9 @@ function devolucionPayment(ticketId, userId, store, call){
     'payments'
   ).then(paymentObject => {
       data = null;
-      count++;
-      return call(paymentObject.rows[0]);
+      findBy('id', paymentObject.lastId, 'payments').then(function(paymentFullObject){
+        return call(paymentFullObject.rows[0]);
+      });
   });
 }
 
@@ -251,6 +252,7 @@ function processDevolucion(){
     ticketData = {
       store : storeObject,
       user  : store.get('current_user'),
+      payments : {}
     };
     createTicketProductJson(function(){
       let parentTicket = parseInt($('#ticket-id').html());
@@ -259,48 +261,51 @@ function processDevolucion(){
             ticketId
           ));
           ticketData.parentTicket = parentTicket;
-
-          devolucionPayment(ticketId, user, storeObject, function(paymentObject){
-            ticketData.payments[paymentObject.id] = paymentObject;
-            ticketData.payments[paymentObject.id].paymentForm = 'Efectivo';
-            findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
-              ticketData.cashRegister = cashRegisterObject.rows[0];
-              findBy(
-                'id',
-                storeObject.business_unit_id,
-                'business_units'
-              ).then(business_unit => {
-                findBy(
-                  'id',
-                  business_unit.rows[0].billing_address_id,
-                  'billing_addresses'
-                ).then(billing_address => {
-                  ticketData.billing_address = billing_address.rows[0];
+          devolucionStoreMovement(parentTicket, ticketId, function(){
+            devolucionServiceOffered(parentTicket, ticketId, function(){
+              devolucionPayment(ticketId, user, storeObject, function(paymentObject){
+                ticketData.payments[paymentObject.id] = paymentObject;
+                ticketData.payments[paymentObject.id].paymentForm = 'Efectivo';
+                findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
+                  ticketData.cashRegister = cashRegisterObject.rows[0];
                   findBy(
                     'id',
-                    ticketData.billing_address.tax_regime_id,
-                    'tax_regimes'
-                  ).then(tax_regime => {
+                    storeObject.business_unit_id,
+                    'business_units'
+                  ).then(business_unit => {
+                    findBy(
+                      'id',
+                      business_unit.rows[0].billing_address_id,
+                      'billing_addresses'
+                    ).then(billing_address => {
+                      ticketData.billing_address = billing_address.rows[0];
+                      findBy(
+                        'id',
+                        ticketData.billing_address.tax_regime_id,
+                        'tax_regimes'
+                      ).then(tax_regime => {
 
-                    ticketData.tax_regime = tax_regime.rows[0];
-                    findBy('id', ticketId, 'tickets').then(ticket => {
-                      ticketData.ticket = ticket.rows[0];
-                      findBy('ticket_id', ticketId, 'payments').then(payments => {
-                        addPaymentFormData(ticketData, payments.rows, function(){
-                          printTicketDevolucion(ticketData, function(){
-                            window.location.href = 'pos_sale.html';
-                          })
+                        ticketData.tax_regime = tax_regime.rows[0];
+                        findBy('id', ticketId, 'tickets').then(ticket => {
+                          ticketData.ticket = ticket.rows[0];
+                          findBy('ticket_id', ticketId, 'payments').then(payments => {
+                            addPaymentFormData(ticketData, payments.rows, function(){
+                              printTicketDevolucion(ticketData, function(){
+                                window.location.href = 'pos_sale.html';
+                              })
+                            });
+                          });
                         });
+
                       });
                     });
-
                   });
                 });
               });
             });
           });
-        }, 'devolución');
-    }, 'devolucionTable')
+        }, 'devolución', parentTicket);
+    }, 'devolucionTable', 'td[id^=discountToDevolucion_]', 'td[id^=priceTo]')
   });
 }
 
@@ -395,6 +400,10 @@ function insertTicket(userId, call, type, parentTicket = null){
         cash_return      : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
       cfdi_use_id     : $('#prospect_cfdi_use').val()
   };
+
+  if (type === "devolución") {
+    data.payments_amount = $('.bigger.total strong').html().replace('$ ','').replace(/,/g,'');
+  }
 
   setPayedLogic(data);
 
@@ -560,6 +569,154 @@ function insertsServiceOffereds(ticketId, call){
     });
 
   }
+}
+
+function createWareHouseEntry(insertData){
+  insert(
+    Object.keys(insertData),
+    Object.values(insertData),
+    'stores_warehouse_entries'
+  ).then(function(){});
+}
+
+function devolucionServiceOffered(parentTicket, ticketId, call){
+  let promises = [];
+  if ($.isEmptyObject(servicesJson)){
+    return call();
+  }
+
+  for (var referenceId in servicesJson){
+    let serviceId = referenceId.replace('productDevolucion_','')
+    promises.push(
+      new Promise(function(localResolve){
+        getAll(
+          'service_offereds',
+          '*',
+          `ticket_id = ${parentTicket} AND id = ${serviceId}`
+        ).then(function(serviceOfferedObject){
+          let data = {};
+          serviceOfferedData = serviceOfferedObject.rows[0];
+          Object.keys(serviceOfferedData).forEach(function(attr){
+            if (serviceOfferedData[attr] !== null) {
+              data[attr] = serviceOfferedData[attr];
+            }
+          });
+          data.service_type = 'devolución'
+          data.ticket_id = ticketId;
+          sellQuantity    = servicesJson[referenceId].sellQuantity,
+          discountPercent = parseFloat(servicesJson[referenceId].discount) / 100,
+          unitPrice       = parseFloat($(`#${servicesJson[referenceId].selector}`).find(
+        'td[id^=priceTo]'
+      ).html().replace('$ ','').replace(/,/g,'')),
+          subtotal        = Math.round(unitPrice * sellQuantity * 100) / 100,
+          finalPrice      = Math.round(unitPrice * (1 - discountPercent) * 100) / 100,
+          discount        = Math.round(subtotal * discountPercent * 100 ) / 100,
+          taxes           = Math.round((subtotal - discount) * 0.16 * 100) / 100,
+          total           = subtotal - discount + taxes;
+          data.total = total;
+          data.subtotal = subtotal;
+          data.taxes = taxes;
+          data.discount_applied = discount;
+          data.final_price = finalPrice;
+          data.quantity = sellQuantity;
+          data.total_cost = sellQuantity * data.cost;
+          delete data.created_at;
+          delete data.updated_at;
+          delete data.id;
+          delete data.store_id;
+          delete data.pos;
+          delete data.web;
+          insert(
+            Object.keys(data),
+            Object.values(data),
+            'service_offereds'
+          ).then(function(){
+            localResolve();
+          });
+        });
+      })
+    );
+  }
+
+  Promise.all(promises).then(function(){
+    return call();
+  });
+}
+
+function devolucionStoreMovement(parentTicket, ticketId, call) {
+  let promises = [];
+  storeMovementArray = [];
+  if ($.isEmptyObject(productsJson)){
+    return call();
+  }
+  for (var productId in productsJson){
+    promises.push(
+      new Promise(function(localResolve){
+        getAll(
+          'store_movements',
+          '*',
+          `ticket_id = ${parentTicket} AND product_id = ${productId}`
+        ).then(function(storeMovementObject){
+          createWareHouseEntry({
+            product_id: productId,
+            quantity: storeMovementObject.rows[0].quantity,
+            store_movement_id: storeMovementObject.rows[0].id
+          });
+          return localResolve(storeMovementObject.rows[0]);
+        });
+      })
+    );
+  }
+
+  Promise.all(promises).then(function(storesMovements){
+    storesMovements.forEach(function(storeMovementData){
+      storeMovementData.movement_type = 'devolucion';
+      storeMovementData.ticket_id = ticketId;
+      let data = {},
+      sellQuantity    = productsJson[productId].sellQuantity,
+      discountPercent = parseFloat(productsJson[productId].discount) / 100,
+      unitPrice       = Math.round(productsJson[productId].price * 100) / 100,
+      subtotal        = Math.round(unitPrice * sellQuantity * 100) / 100,
+      finalPrice      = Math.round(unitPrice * (1 - discountPercent) * 100) / 100,
+      discount        = Math.round(subtotal * discountPercent * 100 ) / 100,
+      taxes           = Math.round((subtotal - discount) * 0.16 * 100) / 100,
+      total           = subtotal - discount + taxes;
+      storeMovementData.total = total;
+      storeMovementData.subtotal = subtotal;
+      storeMovementData.taxes = taxes;
+      storeMovementData.discount_applied = discount;
+      storeMovementData.final_price = finalPrice;
+      storeMovementData.quantity = sellQuantity;
+      storeMovementData.total_cost = sellQuantity * storeMovementData.cost;
+      delete storeMovementData.created_at;
+      delete storeMovementData.updated_at;
+      delete storeMovementData.id;
+      delete storeMovementData.store_id;
+      delete storeMovementData.pos;
+      delete storeMovementData.web;
+      findBy(
+        'product_id',
+         storeMovementData.product_id,
+         'stores_inventories',
+         storeMovementData.quantity
+       ).then(inventory => {
+        updateBy(
+          {
+            quantity: (inventory.rows[0].quantity + inventory.lastId)
+          },
+          'stores_inventories',
+          `id = ${inventory.rows[0].id}`
+        ).then(function(){
+          Object.keys(storeMovementData).forEach(function(attr){
+            if (storeMovementData[attr] !== null) {
+              data[attr] = storeMovementData[attr];
+            }
+          });
+          createStoreMovement(data, call);
+        });
+      });
+    });
+  });
 }
 
 function assignCost(userId, ticketType, ticketId, call) {

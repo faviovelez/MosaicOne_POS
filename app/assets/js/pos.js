@@ -526,10 +526,11 @@ $(document).ready(function() {
       return false;
     }
 
-    if (!isVenta()) {
+    if (isDevolucion()) {
       processDevolucion();
       return false;
     }
+    
     let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
 
     if (!isNaN(parseInt(restoreTicketId))){

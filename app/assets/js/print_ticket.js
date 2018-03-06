@@ -1,5 +1,7 @@
 // Print logic starts
 const remote = require('electron').remote;
+var cmd=require('node-cmd');
+const userHome = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
 let win = null;
 
@@ -444,21 +446,6 @@ function createHtmlFile(html, ticketId){
   }
 }
 
-function getTicketsElements(ticketId, call){
-  findBy('ticket_id', ticketId, 'store_movements').then(storeMovements => {
-    let objects = {
-      storeMovements : storeMovements.rows
-    };
-
-    findBy('ticket_id', ticketId, 'service_offereds').then(serviceOffereds => {
-      objects.serviceOffereds = serviceOffereds.rows;
-      return call(objects);
-    });
-
-  });
-}
-
-
 function restoreStoreInventories(productId, quantity){
     findBy('product_id', productId, 'stores_inventories').then(inventory => {
       updateBy(
@@ -574,6 +561,9 @@ function printTicket(ticketInfo, call){
         initTicket(ticketInfo, function(htmlContent){
 
           createHtmlFile(htmlContent, ticketInfo.ticket.id);
+
+//          cmd.get(`chrome --kiosk-printing --kiosk ${userHome}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketInfo.ticket.id}.html`);
+
           win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
 
           let contents = win.webContents;
@@ -581,15 +571,15 @@ function printTicket(ticketInfo, call){
             win.webContents.print({silent: true});
             win = null;
             return call();
-          });
+          }); // win.webContents.on
 
-        });
+        }); //initTicket
 
-      });
+      }); // findBy
 
-    });
+    }); // getTicketsElements (function)
   } catch (err) {
      rollBackData();
   }
 
-}
+} // printTicket

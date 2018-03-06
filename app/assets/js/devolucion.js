@@ -28,18 +28,11 @@ $(function(){
           total = recalculateTotal(productOrService, percent, productOrService.table),
           color = productOrService.table === 'services' ? carIcon(productOrService.id, productOrService.delivery_company) :
           productOrService.exterior_color_or_design,
-          price = '',
+          price = productOrService.table === 'products' ? productOrService.price : productOrService.initial_price,
           description = productOrService.table === 'products' ? '<a href="#" data-toggle="modal" ' +
           ` data-target="#productShow" data-id="${productOrService.id}" data-table="${productOrService.table}" >` +
           `${productOrService.unique_code} ${productOrService.description} </a>` : productOrService.description
           productInList = $(`#product_${productOrService.id}`);
-
-      if (productOrService.table === 'services'){
-        price ='<input type="text" class="form-control ' +
-        `smaller-form" id="priceToServiceTo_${productOrService.id}" value="${productOrService.initial_price}">`;
-      } else {
-        price = stringPrice(productOrService.price, productOrService.id);
-      }
 
       return `<tr id="productDevolucion_${productOrService.id}">` +
         `<td id="infoTableName" class="hidden">${productOrService.table}</td><td>` +
@@ -69,7 +62,7 @@ $(function(){
 function createDevolucionTotal(id){
   let cuantity = $(`input[id^=cuantityToDevolucion_${id}]`).val().replace(/_/g,''),
     price = 0;
-    priceElement = $(`td[id^=priceToDevolucion_${id}] a`);
+    priceElement = $(`td[id^=priceToDevolucion_${id}]`);
   if (!$(priceElement).html()){
     price = $(`td[id^=priceToDevolucion_${id}] input`).val();
   } else {
@@ -90,7 +83,7 @@ function addEvents(id, productOrServiceObject){
 
   $(`button[id=deleteDevolucion_${id}]`).click(function(){
     $(this).parents('tr').remove();
-    bigTotal();
+    bigTotal('td[id^=discountToDevolucion_]');
   });
 
   $(`#cuantityToDevolucion_${id}`).keyup(function(){
@@ -113,14 +106,17 @@ function addEvents(id, productOrServiceObject){
       )}`
     );
 
-    bigTotal();
+    bigTotal('td[id^=discountToDevolucion_]');
   });
 
   $(`button[id=addToDevelucionTable_${id}]`).click(function(){
     if ($(`#productDevolucion_${productOrServiceObject.id}`).length === 0) {
       $('#devolucionTable').append(devoluAddTr(productOrServiceObject));
-      bigTotal();
+      bigTotal('td[id^=discountToDevolucion_]');
       addEvents(productOrServiceObject.id, productOrServiceObject);
+      let selector = $(`input[id^=cuantityToDevolucion_${productOrServiceObject.id}]`);
+      var im = new Inputmask("99999999");
+      im.mask(selector);
     }
   });
 
@@ -145,7 +141,7 @@ const Inputmask = require('inputmask');
 
           $('#devolucionTable').append(devoluAddTr(product));
           addEvents(product.id, product);
-          bigTotal();
+          bigTotal('td[id^=discountToDevolucion_]');
           let selector = $(`input[id^=cuantityToDevolucion_${product.id}]`);
           var im = new Inputmask("99999999");
           im.mask(selector);
@@ -164,8 +160,10 @@ const Inputmask = require('inputmask');
 
           $('#devolucionTable').append(devoluAddTr(service));
           addEvents(service.id, service);
-          bigTotal();
-
+          bigTotal('td[id^=discountToDevolucion_]');
+          let selector = $(`input[id^=cuantityToDevolucion_${service.id}]`);
+          var im = new Inputmask("99999999");
+          im.mask(selector);
         });
       });
     });
@@ -243,7 +241,7 @@ const Inputmask = require('inputmask');
     $('#prospectSearch').addClass('hidden');
     $('#productSearch').addClass('hidden');
 
-    bigTotal();
+    bigTotal('td[id^=discountToDevolucion_]');
     $('.paymentProcess').addClass('hidden');
     $('#completeSale').removeClass('hidden');
     initTicketSearch();

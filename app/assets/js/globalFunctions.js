@@ -348,7 +348,21 @@ function resumePayment(){
   }
 }
 
-function createRealSubtotal(){
+function getTicketsElements(ticketId, call){
+  findBy('ticket_id', ticketId, 'store_movements').then(storeMovements => {
+    let objects = {
+      storeMovements : storeMovements.rows
+    };
+
+    findBy('ticket_id', ticketId, 'service_offereds').then(serviceOffereds => {
+      objects.serviceOffereds = serviceOffereds.rows;
+      return call(objects);
+    });
+
+  });
+}
+
+function createRealSubtotal(discountSelector = 'a[id^=discount]'){
   let discount = 0;
   $.each($(`td[id^=priceTo]`), function(){
     let price = 0;
@@ -363,9 +377,8 @@ function createRealSubtotal(){
         ).val().replace(/_/g,'')),
         total       = price * cuantity,
         discountval = parseFloat($(tr.find(
-          'a[id^=discount]'
-        ))
-        .html().replace(' %',''));
+          discountSelector
+        )).html().replace(' %',''));
     if (total.toString() === 'NaN'){
       total = 0;
     }
@@ -401,7 +414,7 @@ function createRealSubtotal(){
 
 }
 
-  function bigTotal(){
+  function bigTotal(discountSelector = 'a[id^=discount]'){
     let subTotalInput = $('table.subtotal #SubtotalSum'),
         taxSum        = 0,
         subtotal      = 0;
@@ -430,5 +443,5 @@ function createRealSubtotal(){
       ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}</strong>`
     );
 
-    createRealSubtotal();
+    createRealSubtotal(discountSelector);
   }
