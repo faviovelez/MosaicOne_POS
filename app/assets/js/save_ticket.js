@@ -215,17 +215,25 @@ function addPaymentFormData(ticketData, payments, call){
 }
 
 function devolucionPayment(ticketId, userId, store, call){
-  let data = {
+  let paymentJson = {
+    'cash'        : 1,
+    'debit'       : 18,
+    'credit'     : 4,
+    'check'      : 2,
+    'transfer'   : 3,
+
+  },
+    data = {
     payment_date     : clearDate(new Date()),
     user_id          : userId,
     business_unit_id : store.business_unit_id,
-    payment_form_id  : 1,
+    payment_form_id  : paymentJson[$('.paymentProcess button:not(.hidden).selected').attr('id')],
     payment_type     : 'devolución',
     ticket_id        : ticketId,
     payment_number   : 1,
     total            : $('.bigger.total strong').html().replace('$ ','').replace(/,/g,'')
   };
-
+  
   insert(
     Object.keys(data),
     Object.values(data),

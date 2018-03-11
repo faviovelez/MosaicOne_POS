@@ -1054,7 +1054,8 @@ CREATE TABLE delivery_services (
     web boolean DEFAULT true,
     date date,
     pos_id integer,
-    web_id integer
+    web_id integer,
+    store_id integer
 );
 
 

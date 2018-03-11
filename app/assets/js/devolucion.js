@@ -152,6 +152,7 @@ const Inputmask = require('inputmask');
         ' service_offereds ON services.id = ' +
         ' service_offereds.service_id WHERE' +
         ` ticket_id = ${ticketId}`;
+      cleanPaymentInputs();
       query(localQuery).then(serviceOffereds => {
         serviceOffereds.rows.forEach(service => {
 
@@ -242,8 +243,6 @@ const Inputmask = require('inputmask');
     $('#productSearch').addClass('hidden');
 
     bigTotal('td[id^=discountToDevolucion_]');
-    $('.paymentProcess').addClass('hidden');
-    $('#completeSale').removeClass('hidden');
     initTicketSearch();
     return false;
   });

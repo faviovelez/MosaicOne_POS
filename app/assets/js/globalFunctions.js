@@ -101,14 +101,18 @@ function prospectInfo(ticket){
   '</span>'
 }
 
+function cleanPaymentInputs(){
+  $('#completeSale, .paymentProcess').removeClass('hidden');
+  $('input.paymentProcess, .paymentProcess input, .notInAllProcess').addClass('hidden');
+}
+
 function getPayed(isPayed){
   if (isPayed) {
     $('.paymentProcess').addClass('hidden');
     return '<span class="label label-success left-10">Pagado</span>';
   }
   else {
-    if (!isDevolucion())
-      $('.paymentProcess').removeClass('hidden');
+    $('.paymentProcess').removeClass('hidden');
     return '<span class="label label-danger left-10">Pendiente</span>';
   }
 }

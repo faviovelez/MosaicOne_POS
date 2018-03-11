@@ -2,8 +2,8 @@ const {Pool, Client} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-  user: 'ubuntu',
-  host: '34.214.130.203',
+  user: 'faviovelez',
+  host: 'localhost',
   database: 'mosaicone',
   password: 'bafio44741',
   port: 5432,
@@ -94,7 +94,7 @@ async function getToTransfer(table){
     ' WHERE web = false';
 
   if (table === 'tickets') {
-    localQuery += ` AND ticket_type = 'venta' OR ticket_type = 'cancelado' OR ticket_type = 'pago'`
+    localQuery += ` AND ticket_type = 'venta' OR ticket_type = 'cancelado' OR ticket_type = 'pago' OR ticket_type = 'devolución'`
   }
 
   if (table === 'store_movements' || table === 'service_offereds' || table === 'payments'){

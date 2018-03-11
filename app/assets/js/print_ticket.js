@@ -1,6 +1,6 @@
 // Print logic starts
 const remote = require('electron').remote;
-var cmd=require('node-cmd');
+var cmd = require('node-cmd');
 const userHome = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
 let win = null;
@@ -433,6 +433,9 @@ function initTicket(ticketData, call) {
         '</tbody>' +
         '</table>' +
         '</body>' +
+//        '<script type="text/javascript">' +
+//            'window.print();'+
+//        '</script>' +
         '</html>');
     });
   });
@@ -562,7 +565,7 @@ function printTicket(ticketInfo, call){
 
           createHtmlFile(htmlContent, ticketInfo.ticket.id);
 
-//          cmd.get(`chrome --kiosk-printing --kiosk ${userHome}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketInfo.ticket.id}.html`);
+//          cmd.get(`chrome --kiosk-printing ${userHome}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketInfo.ticket.id}.html`);
 
           win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
 

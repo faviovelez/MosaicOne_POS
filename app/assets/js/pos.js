@@ -334,10 +334,12 @@ $(document).ready(function() {
   }
 
   function getProductsAndServices(call){
-    console.log(1)
     getAll('products').then(products => {
       options = [];
-      console.log(2)
+      if (!products){
+        window.location.href = 'pos_sale.html';
+        return 0;
+      }
       Promise.each(products.rows, product => {
         options.push(
           {
@@ -350,9 +352,11 @@ $(document).ready(function() {
           }
         );
       }).then(() => {
-        console.log(3)
         getAll('services').then(services => {
-          console.log(4);
+          if (!services){
+            window.location.href = 'pos_sale.html';
+            return 0;
+          }
           Promise.each(services.rows, service => {
             options.push(
               {
@@ -366,12 +370,12 @@ $(document).ready(function() {
             );
 
           }).then(() => {
-            console.log(5)
             return call(options);
           });
         })
         .catch(function(err){
-          console.log(err);
+          window.location.href = 'pos_sale.html';
+          return 0;
         });
       });
     });
@@ -530,7 +534,7 @@ $(document).ready(function() {
       processDevolucion();
       return false;
     }
-    
+
     let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
 
     if (!isNaN(parseInt(restoreTicketId))){
@@ -1060,7 +1064,6 @@ $(document).ready(function() {
         $('#addProductSearch').prop('disabled', false);
         $('#addProductSearch').autocomplete({
             lookup: list,
-//            lookupLimit: 10,
             onSelect: function (suggestion) {
               $('#addProductQuantity tr[id^=addProduct_]').remove();
               $('#addProductQuantity').append(
@@ -1076,7 +1079,6 @@ $(document).ready(function() {
 
         $('#mainProductSearch').autocomplete({
           lookup: list,
-//          lookupLimit: 10,
           onSelect: function (suggestion) {
             $('#ticketList').append(addTr(suggestion));
             addEvents(suggestion.id);
@@ -1145,6 +1147,7 @@ $(document).ready(function() {
   });
 
   $("#sale-option").click(function () {
+    window.location = 'pos_sale.html';
     cleanRows();
     $('.items-returns').addClass('hidden');
     $('#devolucionTable tr').remove();

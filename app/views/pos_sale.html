@@ -537,7 +537,7 @@
           <i class="fa fa-address-book-o " aria-hidden="true"></i>
           Venta a Crédito
         </button>
-        <button type="button" class="btn btn-default custom-button hidden" id="returnCash">
+        <button type="button" class="btn btn-default custom-button hidden notInAllProcess" id="returnCash">
           <i class="fa fa-exchange " aria-hidden="true"></i>
           Devolución
         </button>
@@ -559,7 +559,7 @@
           <input type="text" class="form-control paymentProcess" id="paymentMethodCuantity" placeholder="Ingrese monto de pago">
           <span class="input-group-btn">
             <button class="btn btn-default color-button pos-main-btn hidden" type="button" id="completeSale">Completar venta</button>
-            <button class="btn btn-default color-button pos-secondary-btn paymentProcess" type="button" id="addPayment">Agregar pago</button>
+            <button class="btn btn-default color-button pos-secondary-btn paymentProcess notInAllProcess" type="button" id="addPayment">Agregar pago</button>
           </span>
         </div><!-- /input-group -->
       </div><!-- /.row -->
@@ -567,14 +567,14 @@
       <div class="input-group margin-bottom credit-days-container hidden paymentProcess">
         <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)" id="creditDaysNumber">
         <span class="input-group-btn">
-          <button class="btn btn-default color-button pos-main-btn" type="button" id="creditDays">Días de crédito</button>
+          <button class="btn btn-default color-button pos-main-btn notInAllProcess" type="button" id="creditDays">Días de crédito</button>
         </span>
       </div><!-- /input-group -->
 
       <div class="input-group margin-bottom operation-number-container hidden paymentProcess">
         <input type="text" class="form-control" placeholder="Referencia bancaria">
         <span class="input-group-btn">
-          <button class="btn btn-default color-button pos-main-btn" type="button" id="operationNumber">Referencia</button>
+          <button class="btn btn-default color-button pos-main-btn notInAllProcess" type="button" id="operationNumber">Referencia</button>
         </span>
       </div><!-- /input-group -->
 

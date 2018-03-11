@@ -109,17 +109,23 @@ $(document).ready(function() {
   }
 
   function updateWebBan(){
-    for (var tableName in sendObjects){
-      delete sendObjects[tableName].rowsLimit;
-      delete sendObjects[tableName].processRow;
+    return new Promise(function(resolve){
+      let promises = [];
+      for (var tableName in sendObjects){
+        delete sendObjects[tableName].rowsLimit;
+        delete sendObjects[tableName].processRow;
 
-      for (var objectId in sendObjects[tableName]){
-        let localQuery = `UPDATE ${tableName} SET ` +
-          ` web = true WHERE id = ${objectId}`;
-
-          runLocalQuery(localQuery).then(() => {});
+        for (var objectId in sendObjects[tableName]){
+          let localQuery = `UPDATE ${tableName} SET ` +
+            ` web = true WHERE id = ${objectId}`;
+            promises.push(runLocalQuery(localQuery));
+        }
       }
-    }
+      
+      Promise.all(promises).then(function(){
+        resolve();
+      });
+    });
   }
 
   function fillSpecialIds(idsCollection){
@@ -164,13 +170,14 @@ $(document).ready(function() {
             data: sendObjects,
             headers: { "Content-Type": "application/json" }
           };
-        client.post("http://34.214.130.203/pos/received_data", args, function (data, response) {
+        client.post("http://localhost:3000/pos/received_data", args, function (data, response) {
           delete sendObjects.installCode;
           delete sendObjects.storeId;
 
-          updateWebBan();
-          fillSpecialIds(data.ids);
-          alert(data.message);
+          updateWebBan().then(function(){
+            fillSpecialIds(data.ids);
+            alert(data.message);
+          });
         });
 
       });

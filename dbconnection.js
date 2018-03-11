@@ -74,8 +74,8 @@ async function runQuery(q, client, lastId, table){
           err : true
         };
       } else {
-//        debugger
-        console.log(err);
+        console.log('Database error!', err);
+        return false;
       }
     }
   } finally {
@@ -102,6 +102,7 @@ async function query (q, lastId = 0, table = '') {
 
     client.on('error', function (err) {
       console.log('Database error!', err);
+      return false;
     });
 
     await client.connect();
