@@ -308,12 +308,12 @@ async function getOnly(table, ids){
   return result.rows;
 }
 
-async function getAll(table, columns = '*', condition = false){
+async function getAll(table, columns = '*', condition = false, lastId){
   let localQuery = `SELECT ${columns} FROM ${table}`;
   if (condition){
     localQuery += ` WHERE ${condition}`;
   }
-  return await query(localQuery);
+  return await query(localQuery, lastId);
 }
 
 async function updateBy(data, table, condition){

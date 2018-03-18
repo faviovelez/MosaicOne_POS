@@ -233,7 +233,7 @@ function devolucionPayment(ticketId, userId, store, call){
     payment_number   : 1,
     total            : $('.bigger.total strong').html().replace('$ ','').replace(/,/g,'')
   };
-  
+
   insert(
     Object.keys(data),
     Object.values(data),
@@ -600,9 +600,11 @@ function devolucionServiceOffered(parentTicket, ticketId, call){
         getAll(
           'service_offereds',
           '*',
-          `ticket_id = ${parentTicket} AND id = ${serviceId}`
+          `ticket_id = ${parentTicket} AND id = ${serviceId}`,
+          referenceId
         ).then(function(serviceOfferedObject){
           let data = {};
+          let positionIndex = serviceOfferedObject.lastId;
           serviceOfferedData = serviceOfferedObject.rows[0];
           Object.keys(serviceOfferedData).forEach(function(attr){
             if (serviceOfferedData[attr] !== null) {
@@ -611,9 +613,9 @@ function devolucionServiceOffered(parentTicket, ticketId, call){
           });
           data.service_type = 'devolución'
           data.ticket_id = ticketId;
-          sellQuantity    = servicesJson[referenceId].sellQuantity,
-          discountPercent = parseFloat(servicesJson[referenceId].discount) / 100,
-          unitPrice       = parseFloat($(`#${servicesJson[referenceId].selector}`).find(
+          sellQuantity    = servicesJson[positionIndex].sellQuantity,
+          discountPercent = parseFloat(servicesJson[positionIndex].discount) / 100,
+          unitPrice       = parseFloat($(`#${servicesJson[positionIndex].selector}`).find(
         'td[id^=priceTo]'
       ).html().replace('$ ','').replace(/,/g,'')),
           subtotal        = Math.round(unitPrice * sellQuantity * 100) / 100,
@@ -663,10 +665,12 @@ function devolucionStoreMovement(parentTicket, ticketId, call) {
         getAll(
           'store_movements',
           '*',
-          `ticket_id = ${parentTicket} AND product_id = ${productId}`
+          `ticket_id = ${parentTicket} AND product_id = ${productId}`,
+          productId
         ).then(function(storeMovementObject){
+          let referenceId = storeMovementObject.lastId;
           createWareHouseEntry({
-            product_id: productId,
+            product_id: referenceId,
             quantity: storeMovementObject.rows[0].quantity,
             store_movement_id: storeMovementObject.rows[0].id
           });
@@ -678,8 +682,9 @@ function devolucionStoreMovement(parentTicket, ticketId, call) {
 
   Promise.all(promises).then(function(storesMovements){
     storesMovements.forEach(function(storeMovementData){
-      storeMovementData.movement_type = 'devolucion';
+      storeMovementData.movement_type = 'devolución';
       storeMovementData.ticket_id = ticketId;
+      let productId = storeMovementData.product_id;
       let data = {},
       sellQuantity    = productsJson[productId].sellQuantity,
       discountPercent = parseFloat(productsJson[productId].discount) / 100,

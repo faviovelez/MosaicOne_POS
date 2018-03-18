@@ -20,6 +20,36 @@ function translateInfo(info){
   return info;
 }
 
+function increaseInventory(inventory, quantity){
+  updateBy(
+    {
+      quantity: (inventory.quantity + quantity)
+    },
+    'stores_inventories',
+    `id = ${inventory.id}`
+  );
+}
+
+function decreaseInventory(inventory, quantity){
+  updateBy(
+    {
+      quantity: (inventory.quantity - quantity)
+    },
+    'stores_inventories',
+    `id = ${inventory.id}`
+  );
+}
+
+function Inventory(){
+  updateBy(
+    {
+      quantity: (inventory.quantity + quantity)
+    },
+    'stores_inventories',
+    `id = ${inventory.id}`
+  );
+}
+
 function recalculateDiscount(product){
   let realTotal = product.total - product.taxes,
       percentPayment = realTotal * 100 / product.subtotal;

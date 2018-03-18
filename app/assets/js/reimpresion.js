@@ -4,7 +4,7 @@ const userHomeRePrint = process.env[(process.platform == 'win32') ? 'USERPROFILE
 let localWin = null;
 
 // function reimpresion(ticketId) {
-//     cmd.get(`chrome --kiosk-printing --kiosk ${userHomeRePrint}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketId}.html`);
+//     cmd.get(`chrome --kiosk-printing ${userHomeRePrint}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketId}.html`);
 // }
 
  function reimpresion(ticketId) {
@@ -23,13 +23,6 @@ let localWin = null;
 function cancelarTicket(ticketId, isChild = false){
   let Promise = require("bluebird");
   return new Promise(function(resolve, reject){
-    updateBy(
-      {
-        movement_type: 'cancelado'
-      },
-      'store_movements',
-      `ticket_id = ${ticketId}`
-    ).then(function(){
       updateBy(
         {
           service_type: 'cancelado'
@@ -53,13 +46,11 @@ function cancelarTicket(ticketId, isChild = false){
               }
               let quantity = storeMovement.quantity;
               findBy('product_id', storeMovement.product_id, 'stores_inventories').then(inventory => {
-                updateBy(
-                  {
-                    quantity: (inventory.rows[0].quantity + quantity)
-                  },
-                  'stores_inventories',
-                  `id = ${inventory.rows[0].id}`
-                );
+                if (storeMovement.movement_type === 'devolución') {
+                  decreaseInventory(inventory.rows[0], quantity);
+                } else {
+                  increaseInventory(inventory.rows[0], quantity);
+                }
               });
               insert(
                 Object.keys(warehouseData),
@@ -67,6 +58,13 @@ function cancelarTicket(ticketId, isChild = false){
                 'stores_warehouse_entries'
               ).then(function(){});
             }).then(function(){
+              updateBy(
+                {
+                  movement_type: 'cancelado'
+                },
+                'store_movements',
+                `ticket_id = ${ticketId}`
+              ).then(function(){
               updateBy(
                 {
                   ticket_type: 'cancelado'

@@ -103,7 +103,7 @@ $(function(){
     let cuantity = $(`input[id^=cuantityTo_${id}]`).val(),
       manualDiscount = !$('#manual-discount').hasClass('hidden'),
       price    = parseFloat(
-        $(`td[id^=priceTo_${id}]`).html().replace(' $ ','')
+        $(`td[id^=priceTo_${id}]`).html().replace(' $ ','').replace(',','')
       );
     if (!price){
       price = $(`td[id^=priceTo_${id}] input`).val();
@@ -116,7 +116,7 @@ $(function(){
 
     if (manualDiscount){
       let globalManual = parseFloat(
-        $('#manualDiscountQuantity').html().replace(' $ ','')
+        $('#manualDiscountQuantity').html().replace(' $ ','').replace(',','')
       );
 
       if (globalManual.toString() === 'NaN'){

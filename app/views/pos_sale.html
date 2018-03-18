@@ -675,21 +675,30 @@
                     piezas
                   </span>
                  </p>
-                 <p>
-                  <strong>
-                    Ubicación:
+                 <p class="location-paragraph">
+                  <strong class="location-strong">
                   </strong>
+                    Ubicación:
                   <span class="stores_inventory_rack">
                   </span>
                   <span class="stores_inventory_level">
                   </span>
-                 </p>
+                </p>
+                <p class="">
+                  <div class="input-group flex-div hidden">
+                    <input type="text" class="form-control smaller-form round-form"  placeholder="Anaquel" id="rackSave">
+                    <input type="text" class="form-control smaller-form round-form"  placeholder="Nivel" id="levelSave">
+                  </div>
+                </p>
                </td>
              </tr>
            </tbody>
          </table>
        </div>
        <div class="modal-footer">
+         <button type="button" class="btn btn-default pos-main-btn red-modal-button" id="modifyLocation">
+           Modificar ubicación
+         </button>
          <button type="button" class="btn btn-default pos-main-btn" data-dismiss="modal">
            Confirmar
          </button>

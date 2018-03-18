@@ -23,41 +23,96 @@ $(function(){
     return ` $ ${convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
   }
 
-    function devoluAddTr(productOrService){
-      let percent = recalculateDiscount(productOrService),
-          total = recalculateTotal(productOrService, percent, productOrService.table),
-          color = productOrService.table === 'services' ? carIcon(productOrService.id, productOrService.delivery_company) :
-          productOrService.exterior_color_or_design,
-          price = productOrService.table === 'products' ? productOrService.price : productOrService.initial_price,
-          description = productOrService.table === 'products' ? '<a href="#" data-toggle="modal" ' +
-          ` data-target="#productShow" data-id="${productOrService.id}" data-table="${productOrService.table}" >` +
-          `${productOrService.unique_code} ${productOrService.description} </a>` : productOrService.description
-          productInList = $(`#product_${productOrService.id}`);
+  function convertServiceToValidQuantity(ticketId, service){
+    return new Promise(function(resolve, reject){
 
-      return `<tr id="productDevolucion_${productOrService.id}">` +
-        `<td id="infoTableName" class="hidden">${productOrService.table}</td><td>` +
-          '<div class="close-icon">' +
-            `<button id="deleteDevolucion_${productOrService.id}" type="button" class="close center-close" aria-label="Close">` +
-              '<span aria-hidden="true" class="white-light">&times;</span>' +
-            '</button>' +
-          '</div>' +
-        '</td>' +
-        '<td class="left">' +
-          description +
-        '</td>' +
-        `<td> ${color} </td>` +
-        `<td id="priceToDevolucion_${productOrService.id}"> ${translatePrice(price)}` +
-        '<td>' +
-        '<input type="text" class="form-control smaller-form" ' +
-        `placeholder="1" data-valueLimit="${Math.abs(productOrService.quantity)}" id="cuantityToDevolucion_${productOrService.id}" ` +
-        `value="${Math.abs(productOrService.quantity)}">` +
-        '</td>' +
-        `<td id="discountToDevolucion_${productOrService.id}"> ${percent}% </td>` +
-        `<td class="right" id="totalToDevolucion_${productOrService.id}">` +
-        ` $ ${(total * 1.16).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
-        `<td class="right hidden" id="totalSinTo_${productOrService.id}"> ${(total).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
-      '</tr>';
-    }
+      let getDevolutionQuantitiesQuery ='SELECT allMovementsTickets.ticket_type, SUM(service_offereds.quantity) ' +
+      'as quantityMovements, service_offereds.service_id FROM (' +
+      `SELECT * FROM tickets WHERE parent_id = ${ticketId} OR id = ${ticketId}` +
+      ') as allMovementsTickets ' +
+      'INNER JOIN service_offereds ON ' +
+      'allMovementsTickets.id = service_offereds.ticket_Id WHERE ' +
+      `service_offereds.service_id = ${service.service_id} AND ` +
+      'allMovementsTickets.ticket_type = \'devolución\' ' +
+      'GROUP BY allMovementsTickets.ticket_type, service_offereds.service_id';
+
+      query(getDevolutionQuantitiesQuery).then(function(resultValues){
+        if (resultValues.rowCount === 0)
+          return resolve(service);
+
+        let quantityMovements = resultValues.rows[0].quantitymovements;
+        service.quantity = service.quantity - quantityMovements;
+        resolve(service);
+      });
+
+    });
+
+  }
+
+  function convertProductToValidQuantity(ticketId, product){
+    return new Promise(function(resolve, reject){
+
+      let getDevolutionQuantitiesQuery ='SELECT allMovementsTickets.ticket_type, SUM(store_movements.quantity) ' +
+      'as quantityMovements, store_movements.product_id FROM (' +
+      `SELECT * FROM tickets WHERE parent_id = ${ticketId} OR id = ${ticketId}` +
+      ') as allMovementsTickets ' +
+      'INNER JOIN store_movements ON ' +
+      'allMovementsTickets.id = store_movements.ticket_Id WHERE ' +
+      `store_movements.product_id = ${product.id} AND ` +
+      'allMovementsTickets.ticket_type = \'devolución\' ' +
+      'GROUP BY allMovementsTickets.ticket_type, store_movements.product_id';
+
+      query(getDevolutionQuantitiesQuery).then(function(resultValues){
+        if (resultValues.rowCount === 0)
+          return resolve(product);
+
+        let quantityMovements = resultValues.rows[0].quantitymovements;
+        product.quantity = product.quantity - quantityMovements;
+        resolve(product);
+      });
+
+    });
+
+  }
+
+  function devoluAddTr(productOrService){
+    let percent = recalculateDiscount(productOrService),
+        total = recalculateTotal(productOrService, percent, productOrService.table),
+        color = productOrService.table === 'services' ? carIcon(productOrService.id, productOrService.delivery_company) :
+        productOrService.exterior_color_or_design,
+        price = productOrService.table === 'products' ? productOrService.price : productOrService.initial_price,
+        description = productOrService.table === 'products' ? '<a href="#" data-toggle="modal" ' +
+        ` data-target="#productShow" data-id="${productOrService.id}" data-table="${productOrService.table}" >` +
+        `${productOrService.unique_code} ${productOrService.description} </a>` : productOrService.description
+        productInList = $(`#product_${productOrService.id}`);
+
+    if (productOrService.quantity <= 0)
+      return false;
+
+    return `<tr id="productDevolucion_${productOrService.id}">` +
+      `<td id="infoTableName" class="hidden">${productOrService.table}</td><td>` +
+        '<div class="close-icon">' +
+          `<button id="deleteDevolucion_${productOrService.id}" type="button" class="close center-close" aria-label="Close">` +
+            '<span aria-hidden="true" class="white-light">&times;</span>' +
+          '</button>' +
+        '</div>' +
+      '</td>' +
+      '<td class="left">' +
+        description +
+      '</td>' +
+      `<td> ${color} </td>` +
+      `<td id="priceToDevolucion_${productOrService.id}"> ${translatePrice(price)}` +
+      '<td>' +
+      '<input type="text" class="form-control smaller-form" ' +
+      `placeholder="1" data-valueLimit="${Math.abs(productOrService.quantity)}" id="cuantityToDevolucion_${productOrService.id}" ` +
+      `value="${Math.abs(productOrService.quantity)}">` +
+      '</td>' +
+      `<td id="discountToDevolucion_${productOrService.id}"> ${percent}% </td>` +
+      `<td class="right" id="totalToDevolucion_${productOrService.id}">` +
+      ` $ ${(total * 1.16).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
+      `<td class="right hidden" id="totalSinTo_${productOrService.id}"> ${(total).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
+    '</tr>';
+  }
 
 function createDevolucionTotal(id){
   let cuantity = $(`input[id^=cuantityToDevolucion_${id}]`).val().replace(/_/g,''),
@@ -67,7 +122,7 @@ function createDevolucionTotal(id){
     price = $(`td[id^=priceToDevolucion_${id}] input`).val();
   } else {
     price    = parseFloat(
-      $(priceElement).html().replace(' $ ','')
+      $(priceElement).html().replace(' $ ','').replace(',','')
     );
   }
   let total =  parseFloat( (price * cuantity).toFixed(2) ),
@@ -139,12 +194,15 @@ const Inputmask = require('inputmask');
           product.table = 'products';
           product.id    = product.product_id;
 
-          $('#devolucionTable').append(devoluAddTr(product));
-          addEvents(product.id, product);
-          bigTotal('td[id^=discountToDevolucion_]');
-          let selector = $(`input[id^=cuantityToDevolucion_${product.id}]`);
-          var im = new Inputmask("99999999");
-          im.mask(selector);
+          convertProductToValidQuantity(ticketId, product).then(function(processProduct){
+            $('#devolucionTable').append(devoluAddTr(processProduct));
+            addEvents(processProduct.id, processProduct);
+            bigTotal('td[id^=discountToDevolucion_]');
+            let selector = $(`input[id^=cuantityToDevolucion_${processProduct.id}]`);
+            var im = new Inputmask("99999999");
+            im.mask(selector);
+          });
+
         });
       });
 
@@ -159,12 +217,15 @@ const Inputmask = require('inputmask');
           service.table = 'services';
           service.id    = service.serviceid;
 
-          $('#devolucionTable').append(devoluAddTr(service));
-          addEvents(service.id, service);
-          bigTotal('td[id^=discountToDevolucion_]');
-          let selector = $(`input[id^=cuantityToDevolucion_${service.id}]`);
-          var im = new Inputmask("99999999");
-          im.mask(selector);
+          convertServiceToValidQuantity(ticketId, service).then(function(processService){
+            $('#devolucionTable').append(devoluAddTr(processService));
+            addEvents(processService.id, processService);
+            bigTotal('td[id^=discountToDevolucion_]');
+            let selector = $(`input[id^=cuantityToDevolucion_${processService.id}]`);
+            var im = new Inputmask("99999999");
+            im.mask(selector);
+          });
+
         });
       });
     });

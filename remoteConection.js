@@ -2,7 +2,9 @@ const {Pool, Client} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
+//  user: 'ubuntu',
   user: 'faviovelez',
+//  host: '34.214.130.203',
   host: 'localhost',
   database: 'mosaicone',
   password: 'bafio44741',
@@ -76,7 +78,9 @@ async function query (q, remote = true, table = '', lastId = 0) {
   if (lastId !== 0) {
     res.lastId = lastId;
   }
+
   res.table = table;
+
   return res;
 }
 

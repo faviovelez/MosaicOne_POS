@@ -48,20 +48,10 @@ function createTicketProductListDevolucion(productList, discount, call){
           `<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ ${(object.total - object.taxes).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </strong> </td>` +
           '</tr>';
 
-        if (productObject.table === 'serviceOffereds' && object.product.delivery_company != null){
-          createDeliveryServiceCad(object, function(deliveryCad){
-            deliveriesCad += deliveryCad;
-            count++;
-            if (count === parseInt(limit)){
-              call(ticketList, deliveriesCad);
-            }
-          });
-        } else {
           count++;
           if (count === parseInt(limit)){
             call(ticketList, deliveriesCad);
           }
-        }
 
       });
 

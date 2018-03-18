@@ -96,9 +96,9 @@ $(document).ready(function() {
   }
 
   function productAddChange(product){
-    return `<tr id="addProduct_${product.productId}">` +
+    return `<tr id="addProduct_${product.productid}">` +
       '<td class="left">' +
-      product.description +
+      product.value +
       '</td>' +
       `<td> ${product.color} </td>` +
       '<td><input type="text" class="form-control" id="addProductInput" smaller-form" placeholder="1"></td>' +
@@ -334,51 +334,33 @@ $(document).ready(function() {
   }
 
   function getProductsAndServices(call){
-    getAll('products').then(products => {
-      options = [];
+    let productsQuery = `SELECT concat(unique_code, ' ', description) as value,` +
+      'id as productId, price,' +
+      `coalesce(exterior_color_or_design, 'Sin diseño') as color,` +
+      `description, 'products' as table FROM products`;
+
+    query(productsQuery).then(products => {
       if (!products){
         window.location.href = 'pos_sale.html';
         return 0;
       }
-      Promise.each(products.rows, product => {
-        options.push(
-          {
-            value: `${product.unique_code} ${product.description}`,
-            productId:    product.id,
-            price: product.price,
-            color: product.exterior_color_or_design || 'Sin Diseno',
-            description: `${product.unique_code} ${product.description}`,
-            table: 'products'
-          }
-        );
-      }).then(() => {
-        getAll('services').then(services => {
+      options = products.rows;
+      let serviceQuery = `SELECT concat(unique_code, ' ', description) as value,` +
+        'id as productId ,' +
+        `coalesce(delivery_company, '') as company,` +
+        `description, 'services' as table FROM services`;
+        query(serviceQuery).then(services => {
           if (!services){
             window.location.href = 'pos_sale.html';
             return 0;
           }
-          Promise.each(services.rows, service => {
-            options.push(
-              {
-                value: `${service.unique_code} ${service.description}`,
-                productId:    service.id,
-                table:  'services',
-                company: service.delivery_company ? service.delivery_company
-                                                  : '',
-                description: `${service.unique_code} ${service.description}`,
-              }
-            );
-
-          }).then(() => {
-            return call(options);
-          });
+          return call(options.concat(services.rows));
         })
         .catch(function(err){
           window.location.href = 'pos_sale.html';
           return 0;
         });
       });
-    });
   }
 
   function addPaymentTr(total){
@@ -667,7 +649,7 @@ $(document).ready(function() {
       price = $(`td[id^=priceTo_${id}] input`).val();
     } else {
       price    = parseFloat(
-        $(priceElement).html().replace(' $ ','')
+        $(priceElement).html().replace(' $ ','').replace(',','')
       );
     }
     let total =  parseFloat( (price * cuantity).toFixed(2) ),
@@ -678,7 +660,7 @@ $(document).ready(function() {
 
     if (manualDiscount){
       let globalManual = parseFloat(
-        $('#manualDiscountQuantity').html().replace(' $ ','')
+        $('#manualDiscountQuantity').html().replace(' $ ','').replace(',','')
       );
 
       if (globalManual.toString() === 'NaN'){
@@ -848,7 +830,7 @@ $(document).ready(function() {
 
             let secretId = $('#secretServiceId').val();
 
-            $(`tr[id$=_${secretId}_services`).append(
+            $(`#product_${secretId}`).append(
               `<td id="deliveryServiceId${secretId}" class="hidden">` +
               `${deliveryServices.lastId}</td>`
             );
@@ -862,6 +844,12 @@ $(document).ready(function() {
     });
 
     return false;
+  });
+
+  $("#modifyLocation").click(function(){
+    $(".input-group.flex-div").removeClass("hidden");
+    $(".stores_inventory_rack").addClass("hidden");
+    $(".stores_inventory_level").addClass("hidden");
   });
 
   $('#productShow').on('shown.bs.modal', function(e) {
@@ -967,15 +955,13 @@ $(document).ready(function() {
   }
 
   function addTr(product){
-    product.id = product.productId
-    if ($(`#product_${product.id}_products`).length > 0)
+    product.id = product.productid
+    if ($(`#product_${product.id}_products`).length > 0 && product.table === 'products')
       return false;
 
-    let color = product.table === 'services' ? carIcon(product.id, product.company) :
-      product.color,
-      description = product.table === 'products' ? '<a href="#" data-toggle="modal" ' +
+    let description = product.table === 'products' ? '<a href="#" data-toggle="modal" ' +
       ` data-target="#productShow" data-id="${product.id}" data-table="${product.table}" >` +
-      ` ${product.description} </a>` : product.description,
+      ` ${product.value} </a>` : product.value,
       productInList = $(`tr[id^=product_${product.id}_services]`);
 
     if (productInList.length === 1)
@@ -985,7 +971,9 @@ $(document).ready(function() {
 
     let price = product.table === 'products' ? stringPrice(product.price, product.id) :
       '<input type="text" class="form-control ' +
-      `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`;
+      `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`,
+      color = product.table === 'services' ? carIcon(product.id, product.company) :
+        product.color
 
     return `<tr id="product_${product.id}"><td id="infoTableName" class="hidden">${product.table}</td><td>` +
       '<div class="close-icon">' +
