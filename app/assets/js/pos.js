@@ -1,6 +1,5 @@
 $(document).ready(function() {
 
-
   $('#changeSinglePrice').on('shown.bs.modal', function(e) {
 
     let changeSinglePriceOption = document.getElementById("changeSinglePriceInput");
@@ -35,10 +34,13 @@ $(document).ready(function() {
           /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
         )}
     `);
-    $('#changeSinglePrice').modal('hide');
     $('#changeSinglePriceInput').val('');
+    $('#changeSinglePrice').modal('hide');
     $("#changeSinglePriceCheckBox").prop('checked', false);
-    let total = createTotal(productId);
+    let elementCount = $(`tr[id^=product_${productId}`).length;
+    let mainSelector = `#product_${productId}_products[data-child-count=${elementCount}]`;
+    let total = createTotal(`${productId}_products`, mainSelector);
+
     $(`#totalTo_${productId}_products`).html(
       `$ ${(total * 1.16).toFixed(2).replace(
     /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
@@ -54,13 +56,17 @@ $(document).ready(function() {
     resumePayment();
   });
 
-
   function getCashRegisterSum(){
     return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
-      '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
-      'SUM((SELECT (COALESCE(SUM(payments.total),0)) as s ' +
-      'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
-      "WHERE payment_type = 'pago' AND payment_form_id = 1 AND ticket_type = 'venta'))) as sum";
+          '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
+          'SUM((SELECT (COALESCE(SUM(' +
+          "CASE WHEN payments.payment_type = 'pago' AND payments.payment_form_id = 1 THEN payments.total " +
+          "WHEN payments.payment_type = 'devolución' AND payments.payment_form_id = 1 THEN -payments.total " +
+          'ELSE 0 ' +
+          'END ' +
+          '),0)) as s ' +
+          'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
+          "WHERE (tickets.ticket_type != 'pending' AND payments.payment_form_id = 1)))) as sum";
   }
 
   const Inputmask = require('inputmask');
@@ -251,46 +257,47 @@ $(document).ready(function() {
   $('#confirmAddProduct').click(function(){
     $('#confirmAddProduct').prop('disabled', true);
     downUpField = $('#addProductInput').val();
-    if (isNaN(parseInt(downUpField.replace(/_/g,'')))) {
+    if ( isNaN(parseInt(downUpField.replace(/_/g,''))) || parseInt(downUpField.replace(/_/g,'')) == 0 ) {
       downUpField = 0;
-    }
-    let id = $('tr[id^=addProduct_]').attr(
-      'id'
-    ).replace(/\D/g,''),
-      action = $('#addProductDetails').hasClass('head-blue') ? 'alta' : 'baja',
-      table = 'stores_inventories',
-      condition = `product_id = ${id}`,
-      data = {
-        'quantity': parseInt(
-          downUpField.replace(/_/g,'')
-        )
-      };
-    findBy('product_id', id, table).then(inventory => {
-      inventoryObject = inventory.rows[0];
-      createStoreMovementData(id, data.quantity, action, function(storeMovementId){
-        if (!storeMovementId){
+      alert('No seleccionó ninguna cantidad válida');
+      $('#confirmAddProduct').prop('disabled', false);
+    } else {
+      downUpField = parseInt(downUpField.replace(/_/g,''));
+      let id = $('tr[id^=addProduct_]').attr(
+        'id'
+      ).replace(/\D/g,''),
+        action = $('#addProductDetails').hasClass('head-blue') ? 'alta' : 'baja',
+        table = 'stores_inventories',
+        condition = `product_id = ${id}`,
+        data = {
+          'quantity': downUpField
+        };
+
+      findBy('product_id', id, table).then(inventory => {
+        inventoryObject = inventory.rows[0];
+        createStoreMovementData(id, data.quantity, action, function(storeMovementId){
+          if (!storeMovementId){
+            $('#warehouseEntry').modal('hide');
+            alert('Proceso no concluido, por favor realice el alta/baja de nuevo');
+          }
+
+          if ( action === 'alta') {
+            createWarehouseEntry(id, storeMovementId);
+          } else {
+            destroyProcess(id, $('#addProductInput').val().replace(/_/g,''));
+          }
+
           $('#warehouseEntry').modal('hide');
-          alert('Proceso no concluido, por favor realice el alta/baja de nuevo');
-        }
-
-        if ( action === 'alta') {
-          createWarehouseEntry(id, storeMovementId);
-        } else {
-          destroyProcess(id, $('#addProductInput').val().replace(/_/g,''));
-        }
-
-        $('#warehouseEntry').modal('hide');
-
-      });
-
-      if (action === 'alta'){
-        data.quantity += inventory.rows[0].quantity;
-        updateBy(data, table, condition).then(() => {
-        }, err => {
         });
-      }
 
-    });
+        if (action === 'alta'){
+          data.quantity += inventory.rows[0].quantity;
+          updateBy(data, table, condition).then(() => {
+          }, err => {
+          });
+        }
+      });
+    }
   });
 
   function toggleProductAction(type){
@@ -463,18 +470,16 @@ $(document).ready(function() {
       $(this).html(
         ticketDiscInput + ' %'
       );
-      let id = $(this).attr('id').replace(/discount_/,''),
-          total = createTotal(id, true);
-      $(`td[id^=totalTo_${id}]`).html(
+      let id = $(this).parents('tr').attr('id').replace('product_',''),
+          elementCount = $(this).parents('tr').attr('data-child-count'),
+          mainSelector = `#product_${id}[data-child-count=${elementCount}]`;
+          total = createTotal(id, mainSelector);
+      $(`${mainSelector} td[id^=totalTo_${id}]`).html(
         `$ ${(total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
       );
-      $(`td[id^=totalSinTo_${id}]`).html(
-        `$ ${total.toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    )}`
-      );
+
     });
     bigTotal();
     resumePayment();
@@ -640,20 +645,27 @@ $(document).ready(function() {
 
   });
 
-  function createTotal(id){
-    let cuantity = $(`input[id^=cuantityTo_${id}]`).val().replace(/_/g,''),
-      manualDiscount = !$('#manual-discount').hasClass('hidden'),
-      price = 0;
-      priceElement = $(`td[id^=priceTo_${id}] a`);
+  function createTotal(id, mainSelector){
+    first = mainSelector.slice(0, mainSelector.indexOf("[")).replace("#","");
+    second = mainSelector.substring(mainSelector.indexOf("["));
+    manualDiscount = !$('#manual-discount').hasClass('hidden');
+    cuantity = $(`[id="${first}"]${second}`).children().find(`#cuantityTo_${id}`).val().replace(/_/g,'');
+    if (isNaN(parseInt(cuantity))) {
+      cuantity = 0;
+    } else {
+      cuantity = parseInt(cuantity)
+    }
+    price = 0;
+    priceElement = $(`[id="${first}"]${second}`).children().find(`[data-id=${id}][data-target="#changeSinglePrice"]`);
     if (!$(priceElement).html()){
-      price = $(`td[id^=priceTo_${id}] input`).val();
+      price = $(`[id="${first}"]${second}`).children().find(`#priceToServiceTo_${id}`).val();
     } else {
       price    = parseFloat(
         $(priceElement).html().replace(' $ ','').replace(',','')
       );
     }
     let total =  parseFloat( (price * cuantity).toFixed(2) ),
-        discount = $(`a[id^=discount_${id}]`)
+        discount = $(`[id="${first}"]${second}`).children().find(`#discount_${id}`)
       .html().replace(' %',''),
       discountVal = parseFloat(parseFloat ( (parseFloat(discount) / 100 * total).toFixed(3) ).toFixed(2)),
       productTotal    = total - discountVal;
@@ -687,40 +699,24 @@ $(document).ready(function() {
     resumePayment();
   }
 
-  function addEvents(id){
-    $(`button[id=delete_${id}]`).click(function(){
-      $(`tr[id=product_${id}]`).remove();
+  function addEvents(id, elementCount){
+    let mainSelector = `#product_${id}[data-child-count=${elementCount}]`;
+    $(`${mainSelector} button[id=delete_${id}]`)
+    .click(function(){
+      $(`${mainSelector}`).remove();
       bigTotal();
       resumePayment();
     });
 
-    $(`#cuantityTo_${id}`).keyup(function(){
-      let total = createTotal(id);
-      $(`#totalTo_${id}`).html(
+    $(`${mainSelector} #cuantityTo_${id}, ${mainSelector} #priceToServiceTo_${id}`).keyup(function(){
+      let total = createTotal(id, mainSelector);
+      $(`${mainSelector} td[id=totalTo_${id}]`).html(
         `$ ${(total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
       );
 
-      $(`#totalSinTo_${id}`).html(
-        `$ ${total.toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    )}`
-      );
-      bigTotal();
-      resumePayment();
-    });
-
-    $(`#priceToServiceTo_${id}`).keyup(function(){
-      let total = createTotal(id);
-
-      $(`#totalTo_${id}`).html(
-        `$ ${(total * 1.16).toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    )}`
-      );
-
-      $(`#totalSinTo_${id}`).html(
+      $(`${mainSelector} td[id=totalSinTo_${id}]`).html(
         `$ ${total.toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
@@ -731,8 +727,9 @@ $(document).ready(function() {
   }
 
   $('#deliveryService').on('shown.bs.modal', function(e) {
-    let serviceId = e.relatedTarget.dataset.id;
-
+    let elementCount = $(e.relatedTarget).parents('tr').attr('data-child-count');
+    let id = $(e.relatedTarget).parents('tr').attr('id').replace('product_','');
+    let selector = `a[data-id=${id}][data-child-count=${elementCount}]`;
     $('#delivery_service_sender_name').val('');
     $('#delivery_service_sender_zipcode').val('');
     $('#delivery_service_tracking_number').val('');
@@ -751,7 +748,7 @@ $(document).ready(function() {
     $('#delivery_service_company').val('');
     $('#delivery_service_receivers_zipcode').val('');
 
-    $('#secretServiceId').val(serviceId);
+    $('#secretServiceId').val(selector);
 
   });
 
@@ -817,8 +814,10 @@ $(document).ready(function() {
 
     validateDeliveryService(function(validate){
       if (validate){
+        let sendElement = $('#secretServiceId').val();
+        let id = $(sendElement).parents('tr').attr('id').replace('product_','');
 
-        findBy('id', $('#secretServiceId').val().replace(/_.*/,''), 'services').then(service => {
+        findBy('id', $('#secretServiceId').val().match(/\d+/)[0], 'services').then(service => {
 
           data.company = service.rows[0].delivery_company;
 
@@ -827,11 +826,9 @@ $(document).ready(function() {
             Object.values(data),
             'delivery_services'
           ).then(deliveryServices => {
-
-            let secretId = $('#secretServiceId').val();
-
-            $(`#product_${secretId}`).append(
-              `<td id="deliveryServiceId${secretId}" class="hidden">` +
+            let elementId = $($('#secretServiceId').val()).parents('tr').attr('id').replace('product_','');
+            $($('#secretServiceId').val()).parents('tr').append(
+              `<td id="deliveryServiceId${elementId}" class="hidden">` +
               `${deliveryServices.lastId}</td>`
             );
 
@@ -891,13 +888,14 @@ $(document).ready(function() {
     let modalBody = $(this).parent().parent().find(
       '.modal-body'),
         id  = $(modalBody).attr('id').replace('discountTo_',''),
-        tr = $(`#product_${id}`),
+        elementCount = $(modalBody).attr('data-child-count'),
+        tr = `#product_${id}[data-child-count=${elementCount}]`;
         discountReason = $(tr).find('td[id^=discountReasonTo]');
 
     if (discountReason) {
       $(discountReason).remove();
     }
-    $(tr).append(
+    $(`${tr} td:last`).parent().append(
       `<td class='hidden' id="discountReasonTo_${id}">` +
         $(modalBody).find('#discountMotive').val() +
       '</td>'
@@ -906,17 +904,16 @@ $(document).ready(function() {
     if (isNaN(parseFloat(discountInput))) {
       discountInput = 0;
     }
-    $(tr).find('a[id^=discount]').html(
-      `${discountInput} %`
-    );
-    let total = createTotal(id);
-    $(`#totalTo_${id}`).html(
+    $(`${tr} a[id^=discount]`).html(`${discountInput} %`);
+
+    let total = createTotal(id, tr);
+    $(`${tr} td[id=totalTo_${id}]`).html(
       `$ ${(total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
     );
 
-    $(`#totalSinTo_${id}`).html(
+    $(`${tr} id[id=totalSinTo_${id}]`).html(
       `$ ${total.toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
@@ -939,17 +936,19 @@ $(document).ready(function() {
       `discountTo_${productId}`
     );
 
+    $(this).find('.modal-body').attr('data-child-count', relatedObject.childCount);
+
     $('#discountMotive, #discountCount').val('');
   });
 
-  function carIcon(id, company){
+  function carIcon(id, company, childCount){
     if (company === '') {
       return '';
     }
 
     return '<a href="#" data-toggle="modal"' +
       'data-target="#deliveryService"' +
-      `id="service_1" data-id=${id}>` +
+      `id="service_1" data-child-count="${childCount}" data-id=${id}>` +
       '<i class="fa fa-truck" aria-hidden="true"></i>' +
       '</a>';
   }
@@ -968,14 +967,15 @@ $(document).ready(function() {
         product.id = `${product.id}_${product.id}`;
 
     product.id = `${product.id}_${product.table}`;
+    let childCount = $(`tr[id^=product_${product.id}`).length + 1;
 
     let price = product.table === 'products' ? stringPrice(product.price, product.id) :
       '<input type="text" class="form-control ' +
       `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`,
-      color = product.table === 'services' ? carIcon(product.id, product.company) :
+      color = product.table === 'services' ? carIcon(product.id, product.company, childCount) :
         product.color
 
-    return `<tr id="product_${product.id}"><td id="infoTableName" class="hidden">${product.table}</td><td>` +
+    return `<tr id="product_${product.id}" data-child-count="${childCount}"><td id="infoTableName" class="hidden">${product.table}</td><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +
       'class="close center-close" aria-label="Close">' +
@@ -994,7 +994,7 @@ $(document).ready(function() {
       `placeholder="1" id="cuantityTo_${product.id}"></td>` +
       '<td> <a href="#" data-toggle="modal"' +
       'data-target="#discountChange" ' +
-      `id="discount_${product.id}" data-id="${product.id}" ` +
+      `id="discount_${product.id}" data-id="${product.id}" data-child-count="${childCount}" ` +
       `data-table="${product.table}" > 0% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}"> $ </td>` +
       `<td class="right hidden" id="totalSinTo_${product.id}"> $ </td>` +
@@ -1016,12 +1016,14 @@ $(document).ready(function() {
         )
       );
 
-      let lastTicket = store.get('lastTicket') ? store.get('lastTicket')
-                       : 0;
+      let lastTicket = 0;
 
-      $('#ticketNum').html(
-        ` ${lastTicket + 1} `
-      );
+      query("SELECT COALESCE(MAX(id), 0) FROM tickets").then(ticket_number => {
+        lastTicket = ticket_number.rows[0].coalesce;
+        $('#ticketNum').html(
+          ` ${lastTicket + 1} `
+        );
+      });
 
       $('#cashName').html(
         ` ${store.get('cash')} `
@@ -1069,7 +1071,8 @@ $(document).ready(function() {
           lookup: list,
           onSelect: function (suggestion) {
             $('#ticketList').append(addTr(suggestion));
-            addEvents(suggestion.id);
+            let childCount = $(`tr[id^=product_${suggestion.id}`).length;
+            addEvents(suggestion.id, childCount);
             let selector = $(`input[id^=cuantityTo_${suggestion.id}]`);
             var im = new Inputmask("99999999");
             im.mask(selector);

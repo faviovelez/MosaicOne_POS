@@ -89,10 +89,10 @@ $(function(){
     if (productOrService.quantity <= 0)
       return false;
 
-    return `<tr id="productDevolucion_${productOrService.id}">` +
+    return `<tr id="productDevolucion_${productOrService.id}_${productOrService.table}">` +
       `<td id="infoTableName" class="hidden">${productOrService.table}</td><td>` +
         '<div class="close-icon">' +
-          `<button id="deleteDevolucion_${productOrService.id}" type="button" class="close center-close" aria-label="Close">` +
+          `<button id="deleteDevolucion_${productOrService.id}_${productOrService.table}" type="button" class="close center-close" aria-label="Close">` +
             '<span aria-hidden="true" class="white-light">&times;</span>' +
           '</button>' +
         '</div>' +
@@ -134,9 +134,9 @@ function createDevolucionTotal(id){
   return productTotal;
 }
 
-function addEvents(id, productOrServiceObject){
+function addEvents(id, productOrServiceObject, table){
 
-  $(`button[id=deleteDevolucion_${id}]`).click(function(){
+  $(`button[id=deleteDevolucion_${id}_${table}]`).click(function(){
     $(this).parents('tr').remove();
     bigTotal('td[id^=discountToDevolucion_]');
   });
@@ -164,8 +164,8 @@ function addEvents(id, productOrServiceObject){
     bigTotal('td[id^=discountToDevolucion_]');
   });
 
-  $(`button[id=addToDevelucionTable_${id}]`).click(function(){
-    if ($(`#productDevolucion_${productOrServiceObject.id}`).length === 0) {
+  $(`button[id=addToDevolucionTable_${id}_${table}]`).click(function(){
+    if ($(`#productDevolucion_${productOrServiceObject.id}_${table}`).length === 0) {
       $('#devolucionTable').append(devoluAddTr(productOrServiceObject));
       bigTotal('td[id^=discountToDevolucion_]');
       addEvents(productOrServiceObject.id, productOrServiceObject);
@@ -196,7 +196,7 @@ const Inputmask = require('inputmask');
 
           convertProductToValidQuantity(ticketId, product).then(function(processProduct){
             $('#devolucionTable').append(devoluAddTr(processProduct));
-            addEvents(processProduct.id, processProduct);
+            addEvents(processProduct.id, processProduct, 'products');
             bigTotal('td[id^=discountToDevolucion_]');
             let selector = $(`input[id^=cuantityToDevolucion_${processProduct.id}]`);
             var im = new Inputmask("99999999");
@@ -219,7 +219,7 @@ const Inputmask = require('inputmask');
 
           convertServiceToValidQuantity(ticketId, service).then(function(processService){
             $('#devolucionTable').append(devoluAddTr(processService));
-            addEvents(processService.id, processService);
+            addEvents(processService.id, processService, 'services');
             bigTotal('td[id^=discountToDevolucion_]');
             let selector = $(`input[id^=cuantityToDevolucion_${processService.id}]`);
             var im = new Inputmask("99999999");

@@ -4,10 +4,15 @@ $(document).ready(function() {
 
   function getCashRegisterSum(){
     return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
-      '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
-      'SUM((SELECT (COALESCE(SUM(payments.total),0)) as s ' +
-      'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
-      "WHERE payment_type = 'pago' AND payment_form_id = 1 AND ticket_type = 'venta'))) as sum";
+          '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
+          'SUM((SELECT (COALESCE(SUM(' +
+          "CASE WHEN payments.payment_type = 'pago' AND payments.payment_form_id = 1 THEN payments.total " +
+          "WHEN payments.payment_type = 'devolución' AND payments.payment_form_id = 1 THEN -payments.total " +
+          'ELSE 0 ' +
+          'END ' +
+          '),0)) as s ' +
+          'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
+          "WHERE (tickets.ticket_type != 'pending' AND payments.payment_form_id = 1)))) as sum";
   }
 
   function cloneAlert(){

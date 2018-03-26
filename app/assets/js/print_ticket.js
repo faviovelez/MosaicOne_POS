@@ -565,7 +565,7 @@ function printTicket(ticketInfo, call){
 
           createHtmlFile(htmlContent, ticketInfo.ticket.id);
 
-//          cmd.get(`chrome --kiosk-printing ${userHome}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketInfo.ticket.id}.html`);
+//           cmd.get(`chrome --kiosk-printing ${userHome}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketInfo.ticket.id}.html`);
 
           win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
 

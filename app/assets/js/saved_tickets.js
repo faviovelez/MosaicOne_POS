@@ -27,14 +27,14 @@ $(function(){
     '</tr>';
   }
 
-  function carIcon(id, company){
-    if (company === '' || !company) {
+  function carIcon(id, company, childCount){
+    if (company === null) {
       return '';
     }
 
     return '<a href="#" data-toggle="modal"' +
       'data-target="#deliveryService"' +
-      `id="service_1" data-id=${id}>` +
+      `id="service_1" data-child-count="${childCount}" data-id=${id}>` +
       '<i class="fa fa-truck" aria-hidden="true"></i>' +
       '</a>';
   }
@@ -99,6 +99,14 @@ $(function(){
 
   }
 
+  function addDeliveryServiceId(service){
+    if (service.deliveryId) {
+        return `<td id="deliveryServiceId${service.id}" class="hidden">` +
+        `${service.deliveryId}</td>`;
+    }
+    return '';
+  }
+
   function createTotal(id){
     let cuantity = $(`input[id^=cuantityTo_${id}]`).val(),
       manualDiscount = !$('#manual-discount').hasClass('hidden'),
@@ -145,13 +153,15 @@ $(function(){
 
   function addTr(product){
     product.id = product.productId
-    if ($(`#product_${product.id}_products`).length > 0)
+    if ($(`#product_${product.id}_products`).length > 0 && product.table === 'products')
       return false;
+
+      let description = product.table === 'products' ? '<a href="#" data-toggle="modal" ' +
+        ` data-target="#productShow" data-id="${product.id}" data-table="${product.table}" >` +
+        `${product.unique_code} ${product.description}  </a>` : `${product.unique_code} ${product.description}`
 
     let percent = recalculateDiscount(product),
         total = recalculateTotal(product, percent, product.table),
-        color = product.table === 'services' ? carIcon(product.id, product.delivery_company) :
-        product.exterior_color_or_design,
         price = '',
         productInList = $(`tr[id^=product_${product.id}_services]`);
 
@@ -160,6 +170,11 @@ $(function(){
 
     product.id = `${product.id}_${product.table}`;
 
+    let childCount = $(`tr[id^=product_${product.id}`).length + 1;
+
+    let color = product.table === 'services' ? carIcon(product.id, product.delivery_company, childCount) :
+      product.exterior_color_or_design;
+
     if (product.table === 'services'){
       price ='<input type="text" class="form-control ' +
       `smaller-form" id="priceToServiceTo_${product.id}" value="${product.initial_price}">`;
@@ -167,7 +182,9 @@ $(function(){
       price = stringPrice(product.price, product.id);
     }
 
-    return `<tr id="product_${product.id}"><td id="infoTableName" class="hidden">${product.table}</td><td>` +
+    let deliveryTd = product.table === 'services' ? addDeliveryServiceId(product) : '';
+
+  return `<tr id="product_${product.id}" data-child-count="${childCount}"><td id="infoTableName" class="hidden">${product.table}</td><td>` +
       '<div class="close-icon">' +
       `<button id="delete_${product.id}" type="button"` +
       'class="close center-close" aria-label="Close">' +
@@ -176,10 +193,7 @@ $(function(){
       '</div>' +
       '</td>' +
       '<td class="left">' +
-      '<a href="#" data-toggle="modal" data-target="#productShow"' +
-      `data-id="${product.id}" data-table="${product.table}" >` +
-      `${product.unique_code} ${product.description}` +
-      '</a>' +
+      description +
       '</td>' +
       `<td> ${color} </td>` +
       `<td id="priceTo_${product.id}"> ${translatePrice(price)}` +
@@ -189,12 +203,13 @@ $(function(){
       `value="${Math.abs(product.quantity)}"></td>` +
       '<td> <a href="#" data-toggle="modal"' +
       'data-target="#discountChange" ' +
-      `id="discount_${product.id}" data-id="${product.id}" ` +
+      `id="discount_${product.id}" data-id="${product.id}" data-child-count="${childCount}" ` +
       `data-table="${product.table}" > ${percent}% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}">` +
       `$ ${(total * 1.16).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
-      '<td class="right hidden" id="totalSinTo_${product.id}">' +
+      `<td class="right hidden" id="totalSinTo_${product.id}">` +
       `$ ${total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
+      deliveryTd +
       '</tr>';
   }
 
@@ -302,6 +317,18 @@ $(function(){
     }
   }
 
+  function findDeliveryServices(service){
+    return new Promise(function(resolve, reject){
+      findBy('service_offered_id', service.service_offered_id, 'delivery_services')
+        .then(function(deliveryServiceObject){
+          service.deliveryId = deliveryServiceObject.rowCount === 0 ? false :
+                          deliveryServiceObject.rows[0].id;
+
+          resolve(service);
+      });
+    });
+  }
+
   function addPaymentTr(payment){
     let count = payment.payment_number,
         type  = payment.type;
@@ -337,31 +364,20 @@ $(function(){
       });
     });
 
-    localQuery = 'SELECT * FROM services INNER JOIN' +
+    localQuery = 'SELECT *, service_offereds.id as service_offered_id FROM services INNER JOIN' +
       ' service_offereds ON services.id = ' +
       ' service_offereds.service_id WHERE' +
       ` ticket_id = ${ticketId}`;
     query(localQuery).then(serviceOffereds => {
       serviceOffereds.rows.forEach(service => {
-        findBy('service_offered_id', service.id, 'delivery_services').then(
-          deliveryService => {
-            if (deliveryService.rowCount > 0) {
-              let deliveryServiceObject = deliveryService.rows[0];
-
-              $(`#product_${serviceId}_services`).append(
-                `<td id="deliveryServiceId${serviceId}" class="hidden">` +
-                ` ${deliveryServiceObject.id}</td>`
-              );
-            }
-          }
-        );
 
         service.table = 'services';
         service.productId    = service.service_id;
         serviceId     = service.id;
-
-        $('#ticketList').append(addTr(service));
-        addEvents(service.id);
+        findDeliveryServices(service).then(function(processService){
+          $('#ticketList').append(addTr(processService));
+          addEvents(processService.id);
+        });
 
       });
     });

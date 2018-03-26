@@ -36,8 +36,8 @@ function createTicketProductJson(call, selector = 'ticketList', discountSelector
 
   $.each($(`#${selector} tr`), function(){
     let id = $(this).attr('id').replace(/product_|_products|_services|productDevolucion_/g,''),
+        idSelector = $(this).attr("id").replace("product_","");
         table = $(this).find('#infoTableName').html();
-
     if(table === 'products') {
       productsJson[id] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val().replace(/_/g,'')),
@@ -50,14 +50,18 @@ function createTicketProductJson(call, selector = 'ticketList', discountSelector
       idsCollection.push(
         id
       );
-
     } else {
-      servicesJson[$(this).attr('id')] = {
+      let id = $(this).attr('id').replace('product_',''),
+      priceSelector = 'td[id^=priceTo] input' ,
+          elementCount = $(this).attr('data-child-count'),
+          mainSelector = `#product_${id}[data-child-count=${elementCount}]`;
+      servicesJson[mainSelector] = {
         sellQuantity   : parseInt($(this).find($('td input[id^=cuantityTo]')).val().replace(/_/g,'')),
         sellTo         : parseFloat($(this).find('td[id^=totalTo]').html().replace('$ ','').replace(/,/g,'')),
         discount       : parseFloat($(this).find(discountSelector).html().replace(/\s|%|,/g,'')),
-        discountReason : $(this).find('td[id^=discountReasonTo]').html(),
-        selector       : $(this).attr('id')
+        discountReason : $(`td[id^=discountReasonTo]`).html(),
+        price          : parseFloat($(this).find(`#priceToServiceTo_${idSelector}`).val()),
+        selector       : mainSelector
       };
     }
 
@@ -66,12 +70,10 @@ function createTicketProductJson(call, selector = 'ticketList', discountSelector
   if (idsCollection.length > 0){
     getOnly('products', idsCollection).then(products => {
       iterateInventories(products, function(){
-//        debugger
         return call();
       });
     });
   } else {
-//    debugger
     return call();
   }
 
@@ -265,9 +267,12 @@ function processDevolucion(){
     createTicketProductJson(function(){
       let parentTicket = parseInt($('#ticket-id').html());
       insertTicket(user, function(ticketId, parentTicket){
-          store.set('lastTicket', parseInt(
-            ticketId
-          ));
+        query("SELECT COALESCE(MAX(id), 0) FROM tickets").then(ticket_number => {
+          lastTicket = ticket_number.rows[0].coalesce;
+          $('#ticketNum').html(
+            ` ${lastTicket + 1} `
+          );
+        });
           ticketData.parentTicket = parentTicket;
           devolucionStoreMovement(parentTicket, ticketId, function(){
             devolucionServiceOffered(parentTicket, ticketId, function(){
@@ -391,83 +396,95 @@ function getCurrentDate(){
 }
 
 function insertTicket(userId, call, type, parentTicket = null){
-  let paymentsAmount = $('#sumPayments').html() === "" ? 0
-                       : $('#sumPayments').html(),
-      data = {
-        user_id          : userId,
-        subtotal         : $('#savedSubtotal').html().replace(/\s|\$|,/g,''),
-        discount_applied : $('#discountSum').html().replace(/\s|\$|,/g,''),
-        tax_id           : 2,
-        taxes            : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
-        total            : $('.bigger.total strong').html().replace(/\s|\$|,/g,''),
-        ticket_type      : type,
-        payed            : true,
-        ticket_number    : parseInt($('#ticketNum').html()),
-        comments         : $('input[placeholder=Comentarios]').val(),
-        payments_amount  : paymentsAmount.toString().replace(/\s|\$|,/g,''),
-        cash_return      : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
-      cfdi_use_id     : $('#prospect_cfdi_use').val()
-  };
 
-  if (type === "devolución") {
-    data.payments_amount = $('.bigger.total strong').html().replace('$ ','').replace(/,/g,'');
-  }
+  let thisTicketId = parseInt($('#ticketNum').html());
 
-  setPayedLogic(data);
+  query("SELECT COALESCE(MAX(id), 0) FROM tickets").then(ticket_number => {
+    thisTicketId = ticket_number.rows[0].coalesce;
+    $('#ticketNum').html(
+      `${thisTicketId + 1}`
+    );
 
-  if (typeof data.cfdi_use_id === 'undefined' || !data.cfdi_use_id) {
-    delete data.cfdi_use_id;
-  }
+    let paymentsAmount = $('#sumPayments').html() === "" ? 0
+                         : $('#sumPayments').html(),
+        data = {
+          user_id          : userId,
+          subtotal         : $('#savedSubtotal').html().replace(/\s|\$|,/g,''),
+          discount_applied : $('#discountSum').html().replace(/\s|\$|,/g,''),
+          tax_id           : 2,
+          taxes            : $('.subtotal.iva').html().replace(/\s|\$|,/g,''),
+          total            : $('.bigger.total strong').html().replace(/\s|\$|,/g,''),
+          ticket_type      : type,
+          payed            : true,
+          ticket_number    : thisTicketId + 1,
+          comments         : $('input[placeholder=Comentarios]').val(),
+          payments_amount  : paymentsAmount.toString().replace(/\s|\$|,/g,''),
+          cash_return      : $('#currencyChange strong').html().replace(/\s|\$|,/g,''),
+        cfdi_use_id     : $('#prospect_cfdi_use').val()
+    };
 
-  if ($('#prospectList a').length === 1) {
-    let prospectId   = $('#prospectList a').attr('data-id');
-    data.prospect_id = prospectId;
-  }
-  getCashRegisterInfo(cashRegister => {
-    data.cash_register_id = cashRegister.id;
-    if ( parentTicket ){
-      data.parent_id = parentTicket;
+    if (type === "devolución") {
+      data.payments_amount = $('.bigger.total strong').html().replace('$ ','').replace(/,/g,'');
     }
-    insert(
-      Object.keys(data),
-      Object.values(data),
-      'tickets'
-    ).then(ticket => {
-      if (data.parent_id)
-      {
-        let childTicketData = {
-          children_id: ticket.lastId,
-          ticket_id: data.parent_id,
-          date: getCurrentDate()
-        };
 
-        findBy('id', data.parent_id, 'tickets').then(function(ticketInfoData){
-          let ticketInfo = ticketInfoData.rows[0];
-          updateBy(
-            {
-              payed: data.payed,
-              payments_amount: parseFloat(data.payments_amount) + ticketInfo.payments_amount,
-              cash_return: data.cash_return
-            },
-            'tickets',
-            `id = ${data.parent_id}`
-          ).then(function(){
-            insert(
-              Object.keys(childTicketData),
-              Object.values(childTicketData),
-              'tickets_children'
+    setPayedLogic(data);
+
+    if (typeof data.cfdi_use_id === 'undefined' || !data.cfdi_use_id) {
+      delete data.cfdi_use_id;
+    }
+
+    if ($('#prospectList a').length === 1) {
+      let prospectId   = $('#prospectList a').attr('data-id');
+      data.prospect_id = prospectId;
+    }
+    getCashRegisterInfo(cashRegister => {
+      data.cash_register_id = cashRegister.id;
+      if ( parentTicket ){
+        data.parent_id = parentTicket;
+      }
+      insert(
+        Object.keys(data),
+        Object.values(data),
+        'tickets'
+      ).then(ticket => {
+        if (data.parent_id)
+        {
+          let childTicketData = {
+            children_id: ticket.lastId,
+            ticket_id: data.parent_id,
+            date: getCurrentDate()
+          };
+
+          findBy('id', data.parent_id, 'tickets').then(function(ticketInfoData){
+            let ticketInfo = ticketInfoData.rows[0];
+            updateBy(
+              {
+                payed: data.payed,
+                payments_amount: parseFloat(data.payments_amount) + ticketInfo.payments_amount,
+                cash_return: data.cash_return
+              },
+              'tickets',
+              `id = ${data.parent_id}`
             ).then(function(){
-              data = null;
-              return call(ticket.lastId, childTicketData.ticket_id);
+              insert(
+                Object.keys(childTicketData),
+                Object.values(childTicketData),
+                'tickets_children'
+              ).then(function(){
+                data = null;
+                return call(ticket.lastId, childTicketData.ticket_id);
+              });
             });
           });
-        });
-      } else {
-        data = null;
-        return call(ticket.lastId);
-      }
+        } else {
+          data = null;
+          return call(ticket.lastId);
+        }
+      });
     });
+
   });
+
 
 }
 
@@ -479,7 +496,7 @@ function specialQuery(productId){
     ' stores_warehouse_entries.store_movement_id' +
     ' = store_movements.id WHERE ' +
     `stores_warehouse_entries.product_id = ${productId} ` +
-    " AND movement_type = 'alta' ORDER BY stores_warehouse_entries.id ";
+    "ORDER BY stores_warehouse_entries.id ";
 }
 
 function insertsServiceOffereds(ticketId, call){
@@ -497,9 +514,7 @@ function insertsServiceOffereds(ticketId, call){
       discountType    = $('.discounts-form-wrapper button.selected')
       .attr('id'),
       discountPercent = parseFloat(servicesJson[serviceId].discount) / 100,
-      unitPrice       = $(`#${servicesJson[serviceId].selector}`).find(
-        'td[id^=priceTo] input'
-      ).val(),
+      unitPrice       = $(`${servicesJson[serviceId].selector} td[id^=priceTo] input`).val(),
       subtotal        = parseFloat((unitPrice * sellQuantity).toFixed(2)),
       finalPrice      = parseFloat((unitPrice * (1 - discountPercent)).toFixed(2)),
       discount        = parseFloat((subtotal * discountPercent).toFixed(2)),
@@ -507,7 +522,7 @@ function insertsServiceOffereds(ticketId, call){
       total           = parseFloat((subtotal - discount + taxes).toFixed(2)),
       fixedDiscount   = parseFloat(discount.toFixed(2)),
       data = {
-        service_id         : serviceId.replace(/product_/,'').replace(/_.*/,''),
+        service_id         : serviceId.replace(/product_/,'').replace(/_.*/,'').replace('#',''),
         quantity           : sellQuantity,
         service_type       : 'venta',
         ticket_id          : ticketId,
@@ -548,8 +563,8 @@ function insertsServiceOffereds(ticketId, call){
       findBy('id', serviceOffered.lastId, 'service_offereds', serviceOffered.extraInfo).then(
         serviceOffered => {
 
-          let element = `#${serviceOffered.lastId} td:last`;
-          let deliveryServiceId = $(`#${serviceOffered.lastId}`).find('td[id^=deliveryService]').html();
+          let element = `${serviceOffered.lastId} td:last`;
+          let deliveryServiceId = $(`${serviceOffered.lastId} td[id^=deliveryService]`).html();
 
           if (!deliveryServiceId){
             serviceOfferedCount++;
@@ -595,6 +610,8 @@ function devolucionServiceOffered(parentTicket, ticketId, call){
 
   for (var referenceId in servicesJson){
     let serviceId = referenceId.replace('productDevolucion_','')
+    .replace(/product_/,'').replace('#','')
+    .replace("[data-child-count=undefined]","")
     promises.push(
       new Promise(function(localResolve){
         getAll(
@@ -615,9 +632,11 @@ function devolucionServiceOffered(parentTicket, ticketId, call){
           data.ticket_id = ticketId;
           sellQuantity    = servicesJson[positionIndex].sellQuantity,
           discountPercent = parseFloat(servicesJson[positionIndex].discount) / 100,
-          unitPrice       = parseFloat($(`#${servicesJson[positionIndex].selector}`).find(
-        'td[id^=priceTo]'
-      ).html().replace('$ ','').replace(/,/g,'')),
+          unitPrice       = parseFloat($(`${servicesJson[positionIndex]
+            .selector.replace("product_","")
+            .replace("[data-child-count=undefined]","")}`)
+            .find('td[id^=priceTo]')
+            .html().replace('$ ','').replace(/,/g,'')),
           subtotal        = Math.round(unitPrice * sellQuantity * 100) / 100,
           finalPrice      = Math.round(unitPrice * (1 - discountPercent) * 100) / 100,
           discount        = Math.round(subtotal * discountPercent * 100 ) / 100,
@@ -671,7 +690,7 @@ function devolucionStoreMovement(parentTicket, ticketId, call) {
           let referenceId = storeMovementObject.lastId;
           createWareHouseEntry({
             product_id: referenceId,
-            quantity: storeMovementObject.rows[0].quantity,
+            quantity: productsJson[productId]["sellQuantity"],
             store_movement_id: storeMovementObject.rows[0].id
           });
           return localResolve(storeMovementObject.rows[0]);

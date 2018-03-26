@@ -197,11 +197,11 @@ function displayTicketInfo(ticket, extraAction = false){
         let Promise = require("bluebird");
         let ticketInfo = ticket;
         Promise.each(resultData.rows, function(ticketProductInfo){
-          html += addProductToTicket(ticketProductInfo, extraAction);
+          html += addProductToTicket(ticketProductInfo, extraAction, 'products');
         }).then(function(){
           query(ticketInfoQuery(ticket.id, 'service')).then(resultData => {
             Promise.each(resultData.rows, function(ticketProductInfo){
-              html += addProductToTicket(ticketProductInfo, extraAction);
+              html += addProductToTicket(ticketProductInfo, extraAction, 'services');
             }).then(function(){
               html += `</tbody></table><div id="ticketTotalId" class="hidden">${ticket.total}</div>`
               resolve(html);
@@ -230,9 +230,9 @@ function deleteIcon(){
   '</div>';
 }
 
-function addDevelocionIcon(productId){
+function addDevolucionIcon(productId, table){
   return `<div class="close-icon blue-button">` +
-    `<button type="button" id="addToDevelucionTable_${productId}" class="close center-close" aria-label="Close">` +
+    `<button type="button" id="addToDevolucionTable_${productId}_${table}" class="close center-close" aria-label="Close">` +
       '<span aria-hidden="true" class="white-light">+</span>' +
     '</button>' +
   '</div>';
@@ -242,8 +242,8 @@ function extraActionId(extraAction, productId){
   return extraAction ? ` id="extraAction_${productId}"` : '';
 }
 
-function addProductToTicket(ticketProductData, extraAction = false){
-    let iconToAction = extraAction ? addDevelocionIcon(ticketProductData.productid) : deleteIcon();
+function addProductToTicket(ticketProductData, extraAction = false, table){
+    let iconToAction = extraAction ? addDevolucionIcon(ticketProductData.productid, table) : deleteIcon();
     let productPrice = ticketProductData.price || ticketProductData.initial_price;
     return '<tr>' +
       '<td>' +
@@ -420,6 +420,15 @@ function createRealSubtotal(discountSelector = 'a[id^=discount]'){
     discount += parseFloat( ( parseFloat(discountval) / 100 * total).toFixed(2) );
   });
 
+  $('#savedSubtotal').html(
+    ` $ ${(
+      parseFloat($('#SubtotalSum').html().replace(
+        "$ ", ""
+      ).replace(/,/g,'')
+    )).toFixed(2)
+    .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
+  );
+
   $('#discountSum').html(
     ` $ ${discount.toFixed(
         2
@@ -428,12 +437,12 @@ function createRealSubtotal(discountSelector = 'a[id^=discount]'){
       )}`
   );
 
-  $('#savedSubtotal').html(
+  $('#SubtotalSum').html(
     ` $ ${(
       parseFloat($('#SubtotalSum').html().replace(
         "$ ", ""
       ).replace(/,/g,'')
-      ) + parseFloat(
+    ) - parseFloat(
         translateInfo(
           $('#discountSum').html().replace(
             '$ ', ''
@@ -444,6 +453,26 @@ function createRealSubtotal(discountSelector = 'a[id^=discount]'){
       ).replace(
         /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
       )}`
+  );
+
+  realTax = (parseFloat(
+    $('#SubtotalSum').html().replace("$ ", "").replace(',','')
+    ) * 0.16)
+  .toFixed(2);
+
+  realSubtot = parseFloat(
+    $('#SubtotalSum').html().replace("$ ", "").replace(',','')
+    )
+  .toFixed(2);
+
+  $('table.subtotal td.subtotal.iva').html(
+    ` $ ${realTax.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
+  );
+
+  realTot = (parseFloat(realTax) + parseFloat(realSubtot)).toFixed(2);
+
+  $('table.subtotal td.total, #paymentRest').html(
+    `<strong>$ ${realTot.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </strong>`
   );
 
 }
@@ -460,7 +489,6 @@ function createRealSubtotal(discountSelector = 'a[id^=discount]'){
       subtotal += productTotal;
       taxSum += Math.round(productTotal * 0.16 * 100) / 100;
 
-//      taxSum += parseFloat(parseFloat( (productTotal * 0.16).toFixed(3) ).toFixed(2) );
     });
     $(subTotalInput).html(`$ ${subtotal.toFixed(
       2
@@ -470,11 +498,6 @@ function createRealSubtotal(discountSelector = 'a[id^=discount]'){
       `$ ${taxSum.toFixed(2).replace(
         /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
       )}`
-    );
-    $('table.subtotal td.total, #paymentRest').html(
-      `<strong>$ ${(subtotal + parseFloat(taxSum)).toFixed(
-        2
-      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}</strong>`
     );
 
     createRealSubtotal(discountSelector);

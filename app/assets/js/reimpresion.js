@@ -20,20 +20,28 @@ let localWin = null;
    });
  }
 
-function cancelarTicket(ticketId, isChild = false){
-  let Promise = require("bluebird");
-  return new Promise(function(resolve, reject){
+ function warehouseEntriesQuery(productId){
+   return ' SELECT stores_warehouse_entries.product_id' +
+     ` as idIs${productId}, store_movements.cost, stores_warehouse_entries.* FROM ` +
+     ' stores_warehouse_entries' +
+     ' INNER JOIN store_movements ON' +
+     ' stores_warehouse_entries.store_movement_id' +
+     ' = store_movements.id WHERE ' +
+     `stores_warehouse_entries.product_id = ${productId} ` +
+     "ORDER BY stores_warehouse_entries.id ";
+ }
+
+
+  function cancelarTicket(ticketId, isChild = false){
+    let Promise = require("bluebird");
+    return new Promise(function(resolve, reject){
       updateBy(
-        {
-          service_type: 'cancelado'
-        },
+        { service_type: 'cancelado' },
         'service_offereds',
         `ticket_id = ${ticketId}`
       ).then(function(){
         updateBy(
-          {
-            payment_type: 'cancelado'
-          },
+          { payment_type: 'cancelado' },
           'payments',
           `ticket_id = ${ticketId}`
         ).then(function(){
@@ -47,16 +55,34 @@ function cancelarTicket(ticketId, isChild = false){
               let quantity = storeMovement.quantity;
               findBy('product_id', storeMovement.product_id, 'stores_inventories').then(inventory => {
                 if (storeMovement.movement_type === 'devolución') {
+                  qtty = quantity;
+                  n = 0;
                   decreaseInventory(inventory.rows[0], quantity);
-                } else {
+                  query(warehouseEntriesQuery(storeMovement.product_id)).then(entries => {
+                    while(n < entries.rows.length || qtty > 0) {
+                      if (qtty < entries.rows[n].quantity) {
+                        updateBy(
+                          { quantity: (entries.rows[n].quantity - qtty) },
+                          'stores_warehouse_entries',
+                          `id = ${entries.rows[n].id}`
+                        );
+                        qtty = 0;
+                      } else {
+                        qtty -= entries.rows[n].quantity;
+                        deleteBy('stores_warehouse_entries', `id = ${entries.rows[n].id}`);
+                      }
+                      n += 1;
+                    };
+                  });
+                } else if (storeMovement.movement_type === 'venta') {
                   increaseInventory(inventory.rows[0], quantity);
+                  insert(
+                    Object.keys(warehouseData),
+                    Object.values(warehouseData),
+                    'stores_warehouse_entries'
+                  ).then(function(){});
                 }
               });
-              insert(
-                Object.keys(warehouseData),
-                Object.values(warehouseData),
-                'stores_warehouse_entries'
-              ).then(function(){});
             }).then(function(){
               updateBy(
                 {
@@ -80,6 +106,7 @@ function cancelarTicket(ticketId, isChild = false){
                   $('#askForConfirmCancel').modal('hide');
                   resolve();
                   window.location.href = 'pos_sale.html';
+                  });
                 });
               });
             });
@@ -87,8 +114,7 @@ function cancelarTicket(ticketId, isChild = false){
         });
       });
     });
-  });
-}
+  }
 
 function cancelChildrens(ticketId){
   return new Promise(function(resolve, reject){

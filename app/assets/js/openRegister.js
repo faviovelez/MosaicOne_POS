@@ -1,13 +1,20 @@
 $(function(){
 
   function getCashRegisterSum(){
-  return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
-      '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
-      'SUM((SELECT (COALESCE(SUM(payments.total),0)) as s ' +
-      'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
-      "WHERE payment_type = 'pago' AND payment_form_id = 1 AND ticket_type = 'venta'))) as sum";
+    return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
+          '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
+          'SUM((SELECT (COALESCE(SUM(' +
+          "CASE WHEN payments.payment_type = 'pago' AND payments.payment_form_id = 1 THEN payments.total " +
+          "WHEN payments.payment_type = 'devolución' AND payments.payment_form_id = 1 THEN -payments.total " +
+          'ELSE 0 ' +
+          'END ' +
+          '),0)) as s ' +
+          'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
+          "WHERE (tickets.ticket_type != 'pending' AND payments.payment_form_id = 1)))) as sum";
   }
+
   const remote = require('electron').remote;
+  const _ = require('lodash');
 
   async function initStore(){
 
@@ -45,12 +52,17 @@ $(function(){
       ' SELECT COUNT (*) as rows FROM products WHERE (shared = true AND current = true AND' +
       ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ` +
       ` UNION ALL` +
-      ` SELECT COUNT (*) as rows FROM services WHERE (shared = true AND current = true OR store_id = ${store.id})` +
+      ` SELECT COUNT (*) as rows FROM delivery_addresses WHERE id = ${store.delivery_address_id} UNION ALL`+
+      ` SELECT COUNT (*) as rows FROM stores WHERE id = ${store.id} UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM services WHERE (shared = true AND current = true OR store_id = ${store.id}) ` +
     ') as u';
   }
 
   function getStoresInventories(ids, store){
     return new Promise(function(resolve, reject){
+      if (ids.length === 0)
+        return resolve({length: 0});
+
       getAll('stores_inventories', '*', `store_id = ${store.id} AND product_id IN (${ids})`, true).then(storesInventoriesObjects => {
         resolve(storesInventoriesObjects.rows);
       });
@@ -62,7 +74,11 @@ $(function(){
         'products' : 'SELECT * FROM products WHERE (shared = true AND current = true ' +
         `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ORDER BY id`,
         'services' : 'SELECT * FROM services WHERE ' +
-        `(shared = true AND current = true OR store_id = ${store.id}) ORDER BY id`
+        `(shared = true AND current = true OR store_id = ${store.id}) ORDER BY id`,
+        'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
+        `id = ${store.delivery_address_id}`,
+        'stores' : "SELECT * FROM stores " +
+        `WHERE id=${store.id}`,
       };
     }
 
@@ -95,7 +111,7 @@ $(function(){
     });
   }
 
-  function createRemoteArray(localQuery, type){
+  function createRemoteArray(localQuery, type, storeObject){
     return new Promise(function(resolve, reject){
       let Promise = require("bluebird");
       let table = type;
@@ -108,6 +124,11 @@ $(function(){
           ['created_at', 'updated_at'].forEach(field => {
             delete row[field];
           });
+
+          if (table === 'products'){
+            let newPrice = row.price * ( 1 + (storeObject.overprice / 100) );
+            row.price = Math.round(newPrice * 100) / 100;
+          }
 
           promises.push(createInsert(
             Object.keys(row),
@@ -182,7 +203,23 @@ $(function(){
     });
   }
 
-  function getProductsAndServices(store){
+  function updateUniqs(uniqJson){
+    return uniqJson.map(function(uniqInfo){
+      return new Promise(function(resolve, reject){
+        findBy('id', uniqInfo.reg.id, uniqInfo.table).then(foundObjectData => {
+          updateBy(
+            foundObjectData.rows[0],
+            uniqInfo.table,
+            `id = ${uniqInfo.reg.id}`
+          ).then(function(){
+            resolve();
+          });
+        });
+      });
+    });
+  }
+
+  function getUpdatedInformacion(store){
     let promises = [];
     let Promise = require("bluebird");
     return new Promise(function(globalResolve, globalReject){
@@ -191,20 +228,28 @@ $(function(){
 
         for (var type in jsonQueries) {
           promises.push(createLocalArray(jsonQueries[type], type));
-          promises.push(createRemoteArray(jsonQueries[type], type));
+          promises.push(createRemoteArray(jsonQueries[type], type, store));
         }
 
         Promise.all(promises).then(function(returnArray){
-          let localProducts = returnArray[0];
-          let remoteProducts = returnArray[1];
-          let localServices = returnArray[2];
-          let remoteServices = returnArray[3];
+          let groupsArray = _.chunk(returnArray, 2)
           let promisesArray = [];
 
-          promisesArray.push(getProcessIds(localProducts, remoteProducts));
-          promisesArray.push(getProcessIds(localServices, remoteServices));
+          groupsArray.forEach(function(groupArray){
+            promisesArray.push(getProcessIds(groupArray[0], groupArray[1]));
+          });
 
           Promise.all(promisesArray).then(function(validProcessIds){
+            let tablesArray = ['delivery_addresses', 'stores'];
+            let uniqueJsonData = [2,3].map(function(regPosition, index){
+              if (validProcessIds[regPosition].length > 0){
+                return {
+                  reg: validProcessIds[regPosition][0],
+                  table: tablesArray[index]
+                }
+              }
+            });
+            let uniquesRegs = updateUniqs(_.compact(uniqueJsonData));
             let promisesChanges = [];
             validProcessIds[0].forEach(function(product){
 
@@ -251,7 +296,9 @@ $(function(){
               });
 
               Promise.all(promisesChangesServices).then(function(aServiceQueryResult){
-                globalResolve();
+                Promise.all(uniquesRegs).then(function(){
+                  globalResolve();
+                });
               });
             });
           });
@@ -267,6 +314,10 @@ $(function(){
       ' SELECT COUNT (*) as rows FROM products WHERE (shared = true AND current = true AND' +
       ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ` +
       ` AND id NOT IN (${localIds.products}) UNION ALL` +
+      ` SELECT COUNT (*) as rows FROM store_movements INNER JOIN products ` +
+      'ON store_movements.product_id = products.id WHERE' +
+      ` store_movements.store_id = ${store.id} AND products.child_id IS NULL` +
+      ` AND store_movements.id NOT IN (${localIds.storeMovements}) UNION ALL` +
       ` SELECT COUNT (*) as rows FROM services WHERE (shared = true AND current = true OR store_id = ${store.id})` +
       ` AND id NOT IN (${localIds.services}) ` +
     ') as u';
@@ -279,7 +330,11 @@ $(function(){
         ` AND id NOT IN (${localIds.products})`,
         'services' : 'SELECT * FROM services WHERE ' +
         `(shared = true AND current = true OR store_id = ${store.id})` +
-        ` AND id NOT IN (${localIds.services})`
+        ` AND id NOT IN (${localIds.services})`,
+        'store_movements': `SELECT store_movements.* FROM store_movements INNER JOIN products ` +
+        'ON store_movements.product_id = products.id WHERE' +
+        ` store_movements.store_id = ${store.id} AND products.child_id IS NULL ` +
+        ` AND store_movements.id NOT IN (${localIds.storeMovements})`,
       };
     }
 
@@ -294,13 +349,43 @@ $(function(){
           localIds.services = $.map(servicesIdsResult.rows, function(row){
             return row.id;
           });
-          resolve(localIds);
+          getAll('store_movements', 'id').then(storeMovmentsIdsResult => {
+            localIds.storeMovements = $.map(storeMovmentsIdsResult.rows, function(row){
+              return row.id;
+            });
+
+            resolve(localIds);
+          })
         });
       });
     });
   }
 
-  function getProductsAndServicesForNew(store){
+  function createWareHouseEntry(insertData){
+    return new Promise(function(resolve, reject){
+      insert(
+        Object.keys(insertData),
+        Object.values(insertData),
+        'stores_warehouse_entries'
+      ).then(function(insertResult){
+        findBy('product_id', insertData.product_id, 'stores_inventories')
+          .then(function(storeInventoryObject){
+            let inventory = storeInventoryObject.rows[0];
+            updateBy(
+              {
+                quantity: (inventory.quantity + insertData.quantity)
+              },
+              'stores_inventories',
+              `id = ${inventory.id}`
+            ).then(function(storeInventyResult){
+              resolve();
+            });
+          });
+      });
+    });
+  }
+
+  function geInformacionForNew(store){
     return new Promise(function(resolve, reject){
       getLocalIds().then(localIds => {
         query(getQueryCountForNew(store, localIds)).then(limitCount => {
@@ -308,6 +393,7 @@ $(function(){
           let limit = parseInt(limitCount.rows[0].total_rows);
           let newProductsIds = [];
           let queries = lotQueriesForNew(store, localIds);
+          let storeMovementsPromises = [];
           if (limit === 0) {
             resolve();
           }
@@ -317,6 +403,13 @@ $(function(){
               tablesResult.rows.forEach(row => {
                 if (tablesResult.table === 'products')
                   newProductsIds.push(row.id);
+
+                if (tablesResult.table === 'store_movements')
+                  storeMovementsPromises.push(createWareHouseEntry({
+                    product_id: row.product_id,
+                    quantity: row.quantity,
+                    store_movement_id: row.id
+                  }));
 
                 createInsert(
                   Object.keys(row),
@@ -329,24 +422,35 @@ $(function(){
                       getStoresInventories(newProductsIds, store).then(function(storesInventoriesRows){
                         count = 0;
                         limit = storesInventoriesRows.length;
+                        if (limit === 0){
+                          Promise.all(storeMovementsPromises).then(function(){
+                            resolve();
+                          });
+                        } else {
 
-                        storesInventoriesRows.forEach(row => {
-                          createInsert(
-                            Object.keys(row),
-                            Object.values(row),
-                            'stores_inventories'
-                          ).then(localQuery => {
-                            query(localQuery, false).then(() => {
-                              count++;
-                              if (count === limit){
-                                resolve();
-                              }
+                          storesInventoriesRows.forEach(row => {
+                            createInsert(
+                              Object.keys(row),
+                              Object.values(row),
+                              'stores_inventories'
+                            ).then(localQuery => {
+                              query(localQuery, false).then(() => {
+                                count++;
+                                if (count === limit){
+
+                                  Promise.all(storeMovementsPromises).then(function(){
+                                    resolve();
+                                  });
+
+                                }
+                              })
+                              .catch(function(err){
+                                console.log(err);
+                              })
                             })
-                            .catch(function(err){
-                              console.log(err);
-                            })
-                          })
-                        });
+                          });
+
+                        }
                       });
                     }
                   })
@@ -421,8 +525,8 @@ $(function(){
     initStore().then(store => {
       store.set('cash', $('#register_open_cash_register').val());
       alert('Actualizando base de datos, por favor espere un momento');
-      getProductsAndServices(store.get('store')).then(function(){
-        getProductsAndServicesForNew(store.get('store')).then(function(){
+      getUpdatedInformacion(store.get('store')).then(function(){
+        geInformacionForNew(store.get('store')).then(function(){
           window.location.href = 'pos_sale.html';
         });
       })

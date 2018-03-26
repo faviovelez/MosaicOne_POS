@@ -2,6 +2,16 @@ $(document).ready(function(){
 
   const Inputmask = require('inputmask');
 
+  (function setOverprice(){
+
+    query("SELECT overprice FROM stores LIMIT 1").then(overprice => {
+      ovrPr = Math.round(overprice.rows[0].overprice * 100 / 100).toFixed(1);
+      $('.storeOverprice').html(
+        `${ovrPr} %`
+      );
+    });
+  })();
+
   function initDataTables(){
     $('#priceList').DataTable({
       "language": {

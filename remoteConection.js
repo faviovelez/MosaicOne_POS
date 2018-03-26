@@ -19,6 +19,40 @@ const localPool = new Pool({
   port: 5432,
 });
 
+const storeIdsTables = [
+  "bill_receiveds",
+  "bills",
+  "cash_registers",
+  "change_tickets",
+  "deposits",
+  "discount_rules",
+  "estimate_docs",
+  "expenses",
+  "inventory_configurations",
+  "movements",
+  "orders",
+  "payments",
+  "products",
+  "prospects",
+  "requests",
+  "return_tickets",
+  "service_offereds",
+  "services",
+  "store_movements",
+  "stores_inventories",
+  "stores_suppliers",
+  "stores_warehouse_entries",
+  "suppliers",
+  "terminals",
+  "tickets",
+  "users",
+  "warehouses",
+  "withdrawals",
+  "billing_addresses",
+  "tickets_children",
+  'delivery_services'
+];
+
 function runLocalQuery(q){
   return new Promise(function(resolve){
     let res;
@@ -70,7 +104,14 @@ async function query (q, remote = true, table = '', lastId = 0) {
       await client.query('COMMIT');
     } catch (err) {
       await client.query('ROLLBACK');
-      throw err;
+      if (err.toString().indexOf('pkey') > -1){
+        res = {
+          err : true
+        };
+      } else {
+        console.log('Database error!', err);
+        return false;
+      }
     }
   } finally {
     client.release();
@@ -123,6 +164,59 @@ async function toDayRows(table){
     ` WHERE created_at >= '${year}-${month}-${day}'` +
     ` AND created_at < '${year}-${month}-${day + 1}'`;
   return await query(localQuery, false);
+}
+
+async function insert (columns, data, table, extras = true, extraInfo = ''){
+  let localQuery = `INSERT INTO public.${table}(`,
+    store,
+    extrasData = extras ? ', pos, web)' : ')',
+    recordId;
+
+  if ($.inArray(columns, 'id') === -1) {
+    localQuery += 'id, ';
+  }
+  store = await initStore();
+  localQuery += columns.shift();
+  columns.forEach(fieldName => {
+    localQuery += `, ${fieldName}`;
+  });
+
+  if ($.inArray(table, storeIdsTables) > -1) {
+    localQuery += `, created_at, updated_at, store_id${extrasData}`;
+  } else {
+    localQuery += `, created_at, updated_at${extrasData}`;
+  }
+
+  if ($.inArray(columns, 'id') === -1) {
+    let lastId   = await query(`SELECT MAX(id) as id FROM ${table}`);
+    recordId = (lastId.rows[0].id + 1);
+    localQuery += ` VALUES ('${recordId}', '${data.shift()}'`;
+  } else {
+    localQuery += ` VALUES ('${data.shift()}'`;
+  }
+
+  data.forEach(data => {
+    localQuery += `, '${data}'`;
+  });
+  let createDate = new Date(),
+    updateDate = new Date();
+
+  localQuery += `, '${createDate.toString().replace(/GMT.*/,'')}',`;
+  localQuery += `'${updateDate.toString().replace(/GMT.*/,'')}'`;
+  if ($.inArray(table, storeIdsTables) > -1) {
+    let storeId = store.get('store').id;
+    localQuery += `, '${storeId}'`;
+  }
+  extrasData = extras ? ', true, false)' : ')';
+  let queryResult = await query(`${localQuery}${extrasData}`, false, table, recordId);
+
+  while (queryResult.err) {
+    let newId = queryResult.lastId + 1;
+    localQuery = localQuery.replace(queryResult.lastId, newId);
+    queryResult = await query(`${localQuery}${extrasData}`, false, table, newId);
+  }
+  queryResult.extraInfo = extraInfo;
+  return queryResult;
 }
 
 async function createInsert (columns, data, table){

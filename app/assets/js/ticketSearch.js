@@ -44,6 +44,7 @@ $(function(){
         setUserData(payment.user_id, function(userName){
           html += '<tr class="paymentData">' +
             `<td> ${payment.ticket_id} </td>` +
+            `<td class="paymentTypeDesc"> ${payment.payment_type} </td>` +
             `<td> ${getPaymentType(payment.payment_form_id, payment.total)} </td>` +
             `<td data-type="${payment.payment_form_id}" class="paymentTotal"> ${convertToPrice(payment.total)} </td>` +
             `<td> ${getDate(payment.created_at)} </td>` +
@@ -65,7 +66,7 @@ $(function(){
       let html = '<table class="payments-received-on-ticket">' +
         '<thead>' +
           '<tr>' +
-            '<th colspan="5" class="head-black">' +
+            '<th colspan="6" class="head-black">' +
               'Pagos recibidos Ticket:' +
               '<span class="ticket-number">' +
                 `  ${ticket.id}` +
@@ -75,6 +76,9 @@ $(function(){
           '<tr>' +
             '<th>' +
               'Ticket' +
+            '</th>' +
+            '<th>' +
+              'Tipo' +
             '</th>' +
             '<th>' +
               'Forma de pago' +
@@ -113,7 +117,8 @@ $(function(){
     let totalPagado = 0;
     $.each($('.paymentData'), function(){
       let paymentType = parseInt($(this).find('td.paymentTotal').attr('data-type'));
-      if (paymentType < 21) {
+      let realType = $(this).find('td.paymentTypeDesc').html().trim();
+      if (paymentType < 21 && realType == 'pago') {
         totalPagado += parseFloat($(this).find('td.paymentTotal').html().replace(/\s|\$|,/g,''));
       }
     });
@@ -123,7 +128,10 @@ $(function(){
       convertToPrice(paymentRest)
     );
 
-    $('table.subtotal td.total strong').html($('#paymentRest strong').html());
+    $('table.subtotal td.total strong').html(
+      parseFloat($('#ticketTotalId').html())
+      .toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
+      );
 
   }
 
