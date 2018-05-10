@@ -52,15 +52,16 @@ $(function(){
   function convertProductToValidQuantity(ticketId, product){
     return new Promise(function(resolve, reject){
 
-      let getDevolutionQuantitiesQuery ='SELECT allMovementsTickets.ticket_type, SUM(store_movements.quantity) ' +
-      'as quantityMovements, store_movements.product_id FROM (' +
-      `SELECT * FROM tickets WHERE parent_id = ${ticketId} OR id = ${ticketId}` +
-      ') as allMovementsTickets ' +
-      'INNER JOIN store_movements ON ' +
-      'allMovementsTickets.id = store_movements.ticket_Id WHERE ' +
-      `store_movements.product_id = ${product.id} AND ` +
-      'allMovementsTickets.ticket_type = \'devolución\' ' +
-      'GROUP BY allMovementsTickets.ticket_type, store_movements.product_id';
+      let getDevolutionQuantitiesQuery = 'SELECT ticket_type, SUM(quantity) ' +
+          'AS quantityMovements, product_id FROM( ' +
+          "SELECT id, ticket_type, (date_trunc('day', created_at) " +
+          "+ interval '1 day' - interval '1 second' - interval '1 day') as start_date, " +
+          "(date_trunc('day', created_at) + interval '1 day') as end_date " +
+          `FROM tickets WHERE parent_id = ${ticketId} OR id = ${ticketId}) AS results_tickets ` +
+          'INNER JOIN store_movements ON store_movements.ticket_id = results_tickets.id ' +
+          'WHERE (store_movements.created_at > results_tickets.start_date ' +
+          'AND store_movements.created_at < results_tickets.end_date) ' +
+          `AND product_id = ${product.id} AND ticket_type = 'devolución' GROUP BY ticket_type, product_id`;
 
       query(getDevolutionQuantitiesQuery).then(function(resultValues){
         if (resultValues.rowCount === 0)
@@ -70,9 +71,7 @@ $(function(){
         product.quantity = product.quantity - quantityMovements;
         resolve(product);
       });
-
     });
-
   }
 
   function devoluAddTr(productOrService){
@@ -83,7 +82,7 @@ $(function(){
         price = productOrService.table === 'products' ? productOrService.price : productOrService.initial_price,
         description = productOrService.table === 'products' ? '<a href="#" data-toggle="modal" ' +
         ` data-target="#productShow" data-id="${productOrService.id}" data-table="${productOrService.table}" >` +
-        `${productOrService.unique_code} ${productOrService.description} </a>` : productOrService.description
+        `${productOrService.unique_code} ${productOrService.description} ${productOrService.only_measure} </a>` : productOrService.description
         productInList = $(`#product_${productOrService.id}`);
 
     if (productOrService.quantity <= 0)
@@ -122,7 +121,7 @@ function createDevolucionTotal(id){
     price = $(`td[id^=priceToDevolucion_${id}] input`).val();
   } else {
     price    = parseFloat(
-      $(priceElement).html().replace(' $ ','').replace(',','')
+      $(priceElement).html().replace(' $ ','').replace(/,/g,'')
     );
   }
   let total =  parseFloat( (price * cuantity).toFixed(2) ),
@@ -136,10 +135,7 @@ function createDevolucionTotal(id){
 
 function addEvents(id, productOrServiceObject, table){
 
-  $(`button[id=deleteDevolucion_${id}_${table}]`).click(function(){
-    $(this).parents('tr').remove();
-    bigTotal('td[id^=discountToDevolucion_]');
-  });
+  deleteRow(id, table);
 
   $(`#cuantityToDevolucion_${id}`).keyup(function(){
     let limitValue = parseInt($(this).attr('data-valueLimit'));
@@ -177,20 +173,33 @@ function addEvents(id, productOrServiceObject, table){
 
 }
 
+function deleteRow(){
+  $(`button[id^=deleteDevolucion_]`).on('click', function(){
+    $(this).parents('tr').remove();
+    bigTotal('td[id^=discountToDevolucion_]');
+  });
+}
+
 const Inputmask = require('inputmask');
 
-  function loadDevelocionTable(ticketObject){
+  function loadDevolucionTable(ticketObject){
     displayTicketInfo(ticketObject, true).then(tableHtmlContent => {
       $('#resultOfTicketSearch').append(tableHtmlContent);
       $('.items-returns').removeClass('hidden');
-      let ticketId = ticketObject.id,
-          localQuery = 'SELECT * FROM products INNER JOIN' +
-                       ' store_movements ON products.id = ' +
-                       ' store_movements.product_id WHERE' +
-                       ` ticket_id = ${ticketId}`;
+      ticketId = ticketObject.id;
 
-      query(localQuery).then(storeMovementProducts => {
-        storeMovementProducts.rows.forEach(product => {
+      let storeMovQuery = 'SELECT products.*, store_movements.* FROM(SELECT id, ticket_type, ' +
+      "(date_trunc('day', created_at) + interval '1 day' " +
+      "- interval '1 second' - interval '1 day') as start_date, " +
+      "(date_trunc('day', created_at) + interval '1 day') as end_date " +
+      `FROM tickets WHERE id = ${ticketId}) AS results_tickets ` +
+      'INNER JOIN store_movements ON store_movements.ticket_id = results_tickets.id ' +
+      'INNER JOIN products ON products.id = store_movements.product_id ' +
+      'WHERE (store_movements.created_at > results_tickets.start_date ' +
+      'AND store_movements.created_at < results_tickets.end_date)';
+
+      query(storeMovQuery).then(storeMoveProducts => {
+        storeMoveProducts.rows.forEach(product => {
           product.table = 'products';
           product.id    = product.product_id;
 
@@ -206,12 +215,12 @@ const Inputmask = require('inputmask');
         });
       });
 
-      localQuery = 'SELECT *, service_offereds.id as serviceId FROM services INNER JOIN' +
+      let servOfferedQuery = 'SELECT *, service_offereds.id as serviceId FROM services INNER JOIN' +
         ' service_offereds ON services.id = ' +
         ' service_offereds.service_id WHERE' +
         ` ticket_id = ${ticketId}`;
       cleanPaymentInputs();
-      query(localQuery).then(serviceOffereds => {
+      query(servOfferedQuery).then(serviceOffereds => {
         serviceOffereds.rows.forEach(service => {
 
           service.table = 'services';
@@ -244,13 +253,14 @@ const Inputmask = require('inputmask');
             $('#devolucionTable tr').remove();
             $('#ticketTotalId').remove();
             $('.items-returns').addClass('hidden');
+            cleanRows();
             addSearchTicketTr(ticket).then(trInfo => {
               $('#resultTicketList').append(trInfo);
               $('.ticket-results').removeClass('hidden');
               $(`#ticketNumber${ticket.id}`).click(function(){
 
                 $('.ticket-results').addClass('hidden');
-                loadDevelocionTable(ticket);
+                loadDevolucionTable(ticket);
               })
             });
             $(this).val('');
@@ -260,7 +270,23 @@ const Inputmask = require('inputmask');
     });
   }
 
+  function cleanRows(){
+    $("tr[id*='product_'").each(function() {
+      $(this).remove();
+    });
+    $("tr[id*='paymentMethod_'").each(function() {
+      $(this).remove();
+    });
+    resumePayment();
+  }
+
   $("#return-option").click(function () {
+    cleanRows();
+    $('#mainProductSearch').val('');
+    $('.discount-group').addClass('hidden');
+    $('.pay-dev-group').removeClass('hidden');
+    $('#completeSale').addClass('hidden');
+    $('#completeSale').html('Completar devolución');
     $('.btn-group').removeClass('open');
     $('#ticketList tr').remove();
     $('#creditSale').addClass('hidden');

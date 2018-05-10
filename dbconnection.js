@@ -75,6 +75,7 @@ async function runQuery(q, client, lastId, table){
         };
       } else {
         console.log('Database error!', err);
+        console.log(q);
         return false;
       }
     }
@@ -89,7 +90,7 @@ async function runQuery(q, client, lastId, table){
   return res;
 }
 
-async function query (q, lastId = 0, table = '') {
+async function query(q, lastId = 0, table = '') {
   //let timmer = setInterval(async function(){
     let client = new Client({
       user: 'faviovelez',
@@ -99,13 +100,13 @@ async function query (q, lastId = 0, table = '') {
       port: 5432,
     });
 
-
     client.on('error', function (err) {
       console.log('Database error!', err);
+      console.log(q);
       return false;
     });
-
     await client.connect();
+
     let res = await runQuery(q, client, lastId, table)
     //clearInterval(timmer);
     await client.end();
@@ -298,6 +299,18 @@ async function findBy(column, data, table, lastId = 0, refTable = ''){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
   return await query(`${localQuery}`, lastId, refTable);
+}
+
+async function specialFindBy(column, data, table){
+  let specialQuery = `SELECT ${table}.* FROM (SELECT id, ticket_type, ` +
+  "(date_trunc('day', created_at) + interval '1 day' " +
+  "- interval '1 second' - interval '1 day') AS start_date, " +
+  "(date_trunc('day', created_at) + interval '1 day') AS end_date " +
+  `FROM tickets WHERE ${column} = ${data}) AS results_tickets ` +
+  `INNER JOIN ${table} ON ${table}.ticket_id = results_tickets.id ` +
+  `WHERE (${table}.created_at > results_tickets.start_date ` +
+  `AND ${table}.created_at < results_tickets.end_date)`;
+  return await query(specialQuery);
 }
 
 async function getOnly(table, ids){

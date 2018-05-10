@@ -75,6 +75,7 @@ function runLocalQuery(q){
         } catch (err) {
           await client.query('ROLLBACK');
           console.log(err);
+          console.log(q);
         }
       } finally {
         await client.end();
@@ -89,7 +90,7 @@ function runLocalQuery(q){
   });
 }
 
-async function query (q, remote = true, table = '', lastId = 0) {
+async function query(q, remote = true, table = '', lastId = 0) {
   let client = null;
   if (remote){
     client = await remotePool.connect();
@@ -110,6 +111,7 @@ async function query (q, remote = true, table = '', lastId = 0) {
         };
       } else {
         console.log('Database error!', err);
+        console.log(q);
         return false;
       }
     }
@@ -121,13 +123,64 @@ async function query (q, remote = true, table = '', lastId = 0) {
   }
 
   res.table = table;
+  return res;
+}
 
+async function alterRunQuery(q, client, lastId, table){
+  let res;
+  try {
+    await client.query('BEGIN');
+    try {
+      res = await client.query(q);
+      res.err = false;
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      if (err.toString().indexOf('pkey') > -1){
+        res = {
+          err : true
+        };
+      } else {
+        console.log('Database error!', err);
+        console.log(q);
+        return false;
+      }
+    }
+  } finally {
+    if (client.release)
+      client.release(true);
+  }
+  if (lastId !== 0) {
+    res.lastId = lastId;
+  }
+  res.table = table;
+  return res;
+}
+
+async function alterQuery(q, lastId = 0, table = '') {
+  let client = new Client({
+    user: 'faviovelez',
+    host: 'localhost',
+    database: 'mosaiconepos',
+    password: 'bafio44741',
+    port: 5432,
+  });
+
+  client.on('error', function (err) {
+    console.log('Database error!', err);
+    console.log(q);
+    return false;
+  });
+  await client.connect();
+
+  let res = await alterRunQuery(q, client, lastId, table)
+  await client.end();
   return res;
 }
 
 async function insertWebPosIds(table, posId, webId){
   let localQuery = `UPDATE ${table} SET web_id=${webId}, pos_id=${posId}`+
-                    ` WHERE id = ${posId}`,
+                    ` pos = true, web = true WHERE id = ${posId}`,
       remoteQuery = `UPDATE ${table} SET web_id=${webId}, pos_id=${posId}`+
                                       ` WHERE id = ${webId}`;
   await query(localQuery, false, table);
@@ -137,22 +190,7 @@ async function insertWebPosIds(table, posId, webId){
 async function getToTransfer(table){
   let localQuery = `SELECT * FROM ${table}` +
     ' WHERE web = false';
-
-  if (table === 'tickets') {
-    localQuery += ` AND ticket_type = 'venta' OR ticket_type = 'cancelado' OR ticket_type = 'pago' OR ticket_type = 'devolución'`
-  }
-
-  if (table === 'store_movements' || table === 'service_offereds' || table === 'payments'){
-    let resultQuery = `SELECT ${table}.id FROM ${table} INNER JOIN ` +
-    `tickets ON tickets.id = ${table}.ticket_id WHERE tickets.ticket_type = 'pending'`;
-    let ids = await query(resultQuery, false, table);
-    if (ids.rowCount > 0){
-      localQuery += ` AND id NOT IN (${$.map(ids.rows, function(row){return row.id}).toString()})`;
-    }
-    return await query(localQuery, false, table);
-  } else {
-    return await query(localQuery, false, table);
-  }
+  return await query(localQuery, false, table);
 }
 
 async function toDayRows(table){
@@ -253,6 +291,12 @@ async function createInsert (columns, data, table){
 async function findBy(column, data, table, remote = true, lastId = 0){
   let localQuery = `SELECT * FROM ${table} ` +
     `WHERE ${column}='${data}'`;
+  return await query(`${localQuery}`, remote, table, lastId);
+}
+
+async function storeInvFindBy(product_id, store_id, table, remote = true, lastId = 0){
+  let localQuery = `SELECT * FROM ${table} ` +
+    `WHERE product_id = '${product_id}' AND store_id = '${store_id}'`;
   return await query(`${localQuery}`, remote, table, lastId);
 }
 

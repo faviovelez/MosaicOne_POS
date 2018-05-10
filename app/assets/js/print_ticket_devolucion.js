@@ -31,7 +31,7 @@ function createTicketProductListDevolucion(productList, discount, call){
           `${object.product.unique_code} ` +
           '</span>' +
           '<span>' +
-          `${object.product.description} ` +
+          `${object.product.description} ${object.product.only_measure} ` +
           '</span>' +
           '</td>' +
           '<td colspan="1" style="width: 80px; text-align: right; vertical-align:text-top" >' +
@@ -151,6 +151,14 @@ function initTicketDevolucion(ticketData, call) {
       '<td colspan="2" style="text-align: right">_________________</td>' +
       '</tr>' +
       '<tr>' +
+      '<td colspan="2" style="text-align: right"> Subtotal: </td>' +
+      `<td colspan="2" style="text-align: right"> $ ${ticketData.ticket.subtotal.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
+      '</tr>' +
+      '<tr>' +
+      '<td colspan="2" style="text-align: right"> IVA 16%: </td>' +
+      `<td colspan="2" style="text-align: right"> $ ${ticketData.ticket.taxes.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
+      '</tr>' +
+      '<tr>' +
       '<td colspan="2" style="text-align: right">' +
       '<strong> Total: </strong>' +
       '</td>' +
@@ -181,18 +189,18 @@ function initTicketDevolucion(ticketData, call) {
       '</strong>' +
       '</td>' +
       '</tr>' +
-      '<tr>' +
-      '<td colspan="2" style="text-align:left">' +
-      '<strong>' +
-      'Cambio:' +
-      '</strong>' +
-      '</td>' +
-      '<td colspan="2" style="text-align:right">' +
-      '<strong>' +
-      `$ ${ticketData.ticket.cash_return.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}` +
-      '</strong>' +
-      '</td>' +
-      '</tr>' +
+//      '<tr>' +
+//      '<td colspan="2" style="text-align:left">' +
+//      '<strong>' +
+//      'Cambio:' +
+//      '</strong>' +
+//      '</td>' +
+//      '<td colspan="2" style="text-align:right">' +
+//      '<strong>' +
+//      `$ ${ticketData.ticket.cash_return.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}` +
+//      '</strong>' +
+//      '</td>' +
+//      '</tr>' +
       '<tr>' +
       '<td colspan="5">' +
       '_______________________________________ <br /> <br />' +
@@ -244,6 +252,9 @@ function initTicketDevolucion(ticketData, call) {
       '</tbody>' +
       '</table>' +
       '</body>' +
+//      '<script type="text/javascript">' +
+//          'window.print();'+
+//      '</script>' +
       '</html>');
   });
 }

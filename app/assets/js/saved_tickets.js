@@ -27,16 +27,24 @@ $(function(){
     '</tr>';
   }
 
-  function carIcon(id, company, childCount){
+  function carIcon(id, company, childCount, isComplete){
     if (company === null) {
       return '';
     }
 
-    return '<a href="#" data-toggle="modal"' +
+    if (isComplete) {
+      return '<a href="#" data-toggle="modal"' +
+      'data-target="#deliveryService"' +
+      `id="service_1" data-child-count="${childCount}" data-id=${id} class="green-truck">` +
+      '<i class="fa fa-truck" aria-hidden="true"></i>' +
+      '</a>';
+    } else {
+      return '<a href="#" data-toggle="modal"' +
       'data-target="#deliveryService"' +
       `id="service_1" data-child-count="${childCount}" data-id=${id}>` +
       '<i class="fa fa-truck" aria-hidden="true"></i>' +
       '</a>';
+    }
   }
 
   function translatePrice(price){
@@ -108,10 +116,11 @@ $(function(){
   }
 
   function createTotal(id){
+    totalObject = {};
     let cuantity = $(`input[id^=cuantityTo_${id}]`).val(),
       manualDiscount = !$('#manual-discount').hasClass('hidden'),
       price    = parseFloat(
-        $(`td[id^=priceTo_${id}]`).html().replace(' $ ','').replace(',','')
+        $(`td[id^=priceTo_${id}]`).html().replace(' $ ','').replace(/,/g,'')
       );
     if (!price){
       price = $(`td[id^=priceTo_${id}] input`).val();
@@ -121,10 +130,13 @@ $(function(){
       .html().replace(' %',''),
       discountVal = parseFloat(discount) / 100 * total,
       productTotal    = total - discountVal;
+      totaWithoutDisc = total;
+      totalObject["total"] = productTotal;
+      totalObject["totalNoDesc"] = totaWithoutDisc;
 
     if (manualDiscount){
       let globalManual = parseFloat(
-        $('#manualDiscountQuantity').html().replace(' $ ','').replace(',','')
+        $('#manualDiscountQuantity').html().replace(' $ ','').replace(/,/g,'')
       );
 
       if (globalManual.toString() === 'NaN'){
@@ -161,10 +173,9 @@ $(function(){
         `${product.unique_code} ${product.description}  </a>` : `${product.unique_code} ${product.description}`
 
     let percent = recalculateDiscount(product),
-        total = recalculateTotal(product, percent, product.table),
+        total = recalculateTotForSavedTicket(product, percent, product.table),
         price = '',
         productInList = $(`tr[id^=product_${product.id}_services]`);
-
     if (productInList.length === 1)
       product.id = `${product.id}_${product.id}`;
 
@@ -172,17 +183,21 @@ $(function(){
 
     let childCount = $(`tr[id^=product_${product.id}`).length + 1;
 
-    let color = product.table === 'services' ? carIcon(product.id, product.delivery_company, childCount) :
-      product.exterior_color_or_design;
-
-    if (product.table === 'services'){
+    if (product.table === 'services') {
+      deliveryTd = addDeliveryServiceId(product);
+      if (deliveryTd == '') {
+        completedDelivery = false;
+      } else {
+        completedDelivery = true;
+      }
+      color = carIcon(product.id, product.delivery_company, childCount, completedDelivery);
       price ='<input type="text" class="form-control ' +
       `smaller-form" id="priceToServiceTo_${product.id}" value="${product.initial_price}">`;
     } else {
+      deliveryTd = '';
+      color = product.exterior_color_or_design;
       price = stringPrice(product.price, product.id);
     }
-
-    let deliveryTd = product.table === 'services' ? addDeliveryServiceId(product) : '';
 
   return `<tr id="product_${product.id}" data-child-count="${childCount}"><td id="infoTableName" class="hidden">${product.table}</td><td>` +
       '<div class="close-icon">' +
@@ -206,9 +221,9 @@ $(function(){
       `id="discount_${product.id}" data-id="${product.id}" data-child-count="${childCount}" ` +
       `data-table="${product.table}" > ${percent}% </a> </td>` +
       `<td class="right" id="totalTo_${product.id}">` +
-      `$ ${(total * 1.16).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
+      `$ ${(total.total * 1.16).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
       `<td class="right hidden" id="totalSinTo_${product.id}">` +
-      `$ ${total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
+      `$ ${total.totalNoDesc.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
       deliveryTd +
       '</tr>';
   }
@@ -288,7 +303,7 @@ $(function(){
     });
     let total = $('table.subtotal td.total strong').html().replace(
       '$ ', ''
-    ).replace(',',''),
+    ).replace(/,/g,''),
        rest = (parseFloat(total) - sum).toFixed(2);
     $('#sumPayments').html(sum);
     if (parseFloat(rest) <= 0){
@@ -348,11 +363,17 @@ $(function(){
   }
 
   if (window.location.href.indexOf('ticket_id') > -1){
-    let ticketId = window.location.href.replace(/.*ticket_id=/,''),
-        localQuery = 'SELECT * FROM products INNER JOIN' +
-                     ' store_movements ON products.id = ' +
-                     ' store_movements.product_id WHERE' +
-                     ` ticket_id = ${ticketId}`;
+    let ticketId = window.location.href.replace(/.*ticket_id=/,'');
+
+    let localQuery = 'SELECT products.*, store_movements.* FROM(SELECT id, ticket_type, ' +
+      "(date_trunc('day', created_at) + interval '1 day' " +
+      "- interval '1 second' - interval '1 day') as start_date, " +
+      "(date_trunc('day', created_at) + interval '1 day') as end_date " +
+      `FROM tickets WHERE id = ${ticketId}) AS results_tickets ` +
+      'INNER JOIN store_movements ON store_movements.ticket_id = results_tickets.id ' +
+      'INNER JOIN products ON products.id = store_movements.product_id ' +
+      'WHERE (store_movements.created_at > results_tickets.start_date ' +
+      'AND store_movements.created_at < results_tickets.end_date)';
 
     query(localQuery).then(storeMovementProducts => {
       storeMovementProducts.rows.forEach(product => {
@@ -499,19 +520,30 @@ $(function(){
     $('#cancelTicket').modal('hide');
   }
 
-  $('#ticketCancel').click(function(){
+  $('#ticketCancel').one( "click", function() {
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
 
     if (!isNaN(parseInt(ticketId))) {
-      deleteTicket(ticketId);
+      updateBy(
+        {
+          ticket_type: 'guardado / cancelado'
+        },
+        'tickets',
+        `id = ${ticketId}`
+      ).then(() => {});
     }
     window.location.href = 'pos_sale.html';
   });
 
-  $('#ticketCancelConfirm').click(function(){
+  $('#ticketCancelConfirm').one( "click", function() {
     let ticketId = $(this).attr('data-id');
-
-    deleteTicket(ticketId);
+    updateBy(
+      {
+        ticket_type: 'guardado / cancelado'
+      },
+      'tickets',
+      `id = ${ticketId}`
+    ).then(() => {});
   });
 
   function createFullName(user){
@@ -694,7 +726,7 @@ $(function(){
 
   }
 
-  $('#ticketSave').click(function(){
+  $('#ticketSave').one( "click", function() {
     let ticketId = window.location.href.replace(/.*ticket_id=/,'');
 
     if (!validateAllInputsFill()) {
@@ -717,9 +749,9 @@ $(function(){
 
           assignCost(user, 'pending', ticketId, function(){
 
-            insertsServiceOffereds(ticketId, function(){
+            insertsServiceOffereds(ticketId, 'pending', function(){
 
-              insertsPayments('pending', ticketId, user, storeObject, function(){
+              insertsPayments('pending', ticketId, user, storeObject, null, function(){
 
                 store.set('lastTicket', parseInt(
                   $('#ticketNum').html()

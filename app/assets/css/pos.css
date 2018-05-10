@@ -22,8 +22,26 @@
   padding-left: 0;
 }
 
+.green-truck {
+  color: #A0DB23;
+}
+
+.green-truck:hover,
+.green-truck:active,
+.green-truck:focus {
+  color: #88BF11;
+}
+
 .blue-button {
   background-color: #00A8EA !important;
+}
+
+.center-span-completeSale {
+  text-align: center;
+}
+
+.pay-dev-group {
+  text-align: center;
 }
 
 table.ticket-selected,

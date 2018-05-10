@@ -154,7 +154,7 @@
                     Devolución
                   </a>
                 </li>
-                <li>
+                <li class="hidden">
                   <a href="#" id="change-option">
                     <i class="fa fa-handshake-o" aria-hidden="true"></i>
                     Cambio
@@ -397,8 +397,9 @@
       </div>
 
       <div class="discounts-container">
-        <h4> Tipo de descuento</h4>
-        <div class="discounts-form-wrapper">
+        <h4 class="discount-group"> Tipo de descuento</h4>
+        <h4 class="pay-dev-group hidden"> Totales</h4>
+        <div class="discounts-form-wrapper discount-group">
           <button type="button" class="btn btn-default custom-button" id="manual">
             <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
             Manual
@@ -414,7 +415,7 @@
         </div>
 
         <!-- Tabla descuentos automáticos (regla de descuentos) -->
-        <table class="discounts-table hidden" id="automatic-discount">
+        <table class="discounts-table hidden discount-group" id="automatic-discount">
           <thead>
             <tr>
               <th colspan="2"> Descuentos automáticos: </th>
@@ -442,7 +443,7 @@
         </table>
 
         <!-- Tabla descuentos manuales -->
-        <table class="discounts-table hidden" id="manual-discount">
+        <table class="discounts-table hidden discount-group" id="manual-discount">
           <thead>
             <tr>
               <th colspan="2"> Descuento manual: </th>
@@ -557,7 +558,7 @@
       <div class="row process-sale">
         <div class="input-group">
           <input type="text" class="form-control paymentProcess" id="paymentMethodCuantity" placeholder="Ingrese monto de pago">
-          <span class="input-group-btn">
+          <span class="input-group-btn center-span-completeSale">
             <button class="btn btn-default color-button pos-main-btn hidden" type="button" id="completeSale">Completar venta</button>
             <button class="btn btn-default color-button pos-secondary-btn paymentProcess notInAllProcess" type="button" id="addPayment">Agregar pago</button>
           </span>
@@ -616,6 +617,7 @@
          <h4 class="modal-title">Detalles del producto</h4>
        </div>
        <div class="modal-body">
+         <p id="product_id_modal" class="hidden"></p>
          <table>
            <tbody>
              <tr>
@@ -677,8 +679,8 @@
                  </p>
                  <p class="location-paragraph">
                   <strong class="location-strong">
-                  </strong>
                     Ubicación:
+                  </strong>
                   <span class="stores_inventory_rack">
                   </span>
                   <span class="stores_inventory_level">
@@ -698,6 +700,9 @@
        <div class="modal-footer">
          <button type="button" class="btn btn-default pos-main-btn red-modal-button" id="modifyLocation">
            Modificar ubicación
+         </button>
+         <button type="button" class="btn btn-default pos-main-btn red-modal-button hidden" id="confirmChangeLocation">
+           Confirmar cambio
          </button>
          <button type="button" class="btn btn-default pos-main-btn" data-dismiss="modal">
            Confirmar
@@ -901,6 +906,8 @@
                 </tbody>
               </table>
 
+              <h4 class="title-margin-modal"> Dirección </h4>
+
               <table class="table-margin-modal delivery-services-table">
                 <thead>
                   <tr>
@@ -991,6 +998,43 @@
                      </td>
                      <td>
                        <input placeholder="Teléfono fijo" class="form-control round-form transparent-field blue-background" type="text" value="" name="delivery_service[phone]" id="delivery_service_phone" />
+                     </td>
+                   </tr>
+                 </tbody>
+               </table>
+
+               <h4 class="title-margin-modal"> Peso y medidas </h4>
+
+               <table class="table-margin-modal delivery-services-table">
+                 <thead>
+                   <tr>
+                     <th>
+                       <label for="delivery_service_weight">Peso</label><br>
+                     </th>
+                     <th>
+                       <label for="delivery_service_length">Largo</label><br>
+                     </th>
+                     <th>
+                       <label for="delivery_service_width">Ancho</label><br>
+                     </th>
+                     <th>
+                       <label for="delivery_service_height">Alto</label><br>
+                     </th>
+                   </tr>
+               </thead>
+                 <tbody>
+                   <tr>
+                     <td>
+                       <input placeholder="Peso" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[weight]" id="delivery_service_weight" />
+                     </td>
+                     <td>
+                       <input placeholder="Largo" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[length]" id="delivery_service_length" />
+                     </td>
+                     <td>
+                       <input placeholder="Ancho" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[width]" id="delivery_service_width" />
+                     </td>
+                     <td>
+                       <input placeholder="Alto" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[height]" id="delivery_service_height" />
                      </td>
                    </tr>
                  </tbody>
@@ -1161,7 +1205,6 @@
     <script src="../assets/js/pos.js" charset="utf-8"></script>
     <script src="../assets/js/pos_customers.js" charset="utf-8"></script>
     <script src="../assets/js/saved_tickets.js" charset="utf-8"></script>
-    <script src="../assets/js/specialQueries.js" charset="utf-8"></script>
     <script src="../assets/js/reimpresion.js" charset="utf-8"></script>
     <script src="../assets/js/devolucion.js" charset="utf-8"></script>
     <script src="../assets/js/ticketSearch.js" charset="utf-8"></script>

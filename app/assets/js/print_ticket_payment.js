@@ -116,11 +116,15 @@ function initTicketPayment(ticketData, call) {
       '<td colspan="2" style="text-align: right">_________________</td>' +
       '</tr>' +
       '<tr>' +
-      '<td colspan="2" style="text-align: right">' +
-      '<strong> Total: </strong>' +
+      '<td colspan="2" style="text-align:left">' +
+      '<strong>' +
+      'Total:' +
+      '</strong>' +
       '</td>' +
-      '<td colspan="2" style="text-align: right">' +
-      `<strong> $ ${ticketData.ticket.total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </strong>` +
+      '<td colspan="2" style="text-align:right">' +
+      '<strong>' +
+      `$ ${ticketData.ticket.payments_amount.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}` +
+      '</strong>' +
       '</td>' +
       '</tr>' +
       '<tr>' +
@@ -134,10 +138,18 @@ function initTicketPayment(ticketData, call) {
       '<br />' +
       '</td>' +
       '</tr>' +
+//      '<tr>' +
+//      '<td colspan="2" style="text-align: left">' +
+//      '<strong> Total ticket original: </strong>' +
+//      '</td>' +
+//      '<td colspan="2" style="text-align: right">' +
+//      `<strong> $ ${ticketData.ticket.total.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </strong>` +
+//      '</td>' +
+//      '</tr>' +
       '<tr>' +
       '<td colspan="2" style="text-align:left">' +
       '<strong>' +
-      'Total pagado:' +
+      'Pagos en este ticket:' +
       '</strong>' +
       '</td>' +
       '<td colspan="2" style="text-align:right">' +
@@ -209,6 +221,9 @@ function initTicketPayment(ticketData, call) {
       '</tbody>' +
       '</table>' +
       '</body>' +
+//      '<script type="text/javascript">' +
+//          'window.print();'+
+//      '</script>' +
       '</html>');
   });
 }

@@ -11,10 +11,13 @@ $(document).ready(function() {
 
   $('#saveNewPrice').click(function(){
     let productId = $('#changeSinglePriceProductId').html();
-
+    let newPrice = parseFloat($('#changeSinglePriceInput').val());
+    if (isNaN(newPrice)) {
+      newPrice = 0;
+    }
     updateBy(
       {
-        price: $('#changeSinglePriceInput').val()
+        price: newPrice
       },
       'products',
       `id = ${productId}`
@@ -22,7 +25,7 @@ $(document).ready(function() {
 
     updateBy(
       {
-        manual_price: $('#changeSinglePriceInput').val(),
+        manual_price: newPrice,
         manual_price_update: !!$("#changeSinglePriceCheckBox").is(':checked')
       },
       'stores_inventories',
@@ -30,7 +33,7 @@ $(document).ready(function() {
     ).then(() => {});
 
     $(`td[id^=priceTo_${productId}] a`).html(`
-      $ ${parseFloat($('#changeSinglePriceInput').val()).toFixed(2).replace(
+      $ ${parseFloat(newPrice).toFixed(2).replace(
           /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
         )}
     `);
@@ -42,13 +45,13 @@ $(document).ready(function() {
     let total = createTotal(`${productId}_products`, mainSelector);
 
     $(`#totalTo_${productId}_products`).html(
-      `$ ${(total * 1.16).toFixed(2).replace(
+      `$ ${(total.total * 1.16).toFixed(2).replace(
     /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
   )}`
     );
 
     $(`#totalSinTo_${productId}_products`).html(
-      `$ ${total.toFixed(2).replace(
+      `$ ${total.totalNoDesc.toFixed(2).replace(
     /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
   )}`
     );
@@ -111,16 +114,23 @@ $(document).ready(function() {
       '<td><input type="text" class="form-control" id="addReason" smaller-form" placeholder="Motivo">' +
       '</td></tr>';
   }
+
   function getCostPrice(price, overprice, discount){
     return (
-        price /  (1 + overprice / 100) * (1 - discount / 100 )
+        price /  (1 + (overprice / 100)) * (1 - discount / 100 )
       ).toFixed(2);
   }
 
   function createStoreMovementData(productId, quantity, action, call){
     findBy('id', productId, 'products').then(product => {
-      productDetails = product.rows[0];
-
+      productDetails = Object.assign(product.rows[0]);
+      if (productDetails.discount_for_franchises == null) {
+        productDetails.discount_for_franchises = 0;
+      }
+      if (productDetails.discount_for_stores == null) {
+        productDetails.discount_for_stores = 0;
+      }
+      store_product = !(productDetails.store_id == null);
       storeMovementData = {
         product_id    : productDetails.id,
         quantity      : quantity,
@@ -135,18 +145,30 @@ $(document).ready(function() {
         let store = storage.get('store');
         let user = storage.get('current_user');
 
-        if (store.store_type_id === 4) {
-          storeMovementData.cost       = getCostPrice(
-            productDetails.price, store.overprice, productDetails.discount_for_franchises
-          );
-          storeMovementData.total_cost  = storeMovementData.cost * quantity;
-          storeMovementData.final_price = storeMovementData.cost;
-        } else if(store.store_type_id === 1) {
-          storeMovementData.cost       = getCostPrice(
-            productDetails.price, store.overprice, productDetails.discount_for_stores
-          );
-          storeMovementData.total_cost  = storeMovementData.cost * quantity;
-          storeMovementData.final_price = storeMovementData.cost;
+        if (store_product) {
+          if (productDetails.cost == null) {
+            storeMovementData.cost = 0;
+            storeMovementData.total_cost  = storeMovementData.cost * quantity;
+            storeMovementData.final_price = storeMovementData.cost;
+          } else {
+            storeMovementData.cost = productDetails.cost;
+            storeMovementData.total_cost  = storeMovementData.cost * quantity;
+            storeMovementData.final_price = storeMovementData.cost;
+          }
+        } else {
+          if (store.store_type_id === 4) {
+            storeMovementData.cost       = getCostPrice(
+              productDetails.price, store.overprice, productDetails.discount_for_franchises
+            );
+            storeMovementData.total_cost  = storeMovementData.cost * quantity;
+            storeMovementData.final_price = storeMovementData.cost;
+          } else if(store.store_type_id === 1) {
+            storeMovementData.cost       = getCostPrice(
+              productDetails.price, store.overprice, productDetails.discount_for_stores
+            );
+            storeMovementData.total_cost  = storeMovementData.cost * quantity;
+            storeMovementData.final_price = storeMovementData.cost;
+          }
         }
 
         storeMovementData.user_id = user.id;
@@ -164,13 +186,12 @@ $(document).ready(function() {
     });
   }
 
-  function localUpdateStoreInventories(productId, quantity){
-    quantity = quantity;
+  function localUpdateStoreInventories(productId, quantityUpdate){
 
     findBy('product_id', productId, 'stores_inventories').then(inventory => {
       updateBy(
         {
-          quantity: (inventory.rows[0].quantity - quantity)
+          quantity: (inventory.rows[0].quantity - quantityUpdate)
         },
         'stores_inventories',
         `id = ${inventory.rows[0].id}`
@@ -231,6 +252,7 @@ $(document).ready(function() {
     $('#addProductSearch').addClass('hidden');
     $('#addProductQuantity tr[id^=addProduct_]').remove();
     $('#confirmAddProduct').prop('disabled', false);
+    $('#addProductSearch').val('');
   })
 
   function createWarehouseEntry(productId, storeMovementId){
@@ -245,7 +267,6 @@ $(document).ready(function() {
       if (average) {
         warehouseEntryData.retail_units_per_unit = average;
       }
-
       insert(
         Object.keys(warehouseEntryData),
         Object.values(warehouseEntryData),
@@ -275,20 +296,25 @@ $(document).ready(function() {
 
       findBy('product_id', id, table).then(inventory => {
         inventoryObject = inventory.rows[0];
-        createStoreMovementData(id, data.quantity, action, function(storeMovementId){
-          if (!storeMovementId){
+        if (action == 'baja' && inventory.rows[0].quantity < data.quantity) {
+          alert(`No puede dar de baja ${data.quantity} piezas, el inventario actual es de solo ${inventory.rows[0].quantity}, seleccione otra cantidad.`);
+          $('#confirmAddProduct').prop('disabled', false);
+        } else {
+          createStoreMovementData(id, data.quantity, action, function(storeMovementId){
+            if (!storeMovementId){
+              $('#warehouseEntry').modal('hide');
+              alert('Proceso no concluido, por favor realice la entrada/salida de nuevo');
+            }
+
+            if ( action === 'alta') {
+              createWarehouseEntry(id, storeMovementId);
+            } else {
+              destroyProcess(id, $('#addProductInput').val().replace(/_/g,''));
+            }
+
             $('#warehouseEntry').modal('hide');
-            alert('Proceso no concluido, por favor realice el alta/baja de nuevo');
-          }
-
-          if ( action === 'alta') {
-            createWarehouseEntry(id, storeMovementId);
-          } else {
-            destroyProcess(id, $('#addProductInput').val().replace(/_/g,''));
-          }
-
-          $('#warehouseEntry').modal('hide');
-        });
+          });
+        }
 
         if (action === 'alta'){
           data.quantity += inventory.rows[0].quantity;
@@ -301,13 +327,14 @@ $(document).ready(function() {
   });
 
   function toggleProductAction(type){
+    $('#confirmAddProduct').prop('disabled', false);
     $('#addProductQuantity tr[id^=addProduct_]').remove();
     if (type === 'Baja'){
 
       $('#addProductDetails')
         .removeClass('head-blue')
         .addClass('head-red');
-      $('#modalTitleAltaBaja').html('Baja de mercancías');
+      $('#modalTitleAltaBaja').html('Salida de mercancías');
       $('#confirmAddProduct')
       .removeClass('main-button')
       .val('Confirmar baja')
@@ -341,10 +368,10 @@ $(document).ready(function() {
   }
 
   function getProductsAndServices(call){
-    let productsQuery = `SELECT concat(unique_code, ' ', description) as value,` +
-      'id as productId, price,' +
-      `coalesce(exterior_color_or_design, 'Sin diseño') as color,` +
-      `description, 'products' as table FROM products`;
+    let productsQuery = `SELECT CONCAT(unique_code, ' ', description, ' ', only_measure) AS value,` +
+      'id AS productId, price,' +
+      `COALESCE(exterior_color_or_design, 'Sin diseño') AS color,` +
+      `description, 'products' AS table FROM products`;
 
     query(productsQuery).then(products => {
       if (!products){
@@ -352,10 +379,10 @@ $(document).ready(function() {
         return 0;
       }
       options = products.rows;
-      let serviceQuery = `SELECT concat(unique_code, ' ', description) as value,` +
-        'id as productId ,' +
-        `coalesce(delivery_company, '') as company,` +
-        `description, 'services' as table FROM services`;
+      let serviceQuery = `SELECT concat(unique_code, ' ', description) AS value,` +
+        'id AS productId ,' +
+        `COALESCE(delivery_company, '') as company,` +
+        `description, 'services' AS table FROM services`;
         query(serviceQuery).then(services => {
           if (!services){
             window.location.href = 'pos_sale.html';
@@ -370,13 +397,36 @@ $(document).ready(function() {
       });
   }
 
-  function addPaymentTr(total){
-    let count = $('#paymentMethodList tr').length - 2,
-        type  = $('.payment-form-wrapper .selected')
+  $('[id^=quantity_]').on('keyup', function(){
+    let id = $(this).attr('id').replace('quantity_', '');
+    let limitValue = parseInt($(this).parent().parent().find('#totalInventory_' + id).html());
+    let tryValue = parseInt($(this).val());
+    if ( tryValue > limitValue ){
+      $(this).val(limitValue);
+    }
+  });
+
+  function validateTotalPayment(){
+    let type  = $('.payment-form-wrapper .selected')
+      .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
+    let paymentRest = parseFloat($('#paymentRest').text().replace("$ ","").replace(/,/g,""));
+    let currentPayment = parseFloat($('#paymentMethodCuantity').val());
+    if (type != 'Efectivo' && currentPayment > paymentRest) {
+      $('#paymentMethodCuantity').val(paymentRest);
+    }
+  }
+
+  $('#paymentMethodCuantity').on('keyup', function(){
+    validateTotalPayment();
+  });
+
+  function addPaymentTr(total, count){
+    let type  = $('.payment-form-wrapper .selected')
       .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
     if (type === 'VentaaCrédito') {
       type = 'Venta a Crédito';
     }
+
     return `<tr id="paymentMethod_${count}" data-type="${type}">` +
       '<td class="flex">' +
       '<div class="close-icon">' +
@@ -386,9 +436,13 @@ $(document).ready(function() {
       '</button></div>' +
       `${type}</td>` +
       '<td class="right cuantity" >' +
-      `$ ${total}` +
+      `${convertToPrice(total)}` +
       '</td>' +
       '</tr>';
+  }
+
+  function convertToPosPrice(price){
+    return `$ ${price.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
   }
 
   function sumaPayment(total, paymentType){
@@ -396,62 +450,90 @@ $(document).ready(function() {
       'td[class*=cuantity]'
     ).html().replace(/\s|\$|,/g,'');
     let roundValue = Math.round(actualAmount * 100) / 100;
-
-    $(paymentType).find('td[class*=cuantity]').html(roundValue + total);
+      $(paymentType).find('td[class*=cuantity]').html(convertToPosPrice(roundValue + total));
   }
 
   $('#addPayment').click(function(){
+    paymentsJson = {};
+
     let paymentsTable = $('.payments-received-on-ticket').length;
     if ($('#ticketList tr').length === 0 && paymentsTable === 0){
       return false;
     }
+    let type = $('.payment-form-wrapper .selected')
+      .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
+    if (type == 'VentaaCrédito') {
+      type = "'Venta a Crédito'"
+    }
+
+    $.each($("[id^=paymentMethod_]"), function(){
+      thisId = parseInt($(this).attr('id').replace('paymentMethod_', ''));
+      payForm = $(this).attr('data-type');
+      paymentsJson[payForm] = thisId;
+    });
     let count = $('#paymentMethodList tr').length - 2,
-        type  = $('.payment-form-wrapper .selected')
-      .html().replace(/\s/g,'').replace(/.*<\/i>/,''),
       referenceSelector  = 'input[type=text][placeholder="Referencia bancaria"]',
       creditDaysSelector = 'input[type=text][placeholder="Ejemplo: 30 (solo número)"]';
       paymentTypeSelector = $(`tr[data-type=${type}]`);
 
-      if ( isNaN(parseFloat( $('#paymentMethodCuantity').val() )) ) {
-        paymentAmountTotal = 0;
-        alert('Por favor seleccione una cantidad válida: sin espacios, letras o caracteres especiales');
+    if (paymentsJson[type] == undefined) {
+      if (type == "'Venta a Crédito'") {
+        type = 'Venta a Crédito';
+        if (paymentsJson[type] == undefined) {
+          paymentsJson[type] = Object.keys(paymentsJson).length;
+        }
       } else {
-        paymentAmountTotal = parseFloat($('#paymentMethodCuantity').val());
+        paymentsJson[type] = Object.keys(paymentsJson).length;
       }
+    }
+
+    if ( isNaN(parseFloat( $('#paymentMethodCuantity').val() )) ) {
+      paymentAmountTotal = 0;
+      alert('Por favor seleccione una cantidad válida: sin espacios, letras o caracteres especiales');
+    } else {
+      paymentAmountTotal = parseFloat($('#paymentMethodCuantity').val());
+    }
 
     if (paymentTypeSelector.length === 0){
-      $('#paymentMethodList').prepend(addPaymentTr(paymentAmountTotal));
+      $('#paymentMethodList').prepend(addPaymentTr(paymentAmountTotal, paymentsJson[type]));
     } else {
       sumaPayment(paymentAmountTotal, paymentTypeSelector);
     }
 
     if (type === 'Débito' || type === 'Crédito'){
-      $(`tr[id=paymentMethod_${count}]`).append(
-        `<td id="terminal_${count}" class="hidden">${$('#select_terminal').val()}</td>`
+      $(`tr[id=paymentMethod_${paymentsJson[type]}]`).append(
+        `<td id="terminal_${paymentsJson[type]}" class="hidden">${$('#select_terminal').val()}</td>`
       );
     }
+
     if (type === 'Cheque' || type === 'Transferencia') {
           referencia  = $(referenceSelector).val();
-      $(`tr[id=paymentMethod_${count}]`).append(
-        `<td id="reference_${count}" class="hidden">${referencia}</td>`
+      $(`tr[id=paymentMethod_${paymentsJson[type]}]`).append(
+        `<td id="reference_${paymentsJson[type]}" class="hidden">${referencia}</td>`
       );
     }
-    if (type === 'VentaaCrédito') {
+    if (type === 'Venta a Crédito') {
       let creditDays = parseInt($(creditDaysSelector).val().replace(/_/g,''));
       if (creditDays.toString() === 'NaN') {
         creditDays = 0;
       }
-
-      $(`tr[id=paymentMethod_${count}]`).append(
-        `<td id="creditDays_${count}" class="hidden">${creditDays}</td>`
-      );
+      if ($(`#creditDays_${paymentsJson[type]}`).length == 0) {
+        $(`tr[id=paymentMethod_${paymentsJson[type]}]`).append(
+          `<td id="creditDays_${paymentsJson[type]}" class="hidden">${creditDays}</td>`
+        );
+      } else {
+        $(`#creditDays_${paymentsJson[type]}`).remove();
+        $(`tr[id=paymentMethod_${paymentsJson[type]}]`).append(
+          `<td id="creditDays_${paymentsJson[type]}" class="hidden">${creditDays}</td>`
+        );
+      }
     }
     $('#paymentMethodCuantity').val('');
     $(referenceSelector).val('');
     $(creditDaysSelector).val('');
 
-    $(`#closeTr_${count}`).click(function(){
-      $(`tr[id=paymentMethod_${count}]`).remove();
+    $(`#closeTr_${paymentsJson[type]}`).click(function(){
+      $(`tr[id=paymentMethod_${paymentsJson[type]}]`).remove();
       resumePayment();
     });
 
@@ -475,7 +557,7 @@ $(document).ready(function() {
           mainSelector = `#product_${id}[data-child-count=${elementCount}]`;
           total = createTotal(id, mainSelector);
       $(`${mainSelector} td[id^=totalTo_${id}]`).html(
-        `$ ${(total * 1.16).toFixed(2).replace(
+        `$ ${(total.total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
       );
@@ -510,7 +592,17 @@ $(document).ready(function() {
     $('#cancelTicket').modal('hide');
   }
 
-  $('#completeSale').click(function() {
+  function updateTicketSaved(ticketId){
+    updateBy(
+      {
+        ticket_type: 'guardado / cobrado'
+      },
+      'tickets',
+      `id = ${ticketId}`
+    ).then(() => {});
+  }
+
+  $('#completeSale').click(function(){
 
     if (isPago()){
       addPaymentToTicket();
@@ -525,7 +617,7 @@ $(document).ready(function() {
     let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
 
     if (!isNaN(parseInt(restoreTicketId))){
-      deleteTicket(restoreTicketId);
+      updateTicketSaved(restoreTicketId);
     }
 
     if (validateAllServiceOfferedFill()){
@@ -552,9 +644,9 @@ $(document).ready(function() {
             insertTicket(user, function(ticketId){
               assignCost(user, 'venta', ticketId, function(warehouseInfo){
                 ticketData.storeWarehouseInfo = warehouseInfo;
-                insertsServiceOffereds(ticketId, function(){
+                insertsServiceOffereds(ticketId, 'venta', function(){
 
-                  insertsPayments('venta', ticketId, user, storeObject, function(){
+                  insertsPayments('venta', ticketId, user, storeObject, null, function(){
 
                     store.set('lastTicket', parseInt(
                       ticketId
@@ -646,6 +738,7 @@ $(document).ready(function() {
   });
 
   function createTotal(id, mainSelector){
+    totalObject = {};
     first = mainSelector.slice(0, mainSelector.indexOf("[")).replace("#","");
     second = mainSelector.substring(mainSelector.indexOf("["));
     manualDiscount = !$('#manual-discount').hasClass('hidden');
@@ -661,7 +754,7 @@ $(document).ready(function() {
       price = $(`[id="${first}"]${second}`).children().find(`#priceToServiceTo_${id}`).val();
     } else {
       price    = parseFloat(
-        $(priceElement).html().replace(' $ ','').replace(',','')
+        $(priceElement).html().replace(' $ ','').replace(/,/g,'')
       );
     }
     let total =  parseFloat( (price * cuantity).toFixed(2) ),
@@ -669,10 +762,13 @@ $(document).ready(function() {
       .html().replace(' %',''),
       discountVal = parseFloat(parseFloat ( (parseFloat(discount) / 100 * total).toFixed(3) ).toFixed(2)),
       productTotal    = total - discountVal;
+      totaWithoutDisc = total;
+      totalObject["total"] = productTotal;
+      totalObject["totalNoDesc"] = totaWithoutDisc;
 
     if (manualDiscount){
       let globalManual = parseFloat(
-        $('#manualDiscountQuantity').html().replace(' $ ','').replace(',','')
+        $('#manualDiscountQuantity').html().replace(' $ ','').replace(/,/g,'')
       );
 
       if (globalManual.toString() === 'NaN'){
@@ -688,7 +784,7 @@ $(document).ready(function() {
       );
     }
 
-    return productTotal;
+    return totalObject;
   }
 
   function cleanRows(){
@@ -711,13 +807,13 @@ $(document).ready(function() {
     $(`${mainSelector} #cuantityTo_${id}, ${mainSelector} #priceToServiceTo_${id}`).keyup(function(){
       let total = createTotal(id, mainSelector);
       $(`${mainSelector} td[id=totalTo_${id}]`).html(
-        `$ ${(total * 1.16).toFixed(2).replace(
+        `$ ${(total.total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
       );
 
       $(`${mainSelector} td[id=totalSinTo_${id}]`).html(
-        `$ ${total.toFixed(2).replace(
+        `$ ${total.totalNoDesc.toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
       );
@@ -730,23 +826,55 @@ $(document).ready(function() {
     let elementCount = $(e.relatedTarget).parents('tr').attr('data-child-count');
     let id = $(e.relatedTarget).parents('tr').attr('id').replace('product_','');
     let selector = `a[data-id=${id}][data-child-count=${elementCount}]`;
-    $('#delivery_service_sender_name').val('');
-    $('#delivery_service_sender_zipcode').val('');
-    $('#delivery_service_tracking_number').val('');
-    $('#delivery_service_receivers_name').val('');
-    $('#delivery_service_contact_name').val('');
-    $('#delivery_service_street').val('');
-    $('#delivery_service_exterior_number').val('');
-    $('#delivery_service_interior_number').val('');
-    $('#delivery_service_neighborhood').val('');
-    $('#delivery_service_city').val('');
-    $('#delivery_service_state').val('');
-    $('#delivery_service_country').val('');
-    $('#delivery_service_phone').val('');
-    $('#delivery_service_cellphone').val('');
-    $('#delivery_service_email').val('');
-    $('#delivery_service_company').val('');
-    $('#delivery_service_receivers_zipcode').val('');
+    let delivery_id = $(e.relatedTarget).parents('tr').find('[id^=deliveryServiceId]').html();
+
+    if (delivery_id != null) {
+      findBy('id', delivery_id, 'delivery_services').then(deliveryService => {
+        let deliveryInfo = deliveryService.rows[0];
+        $('#delivery_service_sender_name').val(deliveryInfo.sender_name);
+        $('#delivery_service_sender_zipcode').val(deliveryInfo.sender_zipcode);
+        $('#delivery_service_tracking_number').val(deliveryInfo.tracking_number);
+        $('#delivery_service_receivers_name').val(deliveryInfo.receivers_name);
+        $('#delivery_service_contact_name').val(deliveryInfo.contact_name);
+        $('#delivery_service_street').val(deliveryInfo.street);
+        $('#delivery_service_exterior_number').val(deliveryInfo.exterior_number);
+        $('#delivery_service_interior_number').val(deliveryInfo.interior_number);
+        $('#delivery_service_neighborhood').val(deliveryInfo.neighborhood);
+        $('#delivery_service_city').val(deliveryInfo.city);
+        $('#delivery_service_state').val(deliveryInfo.state);
+        $('#delivery_service_country').val(deliveryInfo.country);
+        $('#delivery_service_phone').val(deliveryInfo.phone);
+        $('#delivery_service_cellphone').val(deliveryInfo.cellphone);
+        $('#delivery_service_email').val(deliveryInfo.email);
+        $('#delivery_service_receivers_zipcode').val(deliveryInfo.receivers_zipcode);
+        $('#delivery_service_weight').val(deliveryInfo.weight);
+        $('#delivery_service_length').val(deliveryInfo.length);
+        $('#delivery_service_width').val(deliveryInfo.width);
+        $('#delivery_service_height').val(deliveryInfo.height);
+      });
+    } else {
+      $('#delivery_service_sender_name').val('');
+      $('#delivery_service_sender_zipcode').val('');
+      $('#delivery_service_tracking_number').val('');
+      $('#delivery_service_receivers_name').val('');
+      $('#delivery_service_contact_name').val('');
+      $('#delivery_service_street').val('');
+      $('#delivery_service_exterior_number').val('');
+      $('#delivery_service_interior_number').val('');
+      $('#delivery_service_neighborhood').val('');
+      $('#delivery_service_city').val('');
+      $('#delivery_service_state').val('');
+      $('#delivery_service_country').val('');
+      $('#delivery_service_phone').val('');
+      $('#delivery_service_cellphone').val('');
+      $('#delivery_service_email').val('');
+      $('#delivery_service_company').val('');
+      $('#delivery_service_receivers_zipcode').val('');
+      $('#delivery_service_weight').val('');
+      $('#delivery_service_length').val('');
+      $('#delivery_service_width').val('');
+      $('#delivery_service_height').val('');
+    }
 
     $('#secretServiceId').val(selector);
 
@@ -809,7 +937,11 @@ $(document).ready(function() {
       phone             : $('#delivery_service_phone').val(),
       cellphone         : $('#delivery_service_cellphone').val(),
       email             : $('#delivery_service_email').val(),
-      receivers_zipcode : $('#delivery_service_receivers_zipcode').val()
+      receivers_zipcode : $('#delivery_service_receivers_zipcode').val(),
+      weight            : $('#delivery_service_weight').val(),
+      length            : $('#delivery_service_length').val(),
+      width             : $('#delivery_service_width').val(),
+      height            : $('#delivery_service_height').val()
     };
 
     validateDeliveryService(function(validate){
@@ -831,27 +963,43 @@ $(document).ready(function() {
               `<td id="deliveryServiceId${elementId}" class="hidden">` +
               `${deliveryServices.lastId}</td>`
             );
-
+            $($('#secretServiceId').val()).parents('tr').find('#service_1').addClass('green-truck');
             $('#deliveryService').modal('hide');
-
+            $('#delivery_service_sender_name').val('');
+            $('#delivery_service_sender_zipcode').val('');
+            $('#delivery_service_tracking_number').val('');
+            $('#delivery_service_receivers_name').val('');
+            $('#delivery_service_contact_name').val('');
+            $('#delivery_service_street').val('');
+            $('#delivery_service_exterior_number').val('');
+            $('#delivery_service_interior_number').val('');
+            $('#delivery_service_neighborhood').val('');
+            $('#delivery_service_city').val('');
+            $('#delivery_service_state').val('');
+            $('#delivery_service_country').val('');
+            $('#delivery_service_phone').val('');
+            $('#delivery_service_cellphone').val('');
+            $('#delivery_service_email').val('');
+            $('#delivery_service_company').val('');
+            $('#delivery_service_receivers_zipcode').val('');
           });
-
         });
       }
     });
-
     return false;
   });
 
-  $("#modifyLocation").click(function(){
-    $(".input-group.flex-div").removeClass("hidden");
-    $(".stores_inventory_rack").addClass("hidden");
-    $(".stores_inventory_level").addClass("hidden");
-  });
-
+// Todavía necesita modificaciones el proceso de cambio de ubicación //
   $('#productShow').on('shown.bs.modal', function(e) {
+
+    $("#rackSave").val("");
+    $("#levelSave").val("");
+    $("#modifyLocation").html("Modificar ubicación");
+    $("#modifyLocation").removeClass("confirmChangeLocation");
     let relatedObject = e.relatedTarget.dataset,
         productId     = relatedObject.id.replace(/_.*/,'');
+
+    $('#product_id_modal').html(productId);
 
     findBy('id', productId, relatedObject.table).then(product => {
       let productData = product.rows[0];
@@ -874,15 +1022,93 @@ $(document).ready(function() {
         $('.stores_inventory_quantity').html(
           inventory.rows[0].quantity
         );
-        $('.stores_inventory_rack').html(
-          inventory.rows[0].rack
-        );
-        $('.stores_inventory_level').html(
-          inventory.rows[0].level
-        );
+          let rack = inventory.rows[0].rack;
+
+          let level = inventory.rows[0].level;
+
+        if (level == null) {
+          level = "";
+        } else {
+          level = inventory.rows[0].level;
+        }
+
+        if (rack == null) {
+          rack = "";
+        } else {
+          rack = inventory.rows[0].rack;
+        }
+
+        if (rack == '') {
+          $('.stores_inventory_rack').html(
+            ""
+          );
+        } else {
+          $('.stores_inventory_rack').html(
+            `Anaquel: ${rack},`
+          );
+        }
+
+        if (level == '') {
+          $('.stores_inventory_level').html(
+            ""
+          );
+        } else {
+          $('.stores_inventory_level').html(
+            `Nivel: ${level}`
+          );
+        }
       });
     });
   });
+
+  $("#modifyLocation").click(function(){
+    let code = $("#unique_code").html();
+    let prod_id = $('#product_id_modal').html();
+    findBy('product_id', prod_id, 'stores_inventories').then(inventory => {
+
+      $(".input-group.flex-div").removeClass("hidden");
+      $(".stores_inventory_rack").addClass("hidden");
+      $(".stores_inventory_level").addClass("hidden");
+      $("#modifyLocation").addClass("hidden");
+      $("#confirmChangeLocation").removeClass("hidden");
+
+      $("#rackSave").val(
+        inventory.rows[0].rack
+      );
+      $("#levelSave").val(
+        inventory.rows[0].level
+      );
+
+    });
+  });
+
+  $("#confirmChangeLocation").click(function(){
+    let code = $("#unique_code").html();
+    let prod_id = $('#product_id_modal').html();
+    updateBy(
+      {
+        rack: $("#rackSave").val(),
+        level: $("#levelSave").val()
+      },
+      'stores_inventories',
+      `product_id = ${prod_id}`
+    ).then(() => {
+      $(".input-group.flex-div").addClass("hidden");
+      $(".stores_inventory_rack").removeClass("hidden");
+      $(".stores_inventory_level").removeClass("hidden");
+      $("#modifyLocation").removeClass("hidden");
+      $("#confirmChangeLocation").addClass("hidden");
+      $('#productShow').modal('toggle');
+    });
+  });
+
+
+  $('#productShow').on('hide.bs.modal', function (e) {
+    $(".input-group.flex-div").addClass("hidden");
+    $(".stores_inventory_rack").removeClass("hidden");
+    $(".stores_inventory_level").removeClass("hidden");
+  });
+
 
   $('#closeDiscount').click(function(e){
     let modalBody = $(this).parent().parent().find(
@@ -905,16 +1131,15 @@ $(document).ready(function() {
       discountInput = 0;
     }
     $(`${tr} a[id^=discount]`).html(`${discountInput} %`);
-
     let total = createTotal(id, tr);
     $(`${tr} td[id=totalTo_${id}]`).html(
-      `$ ${(total * 1.16).toFixed(2).replace(
+      `$ ${(total.total * 1.16).toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
     );
 
     $(`${tr} id[id=totalSinTo_${id}]`).html(
-      `$ ${total.toFixed(2).replace(
+      `$ ${total.totalNoDesc.toFixed(2).replace(
       /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
     )}`
     );
@@ -1005,6 +1230,12 @@ $(document).ready(function() {
     return '';
   }
 
+  (function priceMask(){
+    let paymentQuantity = document.getElementById("paymentMethodCuantity");
+    let im = new Inputmask("decimal");
+    im.mask(paymentQuantity);
+  })();
+
  (function setInitialValues(){
     initStore().then(store => {
       $('#username').html(
@@ -1084,8 +1315,44 @@ $(document).ready(function() {
     });
   })();
 
+  /* Métodos para descuentos*/
+
+  $("#manual").click(function () {
+    let ticketDiscountField = document.getElementById("allTicketDiscount");
+    var im = new Inputmask("decimal");
+    im.mask(ticketDiscountField);
+
+    $(this).addClass('selected');
+    $('#automatic-discount').addClass('hidden');
+    $('#manual-discount').removeClass('hidden');
+    $('#automatic').removeClass('selected');
+    $('#none').removeClass('selected');
+  });
+
+  $("#none").click(function () {
+    $(this).addClass('selected');
+    $('#automatic-discount').addClass('hidden');
+    $('#manual-discount').addClass('hidden');
+    $('#automatic').removeClass('selected');
+    $('#manual').removeClass('selected');
+  });
+
+  $("#automatic").click(function () {
+    $(this).addClass('selected');
+    $('#automatic-discount').removeClass('hidden');
+    $('#manual-discount').addClass('hidden');
+    $('#manual').removeClass('selected');
+    $('#none').removeClass('selected');
+  });
+
+
 /* Métodos para cambiar botón de tipo de ventas*/
   $("#change-option").click(function () {
+    $('#mainProductSearch').val('');
+    $('#completeSale').addClass('hidden');
+    $('#completeSale').html('Completar cambio');
+    $('.discount-group').removeClass('hidden');
+    $('.pay-dev-group').addClass('hidden');
     /*Oculta las formas de pago no necesarias en esta sección*/
     $('#creditSale').removeClass('hidden');
     $('#returnCash').removeClass('hidden');
@@ -1140,6 +1407,11 @@ $(document).ready(function() {
   $("#sale-option").click(function () {
     window.location = 'pos_sale.html';
     cleanRows();
+    $('#mainProductSearch').val('');
+    $('.discount-group').removeClass('hidden');
+    $('.pay-dev-group').addClass('hidden');
+    $('#completeSale').addClass('hidden');
+    $('#completeSale').html('Completar venta');
     $('.items-returns').addClass('hidden');
     $('#devolucionTable tr').remove();
     $('#creditSale').removeClass('hidden');
@@ -1183,6 +1455,11 @@ $(document).ready(function() {
 
   $("#estimate-option").click(function () {
     cleanRows();
+    $('#mainProductSearch').val('');
+    $('.discount-group').removeClass('hidden');
+    $('.pay-dev-group').addClass('hidden');
+    $('#completeSale').addClass('hidden');
+    $('#completeSale').html('Completar venta');
     /*Oculta las formas de pago no necesarias en esta sección*/
     $('#creditSale').removeClass('hidden');
     $('#returnCash').addClass('hidden');
@@ -1225,6 +1502,7 @@ $(document).ready(function() {
     resumePayment();
     $("[placeholder=Comentarios]").addClass("hidden");
     $(".payment-form-wrapper").addClass("hidden");
+    $("#manual").click();
   });
 
 
@@ -1264,36 +1542,6 @@ $(".hide-results").click(function () {
 
 });
 
-/* Métodos para descuentos*/
-  $("#manual").click(function () {
-
-    let ticketDiscountField = document.getElementById("allTicketDiscount");
-    var im = new Inputmask("decimal");
-    im.mask(ticketDiscountField);
-
-    $(this).addClass('selected');
-    $('#automatic-discount').addClass('hidden');
-    $('#manual-discount').removeClass('hidden');
-    $('#automatic').removeClass('selected');
-    $('#none').removeClass('selected');
-  });
-
-  $("#none").click(function () {
-    $(this).addClass('selected');
-    $('#automatic-discount').addClass('hidden');
-    $('#manual-discount').addClass('hidden');
-    $('#automatic').removeClass('selected');
-    $('#manual').removeClass('selected');
-  });
-
-  $("#automatic").click(function () {
-    $(this).addClass('selected');
-    $('#automatic-discount').removeClass('hidden');
-    $('#manual-discount').addClass('hidden');
-    $('#manual').removeClass('selected');
-    $('#none').removeClass('selected');
-  });
-
 /* Métodos para tipo de forma de pago*/
   $("#cash").click(function () {
     $(this).addClass('selected');
@@ -1304,6 +1552,7 @@ $(".hide-results").click(function () {
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
+    validateTotalPayment();
     $('.credit-days-container').addClass('hidden');
     $('.operation-number-container').addClass('hidden');
     $('.select-register-container').addClass('hidden');
@@ -1318,6 +1567,7 @@ $(".hide-results").click(function () {
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
+    validateTotalPayment();
     $('.credit-days-container').addClass('hidden');
     $('.operation-number-container').addClass('hidden');
     $('.select-register-container').removeClass('hidden');
@@ -1332,6 +1582,7 @@ $(".hide-results").click(function () {
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
+    validateTotalPayment();
     $('.credit-days-container').addClass('hidden');
     $('.operation-number-container').addClass('hidden');
     $('.select-register-container').removeClass('hidden');
@@ -1346,6 +1597,7 @@ $(".hide-results").click(function () {
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
+    validateTotalPayment();
     $('.credit-days-container').addClass('hidden');
     $('.operation-number-container').removeClass('hidden');
     $('.select-register-container').addClass('hidden');
@@ -1360,6 +1612,7 @@ $(".hide-results").click(function () {
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
+    validateTotalPayment();
     $('.credit-days-container').addClass('hidden');
     $('.operation-number-container').removeClass('hidden');
     $('.select-register-container').addClass('hidden');
@@ -1374,6 +1627,7 @@ $(".hide-results").click(function () {
     $('#cash').removeClass('selected');
     $('#creditSale').removeClass('selected');
     $('#returnCash').removeClass('selected');
+    validateTotalPayment();
     $('.credit-days-container').addClass('hidden');
     $('.operation-number-container').addClass('hidden');
     $('.select-register-container').addClass('hidden');
@@ -1392,6 +1646,7 @@ $(".hide-results").click(function () {
     $('#cash').removeClass('selected');
     $('#other').removeClass('selected');
     $('#returnCash').removeClass('selected');
+    validateTotalPayment();
     $('.credit-days-container').removeClass('hidden');
     $('.operation-number-container').addClass('hidden');
     $('.select-register-container').addClass('hidden');
@@ -1406,6 +1661,7 @@ $(".hide-results").click(function () {
     $('#cash').removeClass('selected');
     $('#other').removeClass('selected');
     $('#creditSale').removeClass('selected');
+    validateTotalPayment();
     $('.credit-days-container').addClass('hidden');
     $('.operation-number-container').addClass('hidden');
     $('.select-register-container').addClass('hidden');

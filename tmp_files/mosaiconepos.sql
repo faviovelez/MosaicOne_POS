@@ -919,7 +919,8 @@ CREATE TABLE delivery_addresses (
     updated_at timestamp without time zone NOT NULL,
     additional_references text,
     name character varying,
-    store_id integer
+    store_id integer,
+    store_alter_id integer
 );
 
 
@@ -1055,7 +1056,11 @@ CREATE TABLE delivery_services (
     date date,
     pos_id integer,
     web_id integer,
-    store_id integer
+    store_id integer,
+    weight character varying,
+    height character varying,
+    length character varying,
+    width character varying
 );
 
 
@@ -3842,7 +3847,8 @@ CREATE TABLE stores (
     advance_i_last_folio integer DEFAULT 0,
     initial_inventory character varying,
     current_inventory character varying,
-    prospects_file character varying
+    prospects_file character varying,
+    bill_email character varying
 );
 
 

@@ -57,9 +57,13 @@ $(document).ready(function(){
   $('#saveNewPrice').click(function(){
     let productId = $('#changeSinglePriceProductId').html();
 
+    let newPrice = parseFloat($('#changeSinglePriceInput').val());
+    if (isNaN(newPrice)) {
+      newPrice = 0;
+    }
     updateBy(
       {
-        price: $('#changeSinglePriceInput').val()
+        price: newPrice
       },
       'products',
       `id = ${productId}`
@@ -67,7 +71,7 @@ $(document).ready(function(){
 
     updateBy(
       {
-        manual_price: $('#changeSinglePriceInput').val(),
+        manual_price: newPrice,
         manual_price_update: !!$("#changeSinglePriceCheckBox").is(':checked')
       },
       'stores_inventories',
@@ -75,7 +79,7 @@ $(document).ready(function(){
     ).then(() => {});
 
     $(`a[data-id="${productId}"]`).html(`
-      $ ${parseFloat($('#changeSinglePriceInput').val()).toFixed(2).replace(
+      $ ${parseFloat(newPrice).toFixed(2).replace(
           /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
         )}
     `);
@@ -86,12 +90,11 @@ $(document).ready(function(){
 
   function addTr(product){
     return '<tr>' +
-      `<td> ${product.unique_code} </td>` +
-      `<td> ${product.description} </td>` +
+      `<td> ${product.value} </td>` +
       `<td> ${product.exterior_color_or_design} </td>` +
       `<td> ${product.only_measure} </td>` +
       `<td> ${product.main_material} </td>` +
-      `<td> ${product.resustance_main_material} </td>` +
+      `<td> ${product.resistance_main_material} </td>` +
       `<td> ${product.line} </td>` +
       '<td>' +
         `<a href="#" data-toggle="modal" data-target="#changeSinglePrice" data-id="${product.id}">` +
@@ -102,7 +105,12 @@ $(document).ready(function(){
   }
 
   (function fillTable(){
-      getAll('products').then(productsObject => {
+    let specialProductQuery = "SELECT id, CONCAT(unique_code, ' ', description, ' ', only_measure) AS value, " +
+                          "COALESCE(exterior_color_or_design, '') AS exterior_color_or_design, " +
+                          "COALESCE(only_measure, '') AS only_measure, COALESCE(main_material, '') AS main_material, " +
+                          "COALESCE(resistance_main_material, '') AS resistance_main_material, " +
+                          "COALESCE(line, '') AS line, price FROM products";
+      query(specialProductQuery).then(productsObject => {
         let limit = productsObject.rowCount;
         let count = 0;
 

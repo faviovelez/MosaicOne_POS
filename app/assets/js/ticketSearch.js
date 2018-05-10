@@ -2,7 +2,6 @@ $(function(){
 
   function setProspectData(){
     return new Promise(function(resolve, reject){
-
     });
   }
 
@@ -27,12 +26,10 @@ $(function(){
       return 'SELECT DISTINCT(payments.id) AS payment_id, payments.payment_date, payments.user_id, ' +
         'payments.payment_form_id, payments.payment_type, ' +
         'payments.ticket_id, payments.total, payments.created_at FROM payments, ' +
-        '(' +
-	       'SELECT children_id, ticket_id FROM tickets_children ' +
-         `WHERE ticket_id = ${ticketId}` +
+        '(SELECT id AS ticket_id FROM tickets ' +
+         `WHERE tickets.id = ${ticketId} OR tickets.parent_id = ${ticketId}` +
          ') AS ticketChildTable WHERE payments.ticket_id ' +
-         '= ticketChildTable.ticket_id ' +
-         'OR payments.ticket_id = ticketChildTable.children_id';
+         '= ticketChildTable.ticket_id';
   }
 
   function insertLotPayments(payments){
@@ -115,29 +112,47 @@ $(function(){
 
   function calculatePaymentRest(){
     let totalPagado = 0;
+    let totalReturn = 0;
+    let totalForPayment = 0;
     $.each($('.paymentData'), function(){
       let paymentType = parseInt($(this).find('td.paymentTotal').attr('data-type'));
       let realType = $(this).find('td.paymentTypeDesc').html().trim();
+
       if (paymentType < 21 && realType == 'pago') {
         totalPagado += parseFloat($(this).find('td.paymentTotal').html().replace(/\s|\$|,/g,''));
+      } else if (paymentType < 21 && realType == 'devolución') {
+        totalReturn -= parseFloat($(this).find('td.paymentTotal').html().replace(/\s|\$|,/g,''));
       }
     });
+    let paymentRest = parseFloat($('#ticketTotalId').html()) - parseFloat(totalReturn) - parseFloat(totalPagado);
 
-    let paymentRest = parseFloat($('#ticketTotalId').html()) - parseFloat(totalPagado);
+    if (isNaN(paymentRest)) {
+      paymentRest = 0;
+    }
+
     $('#paymentRest strong').html(
       convertToPrice(paymentRest)
     );
 
-    $('table.subtotal td.total strong').html(
-      parseFloat($('#ticketTotalId').html())
-      .toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
-      );
+    if (isNaN(parseFloat($('#ticketTotalId').html()))) {
+      totalForPayment = 0;
+    } else {
+      totalForPayment = parseFloat($('#ticketTotalId').html());
+    }
 
+    $('table.subtotal td.total strong').html(
+      `$ ${totalForPayment.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
+    );
   }
 
   function loadPagoTable(ticketObject){
-    displayTicketInfo(ticketObject).then(tableHtmlContent => {
+    displayTicketInfoForSearch(ticketObject).then(tableHtmlContent => {
       $('#resultOfTicketSearch').append(tableHtmlContent);
+      let ticketTotal = 0;
+      $('[id^=totalRowProd_]').each(function() {
+        ticketTotal += parseFloat($(this).html().replace(/ /g, '').replace(/,/g,'').replace('$',''));
+      });
+      $('#ticketTotalId').html(ticketTotal);
       tableHtmlContent = null;
       createPagosTable(ticketObject).then(tableHtmlContent => {
         $('#resultOfTicketSearch').append(tableHtmlContent);
@@ -149,7 +164,6 @@ $(function(){
         $('.operation-number-container').addClass('hidden');
         $('.select-register-container').addClass('hidden');
         // Líneas agregadas para poder esconder las secciones no necesarias
-
       });
     });
   }
@@ -165,6 +179,8 @@ $(function(){
             $('#resultTicketList tr').remove();
             $('#resultOfTicketSearch table').remove();
             $('#ticketTotalId').remove();
+            cleanRows();
+            calculatePaymentRest();
             addSearchTicketTr(ticket).then(trInfo => {
               $('#resultTicketList').append(trInfo);
               $('.ticket-results').removeClass('hidden');
@@ -182,7 +198,23 @@ $(function(){
     });
   }
 
+  function cleanRows(){
+    $("tr[id*='product_'").each(function() {
+      $(this).remove();
+    });
+    $("tr[id*='paymentMethod_'").each(function() {
+      $(this).remove();
+    });
+    resumePayment();
+  }
+
   $("#advance-option").click(function () {
+    cleanRows();
+    $('#mainProductSearch').val('');
+    $('.discount-group').addClass('hidden');
+    $('.pay-dev-group').removeClass('hidden');
+    $('#completeSale').html('Completar pago');
+    $('#completeSale').addClass('hidden');
     //$('#creditSale').addClass('hidden');
     $('.btn-group').removeClass('open');
     $('#returnCash').addClass('hidden');
@@ -228,6 +260,7 @@ $(function(){
     initTicketSearch();
     bigTotal();
     resumePayment();
+    calculatePaymentRest();
     return false;
   });
 

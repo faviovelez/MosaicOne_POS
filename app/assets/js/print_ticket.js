@@ -169,7 +169,7 @@ function createTicketProductList(productList, discount, call){
           `${object.product.unique_code} ` +
           '</span>' +
           '<span>' +
-          `${object.product.description} ` +
+          `${object.product.description} ${object.product.only_measure} ` +
           '</span>' +
           '</td>' +
           '<td colspan="1" style="width: 80px; text-align: right; vertical-align:text-top" >' +
@@ -535,7 +535,6 @@ function rollBackData(ticketData, call){
 }
 
 function printTicket(ticketInfo, call){
-
   try {
     getTicketsElements(ticketInfo.ticket.id, function(products){
 
