@@ -7,19 +7,6 @@ let localWin = null;
 //     cmd.get(`chrome --kiosk-printing ${userHomeRePrint}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketId}.html`);
 // }
 
- function getCashRegisterSum(){
-   return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
-         '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
-         'SUM((SELECT (COALESCE(SUM(' +
-         "CASE WHEN payments.payment_type = 'pago' AND payments.payment_form_id = 1 THEN payments.total " +
-         "WHEN payments.payment_type = 'devolución' AND payments.payment_form_id = 1 THEN -payments.total " +
-         'ELSE 0 ' +
-         'END ' +
-         '),0)) as s ' +
-         'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
-         "WHERE (tickets.ticket_type != 'pending' AND payments.payment_form_id = 1)))) as sum";
- }
-
  function reimpresion(ticketId) {
    localWin = new localRemote.BrowserWindow({width: 800, height: 600, show: false });
    let path = `/tickets/TicketNo_${ticketId}.html`;
@@ -32,6 +19,19 @@ let localWin = null;
      localWin.close();
    });
  }
+
+function getCashRegisterSum(){
+  return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
+        '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
+        'SUM((SELECT (COALESCE(SUM(' +
+        "CASE WHEN payments.payment_type = 'pago' AND payments.payment_form_id = 1 THEN payments.total " +
+        "WHEN payments.payment_type = 'devolución' AND payments.payment_form_id = 1 THEN -payments.total " +
+        'ELSE 0 ' +
+        'END ' +
+        '),0)) as s ' +
+        'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
+        "WHERE (tickets.ticket_type != 'pending' AND payments.payment_form_id = 1)))) as sum";
+}
 
  function warehouseEntriesQuery(productId){
    return ' SELECT stores_warehouse_entries.product_id' +

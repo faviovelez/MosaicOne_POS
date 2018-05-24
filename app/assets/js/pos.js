@@ -583,6 +583,15 @@ $(document).ready(function() {
     return true;
   }
 
+  function removeUnwantedDeliveriesQuery() {
+    return 'DELETE FROM delivery_services WHERE id IN ' +
+            '(SELECT id FROM delivery_services ' +
+            'WHERE service_offered_id IS null ' +
+            'AND id NOT IN ' +
+            '(SELECT id FROM delivery_services ' +
+            'WHERE web_id IS NOT null ORDER BY id ASC LIMIT 1))';
+  }
+
   function deleteTicket(ticketId){
     deleteBy('store_movements', `ticket_id = ${ticketId}`).then(() => {});
     deleteBy('payments', `ticket_id = ${ticketId}`).then(() => {});
@@ -696,8 +705,11 @@ $(document).ready(function() {
                                             alert(`La caja tiene un saldo de ${translatePrice(ticketData.cashRegister.balance)} ` +
                                               'pesos. Realice un retiro.');
                                           }
-                                          $(this).prop( "disabled", false );
-                                           window.location.href = 'pos_sale.html';
+                                          let unwantedDeliveries = removeUnwantedDeliveriesQuery();
+                                          query(unwantedDeliveries).then(() => {
+                                            $(this).prop( "disabled", false );
+                                            window.location.href = 'pos_sale.html';
+                                          });
 
                                         });
 

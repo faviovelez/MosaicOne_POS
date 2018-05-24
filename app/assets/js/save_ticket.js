@@ -517,6 +517,8 @@ function isPayedQuery(ticketId){
     'OR payments.ticket_id = ticketChildTable.parent_id) AS payments_2';
 }
 
+
+
 function insertTicket(userId, call, type, parentTicket = null){
 
   let thisTicketId = parseInt($('#ticketNum').html());
@@ -563,6 +565,10 @@ function insertTicket(userId, call, type, parentTicket = null){
       let prospectId   = $('#prospectList a').attr('data-id');
       data.prospect_id = prospectId;
     }
+    if ($('#ticket-prospect_id').html() !== undefined) {
+      data.prospect_id = $('#ticket-prospect_id').html();
+    }
+
     getCashRegisterInfo(cashRegister => {
       data.cash_register_id = cashRegister.id;
       if ( parentTicket ){
@@ -1153,11 +1159,37 @@ function insertsPayments(ticketType, ticketId, userId, store, parentTicket, call
         Object.values(data),
         'payments'
       ).then(paymentObject => {
-          data = null;
-          count++;
-          if (limit === count){
-            return call();
+
+        let payedQuery = isPayedQuery(parentTicket);
+
+        query(payedQuery).then(paymentData => {
+
+          if (paymentData.rows[0].total >= 1) {
+            updateBy(
+              {payed: false},
+              'tickets',
+              `id = ${parentTicket}`
+            ).then(() => {
+              data = null;
+              count++;
+              if (limit === count){
+                return call();
+              }
+            });
+          } else {
+            updateBy(
+              {payed: true},
+              'tickets',
+              `id = ${parentTicket}`
+            ).then(() => {
+              data = null;
+              count++;
+              if (limit === count){
+                return call();
+              }
+            });
           }
+        });
       });
     });
   });

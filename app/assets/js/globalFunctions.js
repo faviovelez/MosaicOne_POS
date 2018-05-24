@@ -98,7 +98,7 @@ function ticketQuery(){
    'tickets.taxes, tickets.total, tickets.discount_applied, tickets.ticket_type, ' +
    'tickets.cash_register_id, tickets.ticket_number, tickets.comments, ' +
    'tickets.payments_amount, tickets.cash_return, tickets.payed, tickets.parent_id, ' +
-   'tickets.created_at, prospects.legal_or_business_name FROM tickets LEFT JOIN prospects ' +
+   'tickets.created_at, prospects.legal_or_business_name, tickets.prospect_id FROM tickets LEFT JOIN prospects ' +
    'ON tickets.prospect_id = prospects.id WHERE tickets.ticket_type = \'venta\''
 }
 
@@ -234,6 +234,9 @@ function prospectInfo(ticket){
   return ' - ' +
   '<span id="ticket-prospect">' +
    `Cliente: ${ticket.prospect}` +
+  '</span>' +
+  '<span id="ticket-prospect_id" class="hidden">' +
+   `${ticket.prospect_id}` +
   '</span>'
 }
 
@@ -541,6 +544,7 @@ function createTicketOptions(tickets){
           total: ticket.total,
           userId: ticket.user_id,
           prospect: ticket.legal_or_business_name,
+          prospect_id: ticket.prospect_id,
           payed: ticket.payed
         }
       );

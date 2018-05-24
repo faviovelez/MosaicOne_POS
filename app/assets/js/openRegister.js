@@ -84,7 +84,7 @@ $(function(){
       let Promise = require("bluebird");
       let table = type;
       let promises = [];
-      query(localQuery, false).then(localObjects => {
+      alterQuery(localQuery).then(localObjects => {
         Promise.each(localObjects.rows, function(row){
           ['created_at', 'updated_at'].forEach(field => {
             delete row[field];
@@ -103,13 +103,13 @@ $(function(){
     });
   }
 
-  function createRemoteArray(localQuery, type, storeObject){
+  function createRemoteArray(remoteQuery, type, storeObject){
     updateLocalMissings(storeObject.id, storeObject.overprice);
     return new Promise(function(resolve, reject){
       let Promise = require("bluebird");
       let table = type;
       let promises = [];
-      query(localQuery).then(remoteObjects => {
+      query(remoteQuery).then(remoteObjects => {
         Promise.each(remoteObjects.rows, function(row){
           ['created_at', 'updated_at'].forEach(field => {
             delete row[field];
@@ -217,7 +217,7 @@ $(function(){
     let promises_inventories = [];
     let usedQueries = findMissing();
 
-    query(usedQueries.missingInventoriesQuery, false).then(missingInvs => {
+    alterQuery(usedQueries.missingInventoriesQuery).then(missingInvs => {
       missingInvs.rows.forEach(function(inv){
         promises_inventories.push(
           new Promise(function(resolve, reject){
@@ -235,7 +235,7 @@ $(function(){
                 newObjectResult.manual_price = manualPrice;
                 var myInvQuery = `INSERT INTO stores_inventories (${addQuotesToInvs}) VALUES (${Object.values(newObjectResult)});`
                 .replace(/,,/g,',null,').replace(/,,/g,',null,').replace(',)',',null)');
-                query(myInvQuery, false).then(function(){ resolve(); });
+                alterQuery(myInvQuery).then(function(){ resolve(); });
               });
             });
           })
@@ -423,7 +423,7 @@ $(function(){
                   Object.values(row),
                   tablesResult.table
                 ).then(localQuery => {
-                  query(localQuery, false).then(() => {
+                  alterQuery(localQuery).then(() => {
                     count++;
                     if (count === limit){
                       getStoresInventories(newProductsIds, store).then(function(storesInventoriesRows){
@@ -440,7 +440,7 @@ $(function(){
                               Object.values(row),
                               'stores_inventories'
                             ).then(localQuery => {
-                              query(localQuery, false).then(() => {
+                              alterQuery(localQuery).then(() => {
                                 count++;
                                 if (count === limit){
                                   Promise.all(storeMovementsPromises).then(function(){
@@ -475,17 +475,17 @@ $(function(){
         localQuery = 'SELECT * FROM business_units WHERE ' +
         `id = ${storeInfo.business_unit_id}`;
         ids = [];
-      query(localQuery, false).then(business_unit => {
+      alterQuery(localQuery).then(business_unit => {
         ids.push(business_unit.rows[0].billing_address_id);
         let localQuery = 'SELECT billing_address_id FROM prospects' +
           ` WHERE billing_address_id IS NOT NULL`;
-        query(localQuery, false).then(prospects => {
+        alterQuery(localQuery).then(prospects => {
           prospects.rows.forEach(row => {
             ids.push(row.billing_address_id);
           });
           let finalQuery = 'DELETE FROM billing_addresses' +
                            ` WHERE id NOT IN (${ids})`;
-          query(finalQuery, false).then(() => {});
+          alterQuery(finalQuery).then(() => {});
         });
       });
       findBy('store_id', storeInfo.id, 'cash_registers', false).then(cashRegisterObject => {
@@ -496,7 +496,7 @@ $(function(){
           );
         });
       });
-      query(getCashRegisterSum(), false).then(resultSum => {
+      alterQuery(getCashRegisterSum()).then(resultSum => {
         $('#register_open_initial_cash').val(
           `$ ${(resultSum.rows[0].sum || 0).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} `
         );
@@ -554,7 +554,7 @@ $(function(){
   }
 
   function runUpdateCeroCostMovs() {
-    query("SELECT id, overprice, store_type_id FROM stores LIMIT 1", false).then(value => {
+    alterQuery("SELECT id, overprice, store_type_id FROM stores LIMIT 1").then(value => {
       var storeType = "";
       var overPrice = value.rows[0].overprice / 100;
       var store_type = value.rows[0].store_type_id;
@@ -566,9 +566,9 @@ $(function(){
       }
       var costUpdateQueries = updateCeroCostMovs(overPrice, storeType);
       let unwantedDeliveries = removeUnwantedDeliveriesQuery();
-      query(costUpdateQueries.costUpdateQuery, false).then(() => {
-        query(costUpdateQueries.totalCostUpdateQuery, false).then(() => {
-          query(unwantedDeliveries, false).then(() => {
+      alterQuery(costUpdateQueries.costUpdateQuery).then(() => {
+        alterQuery(costUpdateQueries.totalCostUpdateQuery).then(() => {
+          alterQuery(unwantedDeliveries).then(() => {
             window.location.href = 'pos_sale.html';
           });
         });
@@ -580,23 +580,24 @@ $(function(){
     return {
       'fixStoresInvs' : 'UPDATE stores_inventories SET quantity = new_table.sum, web = false ' +
                           'FROM (SELECT ' +
-                            'product_id, ' +
-                            'SUM (' +
-                              "CASE WHEN movement_type = 'alta' THEN quantity " +
-                                "WHEN movement_type = 'alta automática' THEN quantity " +
-                                "WHEN movement_type = 'venta' THEN -quantity " +
-                                "WHEN movement_type = 'devolución' THEN quantity " +
-                                "WHEN movement_type = 'baja' THEN -quantity " +
-                                "WHEN movement_type = 'baja automática' THEN -quantity " +
+                            'stores_inventories.product_id, ' +
+                            'COALESCE(SUM (' +
+                              "CASE WHEN movement_type = 'alta' THEN store_movements.quantity " +
+                                "WHEN movement_type = 'alta automática' THEN store_movements.quantity " +
+                                "WHEN movement_type = 'venta' THEN -store_movements.quantity " +
+                                "WHEN movement_type = 'devolución' THEN store_movements.quantity " +
+                                "WHEN movement_type = 'baja' THEN -store_movements.quantity " +
+                                "WHEN movement_type = 'baja automática' THEN -store_movements.quantity " +
                                 'ELSE 0 ' +
                               'END' +
-                            ') '+
+                            '), 0) AS sum '+
                           'FROM ' +
-                            'store_movements ' +
+                            'stores_inventories LEFT JOIN store_movements ON ' +
+                            'stores_inventories.product_id = store_movements.product_id ' +
                             'GROUP BY ' +
-                            'product_id ' +
+                            'stores_inventories.product_id ' +
                             'ORDER BY ' +
-                            'product_id) new_table ' +
+                            'stores_inventories.product_id) new_table ' +
                           'WHERE stores_inventories.product_id = new_table.product_id; ' +
                           // Esta parte puede no ser necesaria
                           'DELETE FROM stores_inventories ' +
@@ -636,7 +637,7 @@ $(function(){
                           "SET service_type = 'pending', web = false WHERE ticket_id IN " +
                           "(SELECT id FROM tickets WHERE ticket_type = 'pending' AND web_id IS null); " +
                           "UPDATE tickets SET web = false WHERE ticket_type = 'pending' AND web_id IS null";
-    query("SELECT id, overprice, store_type_id FROM stores LIMIT 1", false).then(myStore => {
+    alterQuery("SELECT id, overprice, store_type_id FROM stores LIMIT 1").then(myStore => {
       var disc = "";
       var overPrice = myStore.rows[0].overprice / 100;
       var store_type = myStore.rows[0].store_type_id;
@@ -646,9 +647,9 @@ $(function(){
       } else if ((store_type == 4)) {
         disc = "discount_for_franchises";
       }
-      query(updatePendings, false).then(() => {
+      alterQuery(updatePendings).then(() => {
         let fixQueriesArray = fixQueries(disc, overPrice);
-        query(fixQueriesArray.fixStoresInvs, false).then(() => {
+        alterQuery(fixQueriesArray.fixStoresInvs).then(() => {
           fixinventories(fixQueriesArray);
         });
       });
@@ -656,10 +657,10 @@ $(function(){
   }
 
   function fixinventories(queryArray) {
-    query('SELECT MAX(id) AS max_id FROM store_movements', false).then(maxIdMovs => {
+    alterQuery('SELECT MAX(id) AS max_id FROM store_movements').then(maxIdMovs => {
       let nextIdMov = maxIdMovs.rows[0].max_id;
       let fixInvQuery = '';
-      query(queryArray.fixStoreMovs, false).then(movForFix => {
+      alterQuery(queryArray.fixStoreMovs).then(movForFix => {
         if (movForFix.rows.length > 0) {
           movForFix.rows.forEach(function(movToFix){
             nextIdMov += 1;
@@ -690,8 +691,8 @@ $(function(){
             fixInvQuery += `INSERT INTO store_movements (${invQuotes}) VALUES (${Object.values(newMov)}); `
             .replace(/,,/g,',null,').replace(/,,/g,',null,');
           });
-          query(fixInvQuery, false).then(() => {
-            query(queryArray.fixStoresInvs, false).then(() => {
+          alterQuery(fixInvQuery).then(() => {
+            alterQuery(queryArray.fixStoresInvs).then(() => {
               fixWarehouses(queryArray.fixStoresWarehouses);
             });
           });
@@ -704,9 +705,9 @@ $(function(){
 
   function fixWarehouses(queryArray){
     let fixWarehouseQuery = '';
-    query('SELECT MAX(id) AS max_id FROM stores_warehouse_entries', false).then(maxIdWarehouse => {
+    alterQuery('SELECT MAX(id) AS max_id FROM stores_warehouse_entries').then(maxIdWarehouse => {
       let nextIdWarehouse = maxIdWarehouse.rows[0].max_id;
-      query(queryArray, false).then(warehousesForFix => {
+      alterQuery(queryArray).then(warehousesForFix => {
         warehousesForFix.rows.forEach(function(warehouseToFix){
           fixWarehouseQuery += `DELETE FROM stores_warehouse_entries WHERE product_id = ${warehouseToFix.product_id} AND store_id = ${warehouseToFix.store_id}; `;
           console.log(`deleted all rows from product ${warehouseToFix.product_id}`);
@@ -727,7 +728,7 @@ $(function(){
           fixWarehouseQuery += myWarehouseQuery;
           console.log(`created a query to update warehouse from product ${newWarehouse.product_id}`);
         });
-        query(fixWarehouseQuery, false).then(() => {
+        alterQuery(fixWarehouseQuery).then(() => {
           runUpdateCeroCostMovs();
         });
       });

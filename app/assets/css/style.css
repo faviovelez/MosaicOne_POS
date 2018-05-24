@@ -17,6 +17,11 @@ nav {
 html {
 }
 
+.autocomplete-selected {
+  background-color: #A9D164 !important;
+  color: #fff !important;
+}
+
 .progress {
   margin-top: 4.8%;
 }

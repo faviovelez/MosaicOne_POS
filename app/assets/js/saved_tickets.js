@@ -58,27 +58,29 @@ $(function(){
     return ` $ ${convertPrice.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`;
   }
 
-  function createRealSubtotal(){
+  function createRealSubtotal(discountSelector = 'a[id^=discount]'){
     let discount = 0;
     $.each($(`td[id^=priceTo]`), function(){
-      let price       = parseFloat($(this).html()).toString() === 'NaN' ?
-                        $(this).find('input').val() :
-                        parseFloat($(this).html()),
-          tr          = $(this).parent(),
-          cuantity    = parseInt($(tr).find(
+      let price = 0;
+      if (!$(this).find('a').html()) {
+        price = $(this).find('input').val();
+      } else {
+        price = parseFloat($(this).find('a').html().replace(/\$|,/g,''));
+      }
+      let tr    = $(this).parent();
+      let cuantity    = parseInt($(tr).find(
             'input[id^=cuantityTo]'
-          ).val()),
+          ).val().replace(/_/g,'')),
           total       = price * cuantity,
           discountval = parseFloat($(tr.find(
-            'a[id^=discount]'
-          ))
-          .html().replace(' %',''));
+            discountSelector
+          )).html().replace(' %',''));
       if (total.toString() === 'NaN'){
         total = 0;
       }
-
-      discount += (parseFloat(discountval) / 100 * total);
+      discount += parseFloat( ( parseFloat(discountval) / 100 * total).toFixed(2) );
     });
+
     $('#discountSum').html(
       ` $ ${discount.toFixed(
           2
@@ -87,12 +89,12 @@ $(function(){
         )}`
     );
 
-    $('#savedSubtotal').html(
+    $('#SubtotalSum').html(
       ` $ ${(
-        parseFloat($('#SubtotalSum').html().replace(
+        parseFloat($('#savedSubtotal').html().replace(
           "$ ", ""
         ).replace(/,/g,'')
-        ) + parseFloat(
+      ) - parseFloat(
           translateInfo(
             $('#discountSum').html().replace(
               '$ ', ''
@@ -105,6 +107,26 @@ $(function(){
         )}`
     );
 
+    realTax = (parseFloat(
+      $('#SubtotalSum').html().replace("$ ", "").replace(/,/g,'')
+      ) * 0.16)
+    .toFixed(2);
+
+    realSubtot = parseFloat(
+      $('#SubtotalSum').html().replace("$ ", "").replace(/,/g,'')
+      )
+    .toFixed(2);
+
+    $('table.subtotal td.subtotal.iva').html(
+      ` $ ${realTax.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`
+    );
+
+    realTot = (parseFloat(realTax) + parseFloat(realSubtot)).toFixed(2);
+
+    $('table.subtotal td.total, #paymentRest').html(
+      `<strong>$ ${realTot.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </strong>`
+    );
+
   }
 
   function addDeliveryServiceId(service){
@@ -115,20 +137,30 @@ $(function(){
     return '';
   }
 
-  function createTotal(id){
+  function createTotal(id, mainSelector){
     totalObject = {};
-    let cuantity = $(`input[id^=cuantityTo_${id}]`).val(),
-      manualDiscount = !$('#manual-discount').hasClass('hidden'),
-      price    = parseFloat(
-        $(`td[id^=priceTo_${id}]`).html().replace(' $ ','').replace(/,/g,'')
-      );
-    if (!price){
-      price = $(`td[id^=priceTo_${id}] input`).val();
+    first = mainSelector.slice(0, mainSelector.indexOf("[")).replace("#","");
+    second = mainSelector.substring(mainSelector.indexOf("["));
+    manualDiscount = !$('#manual-discount').hasClass('hidden');
+    cuantity = $(`[id="${first}"]${second}`).children().find(`#cuantityTo_${id}`).val().replace(/_/g,'');
+    if (isNaN(parseInt(cuantity))) {
+      cuantity = 0;
+    } else {
+      cuantity = parseInt(cuantity)
     }
-    let total =  price * cuantity,
-        discount = $(`a[id^=discount_${id}]`)
+    price = 0;
+    priceElement = $(`[id="${first}"]${second}`).children().find(`[data-id=${id}][data-target="#changeSinglePrice"]`);
+    if (!$(priceElement).html()){
+      price = $(`[id="${first}"]${second}`).children().find(`#priceToServiceTo_${id}`).val();
+    } else {
+      price    = parseFloat(
+        $(priceElement).html().replace(' $ ','').replace(/,/g,'')
+      );
+    }
+    let total =  parseFloat( (price * cuantity).toFixed(2) ),
+        discount = $(`[id="${first}"]${second}`).children().find(`#discount_${id}`)
       .html().replace(' %',''),
-      discountVal = parseFloat(discount) / 100 * total,
+      discountVal = parseFloat(parseFloat ( (parseFloat(discount) / 100 * total).toFixed(3) ).toFixed(2)),
       productTotal    = total - discountVal;
       totaWithoutDisc = total;
       totalObject["total"] = productTotal;
@@ -152,10 +184,9 @@ $(function(){
       );
     }
 
-    return productTotal.toFixed(2).replace(
-      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
-    );
+    return totalObject;
   }
+
 
   function stringPrice(price, id){
     return `<a href="#" data-toggle="modal" data-target="#changeSinglePrice" data-id="${id}">` +
@@ -215,7 +246,7 @@ $(function(){
       '</td><td>' +
       '<input type="text" class="form-control smaller-form" ' +
       `placeholder="1" id="cuantityTo_${product.id}" ` +
-      `value="${Math.abs(product.quantity)}"></td>` +
+      '</td>' +
       '<td> <a href="#" data-toggle="modal"' +
       'data-target="#discountChange" ' +
       `id="discount_${product.id}" data-id="${product.id}" data-child-count="${childCount}" ` +
@@ -228,54 +259,60 @@ $(function(){
       '</tr>';
   }
 
-  function bigTotal(){
-    let subTotalInput = $('table.subtotal #SubtotalSum'),
+  function bigTotal(discountSelector = 'a[id^=discount]'){
+    let subTotalInput = $('#savedSubtotal'),
+        taxSum        = 0,
         subtotal      = 0;
-    $.each($(`td[id^=totalTo_]`), function(){
+    $.each($(`td[id^=totalSinTo_]`), function(){
       let productTotal = parseFloat(
         $(this).html().replace('$ ', '').replace(/,/g,'')
       );
-      subtotal += productTotal.toString() === 'NaN' ? 0 : productTotal;
+      productTotal = productTotal.toString() === 'NaN' ? 0 : productTotal;
+      subtotal += productTotal;
+      taxSum += Math.round(productTotal * 0.16 * 100) / 100;
+
     });
     $(subTotalInput).html(`$ ${subtotal.toFixed(
       2
     ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}`);
 
-    let iva = subtotal * 0.16;
     $('table.subtotal td.subtotal.iva').html(
-      `$ ${iva.toFixed(2).replace(
+      `$ ${taxSum.toFixed(2).replace(
         /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
       )}`
     );
-    $('table.subtotal td.total, #paymentRest').html(
-      `<strong>$ ${(subtotal + parseFloat(iva)).toFixed(
-        2
-      ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")}</strong>`
-    );
 
-    createRealSubtotal();
+    createRealSubtotal(discountSelector);
   }
 
-  function addEvents(id){
-    $(`button[id=delete_${id}]`).click(function(){
-      $(`tr[id=product_${id}]`).remove();
+
+  function addEvents(id, elementCount){
+    let mainSelector = `#product_${id}[data-child-count=${elementCount}]`;
+    $(`${mainSelector} button[id=delete_${id}]`)
+    .click(function(){
+      $(`${mainSelector}`).remove();
       bigTotal();
+      resumePayment();
     });
 
-    $(`#cuantityTo_${id}`).keyup(function(){
-      $(`#totalTo_${id}`).html(
-        `$ ${createTotal(id)}`
+    $(`${mainSelector} #cuantityTo_${id}, ${mainSelector} #priceToServiceTo_${id}`).keyup(function(){
+      let total = createTotal(id, mainSelector);
+      $(`${mainSelector} td[id=totalTo_${id}]`).html(
+        `$ ${(total.total * 1.16).toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
       );
-      bigTotal();
-    });
 
-    $(`#priceToServiceTo_${id}`).keyup(function(){
-      $(`#totalTo_${id}`).html(
-        `$ ${createTotal(id)}`
+      $(`${mainSelector} td[id=totalSinTo_${id}]`).html(
+        `$ ${total.totalNoDesc.toFixed(2).replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"
+    )}`
       );
       bigTotal();
+      resumePayment();
     });
   }
+
 
   function fillDiscountFields(ticketInfo){
 
@@ -381,7 +418,10 @@ $(function(){
         product.productId    = product.product_id;
 
         $('#ticketList').append(addTr(product));
-        addEvents(product.id);
+        $(`#cuantityTo_${product.id}`).val(Math.abs(product.quantity));
+        let childCount = $(`tr[id^=product_${product.id}`).length;
+        addEvents(product.id, childCount);
+
       });
     });
 
@@ -397,7 +437,9 @@ $(function(){
         serviceId     = service.id;
         findDeliveryServices(service).then(function(processService){
           $('#ticketList').append(addTr(processService));
-          addEvents(processService.id);
+          $(`#cuantityTo_${processService.id}`).val(Math.abs(processService.quantity));
+          let childCount = $(`tr[id^=product_${processService.id}`).length;
+          addEvents(processService.id, childCount);
         });
 
       });
