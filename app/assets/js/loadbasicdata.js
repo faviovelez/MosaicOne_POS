@@ -7,7 +7,6 @@ $(function(){
         windowBounds: { width: 1024, height: 768 }
       }
     });
-
     return store;
   }
 
@@ -25,7 +24,6 @@ $(function(){
           store.get('current_user')
         )
       );
-
       $('#store').html(store.get('store').store_name);
     });
   })();

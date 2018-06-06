@@ -88,44 +88,48 @@ $(function(){
     ].join(', ');
   }
 
-function lotQueries(store, call){
-    return call({
-      'stores' : "SELECT * FROM stores " +
-      `WHERE id=${store.id}`,
-      'roles' : "SELECT * FROM roles " +
-      "WHERE name IN ('store', 'store-admin')",
-      'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
-      `id = ${store.delivery_address_id}`,
-      'billing_addresses': getBillingAdressesQuery(store),
-      'business_units': 'SELECT * FROM business_units WHERE ' +
-      `id = ${store.business_unit_id}`,
-      'store_types':  'SELECT * FROM store_types WHERE ' +
-      `id = ${store.store_type_id}`,
-      'cost_types':   'SELECT * FROM cost_types WHERE ' +
-      `id = ${store.cost_type_id}`,
-      'business_groups': 'SELECT * FROM business_groups WHERE ' +
-      `id = ${store.business_group_id}`,
-      'prospects': 'SELECT * FROM prospects WHERE ' +
-      `store_id = ${store.id}`,
-      'products' : 'SELECT * FROM products WHERE shared = true AND current = true ' +
-      `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}`,
-      'services' : 'SELECT * FROM services WHERE ' +
-      `shared = true AND current = true OR store_id = ${store.id}`,
-      'stores_inventories': `SELECT ${storesInventoriesColumns()} FROM stores_inventories INNER JOIN products ` +
-      'ON stores_inventories.product_id = products.id WHERE' +
-      ` stores_inventories.store_id = ${store.id} AND products.child_id IS NULL` ,
-      'stores_warehouse_entries': 'SELECT * FROM stores_warehouse_entries ' +
-      `WHERE store_id = ${store.id}`,
-      'store_movements': 'SELECT * FROM store_movements ' +
-      `WHERE store_id = ${store.id}`,
-      'cash_registers': 'SELECT * FROM cash_registers ' +
-      `WHERE store_id = ${store.id}`,
-      'cfdi_uses': 'SELECT * FROM cfdi_uses',
-      'banks':    'SELECT * FROM banks',
-      'tax_regimes' : 'SELECT * FROM tax_regimes',
-      'payment_forms' : 'SELECT * FROM payment_forms'
-    });
-  }
+  function lotQueries(store, call){
+      return call({
+        'stores' : "SELECT * FROM stores " +
+        `WHERE id=${store.id}`,
+        'roles' : "SELECT * FROM roles " +
+        "WHERE name IN ('store', 'store-admin')",
+        'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
+        `id = ${store.delivery_address_id}`,
+        'billing_addresses': getBillingAdressesQuery(store),
+        'business_units': 'SELECT * FROM business_units WHERE ' +
+        `id = ${store.business_unit_id}`,
+        'store_types':  'SELECT * FROM store_types WHERE ' +
+        `id = ${store.store_type_id}`,
+        'cost_types':   'SELECT * FROM cost_types WHERE ' +
+        `id = ${store.cost_type_id}`,
+        'business_groups': 'SELECT * FROM business_groups WHERE ' +
+        `id = ${store.business_group_id}`,
+        'prospects': 'SELECT * FROM prospects WHERE ' +
+        `store_id = ${store.id}`,
+        'products' : 'SELECT * FROM products WHERE shared = true AND current = true ' +
+        `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}`,
+        'services' : 'SELECT * FROM services WHERE ' +
+        `shared = true AND current = true OR store_id = ${store.id}`,
+        'stores_inventories': `SELECT ${storesInventoriesColumns()} FROM stores_inventories INNER JOIN products ` +
+        'ON stores_inventories.product_id = products.id WHERE' +
+        ` stores_inventories.store_id = ${store.id} AND products.child_id IS NULL` ,
+        'stores_warehouse_entries': 'SELECT * FROM stores_warehouse_entries ' +
+        `WHERE store_id = ${store.id}`,
+        'store_movements': 'SELECT * FROM store_movements ' +
+        `WHERE store_id = ${store.id}`,
+        'cash_registers': 'SELECT * FROM cash_registers ' +
+        `WHERE store_id = ${store.id}`,
+        'cfdi_uses': 'SELECT * FROM cfdi_uses',
+        'banks':    'SELECT * FROM banks',
+        'tax_regimes' : 'SELECT * FROM tax_regimes',
+        'payment_forms' : 'SELECT * FROM payment_forms',
+        'tickets' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM tickets WHERE store_id = ${store.id} ORDER BY created_at DESC LIMIT 1`,
+        'payments' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM payments WHERE store_id = ${store.id} ORDER BY created_at DESC LIMIT 1`,
+        'service_offereds' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM service_offereds WHERE store_id = ${store.id} ORDER BY created_at DESC LIMIT 1`,
+        'delivery_services' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM delivery_services WHERE store_id = ${store.id} ORDER BY created_at DESC LIMIT 1`
+      });
+    }
 
   function getBillingAdressesQuery(store){
     return 'SELECT billing_addresses.id, billing_addresses.type_of_person, ' +
@@ -145,6 +149,11 @@ function lotQueries(store, call){
   }
 
   function getQueryCount(store){
+    extraQueries = ` SELECT COUNT (*) as rows FROM tickets WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1 UNION ALL` +
+    ` SELECT COUNT (*) as rows FROM payments WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1 UNION ALL` +
+    ` SELECT COUNT (*) as rows FROM service_offereds WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1 UNION ALL` +
+    ` SELECT COUNT (*) as rows FROM delivery_services WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1`;
+
     return 'SELECT SUM(rows) as total_rows FROM (' +
       ` SELECT COUNT (*) as rows FROM billing_addresses WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores WHERE id = ${store.id} UNION ALL` +
@@ -158,8 +167,8 @@ function lotQueries(store, call){
       ' SELECT COUNT (*) as rows FROM products WHERE shared = true AND current = true AND' +
       ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM services WHERE shared = true AND current = true OR store_id = ${store.id} UNION ALL` +
-      ` SELECT COUNT (*) as rows FROM stores_inventories INNER JOIN products ` +
-      'ON stores_inventories.product_id = products.id WHERE' +
+      ` SELECT COUNT (*) as rows FROM stores_inventories INNER JOIN products` +
+      ' ON stores_inventories.product_id = products.id WHERE' +
       ` stores_inventories.store_id = ${store.id} AND products.child_id IS NULL UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores_warehouse_entries WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM store_movements WHERE store_id = ${store.id} UNION ALL` +
@@ -172,16 +181,14 @@ function lotQueries(store, call){
   }
 
   function cloneAllTables(queries, call, queryCount){
-
     query(queryCount).then(limitCount => {
 
       count = 0;
-      limit = parseInt(limitCount.rows[0].total_rows);
-
+      limit = parseInt(limitCount.rows[0].total_rows) + 4;
+      // Se agrega 1 por cada línea en el extra queries
       $("#dynamic")
         .css("width", 8 + "%")
         .attr("aria-valuenow", 8)
-        .text(8 + "%");
 
       current_progress = 8;
 
@@ -197,7 +204,8 @@ function lotQueries(store, call){
               tablesResult.table
             ).then(localQuery => {
               query(localQuery, false).then(result => {
-                if (count++ === limit){
+                count++;
+                if (count === limit){
                   call();
                 }
                 current_progress += parseInt(count * 92 / limit);
@@ -205,7 +213,6 @@ function lotQueries(store, call){
                 $("#dynamic")
                   .css("width", current_progress + "%")
                   .attr("aria-valuenow", current_progress)
-                  .text(current_progress + "%");
               }, err => {
                 console.log(err);
               });
@@ -225,14 +232,8 @@ function lotQueries(store, call){
 
     script = `psql -U faviovelez -d mosaiconepos ` +
       `< ${path}`;
-    showAlert('Info', 'Proceso de replicación de base de datos iniciado', cloneAlert());
+    showAlert('Info', 'Recibiendo información de tienda', cloneAlert());
     exec = require('child_process').exec;
-
-//    exec('mkdir -p ./tickets', function(err, stdout, stderr){
-//      if(err){
-//        showAlert('Error', stderr, cloneAlert());
-//      }
-//    });
 
     dbRestore = exec(script,
       function(err, stdout, stderr) {
@@ -274,7 +275,8 @@ function lotQueries(store, call){
                       findBy('product_id', productId, 'stores_inventories', false, productId).then(storeInventory => {
                         updateBy(
                           {
-                            manual_price: updatedPrices[storeInventory.lastId]
+                            manual_price: updatedPrices[storeInventory.lastId],
+                            web: false
                           },
                           'stores_inventories',
                           `product_id = ${storeInventory.lastId}`

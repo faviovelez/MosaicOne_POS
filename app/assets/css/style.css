@@ -17,8 +17,21 @@ nav {
 html {
 }
 
+.autocomplete-selected {
+  background-color: #A9D164 !important;
+  color: #fff !important;
+}
+
 .progress {
   margin-top: 4.8%;
+}
+
+.gray-background {
+  background-color: #E8EBEF;
+}
+
+.blue-background {
+  background-color: #CEEAF7;
 }
 
 .alerts-container {
@@ -26,6 +39,10 @@ html {
   top: 9%;
   left: 84%;
   z-index: 100;
+}
+
+.red-icon {
+  color: #D72638
 }
 
 .alert {
@@ -60,6 +77,15 @@ html {
 
 .invisible {
   visibility: hidden;
+}
+
+.input-group.flex-div {
+    display: flex;
+}
+
+input#rackSave,
+input#levelSave {
+  margin-left: 10px;
 }
 
 .main-button {

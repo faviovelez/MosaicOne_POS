@@ -96,28 +96,28 @@
           <input type="text" class="form-control main-search" placeholder="Producto o servicio" id="mainProductSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
 
           <span class="input-group-btn extra-search hidden">
-            <button class="btn btn-default pos-main-btn gray-btn" type="button" id="searchProducts">
-              <i class="fa fa-archive" aria-hidden="true"></i>
+            <button class="btn btn-default pos-main-btn gray-btn hidden" type="button" id="searchProducts"> <!-- Lo oculté para después -->
+              <i class="fa fa-archive hidden" aria-hidden="true"></i> <!-- Lo oculté para después -->
             </button>
           </span>
-          <input type="text" class="form-control extra-search hidden" placeholder="Producto o servicio" id="productSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <input type="text" class="form-control extra-search hidden" placeholder="Producto o servicio" id="productSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)--> <!-- Lo oculté para después -->
 
           <span class="input-group-btn extra-search hidden">
-            <button class="btn btn-default pos-main-btn gray-btn" type="button" id="searchProspects">
-              <i class="fa fa-user-o" aria-hidden="true"></i>
+            <button class="btn btn-default pos-main-btn gray-btn hidden" type="button" id="searchProspects"> <!-- Lo oculté para después -->
+              <i class="fa fa-user-o hidden" aria-hidden="true"></i> <!-- Lo oculté para después -->
             </button>
           </span>
-          <input type="text" class="form-control extra-search hidden" placeholder="Cliente"id="prospectSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <input type="text" class="form-control extra-search hidden" placeholder="Cliente"id="prospectSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)--> <!-- Lo oculté para después -->
 
-          <span class="input-group-btn extra-search hidden">
+          <span class="input-group-btn extra-search hidden ticket-search">
             <button class="btn btn-default pos-main-btn gray-btn" type="button" id="searchTickets">
               <i class="fa fa-file-o" aria-hidden="true"></i>
             </button>
           </span>
-          <input type="text" class="form-control extra-search hidden" placeholder="Número de ticket" id="ticketSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
+          <input type="text" class="form-control extra-search ticket-search hidden" placeholder="Número de ticket" id="ticketSearch"> <!-- Agregar aquí el select2 de productos (products) y servicios (services)-->
 
           <!-- Inician botones de la barra de búsqueda (cambian de acuerdo a la selección de opciones) -->
-          <span class="input-group-btn">
+          <span class="input-group-btn" id="tipoDeMovimiento">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle pos-secondary-btn active-sale-option" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="sale">
                 <i class="fa fa-cart-plus" aria-hidden="true"></i>
@@ -154,7 +154,7 @@
                     Devolución
                   </a>
                 </li>
-                <li>
+                <li class="hidden">
                   <a href="#" id="change-option">
                     <i class="fa fa-handshake-o" aria-hidden="true"></i>
                     Cambio
@@ -207,21 +207,11 @@
           <tr>
             <th> No. ticket </th>
             <th> Fecha </th>
-            <th> Productos </th>
-            <th class="quantity-width"> Piezas </th>
             <th> Total </th>
             <th> Atendió </th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td> <a href="#" class="hide-results"> 147 </a> </td>
-            <td> 01/10/2017 </td>
-            <td> 4 </td>
-            <td> 8 </td>
-            <td class="right"> $ 1,007.00 </td>
-            <td> Favio Velez </td>
-          </tr>
+        <tbody id='resultTicketList'>
           <tr>
             <td> <a href="#" class="hide-results"> 148 </a> </td>
             <td> 02/10/2017 </td>
@@ -243,160 +233,7 @@
       <!-- Termina la tabla de resultados de tickets -->
 
       <!-- Inicia la tabla del ticket seleccionado en la búsqueda-->
-      <table class="ticket-selected hidden">
-        <thead>
-          <tr>
-            <th colspan="6" class="head-blue edge-right">
-              Ticket de venta:
-              <span id="ticket-id">
-                147
-              </span>
-               -
-              <span id="ticket-date">
-                17/10/2017
-              </span>
-              -
-              <span id="ticket-user">
-                Usuario: Favio Velez
-              </span>
-              -
-              <span id="ticket-prospect">
-                Cliente: Juan Perez
-              </span>
-            </th>
-            <th class="head-blue edge-left">
-              <span class="label label-danger">Pendiente</span>
-            </th>
-          </tr>
-          <tr>
-            <th> </th>
-            <th> Producto o Servicio </th>
-            <th> Color/Diseño </th>
-            <th> Precio </th>
-            <th class="quantity-width"> Cantidad </th>
-            <th> Descuento </th>
-            <th> Total </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <div class="close-icon invisible">
-                <button type="button" class="close center-close" aria-label="Close">
-                  <span aria-hidden="true" class="white-light">&times;</span>
-                </button>
-              </div>
-            </td>
-            <td class="left">
-              <a href="#" data-toggle="modal" data-target="#productShow">
-                Bolsa para botella Kraft Satinada Navideña
-              </a>
-            </td>
-            <td> Kraft </td>
-            <td> $ 26.50 </td>
-            <td> 1 </td>
-            <td> 5% </td>
-            <td class="right"> $ 1,007.00 </td>
-          </tr>
-          <tr>
-            <td>
-              <div class="close-icon invisible">
-                <button type="button" class="close center-close" aria-label="Close">
-                  <span aria-hidden="true" class="white-light">&times;</span>
-                </button>
-              </div>
-            </td>
-            <td class="left">
-              <a href="#" data-toggle="modal" data-target="#productShow">
-                Cilindro de acetato botella decorado Nav
-              </a>
-            </td>
-            <td> Transparente </td>
-            <td> $ 37.50 </td>
-            <td>
-              1
-            </td>
-            <td>  0% </td>
-            <td class="right"> $ 375.00 </td>
-          </tr>
-          <tr>
-            <td>
-              <div class="close-icon invisible">
-                <button type="button" class="close center-close" aria-label="Close">
-                  <span aria-hidden="true" class="white-light">&times;</span>
-                </button>
-              </div>
-            </td>
-            <td class="left">
-              Servicio de mensajería UPS (Nacional)
-            </td>
-            <td> N/A </td>
-            <td> $ 100.00 </td>
-            <td> 1 </td>
-            <td> 0% </td>
-            <td class="right"> $ 100.00 </td>
-          </tr>
-          <tr>
-            <td> <br /> </td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- Termina la tabla del ticket seleccionado en la búsqueda-->
-
-      <table class="payments-received-on-ticket hidden">
-        <thead>
-          <tr>
-            <th colspan="5" class="head-black">
-              Pagos recibidos Ticket:
-              <span class="ticket-number">
-                147
-              </span>
-            </th>
-          </tr>
-          <tr>
-            <th>
-              Ticket
-            </th>
-            <th>
-              Forma de pago
-            </th>
-            <th>
-              Monto
-            </th>
-            <th>
-              Fecha
-            </th>
-            <th>
-              Recibió
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td> 147 </td>
-            <td> Efectivo </td>
-            <td> $800.00 </td>
-            <td> 10/09/2017 </td>
-            <td> Favio Velez </td>
-          </tr>
-          <tr>
-            <td> 155 </td>
-            <td> Efectivo </td>
-            <td> $1,000.00 </td>
-            <td> 18/09/2017 </td>
-            <td> Favio Velez </td>
-          </tr>
-          <tr>
-            <td> 194 </td>
-            <td> Transferencia </td>
-            <td> $2,000.00 </td>
-            <td> 10/09/2017 </td>
-            <td> Favio Velez </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Segundo search (para cambios)-->
+      <div id='resultOfTicketSearch'></div>
       <div class="input-group second-search minor-width hidden">
         <span class="input-group-btn">
           <button class="btn btn-default pos-main-btn" type="button" data-toggle="modal" data-target="#productos">
@@ -522,70 +359,7 @@
             <th> Total </th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>
-              <div class="close-icon">
-                <button type="button" class="close center-close" aria-label="Close">
-                  <span aria-hidden="true" class="white-light">&times;</span>
-                </button>
-              </div>
-            </td>
-            <td class="left">
-              <a href="#" data-toggle="modal" data-target="#productShow">
-                Bolsa para botella Kraft Satinada Navideña
-              </a>
-            </td>
-            <td> Kraft </td>
-            <td> $ 26.50 </td>
-            <td>
-              <input type="text" class="form-control smaller-form" placeholder="1">
-            </td>
-            <td> 5% </td>
-            <td class="right"> $ 1,007.00 </td>
-          </tr>
-          <tr>
-            <td>
-              <div class="close-icon">
-                <button type="button" class="close center-close" aria-label="Close">
-                  <span aria-hidden="true" class="white-light">&times;</span>
-                </button>
-              </div>
-            </td>
-            <td class="left">
-              <a href="#" data-toggle="modal" data-target="#productShow">
-                Cilindro de acetato botella decorado Nav
-              </a>
-            </td>
-            <td> Transparente </td>
-            <td> $ 37.50 </td>
-            <td>
-              <input type="text" class="form-control smaller-form" placeholder="1">
-            </td>
-            <td> 0% </td>
-            <td class="right"> $ 375.00 </td>
-          </tr>
-          <tr>
-            <td>
-              <div class="close-icon">
-                <button type="button" class="close center-close" aria-label="Close">
-                  <span aria-hidden="true" class="white-light">&times;</span>
-                </button>
-              </div>
-            </td>
-            <td class="left">
-              Servicio de mensajería UPS (Nacional)
-            </td>
-            <td> N/A </td>
-            <td>
-              $ 100.00
-            </td>
-            <td>
-              <input type="text" class="form-control smaller-form" placeholder="1">
-            </td>
-            <td> 0% </td>
-            <td class="right"> $ 100.00 </td>
-          </tr>
+        <tbody id="devolucionTable">
 
         </tbody>
       </table>
@@ -623,8 +397,9 @@
       </div>
 
       <div class="discounts-container">
-        <h4> Tipo de descuento</h4>
-        <div class="discounts-form-wrapper">
+        <h4 class="discount-group"> Tipo de descuento</h4>
+        <h4 class="pay-dev-group hidden"> Totales</h4>
+        <div class="discounts-form-wrapper discount-group">
           <button type="button" class="btn btn-default custom-button" id="manual">
             <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
             Manual
@@ -640,7 +415,7 @@
         </div>
 
         <!-- Tabla descuentos automáticos (regla de descuentos) -->
-        <table class="discounts-table hidden" id="automatic-discount">
+        <table class="discounts-table hidden discount-group" id="automatic-discount">
           <thead>
             <tr>
               <th colspan="2"> Descuentos automáticos: </th>
@@ -668,7 +443,7 @@
         </table>
 
         <!-- Tabla descuentos manuales -->
-        <table class="discounts-table hidden" id="manual-discount">
+        <table class="discounts-table hidden discount-group" id="manual-discount">
           <thead>
             <tr>
               <th colspan="2"> Descuento manual: </th>
@@ -677,7 +452,7 @@
           <tbody>
             <tr>
               <td> Descuento total ticket % </td>
-              <td class="right"> <a href="#" data-toggle="modal" data-target="#ticketDiscountChange" >Aplicar descuento</a> </td>
+              <td class="right"> <a href="#" data-toggle="modal" data-target="#ticketDiscountChange" id="applyDiscountToTicket">Aplicar descuento</a> </td>
             </tr>
             <tr>
               <td> Total descuento </td>
@@ -763,7 +538,7 @@
           <i class="fa fa-address-book-o " aria-hidden="true"></i>
           Venta a Crédito
         </button>
-        <button type="button" class="btn btn-default custom-button hidden" id="returnCash">
+        <button type="button" class="btn btn-default custom-button hidden notInAllProcess" id="returnCash">
           <i class="fa fa-exchange " aria-hidden="true"></i>
           Devolución
         </button>
@@ -783,24 +558,24 @@
       <div class="row process-sale">
         <div class="input-group">
           <input type="text" class="form-control paymentProcess" id="paymentMethodCuantity" placeholder="Ingrese monto de pago">
-          <span class="input-group-btn">
+          <span class="input-group-btn center-span-completeSale">
             <button class="btn btn-default color-button pos-main-btn hidden" type="button" id="completeSale">Completar venta</button>
-            <button class="btn btn-default color-button pos-secondary-btn paymentProcess" type="button" id="addPayment">Agregar pago</button>
+            <button class="btn btn-default color-button pos-secondary-btn paymentProcess notInAllProcess" type="button" id="addPayment">Agregar pago</button>
           </span>
         </div><!-- /input-group -->
       </div><!-- /.row -->
 
       <div class="input-group margin-bottom credit-days-container hidden paymentProcess">
-        <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)">
+        <input type="text" class="form-control" placeholder="Ejemplo: 30 (solo número)" id="creditDaysNumber">
         <span class="input-group-btn">
-          <button class="btn btn-default color-button pos-main-btn" type="button" id="creditDays">Días de crédito</button>
+          <button class="btn btn-default color-button pos-main-btn notInAllProcess" type="button" id="creditDays">Días de crédito</button>
         </span>
       </div><!-- /input-group -->
 
       <div class="input-group margin-bottom operation-number-container hidden paymentProcess">
         <input type="text" class="form-control" placeholder="Referencia bancaria">
         <span class="input-group-btn">
-          <button class="btn btn-default color-button pos-main-btn" type="button" id="operationNumber">Referencia</button>
+          <button class="btn btn-default color-button pos-main-btn notInAllProcess" type="button" id="operationNumber">Referencia</button>
         </span>
       </div><!-- /input-group -->
 
@@ -842,6 +617,7 @@
          <h4 class="modal-title">Detalles del producto</h4>
        </div>
        <div class="modal-body">
+         <p id="product_id_modal" class="hidden"></p>
          <table>
            <tbody>
              <tr>
@@ -901,21 +677,33 @@
                     piezas
                   </span>
                  </p>
-                 <p>
-                  <strong>
+                 <p class="location-paragraph">
+                  <strong class="location-strong">
                     Ubicación:
                   </strong>
                   <span class="stores_inventory_rack">
                   </span>
                   <span class="stores_inventory_level">
                   </span>
-                 </p>
+                </p>
+                <p class="">
+                  <div class="input-group flex-div hidden">
+                    <input type="text" class="form-control smaller-form round-form"  placeholder="Anaquel" id="rackSave">
+                    <input type="text" class="form-control smaller-form round-form"  placeholder="Nivel" id="levelSave">
+                  </div>
+                </p>
                </td>
              </tr>
            </tbody>
          </table>
        </div>
        <div class="modal-footer">
+         <button type="button" class="btn btn-default pos-main-btn red-modal-button" id="modifyLocation">
+           Modificar ubicación
+         </button>
+         <button type="button" class="btn btn-default pos-main-btn red-modal-button hidden" id="confirmChangeLocation">
+           Confirmar cambio
+         </button>
          <button type="button" class="btn btn-default pos-main-btn" data-dismiss="modal">
            Confirmar
          </button>
@@ -938,7 +726,7 @@
              Aplicar descuento a todo el ticket.
            </p>
          <div class="input-group">
-           <input type="text" class="form-control smaller-form round-form"  placeholder="5%">
+           <input type="text" class="form-control smaller-form round-form"  placeholder="5%" id="allTicketDiscount">
            <input type="text" class="form-control higher-form round-form" placeholder="Motivo del descuento" class="modal-form-input">
          </div><!-- /input-group -->
        </div>
@@ -993,6 +781,27 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
   <!-- Termina mini Modal para confirmar si desea cancelar el ticket -->
+
+  <!-- Inicia mini Modal para confirmar si desea cancelar el ticket (en la tabla de tickets) -->
+   <div class="modal fade" id="askForConfirmCancel" tabindex="-1" role="dialog">
+     <div class="modal-dialog discount-change-modal" role="document">
+       <div class="modal-content">
+         <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+           <h4 class="modal-title">Cancelar ticket</h4>
+         </div>
+         <div class="modal-body">
+           ¿Desea cancelar este ticket? Si lo hace, no podrá recuperarlo.
+         </div>
+         <div class="modal-footer">
+           <button class="btn btn-default pos-main-btn" id='ticketCancelinList' type="button">
+             Confirmar
+           </button>
+         </div>
+       </div><!-- /.modal-content -->
+     </div><!-- /.modal-dialog -->
+   </div><!-- /.modal -->
+   <!-- Termina mini Modal para confirmar si desea cancelar el ticket (en la tabla de tickets) -->
 
   <!-- Inicia mini Modal para llenar datos de uso de la factura -->
    <div class="modal fade" id="billCfdiUse" tabindex="-1" role="dialog">
@@ -1054,13 +863,13 @@
                <tbody>
                  <tr>
                    <td>
-                     <input placeholder="Número de guía" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[tracking_number]" id="delivery_service_tracking_number" />
+                     <input placeholder="Número de guía" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[tracking_number]" id="delivery_service_tracking_number" />
                    </td>
                    <td>
-                     <input placeholder="Nombre compelto" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[sender_name]" id="delivery_service_sender_name" />
+                     <input placeholder="Nombre completo" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[sender_name]" id="delivery_service_sender_name" />
                    </td>
                    <td>
-                     <input placeholder="Código postal" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[sender_zipcode]" id="delivery_service_sender_zipcode" />
+                     <input placeholder="Código postal" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[sender_zipcode]" id="delivery_service_sender_zipcode" />
                    </td>
                  </tr>
                </tbody>
@@ -1085,17 +894,19 @@
                 <tbody>
                   <tr>
                     <td>
-                      <input placeholder="Nombre o razón social" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[receivers_name]" id="delivery_service_receivers_name" />
+                      <input placeholder="Nombre o razón social" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[receivers_name]" id="delivery_service_receivers_name" />
                     </td>
                     <td>
-                      <input placeholder="Nombre completo" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[contact_name]" id="delivery_service_contact_name" />
+                      <input placeholder="Nombre completo" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[contact_name]" id="delivery_service_contact_name" />
                     </td>
                     <td>
-                      <input placeholder="Código postal" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[receivers_zipcode]" id="delivery_service_receivers_zipcode" />
+                      <input placeholder="Código postal" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[receivers_zipcode]" id="delivery_service_receivers_zipcode" />
                     </td>
                   </tr>
                 </tbody>
               </table>
+
+              <h4 class="title-margin-modal"> Dirección </h4>
 
               <table class="table-margin-modal delivery-services-table">
                 <thead>
@@ -1183,10 +994,47 @@
                        <input placeholder="Correo electrónico" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[email]" id="delivery_service_email" />
                      </td>
                      <td>
-                       <input placeholder="Celular" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[cellphone]" id="delivery_service_cellphone" />
+                       <input placeholder="Celular" class="form-control round-form transparent-field blue-background" type="text" value="" name="delivery_service[cellphone]" id="delivery_service_cellphone" />
                      </td>
                      <td>
-                       <input placeholder="Teléfono fijo" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[phone]" id="delivery_service_phone" />
+                       <input placeholder="Teléfono fijo" class="form-control round-form transparent-field blue-background" type="text" value="" name="delivery_service[phone]" id="delivery_service_phone" />
+                     </td>
+                   </tr>
+                 </tbody>
+               </table>
+
+               <h4 class="title-margin-modal"> Peso y medidas </h4>
+
+               <table class="table-margin-modal delivery-services-table">
+                 <thead>
+                   <tr>
+                     <th>
+                       <label for="delivery_service_weight">Peso</label><br>
+                     </th>
+                     <th>
+                       <label for="delivery_service_length">Largo</label><br>
+                     </th>
+                     <th>
+                       <label for="delivery_service_width">Ancho</label><br>
+                     </th>
+                     <th>
+                       <label for="delivery_service_height">Alto</label><br>
+                     </th>
+                   </tr>
+               </thead>
+                 <tbody>
+                   <tr>
+                     <td>
+                       <input placeholder="Peso" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[weight]" id="delivery_service_weight" />
+                     </td>
+                     <td>
+                       <input placeholder="Largo" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[length]" id="delivery_service_length" />
+                     </td>
+                     <td>
+                       <input placeholder="Ancho" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[width]" id="delivery_service_width" />
+                     </td>
+                     <td>
+                       <input placeholder="Alto" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[height]" id="delivery_service_height" />
                      </td>
                    </tr>
                  </tbody>
@@ -1259,7 +1107,8 @@
                  <tr class="head-blue" id="addProductDetails">
                    <th class="rounded-edges-left"> Producto o Servicio </th>
                    <th> Color/Diseño </th>
-                   <th class="rounded-edges-right"> Cantidad </th>
+                   <th> Cantidad </th>
+                   <th class="rounded-edges-right"> Motivo </th>
                  </tr>
                </thead>
                <tbody id='addProductQuantity'>
@@ -1304,6 +1153,33 @@
      </div><!-- /.modal -->
    <!-- Termina Modal para para alerta de retiro de efectivo -->
 
+   <!-- Inicia mini Modal para cambiar precios individuales -->
+    <div class="modal fade" id="changeSinglePrice" tabindex="-1" role="dialog">
+      <div class="modal-dialog price-change-modal" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Cambiar precio</h4>
+          </div>
+          <div class="modal-body">
+            <div class='hidden' id='changeSinglePriceProductId'>
+            </div>
+              <div class="input-group">
+                <input type="text" id='changeSinglePriceInput' class="form-control smaller-form" placeholder="$ 1.00">
+                <span class="input-group-btn main-search">
+                  <button class="btn btn-default pos-main-btn" id='saveNewPrice' type="submit" value="submit">
+                    <i class="fa fa-check " aria-hidden="true"></i>
+                  </button>
+                </span>
+              </div><!-- /input-group -->
+              <br />
+              <input type="checkbox" id='changeSinglePriceCheckBox' name="vehicle" value="auto" class="margin-right">Actualizar manualmente<br>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+  <!-- Termina mini Modal para cambiar precios individuales -->
+
 <!-- Temporalmente deshabilitada la Bottom Nav
   <div class="bottom-nav">
     <a href="#">
@@ -1323,12 +1199,17 @@
     <script src="../../esMx.js" charset="utf-8"></script>
     <script src="../../validator.js" charset="utf-8"></script>
     <script src="../../store.js" charset="utf-8"></script>
+    <script src="../assets/js/globalFunctions.js" charset="utf-8"></script>
     <script src="../assets/js/print_ticket.js" charset="utf-8"></script>
     <script src="../assets/js/save_ticket.js" charset="utf-8"></script>
     <script src="../assets/js/pos.js" charset="utf-8"></script>
     <script src="../assets/js/pos_customers.js" charset="utf-8"></script>
     <script src="../assets/js/saved_tickets.js" charset="utf-8"></script>
-    <script src="../assets/js/specialQueries.js" charset="utf-8"></script>
+    <script src="../assets/js/reimpresion.js" charset="utf-8"></script>
+    <script src="../assets/js/devolucion.js" charset="utf-8"></script>
+    <script src="../assets/js/ticketSearch.js" charset="utf-8"></script>
+    <script src="../assets/js/print_ticket_payment.js" charset="utf-8"></script>
+    <script src="../assets/js/print_ticket_devolucion.js" charset="utf-8"></script>
 
   <script>if (window.module) module = window.module;</script>
 

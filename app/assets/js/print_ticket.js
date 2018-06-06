@@ -1,5 +1,7 @@
 // Print logic starts
 const remote = require('electron').remote;
+var cmd = require('node-cmd');
+const userHome = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
 let win = null;
 
@@ -167,7 +169,7 @@ function createTicketProductList(productList, discount, call){
           `${object.product.unique_code} ` +
           '</span>' +
           '<span>' +
-          `${object.product.description} ` +
+          `${object.product.description} ${object.product.only_measure} ` +
           '</span>' +
           '</td>' +
           '<td colspan="1" style="width: 80px; text-align: right; vertical-align:text-top" >' +
@@ -184,7 +186,7 @@ function createTicketProductList(productList, discount, call){
           `<td colspan="4" style="text-align:right; vertical-align:text-top"> <strong> $ ${(object.total - object.taxes).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </strong> </td>` +
           '</tr>';
 
-        if (productObject.table === 'serviceOffereds'){
+        if (productObject.table === 'serviceOffereds' && object.product.delivery_company != null){
           createDeliveryServiceCad(object, function(deliveryCad){
             deliveriesCad += deliveryCad;
             count++;
@@ -239,12 +241,12 @@ function initTicket(ticketData, call) {
         '<title> Ticket </title>' +
         '<style type="text/css">' +
         '@media print{' +
-        '@page { size:65mm auto; margin-left: 0mm !important; margin-right: 0mm !important;}' +
+        '@page { size:65mm auto; margin-left: 3mm !important; margin-right: 3mm !important;}' +
         '}' +
         '</style>' +
         '</head>' +
         '<body style="margin:0 auto !important; padding:0 auto !important">' +
-        '<table style="font-family: Arial; font-size: 11px; width: 200px; text-align: center; vertical-align:text-top">' +
+        '<table style="font-family: Arial; font-size: 11px; width: 65mm; text-align: center; vertical-align:text-top">' +
         '<tbody>' +
         '<tr>' +
         '<td colspan="4">' +
@@ -289,7 +291,7 @@ function initTicket(ticketData, call) {
         '<td colspan="2" style="text-align:right">' +
         'Ticket: ' +
         '<span>' +
-        `<strong> ${ticketData.ticket.ticket_number} </strong>` +
+        `<strong> ${ticketData.ticket.id} </strong>` +
         '</span>' +
         '</td>' +
         '</tr>' +
@@ -307,7 +309,7 @@ function initTicket(ticketData, call) {
         'Prod. / Serv.' +
         '</strong>' +
         '</td>' +
-        '<td colspan="1" style="width: 80px">' +
+        '<td colspan="1">' +
         '<strong>' +
         'Precio unit. /' +
         '</strong>' +
@@ -398,6 +400,14 @@ function initTicket(ticketData, call) {
         '</td>' +
         '</tr>' +
         '<tr>' +
+        '<td colspan="5"> <br /> </td>' +
+        '</tr>' +
+        '<tr>' +
+        '<td colspan="5"> <strong> En cumplimiento a las disposiciones fiscales vigentes, ' +
+        'no procederán sin excepción alguna, la solicitud de facturas con ticket de fecha ' +
+        'anterior a la manifestada en el presente documento. </strong>  </td>' +
+        '</tr>' +
+        '<tr>' +
         '<td colspan="5">' +
         '_______________________________________ <br /> <br />' +
         '</td>' +
@@ -423,60 +433,155 @@ function initTicket(ticketData, call) {
         '</tbody>' +
         '</table>' +
         '</body>' +
+//        '<script type="text/javascript">' +
+//            'window.print();'+
+//        '</script>' +
         '</html>');
     });
   });
 }
 
 function createHtmlFile(html, ticketId){
-  let fs = require('fs');
-
   try{
     fs.writeFileSync(`./tickets/TicketNo_${ticketId}.html`, html);
   }catch (e){
-    console.log("Cannot write file ", e);
+    console.log("No se pudo crear el archivo ", e);
   }
 }
 
-function getTicketsElements(ticketId, call){
-  findBy('ticket_id', ticketId, 'store_movements').then(storeMovements => {
-    let objects = {
-      storeMovements : storeMovements.rows
-    };
-
-    findBy('ticket_id', ticketId, 'service_offereds').then(serviceOffereds => {
-      objects.serviceOffereds = serviceOffereds.rows;
-      return call(objects);
+function restoreStoreInventories(productId, quantity){
+    findBy('product_id', productId, 'stores_inventories').then(inventory => {
+      updateBy(
+        {
+          quantity: (inventory.rows[0].quantity + quantity)
+        },
+        'stores_inventories',
+        `id = ${inventory.rows[0].id}`
+      );
     });
+  }
 
+function deleteTicketFile(ticketId){
+  try {
+    fs.unlinkSync(`./tickets/TicketNo_${ticketId}.html`);
+  } catch (err) {
+    console.log('Error al borrar el archivo');
+  }
+}
+
+function restoreWarehousesEntries(storeMovements, storeWarehouseInfo){
+  return new Promise(function(resolve, reject){
+    let restoreCount = 0;
+    let restoreLimit = storeMovements.length;
+    storeMovements.forEach(storeMovement => {
+      let processQuantity = storeMovement.quantity;
+      restoreStoreInventories(storeMovement.product_id, storeMovement.quantity);
+      query(specialQuery(storeMovement.product_id), storeMovement.product_id).then(warehouseEntries => {
+        if (warehouseEntries.rowCount === 0) {
+          let productId = warehouseEntries.lastId;
+          let warehouseEntry = storeWarehouseInfo[productId];
+          delete warehouseEntry[`idis${productId}`];
+          delete warehouseEntry.id;
+          delete warehouseEntry.cost;
+          delete warehouseEntry.created_at;
+          delete warehouseEntry.updated_at;
+          delete warehouseEntry.store_id;
+          delete warehouseEntry.pos;
+          delete warehouseEntry.web;
+          insert(
+            Object.keys(warehouseEntry),
+            Object.values(warehouseEntry),
+            'stores_warehouse_entries'
+          ).then(() => {
+            restoreCount++;
+            if (restoreCount === restoreLimit)
+              resolve();
+          });
+        } else {
+          updateBy(
+            {
+              quantity: warehouseEntries.rows[0].quantity + processQuantity
+            },
+            'stores_warehouse_entries',
+            `id = ${warehouseEntries.rows[0].id}`
+          ).then(() => {
+            restoreCount++;
+            if (restoreCount === restoreLimit)
+              resolve();
+          });
+        }
+      });
+    });
+  });
+}
+
+
+
+function rollBackData(ticketData, call){
+  let Promise = require("bluebird");
+  let ticketId = ticketData.ticket.id;
+  Promise.each(ticketData.products.serviceOffereds, function(serviceOffered){
+    deleteBy('delivery_services', `service_offered_id = ${serviceOffered.id}`).then(() => {});
+  }).then(() => {
+    let deleteThings = ['store_movements', 'service_offereds', 'payments'];
+    Promise.each(deleteThings, function(table){
+      deleteBy(table, `ticket_id = ${ticketId}`).then(() => {});
+    }).then(() => {
+      restoreWarehousesEntries(ticketData.products.storeMovements, ticketData.storeWarehouseInfo).then(() => {
+        return call();
+      });
+    });
   });
 }
 
 function printTicket(ticketInfo, call){
+  try {
+    getTicketsElements(ticketInfo.ticket.id, function(products){
 
-  getTicketsElements(ticketInfo.ticket.id, function(products){
+      findBy('id', ticketInfo.store.delivery_address_id, 'delivery_addresses').then(deliveryAddress => {
+        ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
 
-    findBy('id', ticketInfo.store.delivery_address_id, 'delivery_addresses').then(deliveryAddress => {
-      ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
+        ticketInfo.products = products;
 
-      ticketInfo.products = products;
-
-      initTicket(ticketInfo, function(htmlContent){
-
-        createHtmlFile(htmlContent, ticketInfo.ticket.id);
-        win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
-
-        let contents = win.webContents;
-        win.webContents.on('did-finish-load', () => {
-          win.webContents.print({silent: true});
-          win = null;
-          return call();
+        let timmer = new Promise((resolve, reject) => {
+          setTimeout(function(){
+            resolve();
+//              alert('El ticket no fue generado correctamente, por favor intente de nuevo');
+//              rollBackData(ticketInfo, function(){
+//                deleteBy('tickets', `id = ${ticketData.ticket.id}`).then(() => {
+//                  deleteTicketFile(ticketData.ticket.id);
+//                  resolve();
+//                });
+//              });
+            }, 4000);
         });
 
-      });
+        timmer.then(function(){
+          //window.location.href = 'pos_sale.html';
+        });
 
-    });
+        initTicket(ticketInfo, function(htmlContent){
 
-  });
+          createHtmlFile(htmlContent, ticketInfo.ticket.id);
 
-}
+//           cmd.get(`chrome --kiosk-printing ${userHome}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketInfo.ticket.id}.html`);
+
+          win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
+
+          let contents = win.webContents;
+          win.webContents.on('did-finish-load', () => {
+            win.webContents.print({silent: true});
+            win = null;
+            return call();
+          }); // win.webContents.on
+
+        }); //initTicket
+
+      }); // findBy
+
+    }); // getTicketsElements (function)
+  } catch (err) {
+     rollBackData();
+  }
+
+} // printTicket

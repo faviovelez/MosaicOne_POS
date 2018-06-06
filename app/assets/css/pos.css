@@ -22,11 +22,58 @@
   padding-left: 0;
 }
 
+.green-truck {
+  color: #A0DB23;
+}
+
+.green-truck:hover,
+.green-truck:active,
+.green-truck:focus {
+  color: #88BF11;
+}
+
+.blue-button {
+  background-color: #00A8EA !important;
+}
+
+.center-span-completeSale {
+  text-align: center;
+}
+
+.pay-dev-group {
+  text-align: center;
+}
+
+table.ticket-selected,
+table.payments-received-on-ticket,
+table.items-returns {
+  width: 95%;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
+}
+
+table.payments-received-on-ticket {
+    margin-top: 3rem;
+}
+
+table.ticket-results {
+    width: 90%;
+    margin-left: 2.5%;
+}
+
 .list-status-table {
   position: absolute;
   top: 10%;
   margin-left: 122%;
   width: 300px;
+}
+
+a.b {
+  color: #fff;
+}
+
+.left-10 {
+  margin-left: 10px;
 }
 
 .list-status-table > tbody > tr > td > .label > a {
@@ -640,5 +687,14 @@ i.fa.fa-chevron-up.hide-payments:hover {
 div#priceList_wrapper {
     margin-top: 140px;
     margin-bottom: 50px;
-    margin-left: 30px;
+    margin-left: -50px;
+}
+
+div#priceList_paginate {
+    margin-top: -35px;
+}
+
+div#priceList_info {
+    margin-left: 100px;
+    margin-top: 50px;
 }

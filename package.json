@@ -6,8 +6,12 @@
   "description": "Application POS to MosaicOne007 desktop application",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "bluebird": "^3.5.1",
+    "cmd": "^0.1.0",
     "dotenv": "^4.0.0",
     "inputmask": "^3.3.10",
+    "lodash": "^4.17.5",
+    "node-cmd": "^3.0.0",
     "node-rest-client": "^3.1.0",
     "pg": "^7.3.0"
   },
@@ -16,8 +20,9 @@
     "dist": "build -wl"
   },
   "devDependencies": {
-    "electron": "^1.7.9",
-    "electron-builder": "^19.41.0"
+    "electron": "^1.8.4",
+    "electron-builder": "^19.41.0",
+    "electron-reload": "^1.2.2"
   },
   "build": {
     "win": {

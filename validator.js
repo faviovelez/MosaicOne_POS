@@ -21,7 +21,7 @@ function equals(val1, val2, show = true) {
     val1 === val2,
     {
       true:  'Valores iguales',
-      false: 'Error de comparación ' +
+      false: 'Las contraseñas no coinciden ' +
               `${processVal(val1, show)} ` +
               `no es igual a ${processVal(val2)}`
     }
@@ -44,7 +44,7 @@ function size(size, min) {
     size > min,
     {
       true:  'Sí tiene el mínimo requerido',
-      false: `La longuitud de la cadena no es la mínima ${min} requerida`
+      false: `El mínimo son ${min} caracteres`
     }
   );
 }
