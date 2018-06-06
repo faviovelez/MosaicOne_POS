@@ -53,6 +53,15 @@ const storeIdsTables = [
   'delivery_services'
 ];
 
+function mainIp(){
+  
+}
+
+function localIp(){
+
+}
+
+
 function runLocalQuery(q){
   return new Promise(function(resolve){
     let res;

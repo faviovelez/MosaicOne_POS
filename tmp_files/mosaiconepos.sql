@@ -2902,7 +2902,9 @@ CREATE TABLE prospects (
     pos_id integer,
     web_id integer,
     email_2 character varying,
-    email_3 character varying
+    email_3 character varying,
+    collection_active boolean,
+    discount double precision
 );
 
 
@@ -3848,7 +3850,10 @@ CREATE TABLE stores (
     initial_inventory character varying,
     current_inventory character varying,
     prospects_file character varying,
-    bill_email character varying
+    bill_email character varying,
+    collection_active boolean,
+    days_before integer,
+    days_after integer
 );
 
 
@@ -3896,7 +3901,8 @@ CREATE TABLE stores_inventories (
     date date,
     manual_price double precision,
     pos_id integer,
-    web_id integer
+    web_id integer,
+    total_cost double precision
 );
 
 
