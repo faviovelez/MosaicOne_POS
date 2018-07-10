@@ -127,7 +127,8 @@ $(function(){
         'tickets' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM tickets WHERE store_id = ${store.id} ORDER BY created_at DESC LIMIT 1`,
         'payments' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM payments WHERE store_id = ${store.id} ORDER BY created_at DESC LIMIT 1`,
         'service_offereds' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM service_offereds WHERE store_id = ${store.id} ORDER BY created_at DESC LIMIT 1`,
-        'delivery_services' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM delivery_services WHERE store_id = ${store.id} ORDER BY created_at DESC LIMIT 1`
+        'delivery_services' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM delivery_services WHERE store_id = ${store.id} ORDER BY created_at DESC LIMIT 1`,
+        'tickets_children' : `SELECT pos, web, web_id, pos_id AS id, created_at, updated_at FROM tickets_children WHERE store_id = ${store.id} ORDER BY pos_id DESC LIMIT 1`
       });
     }
 
@@ -152,7 +153,8 @@ $(function(){
     extraQueries = ` SELECT COUNT (*) as rows FROM tickets WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1 UNION ALL` +
     ` SELECT COUNT (*) as rows FROM payments WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1 UNION ALL` +
     ` SELECT COUNT (*) as rows FROM service_offereds WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1 UNION ALL` +
-    ` SELECT COUNT (*) as rows FROM delivery_services WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1`;
+    ` SELECT COUNT (*) as rows FROM delivery_services WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1` +
+    ` SELECT COUNT (*) as rows FROM tickets_children WHERE store_id = ${store.id} ORDER BY pos_id DESC LIMIT 1`;
 
     return 'SELECT SUM(rows) as total_rows FROM (' +
       ` SELECT COUNT (*) as rows FROM billing_addresses WHERE store_id = ${store.id} UNION ALL` +
