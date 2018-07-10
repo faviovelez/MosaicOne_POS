@@ -2,9 +2,10 @@ const {Pool, Client} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-//  user: 'ubuntu',
-  user: 'faviovelez',
-//  host: '34.214.130.203',
+  user: 'ubuntu',
+//  user: 'faviovelez',
+  host: '34.214.130.203',
+//  host: '35.161.3.119',
   host: 'localhost',
   database: 'mosaicone',
   password: 'bafio44741',
@@ -52,15 +53,6 @@ const storeIdsTables = [
   "tickets_children",
   'delivery_services'
 ];
-
-function mainIp(){
-  
-}
-
-function localIp(){
-
-}
-
 
 function runLocalQuery(q){
   return new Promise(function(resolve){
