@@ -248,10 +248,12 @@ function cleanPaymentInputs(){
 function getPayed(isPayed){
   if (isPayed) {
     $('.paymentProcess').addClass('hidden');
+    $('.paymentDateContainer').addClass('hidden');
     return '<span class="label label-success left-10">Pagado</span>';
   }
   else {
     $('.paymentProcess').removeClass('hidden');
+    $('.paymentDateContainer').removeClass('hidden');
     return '<span class="label label-danger left-10">Pendiente</span>';
   }
 }

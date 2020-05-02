@@ -80,7 +80,20 @@ function initTicketDevolucion(ticketData, call) {
       '<strong style="font-size: 17px;">' +
       'Diseños de Cartón <br>' +
       '</strong>' +
+
       `Sucursal ${ticketData.store.store_name} <br>` +
+      '<br>' +
+      `${ticketData.delivery.street} ` +
+      `${ticketData.delivery.exterior_number} ` +
+      `${ticketData.delivery.interior_number}, ` +
+      `Col. ${ticketData.delivery.neighborhood}, ` +
+      `${ticketData.delivery.city}, ` +
+      `${ticketData.delivery.state}, ` +
+      `C.P. ${ticketData.delivery.zipcode} <br>` +
+      '<br>' +
+      `Tel. ${ticketData.store.direct_phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2 $3") } <br>` +
+      `${ticketData.store.email} <br>` +
+      'www.disenosdecarton.com.mx <br>' +
       '<br>' +
       `${ticketData.billing_address.business_name} <br>` +
       `${ticketData.billing_address.street} ` +
@@ -97,9 +110,6 @@ function initTicketDevolucion(ticketData, call) {
       '</strong>' +
       `${ticketData.tax_regime.description} <br>` +
       '<br>' +
-      `Tel. ${ticketData.store.direct_phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2 $3") } <br>` +
-      `${ticketData.store.email} <br>` +
-      'www.disenosdecarton.com.mx <br>' +
       '_______________________________________ <br /> <br />' +
       '</td>' +
       '</tr>' +
@@ -271,23 +281,28 @@ function printTicketDevolucion(ticketInfo, call){
   const remotePraintTicketPayment = require('electron').remote;
   let winTicketPayment = null;
   winTicketPayment = new remotePraintTicketPayment.BrowserWindow({width: 800, height: 600, show: false });
-  getTicketsElements(ticketInfo.ticket.id, function(products){
-    ticketInfo.products = products;
-    findBy('id', ticketInfo.store.delivery_address_id, 'delivery_addresses').then(deliveryAddress => {
-      ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
-      initTicketDevolucion(ticketInfo, function(htmlContent){
+  query("SELECT * FROM delivery_addresses WHERE id IN (SELECT delivery_address_id FROM stores)").then(delivery_address => {
+    let delivery = delivery_address.rows[0];
+    getTicketsElements(ticketInfo.ticket.id, function(products){
+      ticketInfo.products = products;
+      ticketInfo.delivery = delivery;
+      findBy('id', ticketInfo.store.delivery_address_id, 'delivery_addresses').then(deliveryAddress => {
+        ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
+        initTicketDevolucion(ticketInfo, function(htmlContent){
 
-        createHtmlFilePayment(htmlContent, ticketInfo.ticket.id);
-        winTicketPayment.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
+          createHtmlFilePayment(htmlContent, ticketInfo.ticket.id);
+          winTicketPayment.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
 
-        let contents = win.webContents;
-        winTicketPayment.webContents.on('did-finish-load', () => {
-          winTicketPayment.webContents.print({silent: true});
-          winTicketPayment = null;
-          return call();
+          let contents = win.webContents;
+          winTicketPayment.webContents.on('did-finish-load', () => {
+            winTicketPayment.webContents.print({silent: true});
+            winTicketPayment = null;
+            return call();
+          });
+
         });
-
       });
     });
   });
+
 }

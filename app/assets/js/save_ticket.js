@@ -650,7 +650,7 @@ function specialQuery(productId){
         'THEN product_cost ' +
         'ELSE 0 ' +
         'END ' +
-      'ELSE round((price / (1 + overprice / 100) * (1 - (discount /100)))::numeric, 2) ' +
+      'ELSE round((price / (1 + (overprice / 100)) * (1 - (discount /100)))::numeric, 2) ' +
       'END ' +
     'ELSE entry_cost ' +
     'END AS cost ' +
@@ -669,7 +669,7 @@ function specialQuery(productId){
     'ELSE 0 ' +
     'END ' +
     'AS discount, ' +
-    '0 AS overprice ' +
+    'CASE WHEN stores.overprice is null THEN 0 ELSE stores.overprice END AS overprice ' +
     'FROM stores_inventories ' +
     'LEFT JOIN stores_warehouse_entries ' +
     'ON stores_warehouse_entries.product_id = stores_inventories.product_id ' +
@@ -723,6 +723,8 @@ function insertsServiceOffereds(ticketId, type, call){
 
     if (discountReason){
       data.discount_reason = discountReason;
+    } else {
+      data.discount_reason = '';
     }
 
     if ($('#prospectList a').length === 1) {
@@ -927,6 +929,7 @@ function devolucionStoreMovement(parentTicket, ticketId, call) {
           'stores_inventories',
           `id = ${inventory.rows[0].id}`
         ).then(function(){
+          storeMovementData.web_id = null;
           Object.keys(storeMovementData).forEach(function(attr){
             if (storeMovementData[attr] !== null) {
               data[attr] = storeMovementData[attr];
@@ -996,10 +999,6 @@ function assignCost(userId, ticketType, ticketId, call) {
         if ($('#prospectList a').length === 1) {
           let prospectId   = $('#prospectList a').attr('data-id');
           data.prospect_id = prospectId;
-        }
-
-        if (data.discount_reason == '') {
-          delete data.discount_reason;
         }
 
         if (entries.rowCount === 0 || ticketType === 'pending') {
@@ -1131,7 +1130,7 @@ function insertsPayments(ticketType, ticketId, userId, store, parentTicket, call
             'Otra'            : 21
           },
           data = {
-            payment_date     : clearDate(new Date()),
+            payment_date     : $('#paymentDate').val(),
             user_id          : userId,
             business_unit_id : store.business_unit_id,
             payment_form_id  : paymentJson[type],

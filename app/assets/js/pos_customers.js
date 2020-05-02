@@ -360,7 +360,7 @@ $(function(){
     return removeEmpty({
       business_name:   $('#prospect_legal_or_business_name').val(),
       type_of_person:  $('#prospect_business_type').val(),
-      rfc:             $('#prospect_billing_address_rfc').val(),
+      rfc:             $('#prospect_billing_address_rfc').val().replace(/ /g, '').replace(/-/g, '').replace(/,/g, ''),
       street:          $('#prospect_billing_address_street').val(),
       exterior_number: $('#prospect_billing_address_exterior_number').val(),
       interior_number: $('#prospect_billing_address_interior_number').val(),

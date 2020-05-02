@@ -3,10 +3,9 @@ require('dotenv').config();
 
 const remotePool = new Pool({
   user: 'ubuntu',
-//  user: 'faviovelez',
+//  user:'faviovelez',
   host: '34.214.130.203',
-//  host: '35.161.3.119',
-  host: 'localhost',
+//  host: 'localhost',
   database: 'mosaicone',
   password: 'bafio44741',
   port: 5432,

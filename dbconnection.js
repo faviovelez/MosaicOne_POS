@@ -6,7 +6,7 @@ const localPool = new Pool({
   host: 'localhost',
   database: 'mosaiconepos',
   password: 'bafio44741',
-  port: 5432,
+  port: 5432
 });
 
 localPool.on('error', function (err) {

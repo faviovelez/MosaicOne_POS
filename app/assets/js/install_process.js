@@ -107,8 +107,8 @@ $(function(){
         `id = ${store.business_group_id}`,
         'prospects': 'SELECT * FROM prospects WHERE ' +
         `store_id = ${store.id}`,
-        'products' : 'SELECT * FROM products WHERE shared = true AND current = true ' +
-        `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}`,
+        'products' : 'SELECT * FROM products WHERE ' +
+        ` (classification = 'de línea' OR classification = 'especial') AND child_id is NULL OR store_id = ${store.id}`,
         'services' : 'SELECT * FROM services WHERE ' +
         `shared = true AND current = true OR store_id = ${store.id}`,
         'stores_inventories': `SELECT ${storesInventoriesColumns()} FROM stores_inventories INNER JOIN products ` +
@@ -150,12 +150,6 @@ $(function(){
   }
 
   function getQueryCount(store){
-    extraQueries = ` SELECT COUNT (*) as rows FROM tickets WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1 UNION ALL` +
-    ` SELECT COUNT (*) as rows FROM payments WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1 UNION ALL` +
-    ` SELECT COUNT (*) as rows FROM service_offereds WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1 UNION ALL` +
-    ` SELECT COUNT (*) as rows FROM delivery_services WHERE store_id = ${store.id} ORDER BY id DESC LIMIT 1` +
-    ` SELECT COUNT (*) as rows FROM tickets_children WHERE store_id = ${store.id} ORDER BY pos_id DESC LIMIT 1`;
-
     return 'SELECT SUM(rows) as total_rows FROM (' +
       ` SELECT COUNT (*) as rows FROM billing_addresses WHERE store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores WHERE id = ${store.id} UNION ALL` +
@@ -166,8 +160,8 @@ $(function(){
       ` SELECT COUNT (*) as rows FROM cost_types WHERE id = ${store.cost_type_id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM business_groups WHERE id = ${store.business_group_id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM prospects WHERE store_id = ${store.id} UNION ALL` +
-      ' SELECT COUNT (*) as rows FROM products WHERE shared = true AND current = true AND' +
-      ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id} UNION ALL` +
+      ' SELECT COUNT (*) as rows FROM products WHERE ' +
+      ` (classification = 'de línea' OR classification = 'especial') AND child_id is NULL OR store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM services WHERE shared = true AND current = true OR store_id = ${store.id} UNION ALL` +
       ` SELECT COUNT (*) as rows FROM stores_inventories INNER JOIN products` +
       ' ON stores_inventories.product_id = products.id WHERE' +
@@ -178,7 +172,12 @@ $(function(){
       ' SELECT COUNT (*) as rows FROM cfdi_uses UNION ALL' +
       ' SELECT COUNT (*) as rows FROM banks UNION ALL' +
       ' SELECT COUNT (*) as rows FROM tax_regimes UNION ALL' +
-      ' SELECT COUNT (*) as rows FROM payment_forms' +
+      ' SELECT COUNT (*) as rows FROM payment_forms UNION ALL' +
+      ` SELECT CASE WHEN COUNT(id) > 0 THEN 1 ELSE 0 END AS rows FROM tickets WHERE store_id = ${store.id} UNION ALL` +
+      ` SELECT CASE WHEN COUNT(id) > 0 THEN 1 ELSE 0 END AS rows FROM payments WHERE store_id = ${store.id} UNION ALL` +
+      ` SELECT CASE WHEN COUNT(id) > 0 THEN 1 ELSE 0 END AS rows FROM service_offereds WHERE store_id = ${store.id} UNION ALL` +
+      ` SELECT CASE WHEN COUNT(id) > 0 THEN 1 ELSE 0 END AS rows FROM delivery_services WHERE store_id = ${store.id} UNION ALL` +
+      ` SELECT CASE WHEN COUNT(id) > 0 THEN 1 ELSE 0 END AS rows FROM tickets_children WHERE store_id = ${store.id}` +
     ') as u';
   }
 
@@ -186,8 +185,7 @@ $(function(){
     query(queryCount).then(limitCount => {
 
       count = 0;
-      limit = parseInt(limitCount.rows[0].total_rows) + 4;
-      // Se agrega 1 por cada línea en el extra queries
+      limit = parseInt(limitCount.rows[0].total_rows);
       $("#dynamic")
         .css("width", 8 + "%")
         .attr("aria-valuenow", 8)

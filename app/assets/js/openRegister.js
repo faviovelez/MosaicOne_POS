@@ -47,7 +47,7 @@ $(function(){
 
   function getQueryCount(store){
     return 'SELECT SUM(rows) as total_rows FROM (' +
-      ' SELECT COUNT (*) as rows FROM products WHERE (shared = true AND current = true AND' +
+      ' SELECT COUNT (*) as rows FROM products WHERE (' +
       ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ` +
       ` UNION ALL` +
       ` SELECT COUNT (*) as rows FROM delivery_addresses WHERE id = ${store.delivery_address_id} UNION ALL`+
@@ -68,8 +68,8 @@ $(function(){
 
   function lotQueries(store){
       return {
-        'products' : 'SELECT * FROM products WHERE (shared = true AND current = true ' +
-        `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ORDER BY id`,
+        'products' : 'SELECT * FROM products WHERE ( ' +
+        ` (classification = 'de línea' OR classification = 'especial') AND child_id is NULL OR store_id = ${store.id}) ORDER BY id`,
         'services' : 'SELECT * FROM services WHERE ' +
         `(shared = true AND current = true OR store_id = ${store.id}) ORDER BY id`,
         'delivery_addresses': 'SELECT * FROM delivery_addresses WHERE ' +
@@ -152,6 +152,18 @@ $(function(){
       });
     });
 
+  }
+
+  function updateProspectsAndBillingAddresses(store) {
+    return {
+      'destroy_query': 'DELETE FROM prospects; DELETE FROM billing_addresses;',
+      'prospects': 'SELECT * FROM prospects WHERE ' +
+      `store_id = ${store.id}`,
+      'billing_addresses': 'SELECT * FROM billing_addresses INNER JOIN business_units ON billing_addresses.id = ' +
+      'business_units.billing_address_id INNER JOIN stores ON stores.business_unit_id ' +
+      `= business_units.id WHERE stores.id = ${store.id} UNION ALL ` +
+      `SELECT * FROM billing_addresses WHERE store_id = ${store.id}`,
+    }
   }
 
   function updateProductWithThisInfo(productId, withoutPrice, storeObject){
@@ -317,25 +329,56 @@ $(function(){
   }
 
   function getQueryCountForNew(store, localIds){
-    return 'SELECT SUM(rows) as total_rows FROM (' +
-      ' SELECT COUNT (*) as rows FROM products WHERE (shared = true AND current = true AND' +
-      ` classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ` +
-      ` AND id NOT IN (${localIds.products}) UNION ALL` +
-      ` SELECT COUNT (*) as rows FROM store_movements INNER JOIN products` +
-      ' ON store_movements.product_id = products.id WHERE' +
-      ` store_movements.store_id = ${store.id} AND products.child_id IS NULL` +
-      " AND (store_movements.movement_type = 'alta automática'" +
-      " OR store_movements.movement_type = 'baja automática')" +
-      ` AND store_movements.id NOT IN (${localIds.storeMovements}) UNION ALL` +
-      ` SELECT COUNT (*) as rows FROM services WHERE (shared = true AND current = true OR store_id = ${store.id})` +
-      ` AND id NOT IN (${localIds.services}) ` +
-    ') as u';
+    if (localIds.storeMovements.length == 0) {
+      return 'SELECT SUM(rows) as total_rows FROM (' +
+        ' SELECT COUNT (*) as rows FROM products WHERE (' +
+        ` (classification = 'de línea' OR classification = 'especial') AND child_id is NULL OR store_id = ${store.id}) ` +
+        ` AND id NOT IN (${localIds.products}) UNION ALL` +
+        ` SELECT COUNT (*) as rows FROM store_movements INNER JOIN products` +
+        ' ON store_movements.product_id = products.id WHERE' +
+        ` store_movements.store_id = ${store.id} AND products.child_id IS NULL ` +
+        " AND (store_movements.movement_type = 'alta automática'" +
+        " OR store_movements.movement_type = 'baja automática')" +
+        ' UNION ALL' +
+        ` SELECT COUNT (*) as rows FROM services WHERE (shared = true AND current = true OR store_id = ${store.id})` +
+        ` AND id NOT IN (${localIds.services}) ` +
+        ') as u';
+    } else {
+      return 'SELECT SUM(rows) as total_rows FROM (' +
+        ' SELECT COUNT (*) as rows FROM products WHERE (' +
+        ` (classification = 'de línea' OR classification = 'especial') AND child_id is NULL OR store_id = ${store.id}) ` +
+        ` AND id NOT IN (${localIds.products}) UNION ALL` +
+        ` SELECT COUNT (*) as rows FROM store_movements INNER JOIN products` +
+        ' ON store_movements.product_id = products.id WHERE' +
+        ` store_movements.store_id = ${store.id} AND products.child_id IS NULL ` +
+        " AND (store_movements.movement_type = 'alta automática'" +
+        " OR store_movements.movement_type = 'baja automática')" +
+        ` AND store_movements.id NOT IN (${localIds.storeMovements}) UNION ALL` +
+        ` SELECT COUNT (*) as rows FROM services WHERE (shared = true AND current = true OR store_id = ${store.id})` +
+        ` AND id NOT IN (${localIds.services}) ` +
+        ') as u';
+    }
   }
 
   function lotQueriesForNew(store, localIds){
+    if (localIds.storeMovements.length == 0) {
       return {
-        'products' : 'SELECT * FROM products WHERE (shared = true AND current = true ' +
-        `AND classification = 'de línea' AND child_id is NULL OR store_id = ${store.id}) ` +
+        'products' : 'SELECT * FROM products WHERE ( ' +
+        `AND (classification = 'de línea' OR classification = 'especial') AND child_id is NULL OR store_id = ${store.id}) ` +
+        `AND id NOT IN (${localIds.products})`,
+        'services' : 'SELECT * FROM services WHERE ' +
+        `(shared = true AND current = true OR store_id = ${store.id})` +
+        ` AND id NOT IN (${localIds.services})`,
+        'store_movements': `SELECT store_movements.* FROM store_movements INNER JOIN products ` +
+        'ON store_movements.product_id = products.id WHERE ' +
+        `store_movements.store_id = ${store.id} AND products.child_id IS NULL ` +
+        "AND (store_movements.movement_type = 'alta automática' " +
+        "OR store_movements.movement_type = 'baja automática') "
+      };
+    } else {
+      return {
+        'products' : 'SELECT * FROM products WHERE ( ' +
+        ` (classification = 'de línea' OR classification = 'especial') AND child_id is NULL OR store_id = ${store.id}) ` +
         `AND id NOT IN (${localIds.products})`,
         'services' : 'SELECT * FROM services WHERE ' +
         `(shared = true AND current = true OR store_id = ${store.id})` +
@@ -345,9 +388,10 @@ $(function(){
         `store_movements.store_id = ${store.id} AND products.child_id IS NULL ` +
         "AND (store_movements.movement_type = 'alta automática' " +
         "OR store_movements.movement_type = 'baja automática') " +
-        `AND store_movements.id NOT IN (${localIds.storeMovements})`,
+        `AND store_movements.id NOT IN (${localIds.storeMovements})`
       };
     }
+  }
 
   function getLocalIds(){
     let localIds = {};
@@ -564,8 +608,33 @@ $(function(){
       } else if ((store_type == 4)) {
         storeType = "discount_for_franchises";
       }
+      var prospectQueries = updateProspectsAndBillingAddresses(myStoreId);
       var costUpdateQueries = updateCeroCostMovs(overPrice, storeType);
-      let unwantedDeliveries = removeUnwantedDeliveriesQuery();
+      var unwantedDeliveries = removeUnwantedDeliveriesQuery();
+
+//      'destroy_query': 'DELETE FROM prospects; DELETE FROM billing_addresses;',
+//      'prospects': 'SELECT * FROM prospects WHERE ' +
+//      `store_id = ${store.id}`,
+//      'billing_addresses': 'SELECT * FROM billing_addresses INNER JOIN business_units ON billing_addresses.id = ' +
+//      'business_units.billing_address_id INNER JOIN stores ON stores.business_unit_id ' +
+//      `= business_units.id WHERE stores.id = ${store.id} UNION ALL ` +
+//      `SELECT * FROM billing_addresses WHERE store_id = ${store.id}`,
+
+//      query(prospectQueries.destroy_query).then(() => {
+//      });
+//      query(prospectQueries.prospects).then(() => {
+//        let warehouseQuotes = Object.keys(newWarehouse).map(value => `"${value}"`).join(',');
+//        let myWarehouseQuery = `INSERT INTO stores_warehouse_entries (${warehouseQuotes}) VALUES (${Object.values(newWarehouse)}); `
+//        .replace(/,,/g,',null,').replace(/,,/g,',null,');
+//        fixWarehouseQuery += myWarehouseQuery;
+
+//      });
+//      query(prospectQueries.billing_addresses).then(() => {
+//      });
+//      query(prospectQueries.billing_addresses).then(() => {
+//      });
+//      query(prospectQueries.billing_addresses).then(() => {
+//      });
       alterQuery(costUpdateQueries.costUpdateQuery).then(() => {
         alterQuery(costUpdateQueries.totalCostUpdateQuery).then(() => {
           alterQuery(unwantedDeliveries).then(() => {
@@ -636,7 +705,17 @@ $(function(){
                           "WHERE ticket_type = 'pending' AND web_id IS null); UPDATE service_offereds " +
                           "SET service_type = 'pending', web = false WHERE ticket_id IN " +
                           "(SELECT id FROM tickets WHERE ticket_type = 'pending' AND web_id IS null); " +
-                          "UPDATE tickets SET web = false WHERE ticket_type = 'pending' AND web_id IS null";
+                          "UPDATE tickets SET web = false WHERE ticket_type = 'pending' AND web_id IS null;" +
+                          "SELECT setval('stores_warehouse_entries_id_seq', (SELECT MAX(id) FROM stores_warehouse_entries)+1); " +
+                          "SELECT setval('tickets_id_seq', (SELECT MAX(id) FROM tickets)+1); " +
+                          "SELECT setval('store_movements_id_seq', (SELECT MAX(id) FROM store_movements)+1); " +
+                          "SELECT setval('service_offereds_id_seq', (SELECT MAX(id) FROM service_offereds)+1); " +
+                          "SELECT setval('payments_id_seq', (SELECT MAX(id) FROM payments)+1); " +
+                          "SELECT setval('prospects_id_seq', (SELECT MAX(id) FROM prospects)+1); " +
+                          "SELECT setval('billing_addresses_id_seq', (SELECT MAX(id) FROM billing_addresses)+1); " +
+                          "SELECT setval('products_id_seq', (SELECT MAX(id) FROM products)+1); " +
+                          "SELECT setval('stores_inventories_id_seq', (SELECT MAX(id) FROM products)+1); " +
+                          "SELECT setval('services_id_seq', (SELECT MAX(id) FROM services)+1); " ;
     alterQuery("SELECT id, overprice, store_type_id FROM stores LIMIT 1").then(myStore => {
       var disc = "";
       var overPrice = myStore.rows[0].overprice / 100;
@@ -742,7 +821,9 @@ $(function(){
       alert('Actualizando base de datos, por favor espere un momento');
       getUpdatedInformacion(store.get('store')).then(function(){
         geInformacionForNew(store.get('store')).then(function(){
-          runFixingQueries();
+          alterQuery('DELETE FROM products WHERE id NOT IN (SELECT product_id FROM stores_inventories);').then(function(){
+            runFixingQueries();
+          });
         });
       })
     });

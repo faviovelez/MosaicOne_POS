@@ -2403,7 +2403,8 @@ CREATE TABLE payments (
     web boolean DEFAULT true,
     date date,
     pos_id integer,
-    web_id integer
+    web_id integer,
+    payment_bill_id integer
 );
 
 
@@ -3853,7 +3854,8 @@ CREATE TABLE stores (
     bill_email character varying,
     collection_active boolean,
     days_before integer,
-    days_after integer
+    days_after integer,
+    days_inventory_desired integer
 );
 
 

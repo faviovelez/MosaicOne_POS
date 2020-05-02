@@ -127,30 +127,30 @@ $(document).ready(function() {
   $('#closeDay').click(function(){
     $(this).prop( "disabled", true );
     alert('Proceso de carga iniciado');
-    createStoreObjectsLot(function(){
-      initStore().then(storage => {
-        let bcrypt = require('bcryptjs'),
-            salt = bcrypt.genSaltSync(10),
-            installCode = bcrypt.hashSync(
-              storage.get('store').install_code,
-              salt
-            );
-        sendObjects.installCode = installCode;
-        sendObjects.storeId     = storage.get('store').id;
-        let Client = require('node-rest-client').Client,
-          client = new Client(),
-          args = {
-            data: sendObjects,
-            headers: { "Content-Type": "application/json" }
-          };
-//        client.post("http://34.214.130.203/pos/received_data", args, function (data, response) {
-        client.post("http://localhost:3000/pos/received_data", args, function (data, response) {
-          delete sendObjects.installCode;
-          delete sendObjects.storeId;
-          fillSpecialIds(data.ids, data.message);
+      createStoreObjectsLot(function(){
+        initStore().then(storage => {
+          let bcrypt = require('bcryptjs'),
+              salt = bcrypt.genSaltSync(10),
+              installCode = bcrypt.hashSync(
+                storage.get('store').install_code,
+                salt
+              );
+          sendObjects.installCode = installCode;
+          sendObjects.storeId     = storage.get('store').id;
+          let Client = require('node-rest-client').Client,
+            client = new Client(),
+            args = {
+              data: sendObjects,
+              headers: { "Content-Type": "application/json" }
+            };
+            client.post("http://34.214.130.203/pos/received_data", args, function (data, response) {
+//          client.post("http://localhost:3000/pos/received_data", args, function (data, response) {
+            delete sendObjects.installCode;
+            delete sendObjects.storeId;
+            fillSpecialIds(data.ids, data.message);
+          });
         });
       });
-    });
     return false;
   });
 

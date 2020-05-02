@@ -533,10 +533,24 @@ $(function(){
           resumePayment();
         });
       });
-
+      resumePayment();
     });
 
   }
+
+  function validateTotalPayment(){
+    let type  = $('.payment-form-wrapper .selected')
+      .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
+    let paymentRest = parseFloat($('#paymentRest').text().replace("$","").replace(/,/g,"").replace(/ /g,""));
+    let currentPayment = parseFloat($('#paymentMethodCuantity').val());
+    if (type != 'Efectivo' && currentPayment > paymentRest) {
+      $('#paymentMethodCuantity').val(paymentRest);
+    }
+  }
+
+  $('#paymentMethodCuantity').on('keyup', function(){
+    validateTotalPayment();
+  });
 
   $('#activateTicket').on('shown.bs.modal', function(e) {
     let ticketId = e.relatedTarget.dataset.id;
@@ -577,7 +591,8 @@ $(function(){
     window.location.href = 'pos_sale.html';
   });
 
-  $('#ticketCancelConfirm').one( "click", function() {
+  $('#ticketCancelConfirm').on( "click", function() {
+    $('#ticketCancelConfirm').prop('disabled', true);
     let ticketId = $(this).attr('data-id');
     updateBy(
       {
@@ -585,7 +600,11 @@ $(function(){
       },
       'tickets',
       `id = ${ticketId}`
-    ).then(() => {});
+    ).then(() => {
+      $(`#ticket${ticketId}`).remove();
+      $('#ticketCancelConfirm').prop('disabled', false);
+      $('#cancelTicket').modal('hide');
+    });
   });
 
   function createFullName(user){

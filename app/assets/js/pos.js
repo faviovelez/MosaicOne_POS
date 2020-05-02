@@ -1,5 +1,17 @@
 $(document).ready(function() {
 
+  Date.prototype.yyyymmdd = function() {
+    var mm = this.getMonth() + 1;
+    var dd = this.getDate();
+
+    return [this.getFullYear() + '-',
+          (mm>9 ? '' : '0') + mm + '-',
+          (dd>9 ? '' : '0') + dd
+         ].join('');
+  };
+
+  $("#paymentDate").val(new Date().yyyymmdd());
+
   $('#changeSinglePrice').on('shown.bs.modal', function(e) {
 
     let changeSinglePriceOption = document.getElementById("changeSinglePriceInput");
@@ -7,6 +19,11 @@ $(document).ready(function() {
     im.mask(changeSinglePriceOption);
 
     $('#changeSinglePriceProductId').html(e.relatedTarget.dataset.id.replace(/_products/, '').replace(/_.*/,''));
+  });
+
+  $('#openCashDrawer').click(function(){
+    printBlank();
+    alert('Se abrió el cajón de efectivo');
   });
 
   $('#saveNewPrice').click(function(){
@@ -314,6 +331,7 @@ $(document).ready(function() {
 
             $('#warehouseEntry').modal('hide');
           });
+          alert(`Se realizó el movimiento de ${action} de inventario por ${downUpField} piezas.`);
         }
 
         if (action === 'alta'){
@@ -327,7 +345,6 @@ $(document).ready(function() {
   });
 
   function toggleProductAction(type){
-    $('#confirmAddProduct').prop('disabled', false);
     $('#addProductQuantity tr[id^=addProduct_]').remove();
     if (type === 'Baja'){
 
@@ -409,7 +426,7 @@ $(document).ready(function() {
   function validateTotalPayment(){
     let type  = $('.payment-form-wrapper .selected')
       .html().replace(/\s/g,'').replace(/.*<\/i>/,'');
-    let paymentRest = parseFloat($('#paymentRest').text().replace("$ ","").replace(/,/g,""));
+    let paymentRest = parseFloat($('#paymentRest').text().replace("$","").replace(/,/g,"").replace(/ /g,""));
     let currentPayment = parseFloat($('#paymentMethodCuantity').val());
     if (type != 'Efectivo' && currentPayment > paymentRest) {
       $('#paymentMethodCuantity').val(paymentRest);
@@ -612,118 +629,118 @@ $(document).ready(function() {
   }
 
   $('#completeSale').click(function(){
-
-    if (isPago()){
-      addPaymentToTicket();
-      return false;
-    }
-
-    if (isDevolucion()) {
-      processDevolucion();
-      return false;
-    }
-
-    let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
-
-    if (!isNaN(parseInt(restoreTicketId))){
-      updateTicketSaved(restoreTicketId);
-    }
-
-    if (validateAllServiceOfferedFill()){
-
-      if (!validateAllInputsFill()) {
-        alert('Favor de llenar todos los campos');
+    query("SELECT * FROM delivery_addresses WHERE id IN (SELECT delivery_address_id FROM stores)").then(delivery_address => {
+      let delivery = delivery_address.rows[0];
+      if (isPago()){
+        addPaymentToTicket();
         return false;
       }
 
-      $(this).prop( "disabled", true );
-      validateQuantity(function(hasInventory){
+      if (isDevolucion()) {
+        processDevolucion();
+        return false;
+      }
 
-        if (hasInventory){
+      let restoreTicketId = window.location.href.replace(/.*ticket_id=/,'');
 
-          initStore().then(store => {
-            let user      = store.get('current_user').id,
-              storeObject = store.get('store');
+      if (!isNaN(parseInt(restoreTicketId))){
+        updateTicketSaved(restoreTicketId);
+      }
 
-            ticketData = {
-              store : storeObject,
-              user  : store.get('current_user'),
-            };
-            let ticketId = null;
-            insertTicket(user, function(ticketId){
-              assignCost(user, 'venta', ticketId, function(warehouseInfo){
-                ticketData.storeWarehouseInfo = warehouseInfo;
-                insertsServiceOffereds(ticketId, 'venta', function(){
+      if (validateAllServiceOfferedFill()){
 
-                  insertsPayments('venta', ticketId, user, storeObject, null, function(){
+        if (!validateAllInputsFill()) {
+          alert('Favor de llenar todos los campos');
+          return false;
+        }
 
-                    store.set('lastTicket', parseInt(
-                      ticketId
-                    ));
+        $(this).prop( "disabled", true );
+        validateQuantity(function(hasInventory){
 
-                    saveExpenses(ticketId, function() {
+          if (hasInventory){
 
-                      query(getCashRegisterSum()).then(sumObject => {
-                        updateBy(
-                          {
-                            balance : sumObject.rows[0].sum
-                          },
-                          'cash_registers',
-                          `name = '${store.get("cash")}'`
-                        ).then(() => {
+            initStore().then(store => {
+              let user      = store.get('current_user').id,
+                storeObject = store.get('store');
+              ticketData = {
+                store : storeObject,
+                user  : store.get('current_user'),
+                delivery : delivery,
+              };
+              let ticketId = null;
+              insertTicket(user, function(ticketId){
+                assignCost(user, 'venta', ticketId, function(warehouseInfo){
+                  ticketData.storeWarehouseInfo = warehouseInfo;
+                  insertsServiceOffereds(ticketId, 'venta', function(){
 
-                          findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
-                            ticketData.cashRegister = cashRegisterObject.rows[0];
+                    insertsPayments('venta', ticketId, user, storeObject, null, function(){
 
-                            findBy(
-                              'id',
-                              storeObject.business_unit_id,
-                              'business_units'
-                            ).then(business_unit => {
+                      store.set('lastTicket', parseInt(
+                        ticketId
+                      ));
+
+                      saveExpenses(ticketId, function() {
+
+                        query(getCashRegisterSum()).then(sumObject => {
+                          updateBy(
+                            {
+                              balance : sumObject.rows[0].sum
+                            },
+                            'cash_registers',
+                            `name = '${store.get("cash")}'`
+                          ).then(() => {
+
+                            findBy('store_id', storeObject.id, 'cash_registers').then(cashRegisterObject => {
+                              ticketData.cashRegister = cashRegisterObject.rows[0];
+
                               findBy(
                                 'id',
-                                business_unit.rows[0].billing_address_id,
-                                'billing_addresses'
-                              ).then(billing_address => {
-                                ticketData.billing_address = billing_address.rows[0];
+                                storeObject.business_unit_id,
+                                'business_units'
+                              ).then(business_unit => {
                                 findBy(
                                   'id',
-                                  ticketData.billing_address.tax_regime_id,
-                                  'tax_regimes'
-                                ).then(tax_regime => {
+                                  business_unit.rows[0].billing_address_id,
+                                  'billing_addresses'
+                                ).then(billing_address => {
+                                  ticketData.billing_address = billing_address.rows[0];
+                                  findBy(
+                                    'id',
+                                    ticketData.billing_address.tax_regime_id,
+                                    'tax_regimes'
+                                  ).then(tax_regime => {
 
-                                  ticketData.tax_regime = tax_regime.rows[0];
-                                  findBy('id', ticketId, 'tickets').then(ticket => {
+                                    ticketData.tax_regime = tax_regime.rows[0];
+                                    findBy('id', ticketId, 'tickets').then(ticket => {
 
-                                    ticketData.ticket = ticket.rows[0];
+                                      ticketData.ticket = ticket.rows[0];
 
-                                    findBy('ticket_id', ticketId, 'payments').then(payments => {
-                                      addPaymentFormData(ticketData, payments.rows, function(){
-                                        printTicket(ticketData, function(){
+                                      findBy('ticket_id', ticketId, 'payments').then(payments => {
+                                        addPaymentFormData(ticketData, payments.rows, function(){
+                                          printTicket(ticketData, function(){
 
-                                          if (ticketData.cashRegister.balance >= ticketData.cashRegister.cash_alert) {
-                                            alert(`La caja tiene un saldo de ${translatePrice(ticketData.cashRegister.balance)} ` +
-                                              'pesos. Realice un retiro.');
-                                          }
-                                          let unwantedDeliveries = removeUnwantedDeliveriesQuery();
-                                          query(unwantedDeliveries).then(() => {
+                                            if (ticketData.cashRegister.balance >= ticketData.cashRegister.cash_alert) {
+                                              alert(`La caja tiene un saldo de ${translatePrice(ticketData.cashRegister.balance)} ` +
+                                                'pesos. Realice un retiro.');
+                                            }
                                             $(this).prop( "disabled", false );
                                             window.location.href = 'pos_sale.html';
+
                                           });
 
                                         });
-
                                       });
+
                                     });
 
                                   });
 
                                 });
-
                               });
-                            });
 
+                            });
                           });
+
                         });
 
                       });
@@ -734,18 +751,17 @@ $(document).ready(function() {
 
                 });
 
-              });
+              }, 'venta');
 
-            }, 'venta');
+            });
 
-          });
-
-        }
-      });
-    } else {
-      alert('Favor de llenar toda la informacion de envios');
-      $('#completeSale').prop( "disabled", false );
-    }
+          }
+        });
+      } else {
+        alert('Favor de llenar toda la informacion de envios');
+        $('#completeSale').prop( "disabled", false );
+      }
+    });
 
   });
 
@@ -906,26 +922,26 @@ $(document).ready(function() {
 
   function validateDeliveryService(call){
     let params = {
-      sender_name       : $('#delivery_service_sender_name').val(),
-      sender_zipcode    : $('#delivery_service_sender_zipcode').val(),
+//      sender_name       : $('#delivery_service_sender_name').val(),
+//      sender_zipcode    : $('#delivery_service_sender_zipcode').val(),
       tracking_number   : $('#delivery_service_tracking_number').val(),
-      receivers_name    : $('#delivery_service_receivers_name').val(),
-      contact_name      : $('#delivery_service_contact_name').val(),
-      receivers_zipcode : $('#delivery_service_receivers_zipcode').val()
+//      receivers_name    : $('#delivery_service_receivers_name').val(),
+//      contact_name      : $('#delivery_service_contact_name').val(),
+//      receivers_zipcode : $('#delivery_service_receivers_zipcode').val()
     };
 
     checkFillAll(params).then(error => {
 
       if (!error) {
-        let thisOrThatFill = thisOrThat(
-          '#delivery_service_phone',
-          '#delivery_service_cellphone'
-        );
+//        let thisOrThatFill = thisOrThat(
+//          '#delivery_service_phone',
+//          '#delivery_service_cellphone'
+//        );
 
-        if (!thisOrThatFill.result) {
-          showAlert(thisOrThatFill.type, thisOrThatFill.message, cloneAlert());
-          return call(false);
-        }
+//        if (!thisOrThatFill.result) {
+//          showAlert(thisOrThatFill.type, thisOrThatFill.message, cloneAlert());
+//          return call(false);
+//        }
         return call(true);
       }
       return call(false);
@@ -971,7 +987,7 @@ $(document).ready(function() {
             'delivery_services'
           ).then(deliveryServices => {
             let elementId = $($('#secretServiceId').val()).parents('tr').attr('id').replace('product_','');
-            $($('#secretServiceId').val()).parents('tr').append(
+            $($('#secretServiceId').val()).parents('tr').prepend(
               `<td id="deliveryServiceId${elementId}" class="hidden">` +
               `${deliveryServices.lastId}</td>`
             );
@@ -1121,6 +1137,21 @@ $(document).ready(function() {
     $(".stores_inventory_level").removeClass("hidden");
   });
 
+  $('#discountCount').on('keyup', function(){
+    discountInput = $('#discountCount').val();
+    if (parseFloat(discountInput) >= 100) {
+      discountInput = 99;
+      $('#discountCount').val(discountInput);
+    }
+  });
+
+  $('#globalDiscount input:first').on('keyup', function(){
+    discountInput = $('#globalDiscount input:first').val();
+    if (parseFloat(discountInput) >= 100) {
+      discountInput = 99;
+      $('#globalDiscount input:first').val(discountInput);
+    }
+  });
 
   $('#closeDiscount').click(function(e){
     let modalBody = $(this).parent().parent().find(
@@ -1142,6 +1173,7 @@ $(document).ready(function() {
     if (isNaN(parseFloat(discountInput))) {
       discountInput = 0;
     }
+
     $(`${tr} a[id^=discount]`).html(`${discountInput} %`);
     let total = createTotal(id, tr);
     $(`${tr} td[id=totalTo_${id}]`).html(
@@ -1157,6 +1189,7 @@ $(document).ready(function() {
     );
 
     bigTotal();
+    resumePayment();
     $('#discountRow').removeClass('hidden');
     $('#SubtotalRow').removeClass('hidden');
   });
@@ -1166,6 +1199,7 @@ $(document).ready(function() {
     let individualDiscount = document.getElementById("discountCount");
     var im = new Inputmask("decimal");
     im.mask(individualDiscount);
+
 
     let relatedObject = e.relatedTarget.dataset,
         productId     = relatedObject.id;
@@ -1210,7 +1244,7 @@ $(document).ready(function() {
       '<input type="text" class="form-control ' +
       `smaller-form" id="priceToServiceTo_${product.id}" placeholder="$ 100.00">`,
       color = product.table === 'services' ? carIcon(product.id, product.company, childCount) :
-        product.color
+        product.color;
 
     return `<tr id="product_${product.id}" data-child-count="${childCount}"><td id="infoTableName" class="hidden">${product.table}</td><td>` +
       '<div class="close-icon">' +
@@ -1261,10 +1295,252 @@ $(document).ready(function() {
 
       let lastTicket = 0;
 
-      query("SELECT COALESCE(MAX(id), 0) FROM tickets").then(ticket_number => {
+      query(
+        "SELECT COALESCE(MAX(id), 0) FROM tickets; "
+      ).then(ticket_number => {
         lastTicket = ticket_number.rows[0].coalesce;
         $('#ticketNum').html(
           ` ${lastTicket + 1} `
+        );
+      }).then(anotherProcess => {
+        query(
+          'DELETE FROM store_movements WHERE id IN ('+
+            'SELECT id FROM (' +
+              'SELECT * FROM (' +
+                'SELECT store_movements.id, web FROM store_movements ' +
+                'INNER JOIN (' +
+                  'SELECT id, ticket_number, created_at FROM (' +
+                    'SELECT id, ticket_number, created_at, ' +
+                    'ROW_NUMBER() OVER (partition BY ticket_number ORDER BY id ASC) AS rnum ' +
+                    'FROM tickets ' +
+                    'WHERE total IS NOT null) t ' +
+                  'WHERE t.rnum <= 1 ' +
+                ') filtered ' +
+                'ON store_movements.ticket_id = filtered.id ' +
+                'WHERE store_movements.created_at < filtered.created_at ' +
+                'AND ABS(filtered.created_at::date - store_movements.created_at::date) <=1 ' +
+              ') movements_new ' +
+            'WHERE web IS null ' +
+            ') ids_movements ' +
+          '); ' +
+          'DELETE FROM payments WHERE id IN ('+
+            'SELECT id FROM (' +
+              'SELECT * FROM (' +
+                'SELECT payments.id, web FROM payments ' +
+                'INNER JOIN (' +
+                  'SELECT id, ticket_number, created_at FROM (' +
+                    'SELECT id, ticket_number, created_at, ' +
+                    'ROW_NUMBER() OVER (partition BY ticket_number ORDER BY id ASC) AS rnum ' +
+                    'FROM tickets ' +
+                    'WHERE total IS NOT null) t ' +
+                  'WHERE t.rnum <= 1 ' +
+                ') filtered ' +
+                'ON payments.ticket_id = filtered.id ' +
+                'WHERE payments.created_at < filtered.created_at ' +
+                'AND ABS(filtered.created_at::date - payments.created_at::date) <=1 ' +
+              ') movements_new ' +
+            'WHERE web IS null ' +
+            ') ids_payments ' +
+          '); ' +
+          'DELETE FROM service_offereds WHERE id IN ('+
+            'SELECT id FROM (' +
+              'SELECT * FROM (' +
+                'SELECT service_offereds.id, web FROM service_offereds ' +
+                'INNER JOIN (' +
+                  'SELECT id, ticket_number, created_at FROM (' +
+                    'SELECT id, ticket_number, created_at, ' +
+                    'ROW_NUMBER() OVER (partition BY ticket_number ORDER BY id ASC) AS rnum ' +
+                    'FROM tickets ' +
+                    'WHERE total IS NOT null) t ' +
+                  'WHERE t.rnum <= 1 ' +
+                ') filtered ' +
+                'ON service_offereds.ticket_id = filtered.id ' +
+                'WHERE service_offereds.created_at < filtered.created_at ' +
+                'AND ABS(filtered.created_at::date - service_offereds.created_at::date) <=1 ' +
+              ') movements_new ' +
+            'WHERE web IS null ' +
+            ') ids_services ' +
+          '); ' +
+
+          "UPDATE tickets SET web = true, ticket_type = 'cancelado' WHERE id IN (" +
+            'SELECT id FROM tickets WHERE ticket_number IN (' +
+             'SELECT CASE WHEN (' +
+              'SELECT COUNT (*) as frecuencia FROM tickets WHERE ticket_number IN (' +
+               'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+              ') ' +
+             ')  > 1 THEN (' +
+	            'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+             ') ' +
+             'ELSE (' +
+              '0 ' +
+             ') ' +
+            'END AS this_output ' +
+          ') AND id NOT IN (' +
+          'SELECT id FROM (' +
+          'SELECT id, ticket_number, ABS(ROUND(SUM(ticket_total - (movs + services))::numeric, 2)) AS difference FROM (' +
+          'SELECT tickets.id, ticket_number, COALESCE(tickets.total, 0) AS ticket_total, ' +
+          'SUM(DISTINCT COALESCE(store_movements.total, 0)) AS movs, ' +
+          'SUM(DISTINCT COALESCE(service_offereds.total, 0)) AS services ' +
+          'FROM tickets ' +
+          'LEFT JOIN store_movements ON store_movements.ticket_id = tickets.id ' +
+          'LEFT JOIN service_offereds ON service_offereds.ticket_id = tickets.id ' +
+           'WHERE tickets.id IN (' +
+            'SELECT id FROM tickets WHERE ticket_number IN (' +
+             'SELECT CASE WHEN (' +
+              'SELECT COUNT (*) as frecuencia FROM tickets WHERE ticket_number IN (' +
+               'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+               ') ' +
+              ')  > 1 THEN (' +
+              'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+              ') ' +
+             'ELSE ( ' +
+              '0 ' +
+             ') ' +
+             'END AS this_ticket ' +
+           ') ' +
+          ') ' +
+          'GROUP BY tickets.id, ticket_number ' +
+          ') new_table ' +
+          'GROUP BY id, ticket_number, ticket_total ' +
+          ') dif_table ' +
+          'ORDER BY difference LIMIT 1 ' +
+          ') ' +
+          '); ' +
+
+          "UPDATE store_movements SET web = true, movement_type = 'cancelado' WHERE ticket_id IN (" +
+            'SELECT id FROM tickets WHERE ticket_number IN (' +
+             'SELECT CASE WHEN (' +
+              'SELECT COUNT (*) as frecuencia FROM tickets WHERE ticket_number IN (' +
+               'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+              ') ' +
+             ')  > 1 THEN (' +
+	            'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+             ') ' +
+             'ELSE (' +
+              '0 ' +
+             ') ' +
+            'END AS this_output ' +
+          ') AND id NOT IN (' +
+          'SELECT id FROM (' +
+          'SELECT id, ticket_number, ABS(ROUND(SUM(ticket_total - (movs + services))::numeric, 2)) AS difference FROM (' +
+          'SELECT tickets.id, ticket_number, COALESCE(tickets.total, 0) AS ticket_total, ' +
+          'SUM(DISTINCT COALESCE(store_movements.total, 0)) AS movs, ' +
+          'SUM(DISTINCT COALESCE(service_offereds.total, 0)) AS services ' +
+          'FROM tickets ' +
+          'LEFT JOIN store_movements ON store_movements.ticket_id = tickets.id ' +
+          'LEFT JOIN service_offereds ON service_offereds.ticket_id = tickets.id ' +
+           'WHERE tickets.id IN (' +
+            'SELECT id FROM tickets WHERE ticket_number IN (' +
+             'SELECT CASE WHEN (' +
+              'SELECT COUNT (*) as frecuencia FROM tickets WHERE ticket_number IN (' +
+               'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+               ') ' +
+              ')  > 1 THEN (' +
+              'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+              ') ' +
+             'ELSE ( ' +
+              '0 ' +
+             ') ' +
+             'END AS this_ticket ' +
+           ') ' +
+          ') ' +
+          'GROUP BY tickets.id, ticket_number ' +
+          ') new_table ' +
+          'GROUP BY id, ticket_number, ticket_total ' +
+          ') dif_table ' +
+          'ORDER BY difference LIMIT 1 ' +
+          ') ' +
+          '); ' +
+
+          "UPDATE service_offereds SET web = true, service_type = 'cancelado' WHERE ticket_id IN (" +
+            'SELECT id FROM tickets WHERE ticket_number IN (' +
+             'SELECT CASE WHEN (' +
+              'SELECT COUNT (*) as frecuencia FROM tickets WHERE ticket_number IN (' +
+               'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+              ') ' +
+             ')  > 1 THEN (' +
+	            'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+             ') ' +
+             'ELSE (' +
+              '0 ' +
+             ') ' +
+            'END AS this_output ' +
+          ') AND id NOT IN (' +
+          'SELECT id FROM (' +
+          'SELECT id, ticket_number, ABS(ROUND(SUM(ticket_total - (movs + services))::numeric, 2)) AS difference FROM (' +
+          'SELECT tickets.id, ticket_number, COALESCE(tickets.total, 0) AS ticket_total, ' +
+          'SUM(DISTINCT COALESCE(store_movements.total, 0)) AS movs, ' +
+          'SUM(DISTINCT COALESCE(service_offereds.total, 0)) AS services ' +
+          'FROM tickets ' +
+          'LEFT JOIN store_movements ON store_movements.ticket_id = tickets.id ' +
+          'LEFT JOIN service_offereds ON service_offereds.ticket_id = tickets.id ' +
+           'WHERE tickets.id IN (' +
+            'SELECT id FROM tickets WHERE ticket_number IN (' +
+             'SELECT CASE WHEN (' +
+              'SELECT COUNT (*) as frecuencia FROM tickets WHERE ticket_number IN (' +
+               'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+               ') ' +
+              ')  > 1 THEN (' +
+              'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+              ') ' +
+             'ELSE ( ' +
+              '0 ' +
+             ') ' +
+             'END AS this_ticket ' +
+           ') ' +
+          ') ' +
+          'GROUP BY tickets.id, ticket_number ' +
+          ') new_table ' +
+          'GROUP BY id, ticket_number, ticket_total ' +
+          ') dif_table ' +
+          'ORDER BY difference LIMIT 1 ' +
+          ') ' +
+          '); ' +
+
+          "UPDATE payments SET web = true, payment_type = 'cancelado' WHERE ticket_id IN (" +
+            'SELECT id FROM tickets WHERE ticket_number IN (' +
+             'SELECT CASE WHEN (' +
+              'SELECT COUNT (*) as frecuencia FROM tickets WHERE ticket_number IN (' +
+               'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+              ') ' +
+             ')  > 1 THEN (' +
+	            'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+             ') ' +
+             'ELSE (' +
+              '0 ' +
+             ') ' +
+            'END AS this_output ' +
+          ') AND id NOT IN (' +
+          'SELECT id FROM (' +
+          'SELECT id, ticket_number, ABS(ROUND(SUM(ticket_total - (movs + services))::numeric, 2)) AS difference FROM (' +
+          'SELECT tickets.id, ticket_number, COALESCE(tickets.total, 0) AS ticket_total, ' +
+          'SUM(DISTINCT COALESCE(store_movements.total, 0)) AS movs, ' +
+          'SUM(DISTINCT COALESCE(service_offereds.total, 0)) AS services ' +
+          'FROM tickets ' +
+          'LEFT JOIN store_movements ON store_movements.ticket_id = tickets.id ' +
+          'LEFT JOIN service_offereds ON service_offereds.ticket_id = tickets.id ' +
+           'WHERE tickets.id IN (' +
+            'SELECT id FROM tickets WHERE ticket_number IN (' +
+             'SELECT CASE WHEN (' +
+              'SELECT COUNT (*) as frecuencia FROM tickets WHERE ticket_number IN (' +
+               'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+               ') ' +
+              ')  > 1 THEN (' +
+              'SELECT COALESCE(MAX(ticket_number), 0) FROM tickets ' +
+              ') ' +
+             'ELSE ( ' +
+              '0 ' +
+             ') ' +
+             'END AS this_ticket ' +
+           ') ' +
+          ') ' +
+          'GROUP BY tickets.id, ticket_number ' +
+          ') new_table ' +
+          'GROUP BY id, ticket_number, ticket_total ' +
+          ') dif_table ' +
+          'ORDER BY difference LIMIT 1 ' +
+          ') ' +
+          '); ' 
         );
       });
 
@@ -1303,6 +1579,7 @@ $(document).ready(function() {
                 productAddChange(suggestion)
               );
 
+              $('#confirmAddProduct').prop('disabled', false);
               let selector = document.getElementById("addProductInput");
               var im = new Inputmask("99999999");
               im.mask(selector);
@@ -1313,7 +1590,14 @@ $(document).ready(function() {
         $('#mainProductSearch').autocomplete({
           lookup: list,
           onSelect: function (suggestion) {
-            $('#ticketList').append(addTr(suggestion));
+            $('#ticketList').prepend(addTr(suggestion));
+
+            if (suggestion.table === 'services') {
+              let servicePrice = document.getElementById(`priceToServiceTo_${suggestion.id}`);
+              let im = new Inputmask("decimal");
+              im.mask(servicePrice);
+            }
+
             let childCount = $(`tr[id^=product_${suggestion.id}`).length;
             addEvents(suggestion.id, childCount);
             let selector = $(`input[id^=cuantityTo_${suggestion.id}]`);
@@ -1326,6 +1610,15 @@ $(document).ready(function() {
 
     });
   })();
+
+  $("#cashRegisterClose").click(function () {
+    let unwantedDeliveries = removeUnwantedDeliveriesQuery();
+    query(unwantedDeliveries).then(() => {});
+  });
+
+  $('#warehouseEntry').on('shown.bs.modal', function () {
+    $('#confirmAddProduct').prop('disabled', true);
+  });
 
   /* Métodos para descuentos*/
 
@@ -1360,6 +1653,7 @@ $(document).ready(function() {
 
 /* Métodos para cambiar botón de tipo de ventas*/
   $("#change-option").click(function () {
+    $('.paymentDateContainer').addClass('hidden');
     $('#mainProductSearch').val('');
     $('#completeSale').addClass('hidden');
     $('#completeSale').html('Completar cambio');
@@ -1417,6 +1711,7 @@ $(document).ready(function() {
   });
 
   $("#sale-option").click(function () {
+    $('.paymentDateContainer').addClass('hidden');
     window.location = 'pos_sale.html';
     cleanRows();
     $('#mainProductSearch').val('');
@@ -1466,6 +1761,7 @@ $(document).ready(function() {
   });
 
   $("#estimate-option").click(function () {
+    $('.paymentDateContainer').addClass('hidden');
     cleanRows();
     $('#mainProductSearch').val('');
     $('.discount-group').removeClass('hidden');

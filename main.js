@@ -98,7 +98,7 @@ app.on('ready', () => {
   });
 
   mainWindow.setResizable(false);
-  mainWindow.webContents.openDevTools();
+//  mainWindow.webContents.openDevTools();
 
   hasUser().then(res => {
     if (res) {

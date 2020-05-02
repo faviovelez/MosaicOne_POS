@@ -167,17 +167,18 @@ function createTicketProductList(productList, discount, call){
           '</span>' +
           '<span>' +
           `${object.product.unique_code} ` +
-          '</span>' +
-          '<span>' +
-          `${object.product.description} ${object.product.only_measure} ` +
-          '</span>' +
+          `${object.product.description} `;
+          if (table != 'services') {
+            ticketList += `${object.product.only_measure} `;
+          }
+          ticketList += '</span>' +
           '</td>' +
           '<td colspan="1" style="width: 80px; text-align: right; vertical-align:text-top" >' +
           `$ ${object.initial_price.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
           '</tr>';
         if (object.discount_applied > 0){
           ticketList += '<tr>' +
-            `<td colspan="3" style="text-align:left"> ${((1 - (object.final_price / object.initial_price)) * 100).toFixed(0)} % de descuento </td>` +
+            `<td colspan="3" style="text-align:left"> ${((1 - (object.final_price / object.initial_price)) * 100).toFixed(2)} % de descuento </td>` +
             `<td colspan="1" style="text-align:right; vertical-align:text-top; min-width:100px"> -$ ${object.discount_applied.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")} </td>` +
             '</tr>';
         }
@@ -232,6 +233,13 @@ function createPaymentFormList(payments, call){
 }
 
 function initTicket(ticketData, call) {
+
+  if (ticketData.store.store_type_id == 1) {
+    var storeTypeString = 'Matriz 333 162 1401';
+  } else {
+    var storeTypeString = '';
+  }
+
   createTicketProductList(ticketData.products, ticketData.ticket.discount_applied, function(productsCad, deliveriesCad){
     createPaymentFormList(ticketData.payments, function(paymentsCad){
       return call('<!DOCTYPE html>' +
@@ -248,13 +256,36 @@ function initTicket(ticketData, call) {
         '<body style="margin:0 auto !important; padding:0 auto !important">' +
         '<table style="font-family: Arial; font-size: 11px; width: 65mm; text-align: center; vertical-align:text-top">' +
         '<tbody>' +
+
+        '<tr>' +
+          '<td colspan="4">' +
+            '<img src="../logo-disenos-decarton.png" style="width: 65mm;" alt="Logo Diseños de Cartón">' +
+          '</td>' +
+        '</tr>' +
+
         '<tr>' +
         '<td colspan="4">' +
         '<strong style="font-size: 17px;">' +
-        'Diseños de Cartón <br>' +
+//        'Diseños de Cartón <br>' +
         '</strong>' +
         `Sucursal ${ticketData.store.store_name} <br>` +
         '<br>' +
+        `${ticketData.delivery.street} ` +
+        `${ticketData.delivery.exterior_number} ` +
+        `${ticketData.delivery.interior_number}, ` +
+        `Col. ${ticketData.delivery.neighborhood}, ` +
+        `${ticketData.delivery.city}, ` +
+        `${ticketData.delivery.state}, ` +
+        `C.P. ${ticketData.delivery.zipcode} <br>` +
+        '<br>' +
+        `Tel. ${ticketData.store.direct_phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2 $3") } <br>` +
+        `${ticketData.store.email} <br>` +
+        'www.disenosdecarton.com.mx <br>' +
+        '<strong>' +
+        `${storeTypeString} <br>` +
+        '</strong>' +
+        '<br>' +
+
         `${ticketData.billing_address.business_name} <br>` +
         `${ticketData.billing_address.street} ` +
         `${ticketData.billing_address.exterior_number} ` +
@@ -270,9 +301,6 @@ function initTicket(ticketData, call) {
         '</strong>' +
         `${ticketData.tax_regime.description} <br>` +
         '<br>' +
-        `Tel. ${ticketData.store.direct_phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2 $3") } <br>` +
-        `${ticketData.store.email} <br>` +
-        'www.disenosdecarton.com.mx <br>' +
         '_______________________________________ <br /> <br />' +
         '</td>' +
         '</tr>' +
@@ -430,6 +458,17 @@ function initTicket(ticketData, call) {
         '<tr>' +
         '<td><br /><br /></td>' +
         '</tr>' +
+
+        '<tr>' +
+          '<td colspan="4">' +
+//            '<img src="../Censo2020_Espacios_reducidos_6.jpg" style="width: 65mm;" alt="Logo INEGI">' +
+          '</td>' +
+        '</tr>' +
+
+        '<tr>' +
+        '<td><br /><br /></td>' +
+        '</tr>' +
+
         '</tbody>' +
         '</table>' +
         '</body>' +
@@ -515,7 +554,35 @@ function restoreWarehousesEntries(storeMovements, storeWarehouseInfo){
   });
 }
 
+function blankHTML() {
+  return '<!DOCTYPE html>' +
+  '<html lang="es">' +
+  '<head>' +
+  '<meta charset="UTF-8">' +
+  '<title> </title>' +
+  '<style type="text/css">' +
+  '@media print{' +
+  '@page { size:3mm auto; margin-left: 0mm !important; margin-right: 0mm !important; font-family: Arial; font-size: 11px text-align: center; vertical-align:text-top}' +
+  '}' +
+  '</style>' +
+  '</head>' +
+  '<body style="margin:0 auto !important; padding:0 auto !important">' +
+  '<tbody>' +
+  '<p>  </p>' +
+  '</body>' +
+  '</html>';
+}
 
+function printBlank() {
+  let htmlContent = blankHTML();
+  win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
+  let contents = win.webContents;
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.print({silent: true});
+    win = null;
+    window.location.href = 'pos_sale.html';
+  });
+}
 
 function rollBackData(ticketData, call){
   let Promise = require("bluebird");
@@ -537,14 +604,13 @@ function rollBackData(ticketData, call){
 function printTicket(ticketInfo, call){
   try {
     getTicketsElements(ticketInfo.ticket.id, function(products){
-
       findBy('id', ticketInfo.store.delivery_address_id, 'delivery_addresses').then(deliveryAddress => {
         ticketInfo.store.deliveryAddress = deliveryAddress.rows[0];
 
         ticketInfo.products = products;
 
         let timmer = new Promise((resolve, reject) => {
-          setTimeout(function(){
+//          setTimeout(function(){
             resolve();
 //              alert('El ticket no fue generado correctamente, por favor intente de nuevo');
 //              rollBackData(ticketInfo, function(){
@@ -553,7 +619,7 @@ function printTicket(ticketInfo, call){
 //                  resolve();
 //                });
 //              });
-            }, 4000);
+//            }, 4000);
         });
 
         timmer.then(function(){
@@ -564,7 +630,7 @@ function printTicket(ticketInfo, call){
 
           createHtmlFile(htmlContent, ticketInfo.ticket.id);
 
-//           cmd.get(`chrome --kiosk-printing ${userHome}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketInfo.ticket.id}.html`);
+//          cmd.get(`chrome --kiosk-printing ${userHome}/AppData/Local/Programs/MosaicOne_POS/tickets/TicketNo_${ticketInfo.ticket.id}.html`);
 
           win.loadURL("data:text/html;charset=utf-8," + encodeURI(htmlContent));
 

@@ -579,13 +579,21 @@
         </span>
       </div><!-- /input-group -->
 
-      <input type="text" class="form-control higher-form process-sale paymentProcess" placeholder="Comentarios"><br /><br />
+      <input type="text" class="form-control higher-form process-sale paymentProcess" placeholder="Comentarios"><br />
+
+      <div class="paymentDateContainer hidden">
+        <input type="date" class="form-control center" id="paymentDate"><br /><br />
+      </div>
+
+      <div class="openCashDrawerContainer">
+        <button class="btn btn-default color-button pos-main-btn" type="button" id="openCashDrawer">Abrir cajón</button>
+      </div>
 
     </div> <!-- Termina right-container  -->
   </div><!-- Termina page-container  -->
 
 <!-- Inicia mini Modal para cambiar descuento individual -->
- <div class="modal fade" id="discountChange" tabindex="-1" role="dialog">
+ <div class="modal fade" id="discountChange" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
    <div class="modal-dialog discount-change-modal" role="document">
      <div class="modal-content">
        <div class="modal-header">
@@ -714,7 +722,7 @@
 <!-- Termina Modal para mostrar detalles del producto -->
 
 <!-- Inicia mini Modal para cambiar descuento individual -->
- <div class="modal fade" id="ticketDiscountChange" tabindex="-1" role="dialog">
+ <div class="modal fade" id="ticketDiscountChange" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
    <div class="modal-dialog discount-change-modal" role="document">
      <div class="modal-content">
        <div class="modal-header">
@@ -832,7 +840,7 @@
    <!-- Termina mini Modal para confirmar si desea cancelar el ticket -->
 
   <!-- Inicia Modal para registrar datos de envío -->
-   <div class="modal fade" id="deliveryService" tabindex="-1" role="dialog">
+   <div class="modal fade" id="deliveryService" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
      <div class="modal-dialog" role="document">
        <div class="modal-content">
          <div class="modal-header">
@@ -865,18 +873,18 @@
                    <td>
                      <input placeholder="Número de guía" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[tracking_number]" id="delivery_service_tracking_number" />
                    </td>
+                   <!-- se quitó a partir de aquí la clase gray-background -->
                    <td>
-                     <input placeholder="Nombre completo" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[sender_name]" id="delivery_service_sender_name" />
+                     <input placeholder="Nombre completo" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[sender_name]" id="delivery_service_sender_name" />
                    </td>
                    <td>
-                     <input placeholder="Código postal" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[sender_zipcode]" id="delivery_service_sender_zipcode" />
+                     <input placeholder="Código postal" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[sender_zipcode]" id="delivery_service_sender_zipcode" />
                    </td>
                  </tr>
                </tbody>
              </table>
 
               <h4 class="title-margin-modal"> Destinatario </h4>
-
               <table class="delivery-services-table">
                 <thead>
                   <tr>
@@ -894,13 +902,13 @@
                 <tbody>
                   <tr>
                     <td>
-                      <input placeholder="Nombre o razón social" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[receivers_name]" id="delivery_service_receivers_name" />
+                      <input placeholder="Nombre o razón social" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[receivers_name]" id="delivery_service_receivers_name" />
                     </td>
                     <td>
-                      <input placeholder="Nombre completo" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[contact_name]" id="delivery_service_contact_name" />
+                      <input placeholder="Nombre completo" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[contact_name]" id="delivery_service_contact_name" />
                     </td>
                     <td>
-                      <input placeholder="Código postal" class="form-control round-form transparent-field gray-background" type="text" value="" name="delivery_service[receivers_zipcode]" id="delivery_service_receivers_zipcode" />
+                      <input placeholder="Código postal" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[receivers_zipcode]" id="delivery_service_receivers_zipcode" />
                     </td>
                   </tr>
                 </tbody>
@@ -993,11 +1001,12 @@
                      <td>
                        <input placeholder="Correo electrónico" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[email]" id="delivery_service_email" />
                      </td>
+                     <!-- se quitó a partir de aquí la clase blue-background -->
                      <td>
-                       <input placeholder="Celular" class="form-control round-form transparent-field blue-background" type="text" value="" name="delivery_service[cellphone]" id="delivery_service_cellphone" />
+                       <input placeholder="Celular" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[cellphone]" id="delivery_service_cellphone" />
                      </td>
                      <td>
-                       <input placeholder="Teléfono fijo" class="form-control round-form transparent-field blue-background" type="text" value="" name="delivery_service[phone]" id="delivery_service_phone" />
+                       <input placeholder="Teléfono fijo" class="form-control round-form transparent-field" type="text" value="" name="delivery_service[phone]" id="delivery_service_phone" />
                      </td>
                    </tr>
                  </tbody>
@@ -1052,7 +1061,7 @@
    <!-- Termina Modal para registrar datos de envío -->
 
    <!-- Inicia Modal para registrar clientes -->
-    <div class="modal fade" id="newProspect" tabindex="-1" role="dialog">
+    <div class="modal fade" id="newProspect" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -1078,7 +1087,7 @@
     <!-- Termina Modal para registrar clientes -->
 
     <!-- Inicia Modal para alta de productos -->
-     <div class="modal fade" id="warehouseEntry" tabindex="-1" role="dialog">
+     <div class="modal fade" id="warehouseEntry" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
        <div class="modal-dialog" role="document">
          <div class="modal-content">
            <div class="modal-header">
@@ -1154,7 +1163,7 @@
    <!-- Termina Modal para para alerta de retiro de efectivo -->
 
    <!-- Inicia mini Modal para cambiar precios individuales -->
-    <div class="modal fade" id="changeSinglePrice" tabindex="-1" role="dialog">
+    <div class="modal fade" id="changeSinglePrice" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
       <div class="modal-dialog price-change-modal" role="document">
         <div class="modal-content">
           <div class="modal-header">
