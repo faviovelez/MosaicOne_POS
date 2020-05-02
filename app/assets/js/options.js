@@ -1,11 +1,35 @@
 $(document).ready(function() {
 
+  const Inputmask = require('inputmask');
+
   function getCashRegisterSum(){
     return 'SELECT (SUM((SELECT COALESCE(SUM(deposits.amount),0) as d FROM deposits)) ' +
-      '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
-      'SUM((SELECT (COALESCE(SUM(payments.total),0)) as s ' +
-      'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
-      "WHERE payment_type = 'pago' AND payment_form_id = 1 AND ticket_type = 'venta'))) as sum";
+          '- SUM((SELECT COALESCE(SUM(withdrawals.amount),0) as w FROM withdrawals)) + ' +
+          'SUM((SELECT (COALESCE(SUM(' +
+          "CASE WHEN payments.payment_type = 'pago' AND payments.payment_form_id = 1 THEN payments.total " +
+          "WHEN payments.payment_type = 'devolución' AND payments.payment_form_id = 1 THEN -payments.total " +
+          'ELSE 0 ' +
+          'END ' +
+          '),0)) as s ' +
+          'FROM payments INNER JOIN tickets ON tickets.id = payments.ticket_id ' +
+          "WHERE (tickets.ticket_type != 'pending' AND payments.payment_form_id = 1)))) as sum";
+  }
+
+  function cloneAlert(){
+    let alerts = $('.alert').length + 1;
+    $('.alerts-container').prepend(
+      `<div class="alert" id="alertNo_${alerts}" hidden>` +
+      `${$('.alert').html()} </div>`
+    );
+    return $('.alert:first').attr('id');
+  }
+
+  function showAlert(type, message, alertId){
+    $(`#${alertId} span.title`).html(`${type}: ${message}`);
+    $(`#${alertId}`)
+      .show()
+      .addClass('alert-danger')
+      .removeClass('hidden');
   }
 
   async function initStore(){
@@ -47,7 +71,7 @@ $(document).ready(function() {
     );
   }
 
-  /* $('#changePasswordAction').click(function(){
+  $('#changePasswordAction').click(function(){
     let validatePassword = passwordValidation();
 
     if (!validatePassword.result) {
@@ -69,10 +93,11 @@ $(document).ready(function() {
         });
       } else {
         showAlert('Error', 'Favor de llenar todos los campos', cloneAlert());
+        return false;
       }
     }
-    
-  }); */
+    return false;
+  });
 
   $('#createCashAlert').click(function(){
     initStore().then(storage => {
@@ -91,11 +116,22 @@ $(document).ready(function() {
   });
 
   $('#addTerminalSave').click(function(){
+
+    let debitComission = parseFloat($('#debit_comission').val());
+    if (isNaN(debitComission)) {
+      debitComission = 0;
+    }
+
+    let creditComission = parseFloat($('#credit_comission').val());
+    if (isNaN(creditComission)) {
+      creditComission = 0;
+    }
+
     let data = {
       name             : $('#terminal_name').val(),
       number           : $('#new_terminal_number').val(),
-      debit_comission  : $('#debit_comission').val(),
-      credit_comission : $('#credit_comission').val()
+      debit_comission  : debitComission,
+      credit_comission : creditComission
     };
 
     insert(
@@ -113,6 +149,11 @@ $(document).ready(function() {
   });
 
   $("#cashAlert").click(function () {
+
+    let cashAlertOption = document.getElementById("register_open_initial_cash");
+    var im = new Inputmask("decimal");
+    im.mask(cashAlertOption);
+
     $(this).addClass('active-list');
     $('#registerColaborator').removeClass('active-list');
     $('#addTerminal').removeClass('active-list');
@@ -133,12 +174,20 @@ $(document).ready(function() {
   });
 
   $('#registerCashDeposit').click(function(){
+
+    let amountToRegister = parseFloat($('#new_cash_deposit_amount').val());
+    if (isNaN(amountToRegister)) {
+      amountToRegister = 0;
+    }
+
     initStore().then(storage => {
       let data = {
         user_id          : storage.get('current_user').id,
-        amount           : parseFloat($('#new_cash_deposit_amount').val()),
+        amount           : amountToRegister,
         cash_register_id : parseInt($('.cashRegisterOptions').val()),
-        name             : $('#new_cash_deposit_description').val()
+        name             : $('#new_cash_deposit_description').val(),
+        pos              : true,
+        web              : false
       };
 
       insert(
@@ -154,12 +203,19 @@ $(document).ready(function() {
   });
 
   $('#registerCashWithdrawal').click(function(){
+    let amountToRegister = parseFloat($('#new_cash_withdrawal_amount').val());
+    if (isNaN(amountToRegister)) {
+      amountToRegister = 0;
+    }
+
     initStore().then(storage => {
       let data = {
         user_id          : storage.get('current_user').id,
-        amount           : parseFloat($('#new_cash_withdrawal_amount').val()),
+        amount           : amountToRegister,
         cash_register_id : parseInt($('.cashRegisterOptions').val()),
-        name             : $('#new_cash_withdrawal_description').val()
+        name             : $('#new_cash_withdrawal_description').val(),
+        pos              : true,
+        web              : false
       };
 
       insert(
@@ -182,6 +238,7 @@ $(document).ready(function() {
     });
 
     getAll('users').then(usersList => {
+      $('#usersOptionsList option').remove();
       usersList.rows.forEach(user => {
         $('#usersOptionsList').append(
           `<option value="${user.id}">${createFullName(user)}</option>`
@@ -205,6 +262,11 @@ $(document).ready(function() {
   })();
 
   $("#registerDeposit").click(function () {
+
+    let deposit = document.getElementById("new_cash_deposit_amount");
+    var im = new Inputmask("decimal");
+    im.mask(deposit);
+
     $(this).addClass('active-list');
     $('#registerColaborator').removeClass('active-list');
     $('#addTerminal').removeClass('active-list');
@@ -225,6 +287,11 @@ $(document).ready(function() {
   });
 
   $("#registerWithdrawal").click(function () {
+
+    let withdraw = document.getElementById("new_cash_withdrawal_amount");
+    var im = new Inputmask("decimal");
+    im.mask(withdraw);
+
     $(this).addClass('active-list');
     $('#registerColaborator').removeClass('active-list');
     $('#addTerminal').removeClass('active-list');
@@ -285,6 +352,16 @@ $(document).ready(function() {
   });
 
   $("#addTerminal").click(function () {
+
+    let debitCom = document.getElementById("debit_comission");
+    var im = new Inputmask("decimal");
+    im.mask(debitCom);
+
+
+    let creditCom = document.getElementById("credit_comission");
+    var im = new Inputmask("decimal");
+    im.mask(creditCom);
+
     $(this).addClass('active-list');
     $('#registerColaborator').removeClass('active-list');
     $('#cashAlert').removeClass('active-list');

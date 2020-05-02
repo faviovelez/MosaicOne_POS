@@ -26,7 +26,13 @@ async function addUser(params){
     data.push(params[attr]);
   });
 
-  return insert(columns, data, 'users');
+  return new Promise(function(resolve, reject){
+    insert(columns, data, 'users').then( userData => {
+      findBy('id', userData.lastId, 'users').then(userResult => {
+          resolve(userResult.rows[0]);
+      });
+    });
+  });
 
 }
 
