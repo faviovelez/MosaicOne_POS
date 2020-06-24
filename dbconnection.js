@@ -93,10 +93,10 @@ async function runQuery(q, client, lastId, table){
 async function query(q, lastId = 0, table = '') {
   //let timmer = setInterval(async function(){
     let client = new Client({
-      user: 'faviovelez',
+      user: 'user',
       host: 'localhost',
-      database: 'mosaiconepos',
-      password: 'bafio44741',
+      database: 'dbpos',
+      password: 'password',
       port: 5432,
     });
 
