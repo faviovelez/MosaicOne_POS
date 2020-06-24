@@ -95,10 +95,13 @@ app.on('ready', () => {
     icon:   'app/assets/img/business.png',
     height: 768,
     width: 1266
+//    webPreferences: {
+//      nodeIntegration: true
+//    }
   });
 
   mainWindow.setResizable(false);
-//  mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   hasUser().then(res => {
     if (res) {

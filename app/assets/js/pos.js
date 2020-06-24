@@ -1540,7 +1540,7 @@ $(document).ready(function() {
           ') dif_table ' +
           'ORDER BY difference LIMIT 1 ' +
           ') ' +
-          '); ' 
+          '); '
         );
       });
 
