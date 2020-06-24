@@ -2,18 +2,18 @@ const {Pool, Client} = require('pg');
 require('dotenv').config();
 
 const remotePool = new Pool({
-  user:'faviovelez',
+  user:'user',
   host: 'localhost',
-  database: 'mosaicone',
-  password: 'bafio44741',
+  database: 'dbhost',
+  password: 'password',
   port: 5432,
 });
 
 const localPool = new Pool({
-  user: 'faviovelez',
+  user: 'user',
   host: 'localhost',
-  database: 'mosaiconepos',
-  password: 'bafio44741',
+  database: 'dbpos',
+  password: 'password',
   port: 5432,
 });
 
@@ -56,10 +56,10 @@ function runLocalQuery(q){
     let res;
 
     let client = new Client({
-      user: 'faviovelez',
+      user: 'user',
       host: 'localhost',
-      database: 'mosaiconepos',
-      password: 'bafio44741',
+      database: 'dbpos',
+      password: 'password',
       port: 5432,
     });
 
