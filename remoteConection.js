@@ -157,10 +157,10 @@ async function alterRunQuery(q, client, lastId, table){
 
 async function alterQuery(q, lastId = 0, table = '') {
   let client = new Client({
-    user: 'faviovelez',
+    user: 'user',
     host: 'localhost',
-    database: 'mosaiconepos',
-    password: 'bafio44741',
+    database: 'dbpos',
+    password: 'password',
     port: 5432,
   });
 
